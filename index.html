@@ -1,1 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智控电商 · 运营后台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/common.css">
+    <script src="js/auth.js"></script>
+    <script>
+        // ⚠️ 页面级守卫：必须在 <head> 尽早执行，防止后台内容闪现
+        requireLogin();
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #eef2f8;
+            color: #0a1a2b;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
+        /* ===== 左侧导航 ===== */
+        .sidebar {
+            width: 220px;
+            background: #0a1e2f;
+            color: #b8cfe0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 20px rgba(10, 30, 47, 0.08);
+            z-index: 100;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+        .sidebar .logo {
+            padding: 22px 20px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar .logo i {
+            font-size: 26px;
+            color: #4dabf7;
+            background: rgba(77, 171, 247, 0.12);
+            padding: 8px;
+            border-radius: 12px;
+        }
+        .sidebar .logo span {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .sidebar .logo .badge {
+            font-size: 10px;
+            background: #4dabf7;
+            color: #0a1e2f;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .sidebar .nav { flex: 1; padding: 16px 12px 20px; }
+        .sidebar .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #5a7f99;
+            padding: 14px 12px 6px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .sidebar .section-label:first-of-type { margin-top: 0; }
+        .sidebar .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: #9bb4cc;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-bottom: 2px;
+            position: relative;
+            user-select: none;
+        }
+        .sidebar .item i {
+            width: 18px;
+            font-size: 15px;
+            text-align: center;
+            color: #5a7f99;
+            transition: 0.15s;
+        }
+        .sidebar .item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #d4e4f0;
+        }
+        .sidebar .item:hover i { color: #7aaed9; }
+        .sidebar .item.active {
+            background: rgba(77, 171, 247, 0.12);
+            color: #fff;
+        }
+        .sidebar .item.active i { color: #4dabf7; }
+        .sidebar .item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 3px;
+            background: #4dabf7;
+            border-radius: 0 4px 4px 0;
+        }
+        .sidebar .item .tag {
+            margin-left: auto;
+            background: rgba(77, 171, 247, 0.15);
+            color: #4dabf7;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .sidebar .bottom {
+            padding: 16px 20px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+            color: #5a7f99;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar .bottom i { font-size: 16px; }
+
+        /* ===== 主内容区 ===== */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: 100vh;
+        }
+        .topbar {
+            background: #fff;
+            padding: 14px 28px;
+            border-bottom: 1px solid #e8edf4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .topbar .left h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .topbar .left p {
+            font-size: 12px;
+            color: #5f7d95;
+            margin-top: 2px;
+        }
+        .topbar .right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .topbar .right .btn {
+            padding: 6px 16px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.1s;
+            user-select: none;
+        }
+        .topbar .right .btn:hover {
+            background: #f5f9fe;
+            border-color: #4dabf7;
+        }
+        .topbar .right .btn i { color: #5f7d95; }
+        .topbar .right .btn:hover i { color: #4dabf7; }
+        .topbar .right .btn-danger:hover {
+            background: #fde8ed;
+            border-color: #b51a3f;
+            color: #b51a3f;
+        }
+        .topbar .right .btn-danger:hover i { color: #b51a3f; }
+        .topbar .right .user-badge {
+            padding: 6px 14px 6px 6px;
+            border-radius: 30px;
+            background: #f0f7fe;
+            border: 1px solid #dce5ef;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #1e3a5f;
+            font-weight: 500;
+        }
+        .topbar .right .user-badge .avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #4dabf7;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ===== iframe 容器 ===== */
+        .content-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #eef2f8;
+            display: block;
+        }
+
+        /* ===== 加载遮罩 ===== */
+        .frame-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #5f7d95;
+            font-size: 14px;
+            display: none;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .frame-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .frame-loading.show { display: block; }
+        .frame-loading i { margin-right: 8px; color: #4dabf7; }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar .logo span,
+            .sidebar .logo .badge,
+            .sidebar .item span,
+            .sidebar .section-label,
+            .sidebar .bottom span,
+            .sidebar .item .tag { display: none; }
+            .sidebar .logo { padding: 16px 12px; justify-content: center; }
+            .sidebar .logo i { font-size: 20px; padding: 6px; }
+            .sidebar .item { justify-content: center; padding: 12px; }
+            .sidebar .item i { font-size: 18px; width: auto; }
+            .sidebar .bottom { justify-content: center; }
+            .topbar { padding: 12px 16px; }
+            .topbar .left h2 { font-size: 15px; }
+            .topbar .right .btn span { display: none; }
+            .topbar .right .user-badge span { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== 左侧导航 ===== -->
+<div class="sidebar">
+    <div class="logo">
+        <i class="fas fa-bolt"></i>
+        <span>智控电商</span>
+        <span class="badge">v3.0</span>
+    </div>
+    <div class="nav">
+        <div class="section-label">AI 智能赋能</div>
+        <div class="item active"
+             data-page="pages/ai_assistant.html"
+             data-title="AI 助手"
+             data-desc="自然语言驱动的经营操作">
+            <i class="fas fa-robot"></i><span>AI 助手</span>
+        </div>
+
+        <div class="section-label">内容与素材</div>
+        <div class="item"
+             data-page="pages/images.html"
+             data-title="图片素材"
+             data-desc="素材管理 · AI 生成">
+            <i class="fas fa-images"></i><span>图片素材</span>
+        </div>
+        <div class="item"
+             data-page="pages/素材生成.html"
+             data-title="素材生成"
+             data-desc="AI 生成商品主图 / 详情 / 视频">
+            <i class="fas fa-magic"></i><span>素材生成</span>
+        </div>
+
+        <div class="section-label">商品与交易</div>
+        <div class="item"
+             data-page="pages/商品管理.html"
+             data-title="商品管理"
+             data-desc="跨平台商品发布 · 库存同步">
+            <i class="fas fa-box"></i><span>商品管理</span>
+        </div>
+        <div class="item"
+             data-page="pages/渠道货源.html"
+             data-title="渠道货源"
+             data-desc="1688 / 供应链选品 · 一键铺货">
+            <i class="fas fa-plug"></i><span>渠道货源</span>
+        </div>
+        <div class="item"
+             data-page="pages/智能采购系统.html"
+             data-title="智能采购"
+             data-desc="AI 驱动的采购决策">
+            <i class="fas fa-cart-plus"></i><span>智能采购</span>
+        </div>
+        <div class="item"
+             data-page="pages/智能物流管理.html"
+             data-title="智能物流"
+             data-desc="全链路物流追踪 · 智能调度">
+            <i class="fas fa-truck"></i><span>智能物流</span>
+        </div>
+
+        <div class="section-label">系统</div>
+        <div class="item"
+             data-page="pages/logs.html"
+             data-title="操作日志"
+             data-desc="系统操作记录审计">
+            <i class="fas fa-history"></i><span>操作日志</span>
+        </div>
+    </div>
+    <div class="bottom">
+        <i class="fas fa-shield-alt"></i>
+        <span>数据加密 · 安全</span>
+    </div>
+</div>
+
+<!-- ===== 主内容区 ===== -->
+<div class="main">
+    <!-- 顶栏 -->
+    <div class="topbar">
+        <div class="left">
+            <h2 id="pageTitle">
+                <i class="fas fa-robot" style="color:#4dabf7;"></i> AI 助手
+            </h2>
+            <p id="pageDesc">自然语言驱动的经营操作</p>
+        </div>
+        <div class="right">
+            <span class="user-badge">
+                <span class="avatar" id="userAvatar">A</span>
+                <span id="currentUser">admin</span>
+            </span>
+            <span class="btn" id="refreshBtn" title="刷新当前页面">
+                <i class="fas fa-sync-alt"></i><span> 刷新</span>
+            </span>
+            <span class="btn" id="openNewBtn" title="在新窗口打开">
+                <i class="fas fa-external-link-alt"></i><span> 新窗口</span>
+            </span>
+            <span class="btn btn-danger" id="logoutBtn" title="退出登录">
+                <i class="fas fa-sign-out-alt"></i><span> 退出</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- iframe 容器 -->
+    <div class="frame-wrap">
+        <div class="frame-loading" id="frameLoading">
+            <i class="fas fa-spinner fa-spin"></i> 页面加载中...
+        </div>
+        <iframe id="contentFrame"
+                class="content-frame"
+                src="pages/ai_assistant.html"
+                name="contentFrame"></iframe>
+    </div>
+</div>
+
+<script src="js/common.js"></script>
+<script>
+    /* ============================================================
+       index.html 主控脚本
+       ============================================================ */
+
+    var frame       = document.getElementById('contentFrame');
+    var pageTitle   = document.getElementById('pageTitle');
+    var pageDesc    = document.getElementById('pageDesc');
+    var frameLoading = document.getElementById('frameLoading');
+    var currentPage = 'pages/ai_assistant.html';
+
+    /* ===== 1. 显示当前用户 ===== */
+    (function initUser() {
+        var user = getCurrentUser();
+        document.getElementById('currentUser').textContent = user;
+        document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+    })();
+
+    /* ===== 2. 导航点击切换 ===== */
+    document.querySelectorAll('.sidebar .item').forEach(function (item) {
+        item.addEventListener('click', function () {
+            // 高亮
+            document.querySelectorAll('.sidebar .item').forEach(function (i) {
+                i.classList.remove('active');
+            });
+            this.classList.add('active');
+
+            // 读取数据
+            var page  = this.dataset.page;
+            var title = this.dataset.title;
+            var desc  = this.dataset.desc;
+
+            currentPage = page;
+
+            // 更新顶栏
+            pageTitle.innerHTML = '<i class="fas fa-circle" style="color:#4dabf7;font-size:8px;"></i> ' + title;
+            pageDesc.textContent = desc;
+
+            // 显示加载中
+            frameLoading.classList.add('show');
+
+            // 切换 iframe
+            frame.src = page;
+
+            // 同步 URL hash
+            location.hash = '#/' + page;
+        });
+    });
+
+    /* ===== 3. iframe 加载完成 ===== */
+    frame.addEventListener('load', function () {
+        frameLoading.classList.remove('show');
+    });
+
+    /* ===== 4. 刷新按钮 ===== */
+    document.getElementById('refreshBtn').addEventListener('click', function () {
+        frameLoading.classList.add('show');
+        // 用时间戳强制重载，避免缓存
+        var sep = frame.src.indexOf('?') > -1 ? '&' : '?';
+        frame.src = frame.src.split('?')[0] + '?_t=' + Date.now();
+        showToast('🔄 已刷新当前页面');
+    });
+
+    /* ===== 5. 新窗口打开 ===== */
+    document.getElementById('openNewBtn').addEventListener('click', function () {
+        window.open(currentPage, '_blank');
+    });
+
+    /* ===== 6. 退出登录 ===== */
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+        if (confirm('确定要退出登录吗？')) {
+            doLogout();
+        }
+    });
+
+    /* ===== 7. 监听子页面 postMessage ===== */
+    window.addEventListener('message', function (e) {
+        var data = e.data || {};
+
+        // 子页面想改父标题
+        if (data.type === 'title') {
+            pageTitle.innerHTML = '<i class="fas fa-circle" style="color:#4dabf7;font-size:8px;"></i> ' + data.value;
+        }
+        // 子页面想弹全局 toast
+        if (data.type === 'toast') {
+            showToast(data.value);
+        }
+        // 子页面想跳转其它板块
+        if (data.type === 'navigate' && data.page) {
+            document.querySelectorAll('.sidebar .item').forEach(function (i) {
+                if (i.dataset.page === data.page) {
+                    i.click();
+                }
+            });
+        }
+    });
+
+    /* ===== 8. 根据 hash 恢复页面 ===== */
+    window.addEventListener('DOMContentLoaded', function () {
+        var hash = location.hash.replace('#/', '');
+        if (hash && hash !== currentPage) {
+            var matched = false;
+            document.querySelectorAll('.sidebar .item').forEach(function (i) {
+                if (i.dataset.page === hash) {
+                    i.click();
+                    matched = true;
+                }
+            });
+            if (!matched) {
+                // hash 无效则回到默认页
+                location.hash = '#/' + currentPage;
+            }
+        }
+
+        // 显示欢迎提示
+        showToast('👋 欢迎回来，' + getCurrentUser());
+    });
+
+    /* ===== 9. 快捷键（可选） ===== */
+    document.addEventListener('keydown', function (e) {
+        // Ctrl + R 刷新 iframe
+        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+            e.preventDefault();
+            document.getElementById('refreshBtn').click();
+        }
+    });
+</script>
+</body>
+</html>
