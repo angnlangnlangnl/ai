@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智控电商 · 运营后台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 登录状态管理，必须在 <head> 尽早执行 -->
     <script src="js/auth.js"></script>
     <script>
-        // ⚠️ 页面级守卫：必须在 <head> 尽早执行，防止后台内容闪现
+        // ⚠️ 页面级守卫：未登录直接跳 login.html
         requireLogin();
     </script>
     <style>
@@ -36,6 +37,7 @@
             z-index: 100;
         }
         .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
         .sidebar::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.15);
             border-radius: 10px;
@@ -58,6 +60,7 @@
             font-size: 18px;
             font-weight: 700;
             color: #fff;
+            letter-spacing: 0.5px;
         }
         .sidebar .logo .badge {
             font-size: 10px;
@@ -76,7 +79,9 @@
             color: #5a7f99;
             padding: 14px 12px 6px;
             font-weight: 600;
+            margin-top: 4px;
         }
+        .sidebar .section-label:first-of-type { margin-top: 0; }
         .sidebar .item {
             display: flex;
             align-items: center;
@@ -137,7 +142,6 @@
             align-items: center;
             gap: 10px;
         }
-        .sidebar .bottom i { font-size: 16px; }
 
         /* ===== 主内容区 ===== */
         .main {
@@ -196,16 +200,13 @@
             background: #f5f9fe;
             border-color: #4dabf7;
         }
-        .topbar .right .btn i { color: #5f7d95; }
-        .topbar .right .btn:hover i { color: #4dabf7; }
         .topbar .right .btn-danger:hover {
             background: #fde8ed;
             border-color: #b51a3f;
             color: #b51a3f;
         }
-        .topbar .right .btn-danger:hover i { color: #b51a3f; }
         .topbar .right .user-badge {
-            padding: 4px 14px 4px 4px;
+            padding: 6px 14px 6px 6px;
             border-radius: 30px;
             background: #f0f7fe;
             border: 1px solid #dce5ef;
@@ -273,11 +274,8 @@
             z-index: 9999;
             white-space: nowrap;
         }
-        .toast.show {
-            display: block;
-            animation: toastIn 0.3s ease;
-        }
-        @keyframes toastIn {
+        .toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp {
             from { opacity: 0; transform: translateX(-50%) translateY(20px); }
             to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
@@ -305,7 +303,7 @@
 </head>
 <body>
 
-<!-- ===== 左侧导航 ===== -->
+<!-- ===== 左侧导航（16 个板块） ===== -->
 <div class="sidebar">
     <div class="logo">
         <i class="fas fa-bolt"></i>
@@ -313,12 +311,77 @@
         <span class="badge">v3.0</span>
     </div>
     <div class="nav">
+
+        <!-- ========== 1. 经营总览 ========== -->
         <div class="section-label">经营总览</div>
         <div class="item active"
+             data-page="pages/dashboard.html"
+             data-title="数据总览"
+             data-desc="全渠道经营数据概览">
+            <i class="fas fa-chart-pie"></i><span>数据总览</span>
+        </div>
+        <div class="item"
+             data-page="pages/diagnosis.html"
+             data-title="店铺经营诊断"
+             data-desc="AI 驱动的经营决策 · 智能预测">
+            <i class="fas fa-stethoscope"></i><span>店铺经营诊断</span>
+        </div>
+        <div class="item"
+             data-page="pages/competitor.html"
+             data-title="同行竞品分析"
+             data-desc="竞品价格监控 · 销量趋势">
+            <i class="fas fa-eye"></i><span>同行竞品分析</span>
+        </div>
+
+        <!-- ========== 2. 交易核心 ========== -->
+        <div class="section-label">交易核心</div>
+        <div class="item"
+             data-page="pages/orders.html"
+             data-title="订单管理"
+             data-desc="全渠道订单统一管理">
+            <i class="fas fa-shopping-cart"></i><span>订单管理</span><span class="tag">23</span>
+        </div>
+        <div class="item"
+             data-page="pages/商品管理.html"
+             data-title="商品管理"
+             data-desc="跨平台商品发布 · 库存同步">
+            <i class="fas fa-box"></i><span>商品管理</span>
+        </div>
+        <div class="item"
+             data-page="pages/inventory.html"
+             data-title="库存管理"
+             data-desc="多平台库存实时同步 · 防超卖">
+            <i class="fas fa-warehouse"></i><span>库存管理</span>
+        </div>
+
+        <!-- ========== 3. AI 智能赋能 ========== -->
+        <div class="section-label">AI 智能赋能</div>
+        <div class="item"
              data-page="pages/ai_assistant.html"
              data-title="AI 助手"
              data-desc="自然语言驱动的经营操作">
             <i class="fas fa-robot"></i><span>AI 助手</span>
+        </div>
+        <div class="item"
+             data-page="pages/ai_service.html"
+             data-title="AI 客服"
+             data-desc="全平台客服消息统一接入">
+            <i class="fas fa-headset"></i><span>AI 客服</span><span class="tag">NEW</span>
+        </div>
+        <div class="item"
+             data-page="pages/customer.html"
+             data-title="客资聚合"
+             data-desc="跨平台客户合并 · 360°画像">
+            <i class="fas fa-users"></i><span>客资聚合</span><span class="tag">89</span>
+        </div>
+
+        <!-- ========== 4. 运营支持 ========== -->
+        <div class="section-label">运营支持</div>
+        <div class="item"
+             data-page="pages/logistics.html"
+             data-title="物流管理"
+             data-desc="全链路物流追踪 · 智能调度">
+            <i class="fas fa-truck"></i><span>物流管理</span>
         </div>
         <div class="item"
              data-page="pages/images.html"
@@ -326,22 +389,6 @@
              data-desc="素材管理 · AI 生成">
             <i class="fas fa-images"></i><span>图片素材</span>
         </div>
-        <div class="item"
-             data-page="pages/logs.html"
-             data-title="操作日志"
-             data-desc="系统操作记录审计">
-            <i class="fas fa-history"></i><span>操作日志</span>
-        </div>
-
-        <div class="section-label">商品与交易</div>
-        <div class="item"
-             data-page="pages/商品管理.html"
-             data-title="商品管理"
-             data-desc="跨平台商品发布 · 库存同步">
-            <i class="fas fa-box"></i><span>商品管理</span>
-        </div>
-
-        <div class="section-label">运营支持</div>
         <div class="item"
              data-page="pages/素材生成.html"
              data-title="素材生成"
@@ -358,14 +405,30 @@
              data-page="pages/智能采购系统.html"
              data-title="智能采购"
              data-desc="AI 驱动的采购决策">
-            <i class="fas fa-cart-plus"></i><span>智能采购</span>
+            <i class="fas fa-cart-plus"></i><span>智能采购</span><span class="tag">NEW</span>
+        </div>
+
+        <!-- ========== 5. 系统配置 ========== -->
+        <div class="section-label">系统配置</div>
+        <div class="item"
+             data-page="pages/channels.html"
+             data-title="渠道管理"
+             data-desc="各平台店铺授权 · API 监控">
+            <i class="fas fa-network-wired"></i><span>渠道管理</span>
         </div>
         <div class="item"
-             data-page="pages/智能物流管理.html"
-             data-title="智能物流"
-             data-desc="全链路物流追踪 · 智能调度">
-            <i class="fas fa-truck"></i><span>智能物流</span>
+             data-page="pages/logs.html"
+             data-title="操作日志"
+             data-desc="系统操作记录审计">
+            <i class="fas fa-history"></i><span>操作日志</span>
         </div>
+        <div class="item"
+             data-page="pages/settings.html"
+             data-title="系统设置"
+             data-desc="账户 · 通知 · 同步 · AI 配置">
+            <i class="fas fa-cog"></i><span>系统设置</span>
+        </div>
+
     </div>
     <div class="bottom">
         <i class="fas fa-shield-alt"></i>
@@ -378,9 +441,9 @@
     <div class="topbar">
         <div class="left">
             <h2 id="pageTitle">
-                <i class="fas fa-robot" style="color:#4dabf7;"></i> AI 助手
+                <i class="fas fa-chart-pie" style="color:#4dabf7;"></i> 数据总览
             </h2>
-            <p id="pageDesc">自然语言驱动的经营操作</p>
+            <p id="pageDesc">全渠道经营数据概览</p>
         </div>
         <div class="right">
             <span class="user-badge">
@@ -406,12 +469,12 @@
         </div>
         <iframe id="contentFrame"
                 class="content-frame"
-                src="pages/ai_assistant.html"
+                src="pages/dashboard.html"
                 name="contentFrame"></iframe>
     </div>
 </div>
 
-<!-- Toast 容器 -->
+<!-- Toast -->
 <div id="toast" class="toast"></div>
 
 <script>
@@ -423,14 +486,13 @@
     var pageTitle    = document.getElementById('pageTitle');
     var pageDesc     = document.getElementById('pageDesc');
     var frameLoading = document.getElementById('frameLoading');
-    var currentPage  = 'pages/ai_assistant.html';
+    var currentPage  = 'pages/dashboard.html';
 
     /* ===== 1. 显示当前用户 ===== */
     (function initUser() {
         var user = getCurrentUser();
         document.getElementById('currentUser').textContent = user;
-        document.getElementById('userAvatar').textContent =
-            (user.charAt(0) || 'A').toUpperCase();
+        document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
     })();
 
     /* ===== 2. 导航点击切换 ===== */
@@ -450,8 +512,7 @@
             currentPage = page;
 
             // 更新顶栏
-            pageTitle.innerHTML =
-                '<i class="fas fa-circle" style="color:#4dabf7;font-size:8px;"></i> ' + title;
+            pageTitle.innerHTML = '<i class="fas fa-circle" style="color:#4dabf7;font-size:8px;"></i> ' + title;
             pageDesc.textContent = desc;
 
             // 显示加载中
@@ -470,11 +531,11 @@
         frameLoading.classList.remove('show');
     });
 
-    /* ===== 4. 刷新按钮（带时间戳，避免缓存） ===== */
+    /* ===== 4. 刷新按钮 ===== */
     document.getElementById('refreshBtn').addEventListener('click', function () {
         frameLoading.classList.add('show');
-        var base = frame.src.split('?')[0];
-        frame.src = base + '?_t=' + Date.now();
+        var sep = frame.src.indexOf('?') > -1 ? '&' : '?';
+        frame.src = frame.src.split('?')[0] + '_t=' + Date.now();
         showToast('🔄 已刷新当前页面');
     });
 
@@ -494,16 +555,12 @@
     window.addEventListener('message', function (e) {
         var data = e.data || {};
 
-        // 子页面想改父标题
         if (data.type === 'title') {
-            pageTitle.innerHTML =
-                '<i class="fas fa-circle" style="color:#4dabf7;font-size:8px;"></i> ' + data.value;
+            pageTitle.innerHTML = '<i class="fas fa-circle" style="color:#4dabf7;font-size:8px;"></i> ' + data.value;
         }
-        // 子页面想弹全局 toast
         if (data.type === 'toast') {
             showToast(data.value);
         }
-        // 子页面想跳转其它板块
         if (data.type === 'navigate' && data.page) {
             document.querySelectorAll('.sidebar .item').forEach(function (i) {
                 if (i.dataset.page === data.page) {
@@ -539,9 +596,10 @@
                 location.hash = '#/' + currentPage;
             }
         }
+        showToast('👋 欢迎回来，' + getCurrentUser());
     });
 
-    /* ===== 10. Ctrl+R 刷新 iframe（不刷新整个页面） ===== */
+    /* ===== 10. Ctrl+R 刷新 iframe ===== */
     document.addEventListener('keydown', function (e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
             e.preventDefault();
