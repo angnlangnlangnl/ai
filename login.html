@@ -1,1 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 · 智控电商</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a1e2f 0%, #1a3a5a 50%, #0a1e2f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
 
+        /* 背景装饰 */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+        body::before {
+            width: 500px; height: 500px;
+            background: #4dabf7;
+            top: -200px; left: -200px;
+        }
+        body::after {
+            width: 400px; height: 400px;
+            background: #7b4fa0;
+            bottom: -150px; right: -150px;
+        }
+
+        /* 登录卡片 */
+        .login-box {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            padding: 44px 40px 36px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.35);
+            animation: boxIn 0.5s ease;
+        }
+        @keyframes boxIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .login-logo i {
+            font-size: 32px;
+            color: #4dabf7;
+            background: rgba(77, 171, 247, 0.12);
+            padding: 12px;
+            border-radius: 16px;
+        }
+        .login-logo span {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0a1e2f;
+            letter-spacing: 0.5px;
+        }
+
+        .login-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #0a1e2f;
+            margin-top: 18px;
+        }
+        .login-subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: #5f7d95;
+            margin-top: 4px;
+            margin-bottom: 28px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0a1e2f;
+            margin-bottom: 6px;
+        }
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .input-wrap input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 1px solid #dce5ef;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fafcfe;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .input-wrap input:focus {
+            outline: none;
+            border-color: #4dabf7;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #0a1e2f;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .login-btn:hover { background: #1a3a5a; }
+        .login-btn:active { transform: scale(0.98); }
+        .login-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .login-error {
+            background: #fde8ed;
+            color: #b51a3f;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .login-error.show { display: flex; animation: shake 0.3s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .login-footer {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid #e8edf4;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.8;
+        }
+        .login-footer .hint {
+            background: #f0f7fe;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: #2a7faa;
+            font-size: 12px;
+            margin-top: 10px;
+            display: inline-block;
+            text-align: left;
+        }
+        .login-footer .hint b { color: #0a1e2f; }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #5f7d95;
+        }
+        .remember-row label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .remember-row a {
+            color: #4dabf7;
+            text-decoration: none;
+        }
+        .remember-row a:hover { text-decoration: underline; }
+
+        @media (max-width: 480px) {
+            .login-box { padding: 32px 24px 28px; }
+            .login-logo span { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <div class="login-logo">
+        <i class="fas fa-bolt"></i>
+        <span>智控电商</span>
+    </div>
+    <div class="login-title">欢迎回来 👋</div>
+    <div class="login-subtitle">登录后进入运营后台 · v3.0</div>
+
+    <div class="login-error" id="loginError">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="loginErrorText">账号或密码错误</span>
+    </div>
+
+    <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="form-group">
+            <label>账号</label>
+            <div class="input-wrap">
+                <i class="fas fa-user"></i>
+                <input type="text" id="username" placeholder="请输入账号" autocomplete="username" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>密码</label>
+            <div class="input-wrap">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="请输入密码" autocomplete="current-password" required>
+            </div>
+        </div>
+
+        <div class="remember-row">
+            <label>
+                <input type="checkbox" id="remember" checked>
+                记住账号
+            </label>
+            <a href="javascript:showToast('请联系管理员重置密码')">忘记密码？</a>
+        </div>
+
+        <button type="submit" class="login-btn" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i> 登 录
+        </button>
+    </form>
+
+    <div class="login-footer">
+        数据加密 · 安全登录
+        <div class="hint">
+            <b>演示账号</b><br>
+            账号：<b>admin</b> / 密码：<b>123456</b><br>
+            账号：<b>yunshan</b> / 密码：<b>yunshan2026</b>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/auth.js"></script>
+<script>
+    /* ===== 已登录则直接进后台 ===== */
+    redirectIfLoggedIn();
+
+    /* ===== 处理登录 ===== */
+    function handleLogin(e) {
+        e.preventDefault();
+        var btn = document.getElementById('loginBtn');
+        var err = document.getElementById('loginError');
+        var errText = document.getElementById('loginErrorText');
+
+        var username = document.getElementById('username').value.trim();
+        var password = document.getElementById('password').value;
+
+        // 按钮 loading
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
+
+        // 模拟网络延迟
+        setTimeout(function () {
+            var result = doLogin(username, password);
+
+            if (result.ok) {
+                // 记住账号
+                if (document.getElementById('remember').checked) {
+                    localStorage.setItem('aicontrol_last_user', username);
+                } else {
+                    localStorage.removeItem('aicontrol_last_user');
+                }
+
+                err.classList.remove('show');
+                btn.innerHTML = '<i class="fas fa-check"></i> 登录成功，正在跳转...';
+
+                setTimeout(function () {
+                    location.href = 'index.html';
+                }, 500);
+            } else {
+                errText.textContent = result.msg;
+                err.classList.add('show');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登 录';
+            }
+        }, 600);
+    }
+
+    /* ===== 回填上次登录账号 ===== */
+    window.addEventListener('DOMContentLoaded', function () {
+        var last = localStorage.getItem('aicontrol_last_user');
+        if (last) document.getElementById('username').value = last;
+    });
+
+    /* ===== 简易 Toast ===== */
+    function showToast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+    }
+
+    /* ===== Toast 样式（内联） ===== */
+    var style = document.createElement('style');
+    style.textContent = `
+        .toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f; color: #fff;
+            padding: 12px 28px; border-radius: 40px;
+            font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none; z-index: 9999; white-space: nowrap;
+        }
+        .toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+</body>
+</html>
