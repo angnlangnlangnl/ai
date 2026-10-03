@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店铺经营诊断</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <script src="../js/auth.js"></script>
+    <script>requireLogin();</script>
+    <style>
+        body {
+            padding: 20px 28px 40px;
+            background: #eef2f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #0a1a2b;
+        }
+        .row-two {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            margin-bottom: 16px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action {
+            font-size: 12px;
+            color: #4dabf7;
+            font-weight: 500;
+        }
+
+        /* AI 简报 */
+        .ai-insight {
+            background: #f0f7fe;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4dabf7;
+        }
+        .ai-insight:last-child { margin-bottom: 0; }
+        .ai-insight .title { font-weight: 600; color: #0a1e2f; font-size: 14px; }
+        .ai-insight .desc { color: #475569; font-size: 13px; margin-top: 4px; }
+        .ai-insight .tag {
+            font-size: 11px;
+            color: #4dabf7;
+            background: rgba(77,171,247,0.08);
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* 预测条 */
+        .predict-row { margin-bottom: 14px; }
+        .predict-row:last-child { margin-bottom: 0; }
+        .predict-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .predict-bar {
+            background: #eef2f6;
+            border-radius: 20px;
+            height: 5px;
+            overflow: hidden;
+        }
+        .predict-bar > div {
+            height: 5px;
+            border-radius: 20px;
+        }
+        .predict-note {
+            background: #f0f7fe;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #475569;
+            margin-top: 12px;
+        }
+
+        /* 问题清单 */
+        .issue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f4f9;
+        }
+        .issue-item:last-child { border: none; }
+        .issue-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .issue-icon.danger { background: #b51a3f; }
+        .issue-icon.warning { background: #b55a1a; }
+        .issue-icon.info { background: #4dabf7; }
+        .issue-content { flex: 1; }
+        .issue-content .title {
+            font-weight: 600;
+            color: #0a1e2f;
+            font-size: 14px;
+        }
+        .issue-content .title .badge-sm {
+            font-size: 10px;
+            padding: 1px 10px;
+            border-radius: 30px;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+        .badge-sm.urgent { background: #fde8ed; color: #b51a3f; }
+        .badge-sm.normal { background: #fef0e6; color: #b55a1a; }
+        .badge-sm.mild   { background: #f0f7fe; color: #2a7faa; }
+        .issue-content .desc {
+            font-size: 13px;
+            color: #5f7d95;
+            margin-top: 2px;
+            line-height: 1.5;
+        }
+        .issue-content .desc .highlight { color: #0a1e2f; font-weight: 500; }
+        .issue-content .meta {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .issue-action { flex-shrink: 0; margin-top: 2px; }
+
+        /* 机会点 */
+        .opportunity-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f4f9;
+        }
+        .opportunity-item:last-child { border: none; }
+        .opp-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f0f7fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4dabf7;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .opp-content { flex: 1; }
+        .opp-content .title { font-weight: 600; color: #0a1e2f; font-size: 14px; }
+        .opp-content .desc  { font-size: 13px; color: #5f7d95; margin-top: 2px; }
+        .opp-content .meta  { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+        /* 按钮 */
+        .btn-sm {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.1s;
+        }
+        .btn-sm.primary { background: #0a1e2f; color: #fff; }
+        .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm:active { transform: scale(0.95); }
+
+        @media (max-width: 1200px) {
+            .row-two { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- AI 简报 + 智能预测 -->
+<div class="row-two">
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-brain"></i> AI 经营简报</h3>
+            <span class="action">每日 09:00</span>
+        </div>
+        <div class="ai-insight">
+            <div class="title"><i class="fas fa-arrow-up" style="color:#0d7c4f;"></i> 抖音渠道转化率上升 12%</div>
+            <div class="desc">近3日抖音流量质量明显上升，建议加大该渠道投放预算，预计可提升整体GMV 8%。</div>
+            <span class="tag">渠道诊断</span>
+        </div>
+        <div class="ai-insight">
+            <div class="title"><i class="fas fa-exclamation-triangle" style="color:#b55a1a;"></i> 拼多多退款率异常上升</div>
+            <div class="desc">近7日退款率上升5.2%，主要原因为物流时效问题，建议更换合作快递或设置区域限售。</div>
+            <span class="tag">风险预警</span>
+        </div>
+        <div class="ai-insight">
+            <div class="title"><i class="fas fa-star" style="color:#f5b342;"></i> 高价值客户流失预警</div>
+            <div class="desc">识别出 8 位高消费客户近45天未复购，建议触发专属优惠券召回。</div>
+            <span class="tag">流失预警</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-chart-bar"></i> 智能预测</h3>
+            <span class="action">置信度 89%</span>
+        </div>
+        <div class="predict-row">
+            <div class="predict-head"><span>下周销售额预测</span><span style="font-weight:600;">¥152k ± ¥8k</span></div>
+            <div class="predict-bar"><div style="background:#4dabf7;width:72%;"></div></div>
+        </div>
+        <div class="predict-row">
+            <div class="predict-head"><span>转化率预测</span><span style="font-weight:600;">4.8%</span></div>
+            <div class="predict-bar"><div style="background:#0d7c4f;width:68%;"></div></div>
+        </div>
+        <div class="predict-row">
+            <div class="predict-head"><span>退款率预测</span><span style="font-weight:600;">3.2%</span></div>
+            <div class="predict-bar"><div style="background:#b55a1a;width:32%;"></div></div>
+        </div>
+        <div class="predict-note">
+            <i class="fas fa-info-circle" style="color:#4dabf7;"></i>
+            基于近3个月数据 + 行业趋势预测
+        </div>
+    </div>
+</div>
+
+<!-- 问题清单 -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-exclamation-triangle" style="color:#b55a1a;"></i> 问题清单</h3>
+        <span class="action"><i class="fas fa-robot"></i> AI 已识别 5 项问题</span>
+    </div>
+
+    <div class="issue-item">
+        <div class="issue-icon danger"><i class="fas fa-exclamation"></i></div>
+        <div class="issue-content">
+            <div class="title">转化率下降 0.6% <span class="badge-sm urgent">紧急</span></div>
+            <div class="desc"><span class="highlight">云山茶叶礼盒</span> 详情页跳出率上升 12%，用户停留时长从 45s 降至 32s</div>
+            <div class="meta"><span><i class="fas fa-box"></i> 影响商品 1 个</span><span><i class="fas fa-clock"></i> 持续 3 天</span></div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm primary" onclick="showToast('📝 正在打开商品优化面板...')">优化</button>
+        </div>
+    </div>
+
+    <div class="issue-item">
+        <div class="issue-icon warning"><i class="fas fa-clock"></i></div>
+        <div class="issue-content">
+            <div class="title">拼多多退款率上升 5.2% <span class="badge-sm normal">警告</span></div>
+            <div class="desc">主要原因为 <span class="highlight">物流时效问题</span>，建议更换合作快递或设置区域限售</div>
+            <div class="meta"><span><i class="fas fa-store"></i> 渠道：拼多多</span><span><i class="fas fa-clock"></i> 持续 7 天</span></div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm outline" onclick="showToast('🚚 正在打开物流配置面板...')">处理</button>
+        </div>
+    </div>
+
+    <div class="issue-item">
+        <div class="issue-icon info"><i class="fas fa-box-open"></i></div>
+        <div class="issue-content">
+            <div class="title">3 个商品库存低于安全线 <span class="badge-sm mild">提示</span></div>
+            <div class="desc"><span class="highlight">云山手工皂套装</span> 仅剩 89 件，预计 7 天后售罄</div>
+            <div class="meta"><span><i class="fas fa-box"></i> 3 个商品</span><span><i class="fas fa-clock"></i> 建议 3 天内补货</span></div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm outline" onclick="showToast('📦 正在打开库存管理面板...')">补货</button>
+        </div>
+    </div>
+
+    <div class="issue-item">
+        <div class="issue-icon warning"><i class="fas fa-user-clock"></i></div>
+        <div class="issue-content">
+            <div class="title">高价值客户 8 人 45 天未复购 <span class="badge-sm normal">警告</span></div>
+            <div class="desc">建议触发 <span class="highlight">专属优惠券召回</span>，预计可挽回 ¥6,200+ 销售额</div>
+            <div class="meta"><span><i class="fas fa-users"></i> 8 位客户</span><span><i class="fas fa-money-bill"></i> 历史消费 ¥12,400</span></div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm primary" onclick="showToast('📢 正在生成召回优惠券...')">召回</button>
+        </div>
+    </div>
+
+    <div class="issue-item">
+        <div class="issue-icon info"><i class="fas fa-file-alt"></i></div>
+        <div class="issue-content">
+            <div class="title">5 个商品详情页信息不完整 <span class="badge-sm mild">提示</span></div>
+            <div class="desc">缺少 <span class="highlight">材质说明</span> 和 <span class="highlight">尺码表</span>，可能影响用户购买决策</div>
+            <div class="meta"><span><i class="fas fa-box"></i> 5 个商品</span><span><i class="fas fa-clock"></i> 建议今日完成</span></div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm outline" onclick="showToast('✏️ 正在打开商品编辑面板...')">编辑</button>
+        </div>
+    </div>
+
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e8edf4;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <span style="font-size:13px;color:#5f7d95;">
+            <i class="fas fa-clock" style="color:#4dabf7;"></i> 基于近7天数据自动识别
+        </span>
+        <span class="btn-sm outline" onclick="showToast('📊 正在生成完整问题报告...')">
+            <i class="fas fa-file-alt"></i> 查看完整报告
+        </span>
+    </div>
+</div>
+
+<!-- 机会点挖掘 -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-lightbulb" style="color:#f5b342;"></i> 机会点挖掘</h3>
+        <span class="action"><i class="fas fa-robot"></i> AI 推荐 4 个增长机会</span>
+    </div>
+
+    <div class="opportunity-item">
+        <div class="opp-icon"><i class="fas fa-comment-dots"></i></div>
+        <div class="opp-content">
+            <div class="title">新增尺寸规格需求</div>
+            <div class="desc">23 位客户在对话中询问"有没有更大尺寸"，建议增加 XL 码选项</div>
+            <div class="meta"><i class="fas fa-clock"></i> 基于近7天对话分析</div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm primary" onclick="showToast('📏 正在生成新品规格建议...')">查看</button>
+        </div>
+    </div>
+
+    <div class="opportunity-item">
+        <div class="opp-icon"><i class="fas fa-rocket"></i></div>
+        <div class="opp-content">
+            <div class="title">潜力商品：云山陶瓷杯</div>
+            <div class="desc">高转化率 (4.8%) 但流量偏低，建议增加推广预算</div>
+            <div class="meta"><i class="fas fa-chart-line"></i> 转化率高于店铺平均 0.7%</div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm primary" onclick="showToast('📢 正在生成推广方案...')">推广</button>
+        </div>
+    </div>
+
+    <div class="opportunity-item">
+        <div class="opp-icon"><i class="fas fa-tags"></i></div>
+        <div class="opp-content">
+            <div class="title">新品调研：茶具套装</div>
+            <div class="desc">搜索词"茶具套装"近7天增长 230%，市场存在明显空白</div>
+            <div class="meta"><i class="fas fa-clock"></i> 竞品分析 · 建议 10 分钟内响应</div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm primary" onclick="showToast('📊 正在生成新品调研报告...')">调研</button>
+        </div>
+    </div>
+
+    <div class="opportunity-item">
+        <div class="opp-icon"><i class="fas fa-users"></i></div>
+        <div class="opp-content">
+            <div class="title">高复购潜力客群</div>
+            <div class="desc">3 个客群组共 456 人，近60天未复购，建议触发唤醒营销</div>
+            <div class="meta"><i class="fas fa-money-bill"></i> 预计可挽回 ¥18,500+</div>
+        </div>
+        <div class="issue-action">
+            <button class="btn-sm primary" onclick="showToast('📨 正在生成唤醒营销方案...')">触达</button>
+        </div>
+    </div>
+
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e8edf4;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <span style="font-size:13px;color:#5f7d95;">
+            <i class="fas fa-clock" style="color:#4dabf7;"></i> 基于对话与数据分析 · 每日更新
+        </span>
+        <span class="btn-sm primary" onclick="showToast('📋 正在生成完整机会报告...')">
+            <i class="fas fa-file-alt"></i> 查看完整报告
+        </span>
+    </div>
+</div>
+
+<script src="../js/common.js"></script>
+<script>
+    // 诊断页自己的逻辑
+    console.log('店铺经营诊断页已加载');
+</script>
+</body>
+</html>
