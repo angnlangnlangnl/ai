@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同行竞品分析</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <script src="../js/auth.js"></script>
+    <script>requireLogin();</script>
+    <style>
+        body {
+            padding: 20px 28px 40px;
+            background: #eef2f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #0a1a2b;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 18px 20px;
+            border-radius: 16px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+        }
+        .stat-card:hover {
+            box-shadow: 0 6px 20px rgba(10,30,47,0.06);
+            border-color: #c8d8e8;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #5f7d95;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0a1e2f;
+            letter-spacing: -0.02em;
+        }
+        .stat-card .trend {
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+            background: #e6f7ec;
+            color: #0d7c4f;
+            padding: 2px 10px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .stat-card .trend.down { background: #fde8ed; color: #b51a3f; }
+        .stat-card .sub {
+            font-size: 12px;
+            color: #5f7d95;
+            margin-top: 4px;
+        }
+
+        /* 卡片 */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            margin-bottom: 16px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action {
+            font-size: 12px;
+            color: #4dabf7;
+            font-weight: 500;
+        }
+
+        /* 表格 */
+        .table-wrap { overflow-x: auto; }
+        .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .table-wrap th {
+            text-align: left;
+            padding: 10px 4px 8px 0;
+            font-weight: 600;
+            color: #5f7d95;
+            border-bottom: 1px solid #e8edf4;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table-wrap td {
+            padding: 12px 4px;
+            border-bottom: 1px solid #f0f4f9;
+            color: #0a1e2f;
+        }
+        .table-wrap tr:last-child td { border: none; }
+
+        /* 徽章 */
+        .badge {
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .badge.taobao { background: #fef0e6; color: #b55a1a; }
+        .badge.douyin { background: #e9f0ff; color: #1a5bb5; }
+        .badge.pdd { background: #fde8ed; color: #b51a3f; }
+        .badge.jd { background: #e6f7ec; color: #0d7c4f; }
+        .badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .badge.warning { background: #fef0e6; color: #b55a1a; }
+        .badge.danger { background: #fde8ed; color: #b51a3f; }
+        .badge.info { background: #e9f0ff; color: #1a5bb5; }
+
+        /* 按钮 */
+        .btn-sm {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.1s;
+        }
+        .btn-sm.primary { background: #0a1e2f; color: #fff; }
+        .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm:active { transform: scale(0.95); }
+
+        /* 筛选 */
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0a1e2f;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 14px;
+            border: 1px solid #dce5ef;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fafcfe;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .filter-row { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 14px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .filter-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 统计卡片 -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-store" style="color:#4dabf7;"></i> 监控竞品数</div>
+        <div class="value">12</div>
+        <div class="sub">较上周 +3</div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-tag" style="color:#4dabf7;"></i> 价格变动</div>
+        <div class="value">8 <span class="trend down"><i class="fas fa-arrow-down"></i> 2.3%</span></div>
+        <div class="sub">平均降幅</div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-chart-line" style="color:#4dabf7;"></i> 竞品销量趋势</div>
+        <div class="value">↑12%</div>
+        <div class="sub">较上月</div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-bullseye" style="color:#4dabf7;"></i> 市场机会</div>
+        <div class="value">3</div>
+        <div class="sub">待跟进</div>
+    </div>
+</div>
+
+<!-- 筛选 -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-filter"></i> 竞品筛选</h3>
+        <span class="action" onclick="showToast('🔄 已重置筛选条件')">
+            <i class="fas fa-undo"></i> 重置
+        </span>
+    </div>
+    <div class="filter-row">
+        <div class="form-group">
+            <label>关键词</label>
+            <input type="text" placeholder="竞品名称 / SKU">
+        </div>
+        <div class="form-group">
+            <label>平台</label>
+            <select>
+                <option>全部</option>
+                <option>淘宝</option>
+                <option>抖音</option>
+                <option>拼多多</option>
+                <option>京东</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>价格区间</label>
+            <select>
+                <option>全部</option>
+                <option>0-50元</option>
+                <option>50-100元</option>
+                <option>100-200元</option>
+                <option>200元以上</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>销量区间</label>
+            <select>
+                <option>全部</option>
+                <option>0-500</option>
+                <option>500-1000</option>
+                <option>1000-5000</option>
+                <option>5000以上</option>
+            </select>
+        </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <span class="btn-sm primary" onclick="showToast('🔍 正在搜索竞品...')">
+            <i class="fas fa-search"></i> 搜索
+        </span>
+        <span class="btn-sm outline" onclick="showToast('➕ 正在添加竞品监控...')">
+            <i class="fas fa-plus"></i> 添加竞品
+        </span>
+        <span style="margin-left:auto;font-size:13px;color:#5f7d95;align-self:center;">
+            共 12 个竞品
+        </span>
+    </div>
+</div>
+
+<!-- 竞品列表 -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-list"></i> 竞品监控列表</h3>
+        <span class="action"><i class="fas fa-sync-alt"></i> 实时更新</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>竞品名称</th>
+                    <th>平台</th>
+                    <th>价格</th>
+                    <th>月销量</th>
+                    <th>评价数</th>
+                    <th>趋势</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>云山茶叶竞品A</strong></td>
+                    <td><span class="badge taobao">淘宝</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥118</td>
+                    <td>1,234</td>
+                    <td>456</td>
+                    <td><span class="badge success">↑ 5%</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📊 查看竞品详情...')">查看</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>云山茶叶竞品B</strong></td>
+                    <td><span class="badge douyin">抖音</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥135</td>
+                    <td>876</td>
+                    <td>234</td>
+                    <td><span class="badge warning">↓ 2%</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📊 查看竞品详情...')">查看</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>手工竹编竞品</strong></td>
+                    <td><span class="badge pdd">拼多多</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥79</td>
+                    <td>2,345</td>
+                    <td>789</td>
+                    <td><span class="badge success">↑ 12%</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📊 查看竞品详情...')">查看</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>山核桃仁竞品</strong></td>
+                    <td><span class="badge jd">京东</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥42</td>
+                    <td>1,567</td>
+                    <td>345</td>
+                    <td><span class="badge danger">↓ 8%</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📊 查看竞品详情...')">查看</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>云山陶瓷杯竞品</strong></td>
+                    <td><span class="badge taobao">淘宝</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥65</td>
+                    <td>1,890</td>
+                    <td>567</td>
+                    <td><span class="badge success">↑ 8%</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📊 查看竞品详情...')">查看</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>手工皂竞品A</strong></td>
+                    <td><span class="badge douyin">抖音</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥88</td>
+                    <td>1,123</td>
+                    <td>234</td>
+                    <td><span class="badge warning">↓ 3%</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📊 查看竞品详情...')">查看</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>书法折扇竞品</strong></td>
+                    <td><span class="badge pdd">拼多多</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥28</td>
+                    <td>2,678</td>
+                    <td>890</td>
+                    <td><span class="badge success">↑ 15%</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📊 查看竞品详情...')">查看</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e8edf4;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <span style="font-size:13px;color:#5f7d95;">
+            <i class="fas fa-clock" style="color:#4dabf7;"></i> 数据每 30 分钟自动更新
+        </span>
+        <span class="btn-sm primary" onclick="showToast('📊 正在生成竞品分析报告...')">
+            <i class="fas fa-file-alt"></i> 分析报告
+        </span>
+    </div>
+</div>
+
+<script src="../js/common.js"></script>
+<script>
+    console.log('同行竞品分析页已加载');
+</script>
+</body>
+</html>
