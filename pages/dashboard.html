@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据总览</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <script src="../js/auth.js"></script>
+    <script>requireLogin();</script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <style>
+        body {
+            padding: 20px 28px 40px;
+            background: #eef2f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #0a1a2b;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 18px 20px;
+            border-radius: 16px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+        }
+        .stat-card:hover {
+            box-shadow: 0 6px 20px rgba(10,30,47,0.06);
+            border-color: #c8d8e8;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #5f7d95;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0a1e2f;
+            letter-spacing: -0.02em;
+        }
+        .stat-card .trend {
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+            background: #e6f7ec;
+            color: #0d7c4f;
+            padding: 2px 10px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .stat-card .trend.down { background: #fde8ed; color: #b51a3f; }
+        .stat-card .sub {
+            font-size: 12px;
+            color: #5f7d95;
+            margin-top: 4px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* 图表卡片 */
+        .row-two {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .row-three {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action {
+            font-size: 12px;
+            color: #4dabf7;
+            font-weight: 500;
+        }
+        .chart-container { height: 200px; width: 100%; }
+        .chart-container-sm { height: 150px; width: 100%; }
+
+        /* 渠道列表 */
+        .channel-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f4f9;
+        }
+        .channel-item:last-child { border: none; }
+        .channel-item .left { display: flex; align-items: center; gap: 10px; }
+        .channel-item .dot { width: 8px; height: 8px; border-radius: 8px; display: inline-block; }
+        .channel-item .name { font-weight: 500; color: #0a1e2f; font-size: 14px; }
+        .channel-item .percent { font-weight: 600; color: #0a1e2f; font-size: 14px; }
+        .channel-item .vol { font-size: 13px; color: #5f7d95; }
+
+        /* AI 简报 */
+        .ai-insight {
+            background: #f0f7fe;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4dabf7;
+        }
+        .ai-insight .title { font-weight: 600; color: #0a1e2f; font-size: 14px; }
+        .ai-insight .desc { color: #475569; font-size: 13px; margin-top: 4px; }
+        .ai-insight .tag {
+            font-size: 11px;
+            color: #4dabf7;
+            background: rgba(77,171,247,0.08);
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* 表格 */
+        .table-wrap { overflow-x: auto; }
+        .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .table-wrap th {
+            text-align: left;
+            padding: 10px 4px 8px 0;
+            font-weight: 600;
+            color: #5f7d95;
+            border-bottom: 1px solid #e8edf4;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table-wrap td {
+            padding: 10px 4px;
+            border-bottom: 1px solid #f0f4f9;
+            color: #0a1e2f;
+        }
+        .table-wrap tr:last-child td { border: none; }
+
+        /* 徽章 */
+        .badge {
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .badge.taobao { background: #fef0e6; color: #b55a1a; }
+        .badge.douyin { background: #e9f0ff; color: #1a5bb5; }
+        .badge.pdd { background: #fde8ed; color: #b51a3f; }
+        .badge.jd { background: #e6f7ec; color: #0d7c4f; }
+        .badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .badge.warning { background: #fef0e6; color: #b55a1a; }
+        .badge.danger { background: #fde8ed; color: #b51a3f; }
+        .badge.info { background: #e9f0ff; color: #1a5bb5; }
+
+        /* 热销榜 */
+        .hot-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f4f9;
+            font-size: 13px;
+            align-items: center;
+        }
+        .hot-item:last-child { border: none; }
+        .hot-item .price { font-weight: 600; color: #b55a1a; }
+
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .row-two { grid-template-columns: 1fr; }
+            .row-three { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 14px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .row-three { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 统计卡片 -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-dollar-sign" style="color:#4dabf7;"></i> 今日销售额</div>
+        <div class="value">¥18.7k <span class="trend"><i class="fas fa-arrow-up"></i> 8.7%</span></div>
+        <div class="sub"><span>订单 347</span><span>客单价 ¥53.9</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-box" style="color:#4dabf7;"></i> 在售商品</div>
+        <div class="value">1,283 <span class="trend"><i class="fas fa-arrow-up"></i> +23</span></div>
+        <div class="sub"><span>昨日新增 12</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-users" style="color:#4dabf7;"></i> 今日访客</div>
+        <div class="value">2,456 <span class="trend down"><i class="fas fa-arrow-down"></i> 3.2%</span></div>
+        <div class="sub"><span>转化率 4.1%</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-robot" style="color:#4dabf7;"></i> AI 智能接待</div>
+        <div class="value">89% <span class="trend"><i class="fas fa-arrow-up"></i> +5%</span></div>
+        <div class="sub"><span>节省人工 12h/天</span></div>
+    </div>
+</div>
+
+<!-- 销售趋势 + 渠道占比 -->
+<div class="row-two">
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-chart-line"></i> 近7日销售趋势</h3>
+            <span class="action"><i class="far fa-calendar"></i> 本周 vs 上周</span>
+        </div>
+        <div id="salesChart" class="chart-container"></div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-pie-chart"></i> 渠道销售占比</h3>
+            <span class="action">实时</span>
+        </div>
+        <div id="channelPie" class="chart-container-sm"></div>
+        <div style="margin-top:8px;">
+            <div class="channel-item">
+                <div class="left"><span class="dot" style="background:#b55a1a;"></span><span class="name">淘宝</span></div>
+                <span class="vol">¥7.5k</span><span class="percent">40%</span>
+            </div>
+            <div class="channel-item">
+                <div class="left"><span class="dot" style="background:#1a5bb5;"></span><span class="name">抖音</span></div>
+                <span class="vol">¥5.6k</span><span class="percent">30%</span>
+            </div>
+            <div class="channel-item">
+                <div class="left"><span class="dot" style="background:#b51a3f;"></span><span class="name">拼多多</span></div>
+                <span class="vol">¥3.0k</span><span class="percent">16%</span>
+            </div>
+            <div class="channel-item">
+                <div class="left"><span class="dot" style="background:#0d7c4f;"></span><span class="name">京东</span></div>
+                <span class="vol">¥2.6k</span><span class="percent">14%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 渠道订单 / 热销 / AI 简报 -->
+<div class="row-three">
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-store-alt"></i> 各渠道订单量</h3>
+            <span class="action">今日</span>
+        </div>
+        <div id="channelBar" class="chart-container-sm"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;flex-wrap:wrap;gap:4px;">
+            <span><span class="badge taobao">淘宝</span> 142</span>
+            <span><span class="badge douyin">抖音</span> 98</span>
+            <span><span class="badge pdd">拼多多</span> 62</span>
+            <span><span class="badge jd">京东</span> 45</span>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-tag" style="color:#f5b342;"></i> 热销商品 Top 3</h3>
+            <span class="action">实时</span>
+        </div>
+        <div class="hot-item">
+            <span><span class="badge success">1</span> 云山茶叶礼盒</span>
+            <span class="price">¥128</span>
+            <span style="color:#5f7d95;">234件</span>
+        </div>
+        <div class="hot-item">
+            <span><span class="badge info">2</span> 手工竹编包</span>
+            <span class="price">¥89</span>
+            <span style="color:#5f7d95;">187件</span>
+        </div>
+        <div class="hot-item">
+            <span><span class="badge warning">3</span> 山核桃仁 250g</span>
+            <span class="price">¥45</span>
+            <span style="color:#5f7d95;">156件</span>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-robot"></i> AI 经营简报</h3>
+            <span class="action">今日</span>
+        </div>
+        <div class="ai-insight">
+            <div class="title"><i class="fas fa-arrow-up" style="color:#0d7c4f;"></i> 抖音渠道转化率提升 12%</div>
+            <div class="desc">近3日抖音流量质量上升，建议加大该渠道投放预算</div>
+            <span class="tag">渠道诊断</span>
+        </div>
+        <div class="ai-insight">
+            <div class="title"><i class="fas fa-exclamation-triangle" style="color:#b55a1a;"></i> 拼多多退款率上升 5.2%</div>
+            <div class="desc">建议检查近期物流时效及商品描述一致性</div>
+            <span class="tag">风险预警</span>
+        </div>
+    </div>
+</div>
+
+<!-- 最新订单 -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-list-ul"></i> 最新订单 · 实时</h3>
+        <span class="action"><i class="fas fa-filter"></i> 全部渠道</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>订单号</th><th>商品</th><th>渠道</th>
+                    <th>金额</th><th>状态</th><th>时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>ORD-2026-0905-001</td><td>云山茶叶礼盒</td><td><span class="badge douyin">抖音</span></td><td>¥128</td><td><span class="badge success">已支付</span></td><td>14:32</td></tr>
+                <tr><td>ORD-2026-0905-002</td><td>手工竹编包</td><td><span class="badge taobao">淘宝</span></td><td>¥89</td><td><span class="badge warning">待发货</span></td><td>14:15</td></tr>
+                <tr><td>ORD-2026-0905-003</td><td>山核桃仁 250g</td><td><span class="badge pdd">拼多多</span></td><td>¥45</td><td><span class="badge info">已发货</span></td><td>13:50</td></tr>
+                <tr><td>ORD-2026-0905-004</td><td>云山手工皂套装</td><td><span class="badge jd">京东</span></td><td>¥79</td><td><span class="badge danger">退款中</span></td><td>13:20</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../js/common.js"></script>
+<script>
+    /* ===== ECharts ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+        var salesChart = echarts.init(document.getElementById('salesChart'));
+        salesChart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['销售额', '订单量'], bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8 },
+            grid: { left: '3%', right: '4%', bottom: '20%', top: '6%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                data: ['08/30', '08/31', '09/01', '09/02', '09/03', '09/04', '今日'],
+                axisLine: { lineStyle: { color: '#dce5ef' } }
+            },
+            yAxis: [
+                { type: 'value', name: '销售额 (千元)', nameTextStyle: { color: '#94a3b8', fontSize: 11 },
+                  splitLine: { lineStyle: { color: '#eef2f6', type: 'dashed' } } },
+                { type: 'value', name: '订单量', nameTextStyle: { color: '#94a3b8', fontSize: 11 },
+                  splitLine: { show: false } }
+            ],
+            series: [
+                { name: '销售额', type: 'bar',
+                  data: [8.6, 11.2, 14.8, 13.5, 16.2, 17.8, 18.7],
+                  itemStyle: { color: '#4dabf7', borderRadius: [4,4,0,0] }, barWidth: '35%' },
+                { name: '订单量', type: 'line', yAxisIndex: 1,
+                  data: [156, 212, 278, 256, 312, 328, 347],
+                  smooth: true, symbol: 'circle', symbolSize: 6,
+                  lineStyle: { color: '#b55a1a', width: 2 }, itemStyle: { color: '#b55a1a' } }
+            ]
+        });
+
+        var pieChart = echarts.init(document.getElementById('channelPie'));
+        pieChart.setOption({
+            tooltip: { trigger: 'item' },
+            legend: { show: false },
+            series: [{
+                type: 'pie', radius: ['45%', '72%'], avoidLabelOverlap: false,
+                itemStyle: { borderRadius: 5, borderColor: '#fff', borderWidth: 2 },
+                label: { show: false }, emphasis: { scale: false },
+                data: [
+                    { value: 40, name: '淘宝', itemStyle: { color: '#b55a1a' } },
+                    { value: 30, name: '抖音', itemStyle: { color: '#1a5bb5' } },
+                    { value: 16, name: '拼多多', itemStyle: { color: '#b51a3f' } },
+                    { value: 14, name: '京东', itemStyle: { color: '#0d7c4f' } }
+                ]
+            }]
+        });
+
+        var barChart = echarts.init(document.getElementById('channelBar'));
+        barChart.setOption({
+            tooltip: { trigger: 'axis' },
+            grid: { left: '5%', right: '5%', bottom: '8%', top: '5%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                data: ['淘宝', '抖音', '拼多多', '京东'],
+                axisLine: { show: false }, axisTick: { show: false }
+            },
+            yAxis: { type: 'value', show: false },
+            series: [{
+                type: 'bar', data: [142, 98, 62, 45], barWidth: '45%',
+                itemStyle: {
+                    color: function(p) {
+                        var colors = ['#b55a1a','#1a5bb5','#b51a3f','#0d7c4f'];
+                        return colors[p.dataIndex];
+                    },
+                    borderRadius: [4,4,0,0]
+                }
+            }]
+        });
+
+        window.addEventListener('resize', function() {
+            salesChart.resize();
+            pieChart.resize();
+            barChart.resize();
+        });
+    });
+</script>
+</body>
+</html>
