@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <script src="../js/auth.js"></script>
+    <script>requireLogin();</script>
+    <style>
+        body {
+            padding: 20px 28px 40px;
+            background: #eef2f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #0a1a2b;
+        }
+
+        /* ===== 统计卡片 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 18px 20px;
+            border-radius: 16px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+        }
+        .stat-card:hover {
+            box-shadow: 0 6px 20px rgba(10,30,47,0.06);
+            border-color: #c8d8e8;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #5f7d95;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0a1e2f;
+            letter-spacing: -0.02em;
+        }
+        .stat-card .trend {
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+            background: #e6f7ec;
+            color: #0d7c4f;
+            padding: 2px 10px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .stat-card .trend.warn { background: #fef0e6; color: #b55a1a; }
+        .stat-card .trend.danger { background: #fde8ed; color: #b51a3f; }
+        .stat-card .sub {
+            font-size: 12px;
+            color: #5f7d95;
+            margin-top: 4px;
+        }
+
+        /* ===== 卡片 ===== */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            margin-bottom: 16px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action {
+            font-size: 12px;
+            color: #4dabf7;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* ===== 筛选栏 ===== */
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0a1e2f;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 14px;
+            border: 1px solid #dce5ef;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fafcfe;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+
+        /* ===== 三级分类筛选 ===== */
+        .category-filter-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px 0 4px 0;
+            width: 100%;
+        }
+        .category-level {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+        .category-level .level-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f7d95;
+            margin-right: 4px;
+            min-width: 36px;
+        }
+        .category-level .cat-tag {
+            padding: 3px 14px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #5f7d95;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+        .category-level .cat-tag:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+            background: #f5f9fe;
+        }
+        .category-level .cat-tag.active {
+            background: #0a1e2f;
+            border-color: #0a1e2f;
+            color: #fff;
+        }
+        .category-level .cat-tag .count {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-left: 3px;
+        }
+        .category-level .cat-tag.active .count {
+            color: rgba(255,255,255,0.5);
+        }
+        .category-divider {
+            width: 100%;
+            height: 1px;
+            background: #e8edf4;
+            margin: 4px 0;
+        }
+
+        /* ===== 表格 ===== */
+        .table-wrap { overflow-x: auto; }
+        .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .table-wrap th {
+            text-align: left;
+            padding: 10px 4px 8px 0;
+            font-weight: 600;
+            color: #5f7d95;
+            border-bottom: 1px solid #e8edf4;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table-wrap td {
+            padding: 12px 4px;
+            border-bottom: 1px solid #f0f4f9;
+            color: #0a1e2f;
+        }
+        .table-wrap tr:last-child td { border: none; }
+        .table-wrap tr:hover td { background: #fafcfe; }
+
+        /* ===== 库存进度条 ===== */
+        .stock-bar {
+            width: 100%;
+            height: 6px;
+            background: #eef2f6;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .stock-bar > div {
+            height: 6px;
+            border-radius: 20px;
+            transition: 0.4s;
+        }
+        .stock-bar > div.good { background: #0d7c4f; }
+        .stock-bar > div.warn { background: #f5b342; }
+        .stock-bar > div.danger { background: #b51a3f; }
+
+        /* ===== 徽章 ===== */
+        .badge {
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .badge.taobao { background: #fef0e6; color: #b55a1a; }
+        .badge.douyin { background: #e9f0ff; color: #1a5bb5; }
+        .badge.pdd { background: #fde8ed; color: #b51a3f; }
+        .badge.jd { background: #e6f7ec; color: #0d7c4f; }
+        .badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .badge.warning { background: #fef0e6; color: #b55a1a; }
+        .badge.danger { background: #fde8ed; color: #b51a3f; }
+        .badge.info { background: #e9f0ff; color: #1a5bb5; }
+        .badge.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .badge.orange { background: #fef0e6; color: #b55a1a; }
+
+        /* ===== 按钮 ===== */
+        .btn-sm {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.1s;
+        }
+        .btn-sm.primary { background: #0a1e2f; color: #fff; }
+        .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm.blue    { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .btn-sm.danger  { background: #fde8ed; color: #b51a3f; }
+        .btn-sm.success { background: #e6f7ec; color: #0d7c4f; }
+        .btn-sm:active  { transform: scale(0.95); }
+
+        /* ===== 底部 ===== */
+        .card-foot {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #e8edf4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card-foot span.muted {
+            font-size: 13px;
+            color: #5f7d95;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .filter-row { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 14px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .filter-row { grid-template-columns: 1fr; }
+            .category-level .level-label { min-width: 28px; font-size: 11px; }
+            .category-level .cat-tag { font-size: 11px; padding: 2px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== 统计卡片 ===== -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-boxes" style="color:#4dabf7;"></i> 总库存</div>
+        <div class="value">12,847</div>
+        <div class="sub">覆盖 8 个商品</div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-exclamation-triangle" style="color:#b55a1a;"></i> 安全预警</div>
+        <div class="value">3 <span class="trend warn">需补货</span></div>
+        <div class="sub">其中 1 个紧急</div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 正常库存</div>
+        <div class="value">5</div>
+        <div class="sub">库存充足</div>
+    </div>
+    <div class="stat-card">
+        <div class="label"><i class="fas fa-clock" style="color:#4dabf7;"></i> 补货计划</div>
+        <div class="value">2</div>
+        <div class="sub">待执行</div>
+    </div>
+</div>
+
+<!-- ===== 筛选栏 ===== -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-filter"></i> 库存筛选</h3>
+        <span class="action" onclick="showToast('🔄 已重置筛选条件')">
+            <i class="fas fa-undo"></i> 重置
+        </span>
+    </div>
+    <div class="filter-row">
+        <div class="form-group">
+            <label>关键词</label>
+            <input type="text" placeholder="商品名称 / SKU" id="invSearch">
+        </div>
+        <div class="form-group">
+            <label>平台</label>
+            <select id="invPlatform">
+                <option value="all">全部平台</option>
+                <option value="淘宝">淘宝</option>
+                <option value="抖音">抖音</option>
+                <option value="拼多多">拼多多</option>
+                <option value="京东">京东</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>状态</label>
+            <select id="invStatus">
+                <option value="all">全部状态</option>
+                <option value="充足">充足</option>
+                <option value="预警">预警</option>
+                <option value="缺货">缺货</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>排序</label>
+            <select>
+                <option>默认排序</option>
+                <option>库存从低到高</option>
+                <option>库存从高到低</option>
+                <option>销量从高到低</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 三级分类筛选 ===== -->
+<div class="card" style="padding:12px 20px;">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+        <span style="font-weight:600;color:#0a1e2f;font-size:13px;">
+            <i class="fas fa-tags" style="color:#4dabf7;"></i> 分类筛选
+        </span>
+        <span style="font-size:12px;color:#94a3b8;">三级分类 · 点击切换</span>
+        <span style="margin-left:auto;font-size:13px;color:#5f7d95;">
+            共 <strong id="invCount">6</strong> 个商品
+        </span>
+    </div>
+    <div class="category-filter-container">
+        <div class="category-level">
+            <span class="level-label">一级</span>
+            <span class="cat-tag active" data-level="1" data-cat="all" onclick="filterInvCategory(1,'all',this)">全部 <span class="count">(6)</span></span>
+            <span class="cat-tag" data-level="1" data-cat="食品" onclick="filterInvCategory(1,'食品',this)">🍜 食品 <span class="count">(3)</span></span>
+            <span class="cat-tag" data-level="1" data-cat="手工艺" onclick="filterInvCategory(1,'手工艺',this)">🎨 手工艺 <span class="count">(3)</span></span>
+            <span class="cat-tag" data-level="1" data-cat="文创" onclick="filterInvCategory(1,'文创',this)">📚 文创 <span class="count">(2)</span></span>
+        </div>
+        <div class="category-divider"></div>
+        <div class="category-level">
+            <span class="level-label">二级</span>
+            <span class="cat-tag active" data-level="2" data-cat="all" onclick="filterInvCategory(2,'all',this)">全部 <span class="count">(6)</span></span>
+            <span class="cat-tag" data-level="2" data-cat="坚果" onclick="filterInvCategory(2,'坚果',this)">🥜 坚果 <span class="count">(2)</span></span>
+            <span class="cat-tag" data-level="2" data-cat="茶饮" onclick="filterInvCategory(2,'茶饮',this)">🍵 茶饮 <span class="count">(1)</span></span>
+            <span class="cat-tag" data-level="2" data-cat="编织" onclick="filterInvCategory(2,'编织',this)">🧶 编织 <span class="count">(2)</span></span>
+            <span class="cat-tag" data-level="2" data-cat="陶瓷" onclick="filterInvCategory(2,'陶瓷',this)">🏺 陶瓷 <span class="count">(1)</span></span>
+            <span class="cat-tag" data-level="2" data-cat="纸艺" onclick="filterInvCategory(2,'纸艺',this)">📄 纸艺 <span class="count">(2)</span></span>
+        </div>
+        <div class="category-divider"></div>
+        <div class="category-level">
+            <span class="level-label">三级</span>
+            <span class="cat-tag active" data-level="3" data-cat="all" onclick="filterInvCategory(3,'all',this)">全部 <span class="count">(6)</span></span>
+            <span class="cat-tag" data-level="3" data-cat="礼盒装" onclick="filterInvCategory(3,'礼盒装',this)">🎁 礼盒装 <span class="count">(2)</span></span>
+            <span class="cat-tag" data-level="3" data-cat="散装" onclick="filterInvCategory(3,'散装',this)">📦 散装 <span class="count">(1)</span></span>
+            <span class="cat-tag" data-level="3" data-cat="手工" onclick="filterInvCategory(3,'手工',this)">✋ 手工 <span class="count">(3)</span></span>
+            <span class="cat-tag" data-level="3" data-cat="定制" onclick="filterInvCategory(3,'定制',this)">🎨 定制 <span class="count">(2)</span></span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 库存列表 ===== -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-list"></i> 库存列表</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="btn-sm blue" onclick="showToast('🔄 正在同步各平台库存...')">
+                <i class="fas fa-sync-alt"></i> 同步库存
+            </span>
+            <span class="btn-sm outline" onclick="showToast('📤 正在批量调整库存...')">
+                <i class="fas fa-upload"></i> 批量调整
+            </span>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>商品名称</th>
+                    <th>分类</th>
+                    <th>平台</th>
+                    <th>库存 / 安全线</th>
+                    <th>库存状态</th>
+                    <th>预警</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="invTableBody">
+                <tr data-category="茶叶" data-platform="抖音" data-subcat="茶饮" data-third="礼盒装" data-name="云山茶叶礼盒" data-status="充足">
+                    <td><strong>云山茶叶礼盒</strong></td>
+                    <td><span class="badge blue">茶叶</span></td>
+                    <td><span class="badge douyin">抖音</span></td>
+                    <td>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;">
+                            <span><strong>234</strong> / 50</span>
+                            <span style="color:#0d7c4f;">充足</span>
+                        </div>
+                        <div class="stock-bar"><div class="good" style="width:100%;"></div></div>
+                    </td>
+                    <td><span class="badge success">充足</span></td>
+                    <td><span class="badge info">正常</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('✏️ 调整库存...')">调整</span>
+                    </td>
+                </tr>
+                <tr data-category="手工艺" data-platform="淘宝" data-subcat="编织" data-third="手工" data-name="手工竹编包" data-status="充足">
+                    <td><strong>手工竹编包</strong></td>
+                    <td><span class="badge orange">手工艺</span></td>
+                    <td><span class="badge taobao">淘宝</span></td>
+                    <td>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;">
+                            <span><strong>187</strong> / 50</span>
+                            <span style="color:#0d7c4f;">充足</span>
+                        </div>
+                        <div class="stock-bar"><div class="good" style="width:100%;"></div></div>
+                    </td>
+                    <td><span class="badge success">充足</span></td>
+                    <td><span class="badge info">正常</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('✏️ 调整库存...')">调整</span>
+                    </td>
+                </tr>
+                <tr data-category="食品" data-platform="拼多多" data-subcat="坚果" data-third="散装" data-name="山核桃仁 250g" data-status="充足">
+                    <td><strong>山核桃仁 250g</strong></td>
+                    <td><span class="badge success">食品</span></td>
+                    <td><span class="badge pdd">拼多多</span></td>
+                    <td>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;">
+                            <span><strong>156</strong> / 50</span>
+                            <span style="color:#0d7c4f;">充足</span>
+                        </div>
+                        <div class="stock-bar"><div class="good" style="width:100%;"></div></div>
+                    </td>
+                    <td><span class="badge success">充足</span></td>
+                    <td><span class="badge info">正常</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('✏️ 调整库存...')">调整</span>
+                    </td>
+                </tr>
+                <tr data-category="文创" data-platform="京东" data-subcat="纸艺" data-third="定制" data-name="云山手工皂套装" data-status="预警">
+                    <td><strong>云山手工皂套装</strong></td>
+                    <td><span class="badge info">文创</span></td>
+                    <td><span class="badge jd">京东</span></td>
+                    <td>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;">
+                            <span><strong>89</strong> / 50</span>
+                            <span style="color:#b55a1a;">预警</span>
+                        </div>
+                        <div class="stock-bar"><div class="warn" style="width:60%;"></div></div>
+                    </td>
+                    <td><span class="badge warning">预警</span></td>
+                    <td><span class="badge warning">建议补货</span></td>
+                    <td>
+                        <span class="btn-sm primary" onclick="showToast('📦 正在生成补货单...')">补货</span>
+                    </td>
+                </tr>
+                <tr data-category="手工艺" data-platform="淘宝" data-subcat="陶瓷" data-third="手工" data-name="云山陶瓷杯" data-status="充足">
+                    <td><strong>云山陶瓷杯</strong></td>
+                    <td><span class="badge orange">手工艺</span></td>
+                    <td><span class="badge taobao">淘宝</span></td>
+                    <td>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;">
+                            <span><strong>143</strong> / 50</span>
+                            <span style="color:#0d7c4f;">充足</span>
+                        </div>
+                        <div class="stock-bar"><div class="good" style="width:100%;"></div></div>
+                    </td>
+                    <td><span class="badge success">充足</span></td>
+                    <td><span class="badge info">正常</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('✏️ 调整库存...')">调整</span>
+                    </td>
+                </tr>
+                <tr data-category="文创" data-platform="抖音" data-subcat="纸艺" data-third="定制" data-name="手写书法折扇" data-status="缺货">
+                    <td><strong>手写书法折扇</strong></td>
+                    <td><span class="badge info">文创</span></td>
+                    <td><span class="badge douyin">抖音</span></td>
+                    <td>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;">
+                            <span><strong style="color:#b51a3f;">0</strong> / 50</span>
+                            <span style="color:#b51a3f;">缺货</span>
+                        </div>
+                        <div class="stock-bar"><div class="danger" style="width:0%;"></div></div>
+                    </td>
+                    <td><span class="badge danger">缺货</span></td>
+                    <td><span class="badge danger">紧急补货</span></td>
+                    <td>
+                        <span class="btn-sm danger" onclick="showToast('🚨 紧急补货...')">紧急补货</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-foot">
+        <span class="muted" id="invFootCount">
+            <i class="fas fa-info-circle" style="color:#4dabf7;"></i>
+            共 6 个商品 · 2 个预警
+        </span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="btn-sm outline" onclick="showToast('📊 正在生成库存分析报告...')">
+                <i class="fas fa-file-alt"></i> 分析报告
+            </span>
+            <span class="btn-sm primary" onclick="showToast('✅ 已保存当前库存配置')">
+                <i class="fas fa-save"></i> 保存配置
+            </span>
+        </div>
+    </div>
+</div>
+
+<script src="../js/common.js"></script>
+<script>
+    /* ============================================================
+       库存管理脚本
+       ============================================================ */
+    var invFilters = { level1: 'all', level2: 'all', level3: 'all' };
+
+    /* 三级分类切换 */
+    function filterInvCategory(level, cat, el) {
+        var key = 'level' + level;
+        var siblings = el.parentElement.querySelectorAll('.cat-tag');
+        siblings.forEach(function(tag) { tag.classList.remove('active'); });
+        el.classList.add('active');
+        invFilters[key] = cat;
+        applyInvFilters();
+    }
+
+    /* 应用所有筛选 */
+    function applyInvFilters() {
+        var keyword = (document.getElementById('invSearch').value || '').toLowerCase().trim();
+        var platform = document.getElementById('invPlatform').value;
+        var status = document.getElementById('invStatus').value;
+
+        var rows = document.querySelectorAll('#invTableBody tr');
+        var visible = 0;
+
+        rows.forEach(function(row) {
+            var rowCat = row.dataset.category || '';
+            var rowSubcat = row.dataset.subcat || '';
+            var rowThird = row.dataset.third || '';
+            var rowPlatform = row.dataset.platform || '';
+            var rowStatus = row.dataset.status || '';
+            var rowName = (row.dataset.name || '').toLowerCase();
+
+            var match = true;
+            if (invFilters.level1 !== 'all' && rowCat !== invFilters.level1) match = false;
+            if (invFilters.level2 !== 'all' && rowSubcat !== invFilters.level2) match = false;
+            if (invFilters.level3 !== 'all' && rowThird !== invFilters.level3) match = false;
+            if (platform !== 'all' && rowPlatform !== platform) match = false;
+            if (status !== 'all' && rowStatus !== status) match = false;
+            if (keyword && !rowName.includes(keyword)) match = false;
+
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+
+        document.getElementById('invCount').textContent = visible;
+        document.getElementById('invFootCount').innerHTML =
+            '<i class="fas fa-info-circle" style="color:#4dabf7;"></i> ' +
+            '共 ' + visible + ' 个商品 · ' + countWarnings() + ' 个预警';
+    }
+
+    /* 统计预警数 */
+    function countWarnings() {
+        var n = 0;
+        document.querySelectorAll('#invTableBody tr').forEach(function(row) {
+            if (row.style.display !== 'none' &&
+                (row.dataset.status === '预警' || row.dataset.status === '缺货')) {
+                n++;
+            }
+        });
+        return n;
+    }
+
+    /* 绑定筛选事件 */
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('invSearch').addEventListener('input', applyInvFilters);
+        document.getElementById('invPlatform').addEventListener('change', applyInvFilters);
+        document.getElementById('invStatus').addEventListener('change', applyInvFilters);
+        applyInvFilters();
+        console.log('库存管理页已加载');
+    });
+</script>
+</body>
+</html>
