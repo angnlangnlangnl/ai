@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <script src="../js/auth.js"></script>
+    <script>requireLogin();</script>
+    <style>
+        body {
+            padding: 20px 28px 40px;
+            background: #eef2f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #0a1a2b;
+        }
+
+        /* ===== 顶部快捷提示 ===== */
+        .quick-hints {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .hint-card {
+            background: linear-gradient(135deg, #f0f7fe, #e9f0ff);
+            border: 1px solid #dce5ef;
+            border-radius: 14px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .hint-card:hover {
+            border-color: #4dabf7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(77,171,247,0.12);
+        }
+        .hint-card .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #4dabf7;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .hint-card .txt .title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0a1e2f;
+            margin-bottom: 2px;
+        }
+        .hint-card .txt .desc {
+            font-size: 12px;
+            color: #5f7d95;
+            line-height: 1.4;
+        }
+
+        /* ===== 主卡片 ===== */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            margin-bottom: 16px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action {
+            font-size: 12px;
+            color: #4dabf7;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* ===== 对话区域 ===== */
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            min-height: 460px;
+            max-height: 600px;
+            border-radius: 12px;
+            background: #fafcfe;
+            border: 1px solid #e8edf4;
+            overflow: hidden;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-track { background: #f0f4f9; }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c8d8e8;
+            border-radius: 10px;
+        }
+
+        /* 消息气泡 */
+        .msg {
+            display: flex;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+        .msg.user { flex-direction: row-reverse; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+        .msg-avatar.ai {
+            background: linear-gradient(135deg, #4dabf7, #6a5cff);
+        }
+        .msg-avatar.user {
+            background: #0a1e2f;
+        }
+
+        .msg-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.7;
+            word-break: break-word;
+        }
+        .msg.ai .msg-bubble {
+            background: #fff;
+            border: 1px solid #e8edf4;
+            border-radius: 4px 14px 14px 14px;
+            color: #0a1e2f;
+        }
+        .msg.user .msg-bubble {
+            background: #0a1e2f;
+            color: #fff;
+            border-radius: 14px 4px 14px 14px;
+        }
+
+        .msg-bubble ul {
+            margin: 6px 0 0 18px;
+            padding: 0;
+            font-size: 13px;
+            color: #5f7d95;
+        }
+        .msg-bubble ul li { margin-bottom: 2px; }
+
+        .msg-bubble .suggest {
+            display: inline-block;
+            background: #f0f7fe;
+            color: #2a7faa;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-top: 8px;
+            margin-right: 6px;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid #dce5ef;
+        }
+        .msg-bubble .suggest:hover {
+            background: #e4f0fd;
+            border-color: #4dabf7;
+        }
+
+        /* AI 打字中 */
+        .typing {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            padding: 4px 0;
+        }
+        .typing .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #94a3b8;
+            animation: typing 1.2s infinite ease-in-out;
+        }
+        .typing .dot:nth-child(2) { animation-delay: 0.15s; }
+        .typing .dot:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        /* ===== 输入区 ===== */
+        .chat-input {
+            border-top: 1px solid #e8edf4;
+            background: #fff;
+            padding: 14px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 11px 16px;
+            border: 1px solid #dce5ef;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            transition: 0.15s;
+            background: #fafcfe;
+        }
+        .chat-input input:focus {
+            border-color: #4dabf7;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.1);
+        }
+        .chat-input .send-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #4dabf7, #6a5cff);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: 0.15s;
+            flex-shrink: 0;
+        }
+        .chat-input .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(77,171,247,0.35);
+        }
+        .chat-input .send-btn:active { transform: scale(0.95); }
+        .chat-input .send-btn:disabled {
+            background: #c8d8e8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ===== 按钮 ===== */
+        .btn-sm {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.1s;
+        }
+        .btn-sm.primary { background: #0a1e2f; color: #fff; }
+        .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm.blue    { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .btn-sm:active  { transform: scale(0.95); }
+
+        /* ===== 底部能力卡片 ===== */
+        .capabilities {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 16px;
+        }
+        .cap-card {
+            background: #fff;
+            border: 1px solid #e8edf4;
+            border-radius: 14px;
+            padding: 16px;
+            transition: 0.15s;
+        }
+        .cap-card:hover {
+            border-color: #4dabf7;
+            box-shadow: 0 6px 20px rgba(77,171,247,0.08);
+        }
+        .cap-card .cap-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .cap-card .cap-icon.blue   { background: #4dabf7; }
+        .cap-card .cap-icon.purple { background: #6a5cff; }
+        .cap-card .cap-icon.green  { background: #0d7c4f; }
+        .cap-card .cap-icon.orange { background: #b55a1a; }
+        .cap-card .cap-icon.pink   { background: #d94f7a; }
+        .cap-card .cap-icon.cyan   { background: #00b8c4; }
+        .cap-card .cap-title {
+            font-weight: 600;
+            color: #0a1e2f;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .cap-card .cap-desc {
+            font-size: 12px;
+            color: #5f7d95;
+            line-height: 1.5;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1200px) {
+            .quick-hints { grid-template-columns: repeat(2, 1fr); }
+            .capabilities { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 14px; }
+            .quick-hints { grid-template-columns: 1fr; }
+            .capabilities { grid-template-columns: 1fr; }
+            .msg-bubble { max-width: 85%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== 快捷提示 ===== -->
+<div class="quick-hints">
+    <div class="hint-card" onclick="quickAsk('帮我查一下上周的销售数据')">
+        <div class="icon"><i class="fas fa-chart-line"></i></div>
+        <div class="txt">
+            <div class="title">查询销售数据</div>
+            <div class="desc">近7日销售额、订单量、转化率</div>
+        </div>
+    </div>
+    <div class="hint-card" onclick="quickAsk('帮我上架3款新品茶叶礼盒，价格定在128元')">
+        <div class="icon"><i class="fas fa-box"></i></div>
+        <div class="txt">
+            <div class="title">上架新品</div>
+            <div class="desc">批量创建商品草稿，自动生成文案</div>
+        </div>
+    </div>
+    <div class="hint-card" onclick="quickAsk('诊断一下店铺最近的经营问题')">
+        <div class="icon"><i class="fas fa-stethoscope"></i></div>
+        <div class="txt">
+            <div class="title">经营诊断</div>
+            <div class="desc">识别问题清单 + 增长机会点</div>
+        </div>
+    </div>
+    <div class="hint-card" onclick="quickAsk('帮我查一下库存情况')">
+        <div class="icon"><i class="fas fa-warehouse"></i></div>
+        <div class="txt">
+            <div class="title">库存查询</div>
+            <div class="desc">低库存预警 + 补货建议</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== AI 对话主区 ===== -->
+<div class="card" style="padding:0;">
+    <div class="card-header" style="padding:18px 20px 14px;margin:0;border-bottom:1px solid #e8edf4;">
+        <h3><i class="fas fa-robot"></i> 对话式经营</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="btn-sm blue" onclick="clearChat()">
+                <i class="fas fa-broom"></i> 清空
+            </span>
+            <span class="btn-sm outline" onclick="showToast('📤 正在导出对话记录...')">
+                <i class="fas fa-file-export"></i> 导出
+            </span>
+            <span class="btn-sm primary" onclick="showToast('🤖 AI 引擎已启动')">
+                <i class="fas fa-microchip"></i> 启动引擎
+            </span>
+        </div>
+    </div>
+
+    <div class="chat-box" style="border-radius:0;border:none;">
+        <div class="chat-messages" id="chatMessages">
+
+            <!-- 欢迎消息 -->
+            <div class="msg ai">
+                <div class="msg-avatar ai"><i class="fas fa-robot"></i></div>
+                <div class="msg-bubble">
+                    👋 你好！我是 <strong>AI 经营助手</strong>，可以帮你：
+                    <ul>
+                        <li>📦 上架商品、修改价格、优化图片</li>
+                        <li>📊 查询销售数据、诊断经营问题</li>
+                        <li>🎯 创建营销活动、生成优惠券</li>
+                        <li>📋 管理库存、分析竞品</li>
+                    </ul>
+                    <div style="margin-top:10px;">
+                        <span class="suggest" onclick="quickAsk('帮我查一下上周的销售数据')">📊 查询销售数据</span>
+                        <span class="suggest" onclick="quickAsk('帮我上架3款新品茶叶礼盒')">📦 上架新品</span>
+                        <span class="suggest" onclick="quickAsk('诊断一下店铺最近的经营问题')">🩺 经营诊断</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 输入区 -->
+        <div class="chat-input">
+            <input type="text"
+                   id="chatInput"
+                   placeholder="输入经营需求，例如：帮我查一下上周的销售数据..."
+                   onkeydown="if(event.key==='Enter') sendMessage()">
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 能力卡片 ===== -->
+<div class="capabilities">
+    <div class="cap-card">
+        <div class="cap-icon blue"><i class="fas fa-box"></i></div>
+        <div class="cap-title">商品操作</div>
+        <div class="cap-desc">上架 / 下架 / 改价 / 优化详情页，一句话搞定</div>
+    </div>
+    <div class="cap-card">
+        <div class="cap-icon purple"><i class="fas fa-chart-line"></i></div>
+        <div class="cap-title">数据查询</div>
+        <div class="cap-desc">销售额、订单量、转化率、访客，随时问随时答</div>
+    </div>
+    <div class="cap-card">
+        <div class="cap-icon green"><i class="fas fa-stethoscope"></i></div>
+        <div class="cap-title">经营诊断</div>
+        <div class="cap-desc">自动识别店铺问题，给出优化建议</div>
+    </div>
+    <div class="cap-card">
+        <div class="cap-icon orange"><i class="fas fa-warehouse"></i></div>
+        <div class="cap-title">库存管理</div>
+        <div class="cap-desc">低库存预警、智能补货建议</div>
+    </div>
+    <div class="cap-card">
+        <div class="cap-icon pink"><i class="fas fa-bullhorn"></i></div>
+        <div class="cap-title">营销活动</div>
+        <div class="cap-desc">创建优惠券、满减活动、召回计划</div>
+    </div>
+    <div class="cap-card">
+        <div class="cap-icon cyan"><i class="fas fa-eye"></i></div>
+        <div class="cap-title">竞品分析</div>
+        <div class="cap-desc">监控竞品价格、销量趋势、市场机会</div>
+    </div>
+</div>
+
+<script src="../js/common.js"></script>
+<script>
+    /* ============================================================
+       AI 助手脚本
+       ============================================================ */
+
+    var chatMessages = document.getElementById('chatMessages');
+    var chatInput    = document.getElementById('chatInput');
+    var sendBtn      = document.getElementById('sendBtn');
+
+    /* ===== 发送消息 ===== */
+    function sendMessage() {
+        var text = chatInput.value.trim();
+        if (!text) return;
+        appendUserMessage(text);
+        chatInput.value = '';
+        showTyping();
+        setTimeout(function() {
+            hideTyping();
+            appendAIMessage(generateReply(text));
+        }, 800 + Math.random() * 500);
+    }
+
+    /* ===== 快捷提问 ===== */
+    function quickAsk(text) {
+        chatInput.value = text;
+        sendMessage();
+    }
+
+    /* ===== 追加用户消息 ===== */
+    function appendUserMessage(text) {
+        var div = document.createElement('div');
+        div.className = 'msg user';
+        div.innerHTML = `
+            <div class="msg-avatar user">我</div>
+            <div class="msg-bubble">${escapeHtml(text)}</div>
+        `;
+        chatMessages.appendChild(div);
+        scrollBottom();
+    }
+
+    /* ===== 追加 AI 消息 ===== */
+    function appendAIMessage(html) {
+        var div = document.createElement('div');
+        div.className = 'msg ai';
+        div.innerHTML = `
+            <div class="msg-avatar ai"><i class="fas fa-robot"></i></div>
+            <div class="msg-bubble">${html}</div>
+        `;
+        chatMessages.appendChild(div);
+        scrollBottom();
+    }
+
+    /* ===== 打字动画 ===== */
+    function showTyping() {
+        var div = document.createElement('div');
+        div.className = 'msg ai';
+        div.id = 'typingMsg';
+        div.innerHTML = `
+            <div class="msg-avatar ai"><i class="fas fa-robot"></i></div>
+            <div class="msg-bubble">
+                <div class="typing">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(div);
+        scrollBottom();
+        sendBtn.disabled = true;
+    }
+    function hideTyping() {
+        var el = document.getElementById('typingMsg');
+        if (el) el.remove();
+        sendBtn.disabled = false;
+    }
+
+    /* ===== 滚到底部 ===== */
+    function scrollBottom() {
+        setTimeout(function() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 50);
+    }
+
+    /* ===== HTML 转义 ===== */
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    /* ===== 规则引擎（演示用） ===== */
+    function generateReply(msg) {
+        var m = msg.toLowerCase();
+
+        if (m.includes('上架') || m.includes('新品')) {
+            return `
+                📦 <strong>已收到上架需求！</strong><br>
+                正在为您生成 <strong>3 款新品茶叶礼盒</strong> 的商品草稿：
+                <ul>
+                    <li>云山春茶礼盒 · 特级龙井 500g</li>
+                    <li>云山红茶礼盒 · 金骏眉 250g</li>
+                    <li>云山乌龙礼盒 · 高山铁观音 250g</li>
+                </ul>
+                预计 10 秒完成，请稍后到「商品管理」确认发布。
+                <div style="margin-top:8px;">
+                    <span class="suggest" onclick="quickAsk('帮我查一下上周的销售数据')">📊 顺便看下销售数据</span>
+                </div>
+            `;
+        }
+
+        if (m.includes('销售') || m.includes('数据') || m.includes('gmv')) {
+            return `
+                📊 <strong>近7日销售数据</strong><br>
+                • 总销售额：<strong>¥18.7k</strong>（较上周 <span style="color:#0d7c4f;">↑ 8.7%</span>）<br>
+                • 订单量：<strong>347 单</strong>（客单价 ¥53.9）<br>
+                • 访客数：<strong>2,456</strong>（转化率 4.1%）<br>
+                • 抖音渠道贡献最大，占比 <strong>40%</strong>
+                <div style="margin-top:8px;">
+                    <span class="suggest" onclick="quickAsk('帮我诊断一下转化率为什么下降')">📉 诊断转化率</span>
+                </div>
+            `;
+        }
+
+        if (m.includes('诊断') || m.includes('问题')) {
+            return `
+                🩺 <strong>店铺经营诊断结果</strong><br>
+                已识别 <strong>5 项问题</strong> + <strong>4 个机会点</strong>：<br>
+                <ul>
+                    <li><span style="color:#b51a3f;">⚠ 云山茶叶礼盒</span> 详情页跳出率上升 12%</li>
+                    <li><span style="color:#b55a1a;">⚠ 拼多多</span> 退款率上升 5.2%</li>
+                    <li><span style="color:#2a7faa;">💡 抖音</span> 转化率提升 12%，建议加投</li>
+                </ul>
+                完整报告请到「店铺经营诊断」查看。
+                <div style="margin-top:8px;">
+                    <span class="suggest" onclick="quickAsk('帮我查一下库存情况')">📦 看下库存</span>
+                </div>
+            `;
+        }
+
+        if (m.includes('库存') || m.includes('补货')) {
+            return `
+                📋 <strong>库存情况</strong><br>
+                • 总库存：<strong>12,847 件</strong>（8 个商品）<br>
+                • <span style="color:#b55a1a;">预警</span>：3 个商品低于安全线<br>
+                • <span style="color:#b51a3f;">缺货</span>：手写书法折扇（0 件）<br>
+                建议 <strong>3 天内补货</strong>，可到「智能采购」一键生成采购单。
+                <div style="margin-top:8px;">
+                    <span class="suggest" onclick="quickAsk('帮我生成补货采购单')">📦 生成采购单</span>
+                </div>
+            `;
+        }
+
+        if (m.includes('竞品') || m.includes('对手')) {
+            return `
+                📊 <strong>竞品分析摘要</strong><br>
+                监控 12 个竞品，其中 <strong>8 个近期降价</strong>（平均降幅 2.3%）<br>
+                • 云山茶叶竞品A（淘宝）：¥118，月销 1,234<br>
+                • 手工竹编竞品（拼多多）：¥79，月销 2,345<br>
+                • 山核桃仁竞品（京东）：¥42，月销 1,567<br>
+                建议保持现有定价策略，重点提升详情页转化。
+                <div style="margin-top:8px;">
+                    <span class="suggest" onclick="quickAsk('看看竞品分析报告')">📊 完整报告</span>
+                </div>
+            `;
+        }
+
+        if (m.includes('优惠') || m.includes('优惠券') || m.includes('营销')) {
+            return `
+                🎯 <strong>营销方案已生成</strong><br>
+                正在为您创建优惠券活动：<br>
+                • 满 <strong>200 减 30</strong>（全店通用）<br>
+                • 有效期限：7 天<br>
+                • 预计覆盖商品：<strong>1,283 件</strong><br>
+                是否立即上线？
+                <div style="margin-top:8px;">
+                    <span class="suggest" onclick="quickAsk('立即上线优惠券')">✅ 立即上线</span>
+                    <span class="suggest" onclick="quickAsk('修改优惠券金额')">✏️ 修改</span>
+                </div>
+            `;
+        }
+
+        if (m.includes('客户') || m.includes('客资') || m.includes('召回')) {
+            return `
+                👥 <strong>客资聚合分析</strong><br>
+                • 总客户数：<strong>3,847</strong>（今日新增 89）<br>
+                • 高价值客户：<strong>342 人</strong><br>
+                • 流失预警：<strong>8 人</strong> 45 天未复购<br>
+                建议触发专属优惠券召回，预计可挽回 <strong>¥6,200+</strong>。
+                <div style="margin-top:8px;">
+                    <span class="suggest" onclick="quickAsk('生成召回优惠券')">📢 生成召回</span>
+                </div>
+            `;
+        }
+
+        /* 默认回复 */
+        return `
+            🤖 收到你的需求：<em>"${escapeHtml(msg)}"</em><br><br>
+            我正在进行以下处理：<br>
+            1. 解析经营意图<br>
+            2. 匹配相关数据 / 操作<br>
+            3. 生成执行方案<br><br>
+            请稍等，我会在几秒内给出完整回复。你也可以试试：
+            <div style="margin-top:8px;">
+                <span class="suggest" onclick="quickAsk('帮我查一下上周的销售数据')">📊 查询销售</span>
+                <span class="suggest" onclick="quickAsk('诊断店铺问题')">🩺 经营诊断</span>
+                <span class="suggest" onclick="quickAsk('查看库存情况')">📦 库存</span>
+            </div>
+        `;
+    }
+
+    /* ===== 清空对话 ===== */
+    function clearChat() {
+        if (!confirm('确定要清空所有对话记录吗？')) return;
+        chatMessages.innerHTML = `
+            <div class="msg ai">
+                <div class="msg-avatar ai"><i class="fas fa-robot"></i></div>
+                <div class="msg-bubble">
+                    🧹 对话已清空，有什么可以帮你？
+                    <div style="margin-top:10px;">
+                        <span class="suggest" onclick="quickAsk('帮我查一下上周的销售数据')">📊 查询销售数据</span>
+                        <span class="suggest" onclick="quickAsk('帮我上架3款新品茶叶礼盒')">📦 上架新品</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        showToast('🧹 对话已清空');
+    }
+
+    /* ===== 页面加载 ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+        chatInput.focus();
+        console.log('AI 助手页已加载');
+    });
+</script>
+</body>
+</html>
