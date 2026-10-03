@@ -24,7 +24,7 @@
         }
 
         /* ============================================================
-           ① 背景：动态星云粒子
+           ① 背景：粒子星云
            ============================================================ */
         #bgCanvas {
             position: fixed;
@@ -34,7 +34,7 @@
         }
 
         /* ============================================================
-           ② 背景光晕（呼吸 + 缓慢漂移）
+           ② 光晕
            ============================================================ */
         .aurora {
             position: fixed;
@@ -75,9 +75,7 @@
             50%      { transform: translate(-90px, 40px) scale(1.3); opacity: 0.7; }
         }
 
-        /* ============================================================
-           ③ 网格线（科技感底纹）
-           ============================================================ */
+        /* 网格底纹 */
         .grid-bg {
             position: fixed;
             inset: 0;
@@ -92,7 +90,7 @@
         }
 
         /* ============================================================
-           ④ 主容器（左右分栏）
+           ③ 主容器
            ============================================================ */
         .login-wrap {
             position: relative;
@@ -113,11 +111,9 @@
         }
 
         /* ============================================================
-           ⑤ 左侧品牌区
+           ④ 左侧品牌区
            ============================================================ */
-        .brand-side {
-            color: #e6f1ff;
-        }
+        .brand-side { color: #e6f1ff; }
         .brand-tag {
             display: inline-flex;
             align-items: center;
@@ -138,7 +134,6 @@
             0%, 100% { opacity: 1; }
             50%      { opacity: 0.4; }
         }
-
         .brand-title {
             font-size: 52px;
             font-weight: 800;
@@ -158,7 +153,6 @@
             0%, 100% { background-position: 0% 50%; }
             50%      { background-position: 100% 50%; }
         }
-
         .brand-subtitle {
             font-size: 16px;
             color: #7a9cc7;
@@ -179,8 +173,6 @@
             0%, 100% { opacity: 1; }
             50%      { opacity: 0; }
         }
-
-        /* 数据指标 */
         .brand-stats {
             display: flex;
             gap: 40px;
@@ -209,19 +201,18 @@
         }
 
         /* ============================================================
-           ⑥ 右侧登录卡片（玻璃拟态 + 霓虹边）
+           ⑤ 右侧卡片
            ============================================================ */
         .card-side {
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-
         .login-card {
             position: relative;
             background: rgba(15, 25, 45, 0.65);
             border-radius: 24px;
-            padding: 44px 40px 36px;
+            padding: 36px 40px 30px;
             backdrop-filter: blur(24px) saturate(180%);
             -webkit-backdrop-filter: blur(24px) saturate(180%);
             border: 1px solid rgba(77, 171, 247, 0.18);
@@ -232,8 +223,6 @@
             overflow: hidden;
             transform-style: preserve-3d;
         }
-
-        /* 顶部扫描光带 */
         .login-card::before {
             content: '';
             position: absolute;
@@ -242,19 +231,13 @@
             width: 100%;
             height: 2px;
             background: linear-gradient(90deg,
-                transparent,
-                #4dabf7,
-                #00d4ff,
-                #4dabf7,
-                transparent);
+                transparent, #4dabf7, #00d4ff, #4dabf7, transparent);
             animation: scan 4s linear infinite;
         }
         @keyframes scan {
             0%   { left: -100%; }
             100% { left: 100%; }
         }
-
-        /* 角落装饰 */
         .login-card::after {
             content: '';
             position: absolute;
@@ -277,18 +260,18 @@
         /* 卡片头部 */
         .card-head {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 22px;
         }
         .card-logo {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
             background: linear-gradient(135deg, rgba(77, 171, 247, 0.2), rgba(106, 92, 255, 0.15));
             border: 1px solid rgba(77, 171, 247, 0.3);
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             position: relative;
             box-shadow: 0 0 40px rgba(77, 171, 247, 0.25);
         }
@@ -296,7 +279,7 @@
             content: '';
             position: absolute;
             inset: -2px;
-            border-radius: 18px;
+            border-radius: 16px;
             background: linear-gradient(135deg, #4dabf7, #6a5cff, #00d4ff);
             opacity: 0.4;
             filter: blur(12px);
@@ -308,13 +291,12 @@
             50%      { opacity: 0.6; }
         }
         .card-logo i {
-            font-size: 26px;
+            font-size: 24px;
             color: #4dabf7;
             filter: drop-shadow(0 0 8px rgba(77, 171, 247, 0.8));
         }
-
         .card-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: #fff;
             letter-spacing: 0.02em;
@@ -322,32 +304,64 @@
         .card-desc {
             font-size: 13px;
             color: #7a9cc7;
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
-        /* 错误提示 */
-        .error-box {
-            background: rgba(181, 26, 63, 0.12);
-            border: 1px solid rgba(181, 26, 63, 0.4);
-            color: #ff6b8a;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            margin-bottom: 16px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            animation: shake 0.35s;
+        /* ============================================================
+           ⑥ Tab 切换（账号密码 / 扫码）
+           ============================================================ */
+        .login-tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(5, 12, 25, 0.5);
+            border: 1px solid rgba(77, 171, 247, 0.12);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 22px;
         }
-        .error-box.show { display: flex; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25%      { transform: translateX(-6px); }
-            75%      { transform: translateX(6px); }
+        .login-tab {
+            flex: 1;
+            padding: 9px 12px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #7a9cc7;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            user-select: none;
+            position: relative;
+        }
+        .login-tab i { font-size: 13px; }
+        .login-tab:hover { color: #a8c4e0; }
+        .login-tab.active {
+            background: linear-gradient(135deg, rgba(77, 171, 247, 0.25), rgba(106, 92, 255, 0.2));
+            color: #fff;
+            box-shadow:
+                0 4px 12px rgba(77, 171, 247, 0.25),
+                0 0 0 1px rgba(77, 171, 247, 0.4) inset;
+        }
+        .login-tab.active i {
+            color: #4dabf7;
+            filter: drop-shadow(0 0 6px rgba(77, 171, 247, 0.8));
+        }
+
+        /* ============================================================
+           ⑦ Tab 内容
+           ============================================================ */
+        .tab-panel { display: none; animation: fadeIn 0.35s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         /* 表单 */
-        .form-group { margin-bottom: 18px; }
+        .form-group { margin-bottom: 16px; }
         .form-group label {
             display: block;
             font-size: 12px;
@@ -392,18 +406,13 @@
             font-family: inherit;
             letter-spacing: 0.02em;
         }
-        .input-wrap input::placeholder {
-            color: #4a6a8c;
-        }
-        /* 自动填充去掉黄色背景 */
+        .input-wrap input::placeholder { color: #4a6a8c; }
         .input-wrap input:-webkit-autofill,
         .input-wrap input:-webkit-autofill:hover,
         .input-wrap input:-webkit-autofill:focus {
             -webkit-text-fill-color: #fff;
             transition: background-color 5000s ease-in-out 0s;
         }
-
-        /* 密码显示切换 */
         .toggle-pwd {
             position: absolute;
             right: 14px;
@@ -416,12 +425,12 @@
         }
         .toggle-pwd:hover { color: #4dabf7; }
 
-        /* 记住我 + 忘记密码 */
+        /* 记住我 + 忘记 */
         .row-between {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 22px;
+            margin-bottom: 20px;
             font-size: 13px;
         }
         .row-between label {
@@ -473,13 +482,13 @@
         .login-btn {
             position: relative;
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             border: none;
             border-radius: 12px;
             background: linear-gradient(135deg, #1e6fd9 0%, #4dabf7 50%, #00d4ff 100%);
             background-size: 200% 200%;
             color: #fff;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             letter-spacing: 0.1em;
             cursor: pointer;
@@ -501,9 +510,7 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg,
-                transparent,
-                rgba(255, 255, 255, 0.3),
-                transparent);
+                transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: 0.6s;
         }
         .login-btn:hover::before { left: 100%; }
@@ -523,23 +530,186 @@
         }
         .login-btn:disabled:hover { transform: none; }
 
-        /* 卡片底部 */
+        /* ============================================================
+           ⑧ 扫码区域
+           ============================================================ */
+        .qr-wrap {
+            text-align: center;
+            padding: 6px 0 4px;
+        }
+        .qr-frame {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 14px;
+            border-radius: 16px;
+            background: rgba(5, 12, 25, 0.6);
+            border: 1px solid rgba(77, 171, 247, 0.25);
+            padding: 12px;
+            box-shadow:
+                0 0 40px rgba(77, 171, 247, 0.15) inset,
+                0 0 30px rgba(77, 171, 247, 0.1);
+            overflow: hidden;
+        }
+        /* 二维码占位（用 CSS 画个二维码示意） */
+        .qr-code {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background:
+                repeating-linear-gradient(0deg,
+                    rgba(77, 171, 247, 0.9) 0 8px,
+                    transparent 8px 16px),
+                repeating-linear-gradient(90deg,
+                    rgba(77, 171, 247, 0.9) 0 8px,
+                    transparent 8px 16px),
+                #0a1428;
+            background-size: 32px 32px, 32px 32px, 100% 100%;
+            background-blend-mode: overlay;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-code i {
+            font-size: 36px;
+            color: rgba(255, 255, 255, 0.95);
+            background: rgba(5, 12, 25, 0.85);
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+        /* 扫描光线 */
+        .qr-frame::before {
+            content: '';
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent, #00d4ff, #4dabf7, #00d4ff, transparent);
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.9);
+            top: 12px;
+            animation: qrScan 2.4s ease-in-out infinite;
+            z-index: 2;
+        }
+        @keyframes qrScan {
+            0%, 100% { top: 12px; opacity: 1; }
+            50%      { top: calc(100% - 14px); opacity: 0.9; }
+        }
+        /* 四角装饰 */
+        .qr-corner {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #4dabf7;
+            box-shadow: 0 0 10px rgba(77, 171, 247, 0.8);
+            z-index: 3;
+        }
+        .qr-corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; border-radius: 8px 0 0 0; }
+        .qr-corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; border-radius: 0 8px 0 0; }
+        .qr-corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; border-radius: 0 0 0 8px; }
+        .qr-corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; border-radius: 0 0 8px 0; }
+
+        .qr-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e6f1ff;
+            margin-bottom: 4px;
+        }
+        .qr-desc {
+            font-size: 12px;
+            color: #7a9cc7;
+            margin-bottom: 14px;
+        }
+
+        /* 扫码平台切换（微信 / 企业微信） */
+        .qr-platforms {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+        .qr-plat {
+            padding: 8px 18px;
+            border-radius: 10px;
+            background: rgba(5, 12, 25, 0.5);
+            border: 1px solid rgba(77, 171, 247, 0.15);
+            color: #7a9cc7;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .qr-plat i { font-size: 15px; }
+        .qr-plat:hover {
+            border-color: rgba(77, 171, 247, 0.4);
+            color: #a8c4e0;
+        }
+        .qr-plat.active {
+            background: linear-gradient(135deg, rgba(77, 171, 247, 0.25), rgba(106, 92, 255, 0.2));
+            border-color: #4dabf7;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(77, 171, 247, 0.3);
+        }
+        .qr-plat.active i {
+            filter: drop-shadow(0 0 6px rgba(77, 171, 247, 0.8));
+        }
+        .qr-plat.wechat.active i { color: #07c160; }
+        .qr-plat.workwechat.active i { color: #2f7bff; }
+
+        .qr-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: rgba(77, 171, 247, 0.08);
+            border: 1px solid rgba(77, 171, 247, 0.2);
+            font-size: 12px;
+            color: #a8c4e0;
+        }
+        .qr-hint i {
+            color: #4dabf7;
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+
+        /* ============================================================
+           ⑨ 卡片底部（含注册入口）
+           ============================================================ */
         .card-foot {
-            margin-top: 26px;
-            padding-top: 20px;
+            margin-top: 20px;
+            padding-top: 18px;
             border-top: 1px solid rgba(77, 171, 247, 0.12);
             display: flex;
             align-items: center;
             justify-content: space-between;
             font-size: 12px;
             color: #5a7fa8;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .card-foot .demo {
+        .card-foot .register {
             display: flex;
-            gap: 6px;
             align-items: center;
+            gap: 6px;
         }
-        .card-foot .demo b { color: #4dabf7; font-weight: 600; }
+        .card-foot .register a {
+            color: #4dabf7;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .card-foot .register a:hover {
+            color: #00d4ff;
+            text-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
+        }
         .card-foot .secure {
             display: flex;
             align-items: center;
@@ -548,7 +718,7 @@
         .card-foot .secure i { color: #0d7c4f; font-size: 11px; }
 
         /* ============================================================
-           ⑦ 加载动画
+           ⑩ 加载 & Toast
            ============================================================ */
         .spinner {
             display: inline-block;
@@ -561,9 +731,26 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ============================================================
-           ⑧ Toast
-           ============================================================ */
+        .error-box {
+            background: rgba(181, 26, 63, 0.12);
+            border: 1px solid rgba(181, 26, 63, 0.4);
+            color: #ff6b8a;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: shake 0.35s;
+        }
+        .error-box.show { display: flex; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25%      { transform: translateX(-6px); }
+            75%      { transform: translateX(6px); }
+        }
+
         .toast {
             position: fixed;
             bottom: 36px;
@@ -582,17 +769,14 @@
             z-index: 9999;
             white-space: nowrap;
         }
-        .toast.show {
-            display: block;
-            animation: toastIn 0.35s ease;
-        }
+        .toast.show { display: block; animation: toastIn 0.35s ease; }
         @keyframes toastIn {
             from { opacity: 0; transform: translateX(-50%) translateY(20px); }
             to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         /* ============================================================
-           ⑨ 响应式
+           ⑪ 响应式
            ============================================================ */
         @media (max-width: 900px) {
             .login-wrap {
@@ -610,31 +794,27 @@
             .brand-stats .stat-item .num { font-size: 26px; }
         }
         @media (max-width: 480px) {
-            .login-card { padding: 32px 24px 28px; }
+            .login-card { padding: 28px 22px 24px; }
             .brand-title { font-size: 28px; }
-            .card-title { font-size: 19px; }
+            .card-title { font-size: 18px; }
+            .qr-frame { width: 170px; height: 170px; }
+            .login-tab { font-size: 12px; padding: 8px 6px; }
+            .login-tab span { display: none; }
+            .login-tab i { font-size: 15px; }
         }
     </style>
 </head>
 <body>
 
-<!-- 背景画布 -->
 <canvas id="bgCanvas"></canvas>
-
-<!-- 光晕 -->
 <div class="aurora a1"></div>
 <div class="aurora a2"></div>
 <div class="aurora a3"></div>
-
-<!-- 网格 -->
 <div class="grid-bg"></div>
 
-<!-- ============================================================
-     登录容器
-     ============================================================ -->
 <div class="login-wrap">
 
-    <!-- 左侧品牌区 -->
+    <!-- ========== 左侧品牌区 ========== -->
     <div class="brand-side">
         <div class="brand-tag">
             <i class="fas fa-circle"></i>
@@ -662,9 +842,11 @@
         </div>
     </div>
 
-    <!-- 右侧登录卡片 -->
+    <!-- ========== 右侧登录卡片 ========== -->
     <div class="card-side" id="cardSide">
         <div class="login-card">
+
+            <!-- 卡片头部 -->
             <div class="card-head">
                 <div class="card-logo">
                     <i class="fas fa-bolt"></i>
@@ -673,57 +855,108 @@
                 <div class="card-desc">登录后进入 AI 运营控制台</div>
             </div>
 
+            <!-- Tab 切换 -->
+            <div class="login-tabs">
+                <div class="login-tab active" data-tab="pwd">
+                    <i class="fas fa-key"></i><span>账号登录</span>
+                </div>
+                <div class="login-tab" data-tab="qr">
+                    <i class="fas fa-qrcode"></i><span>扫码登录</span>
+                </div>
+            </div>
+
+            <!-- 错误提示 -->
             <div class="error-box" id="errorBox">
                 <i class="fas fa-exclamation-circle"></i>
                 <span id="errorText">账号或密码错误</span>
             </div>
 
-            <form id="loginForm" onsubmit="return handleLogin(event)">
-                <div class="form-group">
-                    <label>账号</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="username" placeholder="请输入账号"
-                               autocomplete="username" required>
+            <!-- ========== Tab 1：账号密码 ========== -->
+            <div class="tab-panel active" id="panel-pwd">
+                <form id="loginForm" onsubmit="return handleLogin(event)">
+                    <div class="form-group">
+                        <label>账号</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" placeholder="请输入账号"
+                                   autocomplete="username" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>密码</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="请输入密码"
+                                   autocomplete="current-password" required>
+                            <span class="toggle-pwd" onclick="togglePwd(this)">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row-between">
+                        <label>
+                            <input type="checkbox" id="remember" checked>
+                            记住账号
+                        </label>
+                        <a href="javascript:showToast('请联系管理员重置密码')">忘记密码？</a>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>登 录 控 制 台</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- ========== Tab 2：扫码登录 ========== -->
+            <div class="tab-panel" id="panel-qr">
+                <div class="qr-wrap">
+                    <div class="qr-frame">
+                        <div class="qr-corner tl"></div>
+                        <div class="qr-corner tr"></div>
+                        <div class="qr-corner bl"></div>
+                        <div class="qr-corner br"></div>
+                        <div class="qr-code" id="qrCode">
+                            <i class="fab fa-weixin" id="qrIcon"></i>
+                        </div>
+                    </div>
+
+                    <div class="qr-title" id="qrTitle">微信扫码登录</div>
+                    <div class="qr-desc" id="qrDesc">请使用微信扫一扫，扫描上方二维码</div>
+
+                    <div class="qr-platforms">
+                        <div class="qr-plat wechat active" data-plat="wechat">
+                            <i class="fab fa-weixin"></i> 微信
+                        </div>
+                        <div class="qr-plat workwechat" data-plat="workwechat">
+                            <i class="fas fa-briefcase"></i> 企业微信
+                        </div>
+                    </div>
+
+                    <div class="qr-hint">
+                        <i class="fas fa-circle"></i>
+                        <span id="qrStatus">二维码有效期 5 分钟</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>密码</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="password" placeholder="请输入密码"
-                               autocomplete="current-password" required>
-                        <span class="toggle-pwd" onclick="togglePwd(this)">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="row-between">
-                    <label>
-                        <input type="checkbox" id="remember" checked>
-                        记住账号
-                    </label>
-                    <a href="javascript:showToast('请联系管理员重置密码')">忘记密码？</a>
-                </div>
-
-                <button type="submit" class="login-btn" id="loginBtn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>登 录 控 制 台</span>
-                </button>
-            </form>
-
+            <!-- 卡片底部：注册入口 -->
             <div class="card-foot">
-                <div class="demo">
-                    <i class="fas fa-key" style="color:#4dabf7;"></i>
-                    演示: <b>admin</b> / <b>123456</b>
+                <div class="register">
+                    <i class="fas fa-user-plus" style="color:#4dabf7;"></i>
+                    还没有账号？
+                    <a href="register.html">
+                        立即注册 <i class="fas fa-arrow-right" style="font-size:10px;"></i>
+                    </a>
                 </div>
                 <div class="secure">
                     <i class="fas fa-shield-alt"></i>
                     数据加密
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -742,35 +975,59 @@
     redirectIfLoggedIn();
 
     /* ============================================================
-       2. 粒子背景（Canvas）
+       2. 粒子背景（自适应粒子数）
        ============================================================ */
     (function initParticles() {
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
-        let w, h, particles = [], lines = [];
-        const PARTICLE_COUNT = 90;
+        let w, h, particles = [];
+        let targetCount = 90;
         const MAX_DIST = 140;
+
+        // 根据屏幕宽度决定粒子数
+        function getParticleCount() {
+            const ww = window.innerWidth;
+            if (ww <= 480)  return 40;   // 手机
+            if (ww <= 900)  return 65;   // 平板
+            return 90;                   // 桌面
+        }
 
         function resize() {
             w = canvas.width  = window.innerWidth;
             h = canvas.height = window.innerHeight;
-        }
-        resize();
-        window.addEventListener('resize', resize);
 
-        // 生成粒子
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            // 重新计算粒子数
+            const newCount = getParticleCount();
+            if (newCount !== targetCount) {
+                targetCount = newCount;
+                particles = [];
+                for (let i = 0; i < targetCount; i++) {
+                    particles.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        vx: (Math.random() - 0.5) * 0.3,
+                        vy: (Math.random() - 0.5) * 0.3,
+                        r: Math.random() * 1.8 + 0.4,
+                        alpha: Math.random() * 0.5 + 0.3
+                    });
+                }
+            }
+        }
+
+        targetCount = getParticleCount();
+        for (let i = 0; i < targetCount; i++) {
             particles.push({
-                x: Math.random() * w,
-                y: Math.random() * h,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
                 vx: (Math.random() - 0.5) * 0.3,
                 vy: (Math.random() - 0.5) * 0.3,
                 r: Math.random() * 1.8 + 0.4,
                 alpha: Math.random() * 0.5 + 0.3
             });
         }
+        resize();
+        window.addEventListener('resize', resize);
 
-        // 鼠标位置
         let mouse = { x: -9999, y: -9999 };
         window.addEventListener('mousemove', function (e) {
             mouse.x = e.clientX;
@@ -780,7 +1037,6 @@
         function draw() {
             ctx.clearRect(0, 0, w, h);
 
-            // 绘制粒子连线
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
@@ -798,7 +1054,6 @@
                 }
             }
 
-            // 鼠标连线（近距离更亮）
             for (let i = 0; i < particles.length; i++) {
                 const dx = particles[i].x - mouse.x;
                 const dy = particles[i].y - mouse.y;
@@ -814,7 +1069,6 @@
                 }
             }
 
-            // 绘制粒子
             for (const p of particles) {
                 p.x += p.vx;
                 p.y += p.vy;
@@ -836,14 +1090,13 @@
     })();
 
     /* ============================================================
-       3. 打字机效果
+       3. 打字机
        ============================================================ */
     (function typewriter() {
         const el = document.getElementById('typewriter');
         const text = '全渠道数据聚合 · AI 智能诊断 · 自动化运营 · 让经营更简单。';
         let i = 0;
         el.innerHTML = '<span class="cursor"></span>';
-
         function tick() {
             if (i <= text.length) {
                 el.innerHTML = text.slice(0, i) + '<span class="cursor"></span>';
@@ -864,7 +1117,6 @@
             const smallHTML = hasSmall ? hasSmall.outerHTML : '';
             let cur = 0;
             const step = Math.max(1, target / 45);
-
             function run() {
                 cur += step;
                 if (cur >= target) {
@@ -879,12 +1131,11 @@
     })();
 
     /* ============================================================
-       5. 登录卡片 3D 倾斜跟随鼠标
+       5. 卡片 3D 倾斜
        ============================================================ */
     (function tiltCard() {
         const side = document.getElementById('cardSide');
         const wrap = document.querySelector('.login-wrap');
-
         wrap.addEventListener('mousemove', function (e) {
             const rect = side.getBoundingClientRect();
             const cx = rect.left + rect.width / 2;
@@ -895,14 +1146,75 @@
             side.style.transform =
                 `rotateY(${dx * maxTilt}deg) rotateX(${-dy * maxTilt}deg) translateZ(0)`;
         });
-
         wrap.addEventListener('mouseleave', function () {
             side.style.transform = 'rotateY(0) rotateX(0)';
         });
     })();
 
     /* ============================================================
-       6. 显示 / 隐藏密码
+       6. Tab 切换（账号密码 / 扫码）
+       ============================================================ */
+    document.querySelectorAll('.login-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            const target = this.dataset.tab;
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('panel-' + target).classList.add('active');
+
+            // 切换时清空错误
+            document.getElementById('errorBox').classList.remove('show');
+
+            // 聚焦账号或启动二维码
+            if (target === 'pwd') {
+                setTimeout(() => document.getElementById('username').focus(), 100);
+            }
+        });
+    });
+
+    /* ============================================================
+       7. 扫码平台切换（微信 / 企业微信）
+       ============================================================ */
+    document.querySelectorAll('.qr-plat').forEach(function (plat) {
+        plat.addEventListener('click', function () {
+            document.querySelectorAll('.qr-plat').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+
+            const type = this.dataset.plat;
+            const icon = document.getElementById('qrIcon');
+            const title = document.getElementById('qrTitle');
+            const desc = document.getElementById('qrDesc');
+
+            if (type === 'wechat') {
+                icon.className = 'fab fa-weixin';
+                icon.style.color = '#07c160';
+                title.textContent = '微信扫码登录';
+                desc.textContent = '请使用微信扫一扫，扫描上方二维码';
+            } else {
+                icon.className = 'fas fa-briefcase';
+                icon.style.color = '#2f7bff';
+                title.textContent = '企业微信扫码登录';
+                desc.textContent = '请使用企业微信扫一扫，扫描上方二维码';
+            }
+
+            // 重新生成二维码（视觉刷新）
+            refreshQR();
+        });
+    });
+
+    /* 二维码刷新动画 */
+    function refreshQR() {
+        const code = document.getElementById('qrCode');
+        code.style.opacity = '0.3';
+        setTimeout(() => {
+            code.style.transition = 'opacity 0.4s';
+            code.style.opacity = '1';
+        }, 150);
+        showToast('🔄 已刷新二维码');
+    }
+
+    /* ============================================================
+       8. 显示 / 隐藏密码
        ============================================================ */
     function togglePwd(el) {
         const input = document.getElementById('password');
@@ -919,7 +1231,7 @@
     }
 
     /* ============================================================
-       7. 处理登录
+       9. 处理登录
        ============================================================ */
     function handleLogin(e) {
         e.preventDefault();
@@ -935,7 +1247,6 @@
             return false;
         }
 
-        // loading
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span> <span>验证中...</span>';
 
@@ -964,7 +1275,37 @@
     }
 
     /* ============================================================
-       8. 回填上次登录账号
+       10. 模拟扫码成功（演示用）
+       ============================================================ */
+    // 真实项目：轮询后端接口检查扫码状态
+    // 这里只做演示，5 秒后自动"扫描成功"
+    let qrTimer = null;
+    function simulateQRSuccess() {
+        clearTimeout(qrTimer);
+        qrTimer = setTimeout(function () {
+            const status = document.getElementById('qrStatus');
+            if (status && document.getElementById('panel-qr').classList.contains('active')) {
+                status.textContent = '✅ 扫描成功，正在登录...';
+                status.style.color = '#0d7c4f';
+
+                // 自动写入登录状态
+                sessionStorage.setItem('aicontrol_logged_in', '1');
+                sessionStorage.setItem('aicontrol_user', 'wx_user');
+
+                setTimeout(function () {
+                    location.href = 'index.html';
+                }, 800);
+            }
+        }, 6000); // 演示：6 秒后自动成功
+    }
+
+    /* 切到扫码 tab 时启动模拟 */
+    document.querySelector('.login-tab[data-tab="qr"]').addEventListener('click', function () {
+        simulateQRSuccess();
+    });
+
+    /* ============================================================
+       11. 回填账号 + 自动聚焦
        ============================================================ */
     window.addEventListener('DOMContentLoaded', function () {
         const last = localStorage.getItem('aicontrol_last_user');
@@ -975,7 +1316,7 @@
     });
 
     /* ============================================================
-       9. 简易 Toast
+       12. Toast
        ============================================================ */
     function showToast(msg) {
         const t = document.getElementById('toast');
