@@ -246,4 +246,199 @@
     <div class="card-header">
         <h3><i class="fas fa-filter"></i> 订单筛选</h3>
         <span class="action" onclick="showToast('🔄 已重置筛选条件')">
-           
+            <i class="fas fa-undo"></i> 重置
+        </span>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>渠道</label>
+            <select>
+                <option>全部</option>
+                <option>淘宝</option>
+                <option>抖音</option>
+                <option>拼多多</option>
+                <option>京东</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>状态</label>
+            <select>
+                <option>全部</option>
+                <option>待支付</option>
+                <option>已支付</option>
+                <option>待发货</option>
+                <option>已发货</option>
+                <option>已完成</option>
+                <option>退款中</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>日期</label>
+            <input type="text" placeholder="2026-09-01 ~ 2026-09-05">
+        </div>
+        <div class="form-group">
+            <label>买家</label>
+            <input type="text" placeholder="昵称 / 手机号">
+        </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+        <span class="btn-sm primary" onclick="showToast('🔍 正在搜索订单...')">
+            <i class="fas fa-search"></i> 搜索
+        </span>
+        <span class="btn-sm outline" onclick="showToast('📤 正在导出订单...')">
+            <i class="fas fa-file-export"></i> 导出
+        </span>
+        <span style="margin-left:auto;font-size:13px;color:#5f7d95;align-self:center;">
+            共 347 条订单
+        </span>
+    </div>
+</div>
+
+<!-- 订单列表 -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-list"></i> 订单列表</h3>
+        <span class="action"><i class="fas fa-clock"></i> 实时更新</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th>买家</th>
+                    <th>商品</th>
+                    <th>渠道</th>
+                    <th>金额</th>
+                    <th>状态</th>
+                    <th>时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>ORD-0905-001</strong></td>
+                    <td>王*婷</td>
+                    <td>云山茶叶礼盒</td>
+                    <td><span class="badge douyin">抖音</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥128</td>
+                    <td><span class="badge success">已支付</span></td>
+                    <td>14:32</td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📦 正在处理发货...')">发货</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ORD-0905-002</strong></td>
+                    <td>张*豪</td>
+                    <td>手工竹编包</td>
+                    <td><span class="badge taobao">淘宝</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥89</td>
+                    <td><span class="badge warning">待发货</span></td>
+                    <td>14:15</td>
+                    <td>
+                        <span class="btn-sm primary" onclick="showToast('✏️ 正在处理订单...')">处理</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ORD-0905-003</strong></td>
+                    <td>李*萱</td>
+                    <td>山核桃仁 250g</td>
+                    <td><span class="badge pdd">拼多多</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥45</td>
+                    <td><span class="badge info">已发货</span></td>
+                    <td>13:50</td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📍 正在追踪物流...')">追踪</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ORD-0905-004</strong></td>
+                    <td>赵*琳</td>
+                    <td>云山手工皂套装</td>
+                    <td><span class="badge jd">京东</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥79</td>
+                    <td><span class="badge danger">退款中</span></td>
+                    <td>13:20</td>
+                    <td>
+                        <span class="btn-sm danger" onclick="showToast('🚨 正在处理退款...')">处理</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ORD-0905-005</strong></td>
+                    <td>刘*阳</td>
+                    <td>云山陶瓷杯</td>
+                    <td><span class="badge taobao">淘宝</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥58</td>
+                    <td><span class="badge success">已支付</span></td>
+                    <td>12:45</td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📦 正在处理发货...')">发货</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ORD-0905-006</strong></td>
+                    <td>陈*瑶</td>
+                    <td>手工竹编包</td>
+                    <td><span class="badge douyin">抖音</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥89</td>
+                    <td><span class="badge warning">待发货</span></td>
+                    <td>12:30</td>
+                    <td>
+                        <span class="btn-sm primary" onclick="showToast('✏️ 正在处理订单...')">处理</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ORD-0905-007</strong></td>
+                    <td>周*明</td>
+                    <td>手写书法折扇</td>
+                    <td><span class="badge pdd">拼多多</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥35</td>
+                    <td><span class="badge info">已发货</span></td>
+                    <td>12:10</td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📍 正在追踪物流...')">追踪</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ORD-0905-008</strong></td>
+                    <td>吴*雅</td>
+                    <td>云山国风丝巾</td>
+                    <td><span class="badge jd">京东</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥68</td>
+                    <td><span class="badge success">已完成</span></td>
+                    <td>11:45</td>
+                    <td>
+                        <span class="btn-sm outline" onclick="showToast('📋 查看订单详情...')">详情</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination">
+        <span style="font-size:13px;color:#5f7d95;">
+            显示 1-8 条 / 共 347 条
+        </span>
+        <div class="pages">
+            <span class="page-item" onclick="showToast('📄 上一页')">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+            <span class="page-item active">1</span>
+            <span class="page-item" onclick="showToast('📄 第2页')">2</span>
+            <span class="page-item" onclick="showToast('📄 第3页')">3</span>
+            <span class="page-item">...</span>
+            <span class="page-item" onclick="showToast('📄 第44页')">44</span>
+            <span class="page-item" onclick="showToast('📄 下一页')">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        </div>
+    </div>
+</div>
+
+<script src="../js/common.js"></script>
+<script>
+    console.log('订单管理页已加载');
+</script>
+</body>
+</html>
