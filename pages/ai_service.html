@@ -370,20 +370,13 @@
             padding: 1px 6px; border-radius: 8px;
             font-size: 9px; font-weight: 600;
         }
-        .msg-row .meta .kb-tag {
-            background: #fff5db; color: #a86b00;
-            padding: 1px 6px; border-radius: 8px;
-            font-size: 9px; font-weight: 600;
-        }
 
         .kb-trace {
             margin-top: 6px; padding-top: 6px;
             border-top: 1px dashed #e8edf4;
             font-size: 11px; color: #5f7d95;
         }
-        .kb-trace a {
-            color: #2a7faa; text-decoration: none;
-        }
+        .kb-trace a { color: #2a7faa; text-decoration: none; }
         .kb-trace a:hover { text-decoration: underline; }
 
         .typing-indicator {
@@ -418,6 +411,7 @@
             border-top: 1px solid #e8edf4;
             display: flex; gap: 6px; flex-wrap: wrap;
             flex-shrink: 0; background: #fff;
+            align-items: center;
         }
         .quick-replies .qr-label {
             font-size: 11px; color: #94a3b8;
@@ -430,6 +424,24 @@
             transition: 0.12s; font-family: inherit;
         }
         .qr-btn:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
+        .qr-btn.product {
+            border-color: #ffd4b3;
+            background: #fff5f0;
+            color: #ff5000;
+        }
+        .qr-btn.product:hover {
+            background: #fff0e6;
+            border-color: #ff5000;
+        }
+        .qr-btn.coupon {
+            border-color: #ffd4b3;
+            background: #fff5f0;
+            color: #ff5000;
+        }
+        .qr-btn.coupon:hover {
+            background: #fff0e6;
+            border-color: #ff5000;
+        }
 
         .chat-input-area {
             background: #fff;
@@ -445,6 +457,20 @@
         }
         .chat-input-area .attach-btn:hover {
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
+        }
+        .chat-input-area .attach-btn.product {
+            color: #ff5000;
+        }
+        .chat-input-area .attach-btn.product:hover {
+            border-color: #ff5000;
+            background: #fff5f0;
+        }
+        .chat-input-area .attach-btn.coupon {
+            color: #ff5000;
+        }
+        .chat-input-area .attach-btn.coupon:hover {
+            border-color: #ff5000;
+            background: #fff5f0;
         }
         .chat-input-area .input-wrap {
             flex: 1; background: #f8fafc;
@@ -518,7 +544,7 @@
         .lib-panel::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
 
         .lib-toolbar {
-            display: flex; gap: 8px; align-items: center;
+            display: flex; gap: 10px; align-items: center;
             margin-bottom: 14px; flex-wrap: wrap;
         }
         .lib-toolbar input[type="text"],
@@ -591,26 +617,21 @@
             box-shadow: 0 6px 20px rgba(10,30,47,0.06);
             border-color: #c8d8e8;
         }
-        .kb-card.disabled {
-            opacity: 0.55;
-            background: #f5f7fa;
-        }
+        .kb-card.disabled { opacity: 0.55; background: #f5f7fa; }
         .kb-card.pinned {
             border-color: #f5b342;
             box-shadow: 0 0 0 1px #f5b342 inset;
         }
         .kb-card .kb-head {
             display: flex; justify-content: space-between;
-            align-items: flex-start; margin-bottom: 8px;
-            gap: 8px;
+            align-items: flex-start; margin-bottom: 8px; gap: 8px;
         }
         .kb-card .kb-title {
             font-size: 14px; font-weight: 600; color: #0a1e2f;
             line-height: 1.4;
             overflow: hidden; text-overflow: ellipsis;
             display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            flex: 1;
+            -webkit-box-orient: vertical; flex: 1;
         }
         .kb-card .kb-cat {
             font-size: 10px; padding: 2px 8px; border-radius: 20px;
@@ -625,8 +646,7 @@
             -webkit-box-orient: vertical;
         }
         .kb-card .kb-tags {
-            display: flex; gap: 4px; flex-wrap: wrap;
-            margin: 8px 0;
+            display: flex; gap: 4px; flex-wrap: wrap; margin: 8px 0;
         }
         .kb-card .kb-tag {
             font-size: 10px; padding: 2px 8px; border-radius: 20px;
@@ -641,34 +661,24 @@
         }
         .kb-card-actions {
             display: flex; gap: 4px;
-            padding-top: 8px;
-            margin-top: 8px;
+            padding-top: 8px; margin-top: 8px;
             border-top: 1px solid #f0f4f9;
         }
         .kb-act-btn {
-            flex: 1;
-            padding: 6px;
+            flex: 1; padding: 6px;
             border-radius: 6px;
             border: 1px solid #dce5ef;
-            background: #fff;
-            color: #5f7d95;
-            cursor: pointer;
-            font-size: 11px;
-            transition: 0.12s;
-            font-family: inherit;
+            background: #fff; color: #5f7d95;
+            cursor: pointer; font-size: 11px;
+            transition: 0.12s; font-family: inherit;
         }
         .kb-act-btn:hover {
-            border-color: #4dabf7;
-            color: #2a7faa;
-            background: #f5f9fe;
+            border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
         }
         .kb-act-btn.danger:hover {
-            border-color: #b51a3f;
-            color: #b51a3f;
-            background: #fde8ed;
+            border-color: #b51a3f; color: #b51a3f; background: #fde8ed;
         }
 
-        /* 素材网格 */
         .asset-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -711,9 +721,7 @@
             padding: 2px 8px; border-radius: 10px;
             font-weight: 500;
         }
-        .asset-card .asset-info {
-            padding: 10px 12px;
-        }
+        .asset-card .asset-info { padding: 10px 12px; }
         .asset-card .asset-name {
             font-size: 12px; font-weight: 600; color: #0a1e2f;
             overflow: hidden; text-overflow: ellipsis;
@@ -759,130 +767,899 @@
             font-size: 52px; color: #dce5ef;
             margin-bottom: 14px; display: block;
         }
-        .lib-empty h3 {
-            font-size: 16px; color: #0a1e2f; margin-bottom: 6px;
-        }
+        .lib-empty h3 { font-size: 16px; color: #0a1e2f; margin-bottom: 6px; }
         .lib-empty p { font-size: 13px; }
 
-        /* ===== 上传弹窗 ===== */
-        .upload-modal {
-            position: fixed; inset: 0;
-            background: rgba(10,30,47,0.55);
-            backdrop-filter: blur(4px); z-index: 9999;
-            display: none; align-items: center; justify-content: center;
-            padding: 20px;
-        }
-        .upload-modal.show { display: flex; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .upload-box {
-            background: #fff; border-radius: 16px;
-            max-width: 460px; width: 100%;
-            max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
-        }
-        .upload-head {
-            padding: 18px 22px 14px;
-            border-bottom: 1px solid #e8edf4;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .upload-head h3 {
-            font-size: 16px; font-weight: 600; color: #0a1e2f;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .upload-head h3 i { color: #4dabf7; }
-        .upload-head .close {
-            width: 30px; height: 30px; border-radius: 50%;
-            border: none; background: #f0f4f9; color: #5f7d95;
-            cursor: pointer; font-size: 15px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .upload-head .close:hover { background: #fde8ed; color: #b51a3f; }
-        .upload-body { padding: 18px 22px; }
-        .upload-body .form-group { margin-bottom: 14px; }
-        .upload-body label {
-            display: block; font-size: 12px; font-weight: 500;
-            color: #5f7d95; margin-bottom: 6px;
-        }
-        .upload-body label .req { color: #b51a3f; }
-        .upload-body input[type="text"],
-        .upload-body select {
-            width: 100%; padding: 10px 14px;
-            border: 1px solid #dce5ef; border-radius: 10px;
-            background: #fafcfe; font-size: 13px;
-            font-family: inherit; outline: none; color: #0a1e2f;
-        }
-        .upload-body input[type="text"]:focus,
-        .upload-body select:focus {
-            border-color: #4dabf7; background: #fff;
-            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
-        }
-        .upload-body .file-input-wrap {
-            border: 2px dashed #dce5ef;
-            border-radius: 10px; padding: 20px;
-            text-align: center; cursor: pointer;
-            transition: 0.15s; background: #fafcfe;
-        }
-        .upload-body .file-input-wrap:hover {
-            border-color: #4dabf7; background: #f5f9fe;
-        }
-        .upload-body .file-input-wrap.dragover {
-            border-color: #4dabf7; background: #f0f7fe;
-        }
-        .upload-body .file-input-wrap i {
-            font-size: 28px; color: #4dabf7;
-            margin-bottom: 8px; display: block;
-        }
-        .upload-body .file-input-wrap p {
-            font-size: 13px; color: #5f7d95;
-        }
-        .upload-body .file-input-wrap small {
-            font-size: 11px; color: #94a3b8;
-            display: block; margin-top: 4px;
-        }
-        .upload-body .selected-file {
-            background: #f0f7fe; border-radius: 10px;
-            padding: 10px 14px; margin-top: 8px;
-            font-size: 13px; color: #2a7faa;
-            display: none; align-items: center; gap: 8px;
-        }
-        .upload-body .selected-file.show { display: flex; }
-        .upload-body .selected-file .name {
-            flex: 1; overflow: hidden;
-            text-overflow: ellipsis; white-space: nowrap;
-        }
-        .upload-foot {
-            display: flex; gap: 10px;
-            padding: 14px 22px;
-            border-top: 1px solid #e8edf4;
-            background: #fafcfe;
-        }
-        .upload-foot .btn {
-            flex: 1; padding: 11px 18px;
-            border-radius: 10px; border: none;
-            font-size: 14px; font-weight: 600;
-            cursor: pointer; font-family: inherit;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+        /* ============================================================
+           ★ 商品链接卡片（对齐淘宝样式）
+           ============================================================ */
+        .product-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e8edf4;
+            overflow: hidden;
+            margin-top: 8px;
+            width: 320px;
+            max-width: 100%;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.04);
             transition: 0.15s;
         }
-        .upload-foot .btn.primary { background: #0a1e2f; color: #fff; }
-        .upload-foot .btn.primary:hover { background: #1a3a5a; }
-        .upload-foot .btn.primary:disabled {
-            opacity: 0.5; cursor: not-allowed;
+        .product-card:hover {
+            box-shadow: 0 6px 20px rgba(255,80,0,0.1);
+            border-color: #ffb380;
         }
-        .upload-foot .btn.outline {
-            background: #fff; border: 1px solid #dce5ef; color: #1e3a5f;
-            flex: 0 0 auto;
+        .product-card .pc-body {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            cursor: pointer;
         }
-        .upload-foot .btn.outline:hover { background: #f5f8fc; }
+        .product-card .pc-image {
+            width: 88px;
+            height: 88px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f0f7fe, #e0f0ff);
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .product-card .pc-image img {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+        }
+        .product-card .pc-image .ph {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            color: #4dabf7; font-size: 28px;
+        }
+        .product-card .pc-image .platform-badge {
+            position: absolute; top: 4px; left: 4px;
+            background: rgba(10,30,47,0.75);
+            color: #fff;
+            font-size: 9px;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .product-card .pc-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .product-card .pc-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0a1e2f;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .product-card .pc-spec {
+            font-size: 11px;
+            color: #94a3b8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .product-card .pc-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-top: 2px;
+        }
+        .product-card .pc-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff5000;
+            letter-spacing: -0.02em;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .product-card .pc-price small {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .product-card .pc-original {
+            font-size: 11px;
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+        .product-card .pc-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 10px;
+            color: #94a3b8;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 2px;
+        }
+        .product-card .pc-meta .rating {
+            color: #ff5000;
+            font-weight: 500;
+        }
+        .product-card .pc-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .product-card .pc-tag {
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: #fff0e6;
+            color: #ff5000;
+            border: 1px solid #ffd4b3;
+        }
+        .product-card .pc-actions {
+            display: flex;
+            border-top: 1px solid #f0f4f9;
+        }
+        .product-card .pc-btn {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.12s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: #0a1e2f;
+        }
+        .product-card .pc-btn:first-child {
+            border-right: 1px solid #f0f4f9;
+        }
+        .product-card .pc-btn.cart { color: #5f7d95; }
+        .product-card .pc-btn.cart:hover { background: #f5f9fe; color: #2a7faa; }
+        .product-card .pc-btn.buy {
+            background: linear-gradient(135deg, #ff7733, #ff5000);
+            color: #fff;
+        }
+        .product-card .pc-btn.buy:hover {
+            background: linear-gradient(135deg, #ff5000, #e63c00);
+        }
+        .product-card .pc-btn:active { transform: scale(0.98); }
 
+        /* ===== 多商品轮播卡片 ===== */
+        .product-carousel {
+            margin-top: 8px;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e8edf4;
+            overflow: hidden;
+            width: 320px;
+            max-width: 100%;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.04);
+        }
+        .product-carousel .pc-title-bar {
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #fff5f0, #fff0e6);
+            border-bottom: 1px solid #ffe4cc;
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff5000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .product-carousel .pc-title-bar i {
+            color: #ff7733;
+        }
+        .product-carousel .pc-list {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .product-carousel .pc-list::-webkit-scrollbar { display: none; }
+        .product-carousel .pc-slide {
+            min-width: 100%;
+            scroll-snap-align: start;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .product-carousel .pc-slide:hover {
+            background: #fafcfe;
+        }
+        .product-carousel .pc-slide .pc-image {
+            width: 88px;
+            height: 88px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f0f7fe, #e0f0ff);
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .product-carousel .pc-slide .pc-image img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .product-carousel .pc-slide .pc-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .product-carousel .pc-slide .pc-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0a1e2f;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .product-carousel .pc-slide .pc-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff5000;
+        }
+        .product-carousel .pc-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 0 10px;
+            background: #fff;
+        }
+        .product-carousel .pc-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #dce5ef;
+            transition: 0.15s;
+            cursor: pointer;
+        }
+        .product-carousel .pc-indicator.active {
+            width: 18px;
+            border-radius: 4px;
+            background: #ff5000;
+        }
+        .product-carousel .pc-nav {
+            display: flex;
+            border-top: 1px solid #f0f4f9;
+        }
+        .product-carousel .pc-nav-btn {
+            flex: 1;
+            padding: 8px 0;
+            border: none;
+            background: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f7d95;
+            cursor: pointer;
+            transition: 0.12s;
+            font-family: inherit;
+        }
+        .product-carousel .pc-nav-btn:hover {
+            background: #f5f9fe;
+            color: #2a7faa;
+        }
+        .product-carousel .pc-nav-btn.buy {
+            background: linear-gradient(135deg, #ff7733, #ff5000);
+            color: #fff;
+        }
+        .product-carousel .pc-nav-btn.buy:hover {
+            background: linear-gradient(135deg, #ff5000, #e63c00);
+        }
+
+        /* ===== 优惠券卡片 ===== */
+        .coupon-card {
+            margin-top: 8px;
+            display: flex;
+            background: linear-gradient(135deg, #fff5f0, #ffe4cc);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #ffd4b3;
+            width: 320px;
+            max-width: 100%;
+            box-shadow: 0 2px 8px rgba(255,80,0,0.08);
+            position: relative;
+        }
+        .coupon-card .cc-left {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #ff7733, #ff5000);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            min-width: 110px;
+            position: relative;
+        }
+        .coupon-card .cc-left::before,
+        .coupon-card .cc-left::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+        }
+        .coupon-card .cc-left::before { top: -8px; }
+        .coupon-card .cc-left::after { bottom: -8px; }
+        .coupon-card .cc-amount {
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: baseline;
+        }
+        .coupon-card .cc-amount small {
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .coupon-card .cc-condition {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        .coupon-card .cc-right {
+            flex: 1;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+            position: relative;
+        }
+        .coupon-card .cc-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #8a5a00;
+        }
+        .coupon-card .cc-desc {
+            font-size: 11px;
+            color: #b57a00;
+        }
+        .coupon-card .cc-expire {
+            font-size: 10px;
+            color: #b57a00;
+            opacity: 0.75;
+            margin-top: 2px;
+        }
+        .coupon-card .cc-action {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #ff7733, #ff5000);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.12s;
+            font-family: inherit;
+        }
+        .coupon-card .cc-action:hover {
+            filter: brightness(1.05);
+            transform: translateY(-50%) scale(1.02);
+        }
+
+        /* ===== 商品选择弹窗 ===== */
+        .product-picker-modal {
+            position: fixed; inset: 0;
+            background: rgba(10,30,47,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .product-picker-modal.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        .product-picker-box {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 720px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+        }
+        .product-picker-head {
+            padding: 16px 22px;
+            border-bottom: 1px solid #e8edf4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-picker-head h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .product-picker-head h3 i { color: #ff5000; }
+        .product-picker-head .close-btn {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f4f9;
+            color: #5f7d95;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .product-picker-head .close-btn:hover {
+            background: #fde8ed;
+            color: #b51a3f;
+        }
+        .product-picker-search {
+            padding: 12px 22px;
+            border-bottom: 1px solid #e8edf4;
+            position: relative;
+        }
+        .product-picker-search input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 1px solid #dce5ef;
+            border-radius: 10px;
+            background: #fafcfe;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            color: #0a1e2f;
+        }
+        .product-picker-search input:focus {
+            border-color: #ff5000;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(255,80,0,0.08);
+        }
+        .product-picker-search::before {
+            content: '\f002';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 36px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 13px;
+            pointer-events: none;
+        }
+        .product-picker-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 22px 18px;
+        }
+        .product-picker-list::-webkit-scrollbar { width: 6px; }
+        .product-picker-list::-webkit-scrollbar-thumb {
+            background: #dce5ef;
+            border-radius: 10px;
+        }
+        .product-picker-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e8edf4;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+            background: #fff;
+            align-items: center;
+        }
+        .product-picker-item:hover {
+            border-color: #ff5000;
+            background: #fff5f0;
+            transform: translateX(2px);
+        }
+        .product-picker-item.selected {
+            border-color: #ff5000;
+            background: #fff5f0;
+            box-shadow: 0 0 0 2px rgba(255,80,0,0.15);
+        }
+        .product-picker-item .pitem-checkbox {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            border: 2px solid #dce5ef;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.12s;
+        }
+        .product-picker-item.selected .pitem-checkbox {
+            background: #ff5000;
+            border-color: #ff5000;
+            color: #fff;
+        }
+        .product-picker-item .pitem-checkbox i {
+            font-size: 12px;
+            opacity: 0;
+        }
+        .product-picker-item.selected .pitem-checkbox i {
+            opacity: 1;
+        }
+        .product-picker-item .pitem-img {
+            width: 60px; height: 60px;
+            border-radius: 8px;
+            background: #f0f7fe;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: #4dabf7; font-size: 22px;
+        }
+        .product-picker-item .pitem-img img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .product-picker-item .pitem-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .product-picker-item .pitem-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0a1e2f;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .product-picker-item .pitem-meta {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .product-picker-item .pitem-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ff5000;
+            margin-top: 4px;
+        }
+        .product-picker-item .pitem-send {
+            display: flex;
+            align-items: center;
+            color: #ff5000;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .product-picker-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+        .product-picker-empty i {
+            font-size: 40px;
+            color: #dce5ef;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .product-picker-foot {
+            padding: 12px 22px;
+            border-top: 1px solid #e8edf4;
+            background: #fafcfe;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .product-picker-foot .picked-info {
+            font-size: 13px;
+            color: #5f7d95;
+        }
+        .product-picker-foot .picked-info strong {
+            color: #ff5000;
+        }
+        .product-picker-foot .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+        .product-picker-foot .btn {
+            padding: 9px 20px;
+            border-radius: 20px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.12s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .product-picker-foot .btn.outline {
+            background: #fff;
+            border: 1px solid #dce5ef;
+            color: #1e3a5f;
+        }
+        .product-picker-foot .btn.outline:hover {
+            background: #f5f8fc;
+        }
+        .product-picker-foot .btn.primary {
+            background: linear-gradient(135deg, #ff7733, #ff5000);
+            color: #fff;
+        }
+        .product-picker-foot .btn.primary:hover {
+            filter: brightness(1.05);
+        }
+        .product-picker-foot .btn.primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== 优惠券选择弹窗 ===== */
+        .coupon-picker-modal {
+            position: fixed; inset: 0;
+            background: rgba(10,30,47,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .coupon-picker-modal.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        .coupon-picker-box {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+        }
+        .coupon-picker-body {
+            padding: 18px 22px;
+            overflow-y: auto;
+        }
+        .coupon-picker-body::-webkit-scrollbar { width: 6px; }
+        .coupon-picker-body::-webkit-scrollbar-thumb {
+            background: #dce5ef;
+            border-radius: 10px;
+        }
+        .coupon-item {
+            display: flex;
+            background: linear-gradient(135deg, #fff5f0, #ffe4cc);
+            border-radius: 10px;
+            border: 1px solid #ffd4b3;
+            margin-bottom: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.12s;
+        }
+        .coupon-item:hover {
+            border-color: #ff5000;
+            box-shadow: 0 4px 12px rgba(255,80,0,0.12);
+        }
+        .coupon-item.selected {
+            border-color: #ff5000;
+            box-shadow: 0 0 0 2px rgba(255,80,0,0.2);
+        }
+        .coupon-item .ci-left {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #ff7733, #ff5000);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-width: 100px;
+            flex-shrink: 0;
+        }
+        .coupon-item .ci-amount {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .coupon-item .ci-amount small {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .coupon-item .ci-condition {
+            font-size: 10px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+        .coupon-item .ci-right {
+            flex: 1;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+        }
+        .coupon-item .ci-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #8a5a00;
+        }
+        .coupon-item .ci-desc {
+            font-size: 11px;
+            color: #b57a00;
+        }
+        .coupon-item .ci-expire {
+            font-size: 10px;
+            color: #b57a00;
+            opacity: 0.75;
+        }
+        .coupon-item .ci-check {
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            color: #ff5000;
+            font-size: 20px;
+            opacity: 0;
+            transition: 0.12s;
+        }
+        .coupon-item.selected .ci-check {
+            opacity: 1;
+        }
+
+        /* ===== 商品卡片样式设置弹窗 ===== */
+        .card-style-modal {
+            position: fixed; inset: 0;
+            background: rgba(10,30,47,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card-style-modal.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        .card-style-box {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 540px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+        }
+        .card-style-body {
+            padding: 18px 22px;
+            overflow-y: auto;
+        }
+        .card-style-body .form-group { margin-bottom: 14px; }
+        .card-style-body label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f7d95;
+            margin-bottom: 6px;
+        }
+        .card-style-body input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #dce5ef;
+            border-radius: 10px;
+            background: #fafcfe;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            color: #0a1e2f;
+        }
+        .card-style-body input[type="text"]:focus {
+            border-color: #4dabf7;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .color-preset-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .color-preset {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 2px solid #e8edf4;
+            cursor: pointer;
+            transition: 0.12s;
+            position: relative;
+        }
+        .color-preset:hover {
+            transform: scale(1.05);
+        }
+        .color-preset.active {
+            border-color: #0a1e2f;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0a1e2f;
+        }
+
+        /* ===== 灯箱 ===== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            cursor: zoom-out;
+        }
+        .lightbox.show { display: flex; }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+            cursor: default;
+        }
+        .lightbox-content img,
+        .lightbox-content video {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: -16px; right: -16px;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: #fff;
+            color: #0a1e2f;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* ===== Toast ===== */
         .global-toast {
-            position: fixed; bottom: 30px; left: 50%;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
             transform: translateX(-50%);
-            background: #0a1e2f; color: #fff;
-            padding: 12px 28px; border-radius: 40px;
-            font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 9999; white-space: nowrap; display: none;
-            max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+            background: #0a1e2f;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 99999;
+            white-space: nowrap;
+            display: none;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .global-toast.show { display: block; animation: fadeUp 0.3s ease; }
         @keyframes fadeUp {
@@ -890,7 +1667,6 @@
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 1200px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
@@ -918,6 +1694,7 @@
             .lib-panel { padding: 12px; }
             .kb-grid, .asset-grid { gap: 10px; }
             .asset-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .product-card { width: 280px; }
         }
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -926,6 +1703,7 @@
             .chat-head .actions .btn-sm span { display: none; }
             .msg-row { max-width: 92%; }
             .kb-grid { grid-template-columns: 1fr; }
+            .product-card { width: 100%; }
         }
     </style>
 </head>
@@ -944,6 +1722,12 @@
         <button class="tb-btn" onclick="markAllRead()" title="全部已读">
             <i class="fas fa-check-double"></i><span> 全部已读</span>
         </button>
+        <button class="tb-btn" onclick="showClickStats()" title="卡片点击统计">
+            <i class="fas fa-chart-bar"></i><span> 卡片统计</span>
+        </button>
+        <button class="tb-btn" onclick="openCardStyleModal()" title="卡片样式设置">
+            <i class="fas fa-palette"></i><span> 卡片样式</span>
+        </button>
     </div>
 </div>
 
@@ -958,18 +1742,17 @@
         <div class="value" id="statAI">1,023 <small>79.6%</small></div>
     </div>
     <div class="stat-card">
-        <div class="label"><i class="fas fa-book"></i> 知识库</div>
-        <div class="value" id="statKb">0</div>
+        <div class="label"><i class="fas fa-shopping-bag" style="color:#ff5000;"></i> 发卡片</div>
+        <div class="value" id="statCards">0</div>
     </div>
     <div class="stat-card">
-        <div class="label"><i class="fas fa-images"></i> 素材库</div>
-        <div class="value" id="statAssets">0</div>
+        <div class="label"><i class="fas fa-mouse-pointer" style="color:#ff5000;"></i> 卡片点击</div>
+        <div class="value" id="statClicks">0</div>
     </div>
 </div>
 
 <!-- ===== 主体 ===== -->
 <div class="app-body">
-    <!-- 左侧会话列表 -->
     <aside class="conv-side">
         <div class="conv-head">
             <h3><i class="fas fa-inbox"></i> 会话列表</h3>
@@ -987,9 +1770,7 @@
         <div class="conv-list" id="convList"></div>
     </aside>
 
-    <!-- 右侧主面板 -->
     <main class="chat-panel">
-        <!-- Tab 切换 -->
         <div class="chat-tabs">
             <button class="chat-tab active" onclick="switchTab('chat', this)">
                 <i class="fas fa-comments"></i> <span class="tab-text">对话</span>
@@ -1005,12 +1786,11 @@
         </div>
 
         <div class="panel-container">
-            <!-- ===== Tab 1: 对话 ===== -->
             <div class="panel active" id="panel-chat">
                 <div class="empty-chat" id="emptyChat">
                     <i class="fas fa-headset"></i>
                     <h3>👋 选择左侧会话开始接待</h3>
-                    <p>AI 已接入 <strong>企业知识库</strong> 和 <strong>素材库</strong>，<br>会自动引用资料回答，还能发送匹配的图片/视频。</p>
+                    <p>AI 已接入 <strong>企业知识库</strong>、<strong>素材库</strong> 和 <strong>商品卡片</strong>，<br>会自动引用资料 + 推荐商品，客户点击即可下单。</p>
                 </div>
 
                 <div class="chat-head" id="chatHead" style="display:none;">
@@ -1033,16 +1813,27 @@
                 </div>
 
                 <div class="quick-replies" id="quickReplies" style="display:none;">
-                    <span class="qr-label">快捷回复：</span>
+                    <span class="qr-label">快捷操作：</span>
+                    <button class="qr-btn product" onclick="openProductPicker()">
+                        <i class="fas fa-shopping-bag"></i> 发商品卡片
+                    </button>
+                    <button class="qr-btn coupon" onclick="openCouponPicker()">
+                        <i class="fas fa-ticket-alt"></i> 发优惠券
+                    </button>
                     <button class="qr-btn" onclick="sendQuick('您好，请问有什么可以帮您？')">你好</button>
                     <button class="qr-btn" onclick="sendQuick('这款商品目前有现货，下单后24小时内发货。')">现货</button>
                     <button class="qr-btn" onclick="sendQuick('支持7天无理由退换，请放心购买。')">退换货</button>
-                    <button class="qr-btn" onclick="sendQuick('可以发顺丰，补差价¥10即可。')">顺丰</button>
                 </div>
 
                 <div class="chat-input-area" id="chatInputArea" style="display:none;">
                     <button class="attach-btn" onclick="quickSendAsset()" title="从素材库发送">
                         <i class="fas fa-image"></i>
+                    </button>
+                    <button class="attach-btn product" onclick="openProductPicker()" title="发商品卡片">
+                        <i class="fas fa-shopping-bag"></i>
+                    </button>
+                    <button class="attach-btn coupon" onclick="openCouponPicker()" title="发优惠券">
+                        <i class="fas fa-ticket-alt"></i>
                     </button>
                     <div class="input-wrap">
                         <textarea id="msgInput" rows="1" placeholder="输入回复内容，回车发送，Shift+回车换行..."
@@ -1054,54 +1845,31 @@
                 </div>
             </div>
 
-            <!-- ===== Tab 2: 知识库 ===== -->
+            <!-- 知识库面板 -->
             <div class="panel" id="panel-kb">
                 <div class="lib-panel">
                     <div class="lib-toolbar">
                         <input type="text" id="kbSearch" placeholder="搜索知识标题/内容/标签..." oninput="filterKb()">
-                        <select id="kbCategoryFilter" onchange="filterKb()">
-                            <option value="all">全部分类</option>
-                        </select>
                         <select id="kbStatusFilter" onchange="filterKb()">
                             <option value="all">全部状态</option>
                             <option value="enabled">仅启用</option>
                             <option value="disabled">仅停用</option>
-                            <option value="pinned">仅置顶</option>
                         </select>
-                        <select id="kbSortBy" onchange="filterKb()">
-                            <option value="time">按时间</option>
-                            <option value="hit">按命中次数</option>
-                            <option value="title">按标题</option>
-                        </select>
-                        <button class="lib-btn primary" onclick="openKbUpload()">
-                            <i class="fas fa-cloud-upload-alt"></i> 上传知识
-                        </button>
-                        <button class="lib-btn outline" onclick="openKbBatchUpload()">
-                            <i class="fas fa-file-import"></i> 批量导入
-                        </button>
-                        <button class="lib-btn outline" onclick="openKbAutoGenerate()">
-                            <i class="fas fa-magic"></i> AI 提炼
-                        </button>
-                        <button class="lib-btn outline" onclick="showKbStats()">
-                            <i class="fas fa-chart-bar"></i> 统计
-                        </button>
                         <button class="lib-btn outline" onclick="loadKb()">
                             <i class="fas fa-sync-alt"></i> 刷新
                         </button>
                     </div>
-
                     <div class="kb-category-tree" id="kbCategoryTree"></div>
-
                     <div class="kb-grid" id="kbGrid"></div>
                     <div class="lib-empty" id="kbEmpty" style="display:none;">
                         <i class="fas fa-book-open"></i>
-                        <h3>还没有知识内容</h3>
-                        <p>点击"上传知识"或"批量导入"，支持 txt/md/json/csv/pdf/docx</p>
+                        <h3>暂无知识内容</h3>
+                        <p>请到「知识库管理」页面上传</p>
                     </div>
                 </div>
             </div>
 
-            <!-- ===== Tab 3: 素材库 ===== -->
+            <!-- 素材库面板 -->
             <div class="panel" id="panel-assets">
                 <div class="lib-panel">
                     <div class="lib-toolbar">
@@ -1111,19 +1879,15 @@
                             <option value="image">图片</option>
                             <option value="video">视频</option>
                         </select>
-                        <button class="lib-btn primary" onclick="openAssetUpload()">
-                            <i class="fas fa-cloud-upload-alt"></i> 上传素材
-                        </button>
                         <button class="lib-btn outline" onclick="loadAssets()">
                             <i class="fas fa-sync-alt"></i> 刷新
                         </button>
                     </div>
-
                     <div class="asset-grid" id="assetGrid"></div>
                     <div class="lib-empty" id="assetEmpty" style="display:none;">
                         <i class="fas fa-images"></i>
-                        <h3>还没有素材</h3>
-                        <p>点击"上传素材"，支持图片和视频</p>
+                        <h3>暂无素材</h3>
+                        <p>请到「素材库管理」页面上传</p>
                     </div>
                 </div>
             </div>
@@ -1131,102 +1895,93 @@
     </main>
 </div>
 
-<!-- ===== 上传知识弹窗 ===== -->
-<div class="upload-modal" id="kbUploadModal" onclick="if(event.target===this) closeKbUpload()">
-    <div class="upload-box">
-        <div class="upload-head">
-            <h3><i class="fas fa-book"></i> 上传知识</h3>
-            <button class="close" onclick="closeKbUpload()">×</button>
+<!-- ===== 商品选择弹窗 ===== -->
+<div class="product-picker-modal" id="productPickerModal" onclick="if(event.target===this) closeProductPicker()">
+    <div class="product-picker-box">
+        <div class="product-picker-head">
+            <h3><i class="fas fa-shopping-bag"></i> 选择商品发送给客户</h3>
+            <button class="close-btn" onclick="closeProductPicker()">×</button>
         </div>
-        <div class="upload-body">
-            <div class="form-group">
-                <label>知识标题 <span class="req">*</span></label>
-                <input type="text" id="kbTitle" placeholder="例如：退货政策说明">
-            </div>
-            <div class="form-group">
-                <label>分类</label>
-                <select id="kbCategory">
-                    <option value="cat_other">📝 其他</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>标签（逗号分隔）</label>
-                <input type="text" id="kbTags" placeholder="例如：退货,售后,政策">
-            </div>
-            <div class="form-group">
-                <label>文件 <span class="req">*</span></label>
-                <div class="file-input-wrap" id="kbFileWrap" onclick="document.getElementById('kbFileInput').click()">
-                    <i class="fas fa-file-upload"></i>
-                    <p>点击选择文件，或拖拽到此处</p>
-                    <small>支持 .txt / .md / .json / .csv / .pdf / .docx，≤ 20MB</small>
-                </div>
-                <input type="file" id="kbFileInput" accept=".txt,.md,.markdown,.json,.csv,.pdf,.docx" style="display:none;"
-                    onchange="onKbFileSelected(event)">
-                <div class="selected-file" id="kbSelectedFile">
-                    <i class="fas fa-file-alt"></i>
-                    <span class="name" id="kbFileName"></span>
-                    <span style="color:#94a3b8;font-size:11px;" id="kbFileSize"></span>
-                </div>
-            </div>
+        <div class="product-picker-search">
+            <input type="text" id="productPickerSearch" placeholder="搜索商品名 / SKU / 分类..."
+                oninput="filterProductPicker()">
         </div>
-        <div class="upload-foot">
-            <button class="btn outline" onclick="closeKbUpload()">取消</button>
-            <button class="btn primary" id="kbSubmitBtn" onclick="submitKbUpload()">
-                <i class="fas fa-upload"></i> 上传
-            </button>
+        <div class="product-picker-list" id="productPickerList"></div>
+        <div class="product-picker-foot">
+            <div class="picked-info">
+                已选 <strong id="pickedCount">0</strong> 个
+            </div>
+            <div class="btn-group">
+                <button class="btn outline" onclick="clearProductPick()">清空</button>
+                <button class="btn primary" id="sendProductBtn" onclick="sendPickedProducts()" disabled>
+                    <i class="fas fa-paper-plane"></i> 发送
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ===== 上传素材弹窗 ===== -->
-<div class="upload-modal" id="assetUploadModal" onclick="if(event.target===this) closeAssetUpload()">
-    <div class="upload-box">
-        <div class="upload-head">
-            <h3><i class="fas fa-images"></i> 上传素材</h3>
-            <button class="close" onclick="closeAssetUpload()">×</button>
+<!-- ===== 优惠券选择弹窗 ===== -->
+<div class="coupon-picker-modal" id="couponPickerModal" onclick="if(event.target===this) closeCouponPicker()">
+    <div class="coupon-picker-box">
+        <div class="product-picker-head">
+            <h3><i class="fas fa-ticket-alt" style="color:#ff5000;"></i> 选择优惠券发送</h3>
+            <button class="close-btn" onclick="closeCouponPicker()">×</button>
         </div>
-        <div class="upload-body">
-            <div class="form-group">
-                <label>商品名（可选）</label>
-                <input type="text" id="assetProductName" placeholder="例如：云山茶叶礼盒">
-            </div>
-            <div class="form-group">
-                <label>分类</label>
-                <select id="assetCategory">
-                    <option value="产品图">产品图</option>
-                    <option value="场景图">场景图</option>
-                    <option value="详情图">详情图</option>
-                    <option value="使用教程">使用教程</option>
-                    <option value="售后说明">售后说明</option>
-                    <option value="其他">其他</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>标签（逗号分隔）</label>
-                <input type="text" id="assetTags" placeholder="例如：茶叶,礼盒,主图">
-            </div>
-            <div class="form-group">
-                <label>文件 <span class="req">*</span></label>
-                <div class="file-input-wrap" id="assetFileWrap" onclick="document.getElementById('assetFileInput').click()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>点击选择文件，或拖拽到此处</p>
-                    <small>支持 .jpg/.png/.webp/.gif/.mp4/.webm，图片 ≤ 10MB，视频 ≤ 100MB</small>
-                </div>
-                <input type="file" id="assetFileInput" accept="image/*,video/mp4,video/webm" style="display:none;"
-                    onchange="onAssetFileSelected(event)">
-                <div class="selected-file" id="assetSelectedFile">
-                    <i class="fas fa-file"></i>
-                    <span class="name" id="assetFileName"></span>
-                    <span style="color:#94a3b8;font-size:11px;" id="assetFileSize"></span>
-                </div>
+        <div class="coupon-picker-body" id="couponPickerList"></div>
+        <div class="product-picker-foot">
+            <div class="picked-info">已选 <strong id="pickedCouponCount">0</strong> 张</div>
+            <div class="btn-group">
+                <button class="btn outline" onclick="closeCouponPicker()">取消</button>
+                <button class="btn primary" id="sendCouponBtn" onclick="sendPickedCoupon()" disabled>
+                    <i class="fas fa-paper-plane"></i> 发送
+                </button>
             </div>
         </div>
-        <div class="upload-foot">
-            <button class="btn outline" onclick="closeAssetUpload()">取消</button>
-            <button class="btn primary" id="assetSubmitBtn" onclick="submitAssetUpload()">
-                <i class="fas fa-upload"></i> 上传
-            </button>
+    </div>
+</div>
+
+<!-- ===== 卡片样式设置弹窗 ===== -->
+<div class="card-style-modal" id="cardStyleModal" onclick="if(event.target===this) closeCardStyleModal()">
+    <div class="card-style-box">
+        <div class="product-picker-head">
+            <h3><i class="fas fa-palette" style="color:#ff5000;"></i> 卡片样式设置</h3>
+            <button class="close-btn" onclick="closeCardStyleModal()">×</button>
         </div>
+        <div class="card-style-body">
+            <div class="form-group">
+                <label>主色调（价格 + 按钮）</label>
+                <div class="color-preset-row" id="colorPresetRow"></div>
+            </div>
+            <div class="form-group">
+                <label>"立即购买"按钮文案</label>
+                <input type="text" id="buyBtnText" placeholder="立即购买">
+            </div>
+            <div class="form-group">
+                <label>"加入购物车"按钮文案</label>
+                <input type="text" id="cartBtnText" placeholder="加入购物车">
+            </div>
+            <div class="form-group">
+                <label>商品卡片标题栏文案（多商品轮播时显示）</label>
+                <input type="text" id="carouselTitleText" placeholder="为您推荐以下几款">
+            </div>
+        </div>
+        <div class="product-picker-foot">
+            <div class="picked-info"></div>
+            <div class="btn-group">
+                <button class="btn outline" onclick="resetCardStyle()">恢复默认</button>
+                <button class="btn primary" onclick="saveCardStyle()">
+                    <i class="fas fa-save"></i> 保存
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="if(event.target===this) closeLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+        <button class="lightbox-close" onclick="closeLightbox()">×</button>
+        <div id="lightboxMedia"></div>
     </div>
 </div>
 
@@ -1255,13 +2010,33 @@
         kbCategories: [],
         kbFilterCategory: 'all',
         assetItems: [],
-        kbFile: null,
-        assetFile: null,
-        currentTab: 'chat'
+        currentTab: 'chat',
+
+        // ★ 商品相关
+        productsCache: [],
+        pickedProducts: [],
+        pickedCoupon: null,
+        couponsCache: [],
+
+        // ★ 卡片样式（可配置）
+        cardStyle: {
+            primaryColor: '#ff5000',
+            primaryColorLight: '#ff7733',
+            buyBtnText: '立即购买',
+            cartBtnText: '加入购物车',
+            carouselTitleText: '为您推荐以下几款'
+        },
+
+        // ★ 点击追踪
+        clickStats: {
+            totalShown: 0,
+            totalClicked: 0,
+            byProduct: {}
+        }
     };
 
     /* ============================================================
-       模拟会话数据
+       模拟数据
        ============================================================ */
     const DEMO_CONVERSATIONS = [
         { id: 'c1', name: '王*婷', avatarText: '王', avatarColor: '#b55a1a', platform: '抖音', online: true, lastTime: '14:32', unread: 2, lastMsg: '这款茶叶礼盒可以定制包装吗？' },
@@ -1296,7 +2071,7 @@
         ],
         c6: [
             { id: 'm1', from: 'user', text: '茶叶礼盒的保质期？', time: '12:50' },
-            { m2: null, from: 'ai', text: '保质期18个月。', time: '12:50' }
+            { id: 'm2', from: 'ai', text: '保质期18个月。', time: '12:50' }
         ]
     };
 
@@ -1304,58 +2079,36 @@
        初始化
        ============================================================ */
     document.addEventListener('DOMContentLoaded', function () {
+        loadCardStyle();
         state.conversations = JSON.parse(JSON.stringify(DEMO_CONVERSATIONS));
         state.messagesMap = JSON.parse(JSON.stringify(DEMO_MESSAGES));
         state.conversations.forEach(c => state.takeoverState[c.id] = 'ai');
         renderConvList();
         loadKb();
         loadAssets();
-        bindDragEvents();
+        loadProducts();
+        loadCoupons();
         bindInputEvents();
-
-        // ★ URL hash 自动切换 Tab
-        const h = location.hash.replace('#', '');
-        if (h === 'kb' || h === 'assets') {
-            setTimeout(() => switchTabByName(h), 150);
-        }
+        bindGlobalShortcuts();
+        updateStatsBar();
     });
 
     function bindInputEvents() {
         const input = document.getElementById('msgInput');
         input.addEventListener('input', function () {
             updateSendBtn();
-            handleKbRecommendInput();
         });
     }
 
-    function bindDragEvents() {
-        const kbWrap = document.getElementById('kbFileWrap');
-        ['dragenter', 'dragover'].forEach(ev => kbWrap.addEventListener(ev, e => {
-            e.preventDefault(); kbWrap.classList.add('dragover');
-        }));
-        ['dragleave', 'drop'].forEach(ev => kbWrap.addEventListener(ev, e => {
-            e.preventDefault(); kbWrap.classList.remove('dragover');
-        }));
-        kbWrap.addEventListener('drop', e => {
-            const file = e.dataTransfer.files[0];
-            if (file) {
-                document.getElementById('kbFileInput').files = e.dataTransfer.files;
-                onKbFileSelected({ target: { files: [file] } });
-            }
-        });
-
-        const assetWrap = document.getElementById('assetFileWrap');
-        ['dragenter', 'dragover'].forEach(ev => assetWrap.addEventListener(ev, e => {
-            e.preventDefault(); assetWrap.classList.add('dragover');
-        }));
-        ['dragleave', 'drop'].forEach(ev => assetWrap.addEventListener(ev, e => {
-            e.preventDefault(); assetWrap.classList.remove('dragover');
-        }));
-        assetWrap.addEventListener('drop', e => {
-            const file = e.dataTransfer.files[0];
-            if (file) {
-                document.getElementById('assetFileInput').files = e.dataTransfer.files;
-                onAssetFileSelected({ target: { files: [file] } });
+    function bindGlobalShortcuts() {
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const picker = document.getElementById('productPickerModal');
+                if (picker && picker.classList.contains('show')) closeProductPicker();
+                const coupon = document.getElementById('couponPickerModal');
+                if (coupon && coupon.classList.contains('show')) closeCouponPicker();
+                const style = document.getElementById('cardStyleModal');
+                if (style && style.classList.contains('show')) closeCardStyleModal();
             }
         });
     }
@@ -1373,17 +2126,6 @@
             setTimeout(scrollMessagesToBottom, 50);
         }
     }
-
-    function switchTabByName(name) {
-        if (!name) return;
-        const tabs = document.querySelectorAll('.chat-tab');
-        const tabMap = { 'chat': 0, 'kb': 1, 'assets': 2 };
-        const idx = tabMap[name];
-        if (idx !== undefined && tabs[idx]) {
-            tabs[idx].click();
-        }
-    }
-    window.switchTabByName = switchTabByName;
 
     /* ============================================================
        会话列表
@@ -1517,7 +2259,7 @@
                     ? '<span class="agent-tag">客服</span>'
                     : (m.system ? '<span class="system-tag">系统</span>' : ''));
 
-            // ★ 引用溯源
+            // 引用溯源
             let kbTraceHtml = '';
             if (m.kb_hits && m.kb_hits.length > 0) {
                 kbTraceHtml = `
@@ -1528,27 +2270,36 @@
                         </div>
                         ${m.kb_hits.map(k => `
                             <div style="padding-left:12px;">
-                                · <a href="javascript:void(0)" onclick="showKbDetail('${k.id}')">
-                                    ${escapeHtml(k.title)}
-                                  </a>
+                                · <a href="javascript:void(0)" onclick="showKbDetail('${k.id}')">${escapeHtml(k.title)}</a>
                                 ${k.match_type ? `<span style="font-size:10px;color:#94a3b8;">（${k.match_type}）</span>` : ''}
                             </div>
                         `).join('')}
-                        <div style="margin-top:6px;">
-                            <button onclick="kbFeedback('${m.id}', true)"
-                                style="font-size:10px;padding:2px 8px;border:1px solid #0d7c4f;background:transparent;color:#0d7c4f;border-radius:10px;cursor:pointer;">
-                                👍 有帮助
-                            </button>
-                            <button onclick="kbFeedback('${m.id}', false)"
-                                style="font-size:10px;padding:2px 8px;border:1px solid #b51a3f;background:transparent;color:#b51a3f;border-radius:10px;cursor:pointer;">
-                                👎 没帮助
-                            </button>
-                        </div>
                     </div>
                 `;
             }
 
-            // 媒体
+            // ★ 单个商品卡片
+            let productCardHtml = '';
+            if (m.product_card) {
+                productCardHtml = renderProductCard(m.product_card, m.id);
+                // 追踪：卡片展示
+                recordCardShown(m.product_card.id);
+            }
+
+            // ★ 多商品轮播卡片
+            let carouselHtml = '';
+            if (m.product_cards && m.product_cards.length > 0) {
+                carouselHtml = renderProductCarousel(m.product_cards, m.id);
+                m.product_cards.forEach(p => recordCardShown(p.id));
+            }
+
+            // ★ 优惠券卡片
+            let couponHtml = '';
+            if (m.coupon_card) {
+                couponHtml = renderCouponCard(m.coupon_card, m.id);
+            }
+
+            // 素材
             let mediaHtml = '';
             if (m.assets && m.assets.length > 0) {
                 mediaHtml += '<div class="msg-media">';
@@ -1573,6 +2324,9 @@
                     <div class="bubble-wrap">
                         <div class="bubble">
                             ${textHtml}
+                            ${productCardHtml}
+                            ${carouselHtml}
+                            ${couponHtml}
                             ${mediaHtml}
                             ${kbTraceHtml}
                         </div>
@@ -1586,10 +2340,716 @@
         }).join('');
     }
 
-    function scrollMessagesToBottom() {
-        const container = document.getElementById('chatMessages');
-        if (!container) return;
-        setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+    /* ============================================================
+       ★ 渲染单个商品卡片
+       ============================================================ */
+    function renderProductCard(p, msgId) {
+        if (!p) return '';
+        const cs = state.cardStyle;
+
+        let imgHtml = '';
+        if (p.main_image) {
+            imgHtml = `<img src="${p.main_image}" alt="${escapeHtml(p.name)}" loading="lazy"
+                onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\\'fas fa-image\\' style=\\'font-size:28px;color:#4dabf7;\\'></i>'">`;
+        } else {
+            imgHtml = `<div class="ph"><i class="fas fa-image"></i></div>`;
+        }
+
+        const platformBadge = p.platform
+            ? `<span class="platform-badge">${escapeHtml(p.platform)}</span>`
+            : '';
+
+        const originalPriceHtml = (p.original_price && p.original_price > p.price)
+            ? `<span class="pc-original">¥${p.original_price}</span>`
+            : '';
+
+        const tagsHtml = (p.tags && p.tags.length > 0)
+            ? `<div class="pc-tags">${p.tags.slice(0, 3).map(t => `<span class="pc-tag">${escapeHtml(t)}</span>`).join('')}</div>`
+            : '';
+
+        const salesHtml = p.sales
+            ? `<span>已售 ${formatNumber(p.sales)}</span>`
+            : '';
+
+        const ratingHtml = p.rating
+            ? `<span class="rating"><i class="fas fa-star"></i> ${escapeHtml(p.rating)}</span>`
+            : '';
+
+        const stockHtml = (p.stock !== undefined && p.stock < 50)
+            ? `<span style="color:#b55a1a;">仅剩 ${p.stock} 件</span>`
+            : '';
+
+        const url = p.url || '#';
+        const safeUrl = url.replace(/'/g, "\\'");
+        const productId = p.id;
+        const msgIdSafe = msgId || '';
+
+        return `
+            <div class="product-card" id="pc_${productId}_${msgIdSafe}"
+                 style="--pc-color:${cs.primaryColor};--pc-color-light:${cs.primaryColorLight};">
+                <div class="pc-body" onclick="onCardClick(${productId}, '${msgIdSafe}', '${safeUrl}', '${escapeHtml(p.name)}')">
+                    <div class="pc-image">
+                        ${imgHtml}
+                        ${platformBadge}
+                    </div>
+                    <div class="pc-info">
+                        <div class="pc-name">${escapeHtml(p.name)}</div>
+                        ${p.spec ? `<div class="pc-spec">${escapeHtml(p.spec)}</div>` : ''}
+                        <div class="pc-price-row">
+                            <span class="pc-price" style="color:${cs.primaryColor};"><small>¥</small>${p.price}</span>
+                            ${originalPriceHtml}
+                        </div>
+                        <div class="pc-meta">
+                            ${salesHtml}
+                            ${ratingHtml}
+                            ${stockHtml}
+                        </div>
+                        ${tagsHtml}
+                    </div>
+                </div>
+                <div class="pc-actions">
+                    <button class="pc-btn cart" onclick="event.stopPropagation(); onCardAction(${productId}, '${msgIdSafe}', 'cart', '${safeUrl}', '${escapeHtml(p.name)}')">
+                        <i class="fas fa-shopping-cart"></i> ${escapeHtml(cs.cartBtnText)}
+                    </button>
+                    <button class="pc-btn buy" style="background:linear-gradient(135deg, ${cs.primaryColorLight}, ${cs.primaryColor});"
+                        onclick="event.stopPropagation(); onCardAction(${productId}, '${msgIdSafe}', 'buy', '${safeUrl}', '${escapeHtml(p.name)}')">
+                        <i class="fas fa-bolt"></i> ${escapeHtml(cs.buyBtnText)}
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /* ============================================================
+       ★ 渲染多商品轮播卡片
+       ============================================================ */
+    function renderProductCarousel(products, msgId) {
+        if (!products || products.length === 0) return '';
+        const cs = state.cardStyle;
+        const carouselId = 'carousel_' + (msgId || Date.now()) + '_' + Math.random().toString(36).slice(2, 6);
+
+        const slides = products.map((p, idx) => {
+            let imgHtml = p.main_image
+                ? `<img src="${p.main_image}" alt="${escapeHtml(p.name)}" loading="lazy"
+                    onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\\'fas fa-image\\' style=\\'font-size:28px;color:#4dabf7;\\'></i>'">`
+                : `<div class="ph"><i class="fas fa-image"></i></div>`;
+
+            const originalPriceHtml = (p.original_price && p.original_price > p.price)
+                ? `<span class="pc-original" style="font-size:11px;color:#94a3b8;text-decoration:line-through;">¥${p.original_price}</span>`
+                : '';
+
+            return `
+                <div class="pc-slide" onclick="onCardClick(${p.id}, '${msgId || ''}', '${(p.url || '#').replace(/'/g, "\\'")}', '${escapeHtml(p.name)}')">
+                    <div class="pc-image">${imgHtml}</div>
+                    <div class="pc-info">
+                        <div class="pc-name">${escapeHtml(p.name)}</div>
+                        ${p.spec ? `<div style="font-size:11px;color:#94a3b8;">${escapeHtml(p.spec)}</div>` : ''}
+                        <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px;">
+                            <span class="pc-price" style="color:${cs.primaryColor};"><small style="font-size:12px;font-weight:500;">¥</small>${p.price}</span>
+                            ${originalPriceHtml}
+                        </div>
+                        <div class="pc-meta" style="font-size:10px;color:#94a3b8;display:flex;gap:8px;margin-top:2px;">
+                            <span>已售 ${formatNumber(p.sales || 0)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const indicators = products.map((_, idx) =>
+            `<span class="pc-indicator ${idx === 0 ? 'active' : ''}" data-idx="${idx}" onclick="scrollCarousel('${carouselId}', ${idx})"></span>`
+        ).join('');
+
+        return `
+            <div class="product-carousel" id="${carouselId}">
+                <div class="pc-title-bar">
+                    <i class="fas fa-fire"></i>
+                    <span>${escapeHtml(cs.carouselTitleText)}</span>
+                    <span style="margin-left:auto;font-size:11px;opacity:0.7;">共 ${products.length} 款</span>
+                </div>
+                <div class="pc-list" onscroll="onCarouselScroll('${carouselId}')">
+                    ${slides}
+                </div>
+                <div class="pc-indicators">
+                    ${indicators}
+                </div>
+            </div>
+        `;
+    }
+
+    function scrollCarousel(carouselId, idx) {
+        const carousel = document.getElementById(carouselId);
+        if (!carousel) return;
+        const list = carousel.querySelector('.pc-list');
+        const slides = list.querySelectorAll('.pc-slide');
+        if (slides[idx]) {
+            slides[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        }
+        carousel.querySelectorAll('.pc-indicator').forEach((ind, i) => {
+            ind.classList.toggle('active', i === idx);
+        });
+    }
+
+    function onCarouselScroll(carouselId) {
+        const carousel = document.getElementById(carouselId);
+        if (!carousel) return;
+        const list = carousel.querySelector('.pc-list');
+        const slides = list.querySelectorAll('.pc-slide');
+        const scrollLeft = list.scrollLeft;
+        const slideWidth = list.clientWidth;
+        const idx = Math.round(scrollLeft / slideWidth);
+        carousel.querySelectorAll('.pc-indicator').forEach((ind, i) => {
+            ind.classList.toggle('active', i === idx);
+        });
+    }
+
+    /* ============================================================
+       ★ 渲染优惠券卡片
+       ============================================================ */
+    function renderCouponCard(c, msgId) {
+        if (!c) return '';
+        const cs = state.cardStyle;
+        const expireDate = c.expire_at || '';
+
+        return `
+            <div class="coupon-card">
+                <div class="cc-left" style="background:linear-gradient(135deg, ${cs.primaryColorLight}, ${cs.primaryColor});">
+                    <div class="cc-amount">
+                        <small>¥</small>${c.discount}
+                    </div>
+                    <div class="cc-condition">满${c.threshold}可用</div>
+                </div>
+                <div class="cc-right">
+                    <div class="cc-name">${escapeHtml(c.name || '优惠券')}</div>
+                    <div class="cc-desc">${escapeHtml(c.desc || '全店通用')}</div>
+                    ${expireDate ? `<div class="cc-expire">有效期至 ${expireDate}</div>` : ''}
+                    <button class="cc-action" style="background:linear-gradient(135deg, ${cs.primaryColorLight}, ${cs.primaryColor});"
+                        onclick="event.stopPropagation(); claimCoupon('${c.code}', '${escapeHtml(c.name || '')}')">
+                        立即领取
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function claimCoupon(code, name) {
+        showToast(`🎟️ 已领取「${name}」`);
+        // 记录点击
+        state.clickStats.totalClicked++;
+        updateStatsBar();
+    }
+
+    /* ============================================================
+       ★ 点击追踪
+       ============================================================ */
+    function recordCardShown(productId) {
+        state.clickStats.totalShown++;
+        if (!state.clickStats.byProduct[productId]) {
+            state.clickStats.byProduct[productId] = { shown: 0, clicked: 0 };
+        }
+        state.clickStats.byProduct[productId].shown++;
+    }
+
+    function onCardClick(productId, msgId, url, name) {
+        // 记录点击
+        state.clickStats.totalClicked++;
+        if (!state.clickStats.byProduct[productId]) {
+            state.clickStats.byProduct[productId] = { shown: 0, clicked: 0 };
+        }
+        state.clickStats.byProduct[productId].clicked++;
+        updateStatsBar();
+
+        // 上报后端
+        reportClick(productId, name, 'view');
+
+        // 跳转
+        if (url && url !== '#') {
+            window.open(url, '_blank');
+        } else {
+            showToast(`👀 查看商品：${name}`);
+        }
+    }
+
+    function onCardAction(productId, msgId, action, url, name) {
+        state.clickStats.totalClicked++;
+        if (!state.clickStats.byProduct[productId]) {
+            state.clickStats.byProduct[productId] = { shown: 0, clicked: 0 };
+        }
+        state.clickStats.byProduct[productId].clicked++;
+        updateStatsBar();
+
+        reportClick(productId, name, action);
+
+        if (action === 'cart') {
+            showToast(`🛒 已加入购物车：${name}`);
+        } else if (action === 'buy') {
+            showToast(`⚡ 正在跳转到购买页：${name}`);
+            if (url && url !== '#') {
+                window.open(url, '_blank');
+            }
+        }
+    }
+
+    async function reportClick(productId, productName, action) {
+        try {
+            await fetch(BACKEND_URL + '/api/ai/track-card-click', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    product_id: productId,
+                    product_name: productName,
+                    action: action,
+                    conv_id: state.currentId,
+                    time: new Date().toISOString()
+                })
+            });
+        } catch (e) {
+            console.warn('上报点击失败', e);
+        }
+    }
+
+    function updateStatsBar() {
+        document.getElementById('statCards').textContent = state.clickStats.totalShown;
+        document.getElementById('statClicks').textContent = state.clickStats.totalClicked;
+    }
+
+    /* ============================================================
+       ★ 卡片样式设置
+       ============================================================ */
+    const COLOR_PRESETS = [
+        { name: '淘宝橙', primary: '#ff5000', light: '#ff7733' },
+        { name: '抖音红', primary: '#fe2c55', light: '#ff6b8a' },
+        { name: '京东红', primary: '#e1251b', light: '#ff5e54' },
+        { name: '拼多多红', primary: '#e02e24', light: '#ff6659' },
+        { name: '科技蓝', primary: '#4dabf7', light: '#6fc3ff' },
+        { name: '微信绿', primary: '#07c160', light: '#4dd58a' },
+        { name: '高端黑', primary: '#0a1e2f', light: '#2a4a6a' },
+        { name: '国潮紫', primary: '#7b4fa0', light: '#a878cc' }
+    ];
+
+    function openCardStyleModal() {
+        const row = document.getElementById('colorPresetRow');
+        row.innerHTML = COLOR_PRESETS.map(p => `
+            <div class="color-preset ${state.cardStyle.primaryColor === p.primary ? 'active' : ''}"
+                 style="background:linear-gradient(135deg, ${p.light}, ${p.primary});"
+                 title="${p.name}"
+                 onclick="pickColor('${p.primary}', '${p.light}')"></div>
+        `).join('');
+        document.getElementById('buyBtnText').value = state.cardStyle.buyBtnText;
+        document.getElementById('cartBtnText').value = state.cardStyle.cartBtnText;
+        document.getElementById('carouselTitleText').value = state.cardStyle.carouselTitleText;
+        document.getElementById('cardStyleModal').classList.add('show');
+    }
+
+    function closeCardStyleModal() {
+        document.getElementById('cardStyleModal').classList.remove('show');
+    }
+
+    function pickColor(primary, light) {
+        document.querySelectorAll('.color-preset').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+        state.cardStyle.primaryColor = primary;
+        state.cardStyle.primaryColorLight = light;
+    }
+
+    function saveCardStyle() {
+        state.cardStyle.buyBtnText = document.getElementById('buyBtnText').value.trim() || '立即购买';
+        state.cardStyle.cartBtnText = document.getElementById('cartBtnText').value.trim() || '加入购物车';
+        state.cardStyle.carouselTitleText = document.getElementById('carouselTitleText').value.trim() || '为您推荐以下几款';
+
+        // 持久化到 localStorage
+        try {
+            localStorage.setItem('ai_card_style', JSON.stringify(state.cardStyle));
+        } catch (e) {}
+
+        showToast('✅ 卡片样式已保存');
+        closeCardStyleModal();
+        if (state.currentId) renderMessages(state.currentId);
+    }
+
+    function resetCardStyle() {
+        state.cardStyle = {
+            primaryColor: '#ff5000',
+            primaryColorLight: '#ff7733',
+            buyBtnText: '立即购买',
+            cartBtnText: '加入购物车',
+            carouselTitleText: '为您推荐以下几款'
+        };
+        try {
+            localStorage.removeItem('ai_card_style');
+        } catch (e) {}
+        openCardStyleModal();
+        showToast('🔄 已恢复默认');
+    }
+
+    function loadCardStyle() {
+        try {
+            const saved = localStorage.getItem('ai_card_style');
+            if (saved) {
+                Object.assign(state.cardStyle, JSON.parse(saved));
+            }
+        } catch (e) {}
+    }
+
+    function showClickStats() {
+        const stats = state.clickStats;
+        const byProduct = stats.byProduct || {};
+        const items = Object.entries(byProduct).map(([pid, s]) => {
+            const p = state.productsCache.find(x => String(x.id) === String(pid));
+            return {
+                name: p ? p.name : `商品 ${pid}`,
+                shown: s.shown,
+                clicked: s.clicked,
+                ctr: s.shown > 0 ? Math.round(s.clicked / s.shown * 100) : 0
+            };
+        }).sort((a, b) => b.clicked - a.clicked);
+
+        let html = `
+            <html><head><title>卡片点击统计</title>
+            <style>
+                body { font-family: -apple-system, sans-serif; padding: 30px; background: #f8fafc; color: #0a1e2f; }
+                h1 { font-size: 22px; margin-bottom: 20px; }
+                .summary { display: flex; gap: 20px; margin-bottom: 24px; }
+                .summary-card { background: #fff; border: 1px solid #e8edf4; border-radius: 12px; padding: 16px 24px; flex: 1; }
+                .summary-card .label { font-size: 12px; color: #5f7d95; }
+                .summary-card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+                .summary-card .value.orange { color: #ff5000; }
+                table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(10,30,47,0.04); }
+                th { text-align: left; padding: 12px; background: #f0f7fe; font-size: 12px; color: #5f7d95; }
+                td { padding: 12px; border-bottom: 1px solid #f0f4f9; font-size: 13px; }
+                tr:last-child td { border-bottom: none; }
+                .ctr-bar { display: inline-block; height: 6px; background: #ff5000; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+                .empty { padding: 40px; text-align: center; color: #94a3b8; }
+            </style>
+            </head><body>
+            <h1>📊 商品卡片点击统计</h1>
+            <div class="summary">
+                <div class="summary-card">
+                    <div class="label">卡片展示次数</div>
+                    <div class="value">${stats.totalShown}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">用户点击次数</div>
+                    <div class="value orange">${stats.totalClicked}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">整体点击率</div>
+                    <div class="value orange">${stats.totalShown > 0 ? Math.round(stats.totalClicked / stats.totalShown * 100) : 0}%</div>
+                </div>
+            </div>
+            ${items.length === 0 ? '<div class="empty">暂无数据</div>' : `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品名称</th>
+                            <th>展示</th>
+                            <th>点击</th>
+                            <th>点击率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.map(it => `
+                            <tr>
+                                <td>${escapeHtml(it.name)}</td>
+                                <td>${it.shown}</td>
+                                <td><strong style="color:#ff5000;">${it.clicked}</strong></td>
+                                <td>
+                                    <span class="ctr-bar" style="width:${it.ctr * 1.5}px;"></span>
+                                    ${it.ctr}%
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `}
+            </body></html>
+        `;
+
+        const w = window.open('', '_blank', 'width=800,height=600');
+        w.document.write(html);
+    }
+
+    /* ============================================================
+       商品加载
+       ============================================================ */
+    async function loadProducts() {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/products');
+            const data = await res.json();
+            state.productsCache = data.products || [];
+        } catch (e) {
+            console.warn('加载商品失败', e);
+            state.productsCache = [];
+        }
+    }
+
+    async function loadCoupons() {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/coupons');
+            const data = await res.json();
+            state.couponsCache = data.coupons || getDefaultCoupons();
+        } catch (e) {
+            state.couponsCache = getDefaultCoupons();
+        }
+    }
+
+    function getDefaultCoupons() {
+        return [
+            { id: 'cp1', code: 'NEW20', name: '新客专享券', discount: 20, threshold: 100, desc: '新人首单立减', expire_at: '2026-12-31' },
+            { id: 'cp2', code: 'VIP50', name: 'VIP 会员券', discount: 50, threshold: 300, desc: '会员专享 满300减50', expire_at: '2026-12-31' },
+            { id: 'cp3', code: 'FREESHIP', name: '包邮券', discount: 8, threshold: 0, desc: '全店包邮', expire_at: '2026-12-31' }
+        ];
+    }
+
+    /* ============================================================
+       商品选择器
+       ============================================================ */
+    function openProductPicker() {
+        if (!state.currentId) {
+            showToast('⚠️ 请先选择会话');
+            return;
+        }
+        state.pickedProducts = [];
+        document.getElementById('productPickerSearch').value = '';
+        renderProductPickerList(state.productsCache);
+        updatePickedCount();
+        document.getElementById('productPickerModal').classList.add('show');
+    }
+
+    function closeProductPicker() {
+        document.getElementById('productPickerModal').classList.remove('show');
+    }
+
+    function renderProductPickerList(products) {
+        const list = document.getElementById('productPickerList');
+        if (!products || products.length === 0) {
+            list.innerHTML = `
+                <div class="product-picker-empty">
+                    <i class="fas fa-box-open"></i>
+                    <p>暂无商品</p>
+                </div>
+            `;
+            return;
+        }
+        list.innerHTML = products.map(p => {
+            const imgHtml = p.main_image
+                ? `<img src="${p.main_image}" alt="${escapeHtml(p.name)}" loading="lazy">`
+                : `<i class="fas fa-image"></i>`;
+            const selected = state.pickedProducts.find(x => x.id === p.id);
+            return `
+                <div class="product-picker-item ${selected ? 'selected' : ''}"
+                     data-pid="${p.id}"
+                     onclick="togglePickProduct(${p.id})">
+                    <div class="pitem-checkbox"><i class="fas fa-check"></i></div>
+                    <div class="pitem-img">${imgHtml}</div>
+                    <div class="pitem-info">
+                        <div class="pitem-name">${escapeHtml(p.name)}</div>
+                        <div class="pitem-meta">
+                            <span><i class="fas fa-tag"></i> ${escapeHtml(p.category || '未分类')}</span>
+                            <span><i class="fas fa-fire"></i> 已售 ${formatNumber(p.sales || 0)}</span>
+                            <span><i class="fas fa-warehouse"></i> 库存 ${p.stock || 0}</span>
+                        </div>
+                        <div class="pitem-price">¥${p.price}</div>
+                    </div>
+                    <div class="pitem-send"><i class="fas fa-paper-plane"></i></div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function togglePickProduct(productId) {
+        const p = state.productsCache.find(x => x.id === productId);
+        if (!p) return;
+        const idx = state.pickedProducts.findIndex(x => x.id === productId);
+        if (idx >= 0) {
+            state.pickedProducts.splice(idx, 1);
+        } else {
+            // 最多选 3 个（多商品轮播）
+            if (state.pickedProducts.length >= 3) {
+                showToast('⚠️ 一次最多选 3 个商品');
+                return;
+            }
+            state.pickedProducts.push(p);
+        }
+        renderProductPickerList(state.productsCache);
+        updatePickedCount();
+    }
+
+    function updatePickedCount() {
+        const n = state.pickedProducts.length;
+        document.getElementById('pickedCount').textContent = n;
+        document.getElementById('sendProductBtn').disabled = n === 0;
+    }
+
+    function clearProductPick() {
+        state.pickedProducts = [];
+        renderProductPickerList(state.productsCache);
+        updatePickedCount();
+    }
+
+    function filterProductPicker() {
+        const keyword = (document.getElementById('productPickerSearch').value || '').trim().toLowerCase();
+        let list = state.productsCache || [];
+        if (keyword) {
+            list = list.filter(p => {
+                const hay = ((p.name || '') + ' ' + (p.sku || '') + ' ' + (p.category || '')).toLowerCase();
+                return hay.includes(keyword);
+            });
+        }
+        renderProductPickerList(list);
+    }
+
+    async function sendPickedProducts() {
+        if (state.pickedProducts.length === 0) return;
+        if (!state.currentId) return;
+
+        const convId = state.currentId;
+        const products = state.pickedProducts.slice();
+
+        // 构建卡片数据
+        const cards = products.map(p => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            original_price: p.original_price || null,
+            main_image: p.main_image || '',
+            sales: p.sales || 0,
+            stock: p.stock || 0,
+            platform: p.platform || '',
+            spec: p.spec || '',
+            rating: p.rating || '',
+            tags: p.tags || [],
+            url: generateProductUrl(p)
+        }));
+
+        // 追加到消息列表
+        if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
+
+        let msgData = {
+            id: 'm_' + Date.now(),
+            from: 'agent',
+            text: '',
+            time: nowTime()
+        };
+
+        if (cards.length === 1) {
+            msgData.product_card = cards[0];
+        } else {
+            msgData.product_cards = cards;
+            msgData.text = `为您推荐以下 ${cards.length} 款：`;
+        }
+
+        state.messagesMap[convId].push(msgData);
+
+        // 更新会话预览
+        const conv = state.conversations.find(c => c.id === convId);
+        if (conv) {
+            conv.lastMsg = `[商品卡片] ${cards.map(c => c.name).join('、')}`;
+            conv.lastTime = nowTime();
+        }
+
+        // 渲染
+        renderMessages(convId);
+        renderConvList();
+        scrollMessagesToBottom();
+        closeProductPicker();
+        showToast(`✅ 已发送 ${cards.length} 个商品`);
+    }
+
+    function generateProductUrl(p) {
+        if (p.url) return p.url;
+        const platform = p.platform || '';
+        const sku = p.sku || '';
+        const name = encodeURIComponent(p.name || '');
+        if (platform.includes('淘宝')) {
+            return `https://s.taobao.com/search?q=${name}`;
+        } else if (platform.includes('抖音')) {
+            return `https://haohuo.jinritemai.com/views/product/detail?id=${sku}`;
+        } else if (platform.includes('拼多多')) {
+            return `https://mobile.yangkeduo.com/search_result.html?search_key=${name}`;
+        } else if (platform.includes('京东')) {
+            return `https://search.jd.com/Search?keyword=${name}`;
+        }
+        return '#';
+    }
+
+    /* ============================================================
+       优惠券选择器
+       ============================================================ */
+    function openCouponPicker() {
+        if (!state.currentId) {
+            showToast('⚠️ 请先选择会话');
+            return;
+        }
+        state.pickedCoupon = null;
+        renderCouponList();
+        document.getElementById('couponPickerModal').classList.add('show');
+    }
+
+    function closeCouponPicker() {
+        document.getElementById('couponPickerModal').classList.remove('show');
+    }
+
+    function renderCouponList() {
+        const list = document.getElementById('couponPickerList');
+        const coupons = state.couponsCache || [];
+        if (coupons.length === 0) {
+            list.innerHTML = '<div class="product-picker-empty"><i class="fas fa-ticket-alt"></i><p>暂无优惠券</p></div>';
+            return;
+        }
+        list.innerHTML = coupons.map(c => `
+            <div class="coupon-item ${state.pickedCoupon && state.pickedCoupon.id === c.id ? 'selected' : ''}"
+                 onclick="pickCoupon('${c.id}')">
+                <div class="ci-left">
+                    <div class="ci-amount"><small>¥</small>${c.discount}</div>
+                    <div class="ci-condition">满${c.threshold}可用</div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-name">${escapeHtml(c.name)}</div>
+                    <div class="ci-desc">${escapeHtml(c.desc || '')}</div>
+                    <div class="ci-expire">有效期至 ${c.expire_at || '长期'}</div>
+                </div>
+                <div class="ci-check"><i class="fas fa-check-circle"></i></div>
+            </div>
+        `).join('');
+    }
+
+    function pickCoupon(id) {
+        const c = state.couponsCache.find(x => x.id === id);
+        if (!c) return;
+        state.pickedCoupon = c;
+        renderCouponList();
+        document.getElementById('pickedCouponCount').textContent = 1;
+        document.getElementById('sendCouponBtn').disabled = false;
+    }
+
+    async function sendPickedCoupon() {
+        if (!state.pickedCoupon) return;
+        if (!state.currentId) return;
+
+        const convId = state.currentId;
+        const c = state.pickedCoupon;
+
+        if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
+        state.messagesMap[convId].push({
+            id: 'm_' + Date.now(),
+            from: 'agent',
+            text: `送您一张「${c.name}」，满${c.threshold}减${c.discount}，点击立即领取~`,
+            time: nowTime(),
+            coupon_card: c
+        });
+
+        const conv = state.conversations.find(x => x.id === convId);
+        if (conv) {
+            conv.lastMsg = `[优惠券] ${c.name}`;
+            conv.lastTime = nowTime();
+        }
+
+        renderMessages(convId);
+        renderConvList();
+        scrollMessagesToBottom();
+        closeCouponPicker();
+        showToast(`🎟️ 已发送「${c.name}」`);
     }
 
     /* ============================================================
@@ -1621,7 +3081,6 @@
         renderMessages(convId);
         renderConvList();
         scrollMessagesToBottom();
-        hideKbRecommend();
 
         state.isReplying = true;
         setTimeout(() => {
@@ -1650,6 +3109,8 @@
             '这个质量怎么样？',
             '能发个实物图看看吗？',
             '有使用教程吗？',
+            '这个多少钱？',
+            '有什么推荐的吗？',
             '好的，那我下单了'
         ];
         const reply = replies[Math.floor(Math.random() * replies.length)];
@@ -1716,7 +3177,7 @@
             });
             if (res.ok) replyData = await res.json();
         } catch (e) {
-            console.warn('后端 AI 回复失败，走本地规则', e);
+            console.warn('后端 AI 回复失败', e);
         }
 
         let replyText = '';
@@ -1734,7 +3195,10 @@
             }
         }
 
-        setTimeout(() => {
+        // ★ 尝试智能推荐商品
+        const recommendedProducts = await smartRecommendProducts(userText);
+
+        setTimeout(async () => {
             if (state.takeoverState[convId] !== 'ai') {
                 typing.classList.remove('show');
                 return;
@@ -1742,6 +3206,8 @@
             typing.classList.remove('show');
 
             if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
+
+            // 先发文字
             state.messagesMap[convId].push({
                 id: 'm_' + Date.now(),
                 from: 'ai',
@@ -1750,6 +3216,42 @@
                 kb_hits: kbHits,
                 assets: assets
             });
+
+            // 再发商品卡片
+            if (recommendedProducts && recommendedProducts.length > 0) {
+                const cards = recommendedProducts.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    price: p.price,
+                    original_price: p.original_price || null,
+                    main_image: p.main_image || '',
+                    sales: p.sales || 0,
+                    stock: p.stock || 0,
+                    platform: p.platform || '',
+                    spec: p.spec || '',
+                    rating: p.rating || '',
+                    tags: p.tags || [],
+                    url: generateProductUrl(p)
+                }));
+
+                if (cards.length === 1) {
+                    state.messagesMap[convId].push({
+                        id: 'm_' + Date.now() + '_card',
+                        from: 'ai',
+                        text: '',
+                        time: nowTime(),
+                        product_card: cards[0]
+                    });
+                } else {
+                    state.messagesMap[convId].push({
+                        id: 'm_' + Date.now() + '_cards',
+                        from: 'ai',
+                        text: '',
+                        time: nowTime(),
+                        product_cards: cards
+                    });
+                }
+            }
 
             const conv = state.conversations.find(c => c.id === convId);
             if (conv) {
@@ -1763,6 +3265,76 @@
             }
             renderConvList();
         }, 800);
+    }
+
+    /* ============================================================
+       ★ AI 智能推荐商品（关键词 + 后端 DeepSeek）
+       ============================================================ */
+    async function smartRecommendProducts(userText) {
+        // 触发条件
+        const triggers = ['多少钱', '什么价格', '有哪些', '有什么', '推荐', '款式', '看看', '商品', '款', '什么价位', '报价'];
+        const shouldTrigger = triggers.some(w => userText.includes(w));
+        if (!shouldTrigger) return [];
+
+        if (!state.productsCache || state.productsCache.length === 0) {
+            await loadProducts();
+        }
+        if (state.productsCache.length === 0) return [];
+
+        // 优先走后端智能匹配（AI 语义）
+        try {
+            const res = await fetch(BACKEND_URL + '/api/ai/recommend-products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: userText,
+                    max_results: 3
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.products && data.products.length > 0) {
+                    return data.products;
+                }
+            }
+        } catch (e) {
+            console.warn('AI 推荐失败，降级到本地匹配', e);
+        }
+
+        // 降级：本地关键词匹配
+        return localRecommendProducts(userText);
+    }
+
+    function localRecommendProducts(userText) {
+        const keywords = ['茶', '竹编', '核桃', '皂', '陶瓷', '扇', '姜茶', '丝巾', '礼盒'];
+        let matches = [];
+        for (const kw of keywords) {
+            if (userText.includes(kw)) {
+                const found = state.productsCache.filter(p =>
+                    (p.name + ' ' + (p.tags || []).join(' ')).includes(kw)
+                );
+                matches.push(...found);
+            }
+        }
+        // 去重
+        const seen = new Set();
+        matches = matches.filter(p => {
+            if (seen.has(p.id)) return false;
+            seen.add(p.id);
+            return true;
+        });
+        // 不够 3 个就取销量最高的补
+        if (matches.length < 3) {
+            const sorted = state.productsCache.slice().sort((a, b) => (b.sales || 0) - (a.sales || 0));
+            for (const p of sorted) {
+                if (matches.length >= 3) break;
+                if (!seen.has(p.id)) {
+                    matches.push(p);
+                    seen.add(p.id);
+                }
+            }
+        }
+        return matches.slice(0, 3);
     }
 
     function generateLocalReply(text) {
@@ -1795,7 +3367,7 @@
     }
 
     /* ============================================================
-       知识库
+       知识库 / 素材库加载
        ============================================================ */
     async function loadKb() {
         try {
@@ -1805,80 +3377,20 @@
                 state.kbItems = data.items || [];
                 state.kbStats = data.stats || {};
                 state.kbCategories = data.categories || [];
-                fillKbCategorySelects();
-                renderKbCategoryTree();
                 renderKb();
                 updateBadges();
-            } else {
-                state.kbItems = [];
-                renderKb();
             }
         } catch (e) {
             console.warn('加载知识库失败', e);
-            state.kbItems = [];
-            renderKb();
         }
-    }
-
-    function flattenCategories(tree, depth, result) {
-        if (!result) result = [];
-        tree.forEach(n => {
-            result.push({ id: n.id, name: '　'.repeat(depth) + (n.icon || '') + ' ' + n.name, depth: depth });
-            if (n.children && n.children.length > 0) {
-                flattenCategories(n.children, depth + 1, result);
-            }
-        });
-        return result;
-    }
-
-    function fillKbCategorySelects() {
-        const flat = flattenCategories(state.kbCategories || [], 0, []);
-        // 顶部筛选
-        const sel = document.getElementById('kbCategoryFilter');
-        const cur = sel.value;
-        sel.innerHTML = '<option value="all">全部分类</option>' +
-            flat.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');
-        sel.value = cur || 'all';
-        // 上传弹窗
-        const catSel = document.getElementById('kbCategory');
-        if (catSel) {
-            catSel.innerHTML = flat.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');
-        }
-    }
-
-    function renderKbCategoryTree() {
-        const tree = document.getElementById('kbCategoryTree');
-        const flat = flattenCategories(state.kbCategories || [], 0, []);
-        if (flat.length === 0) {
-            tree.innerHTML = '';
-            return;
-        }
-        tree.innerHTML = `
-            <span class="kb-cat-chip ${state.kbFilterCategory === 'all' ? 'active' : ''}"
-                  onclick="filterKbByCategory('all')">全部</span>
-            ${flat.map(x => `
-                <span class="kb-cat-chip ${state.kbFilterCategory === x.id ? 'active' : ''}"
-                      onclick="filterKbByCategory('${x.id}')">${escapeHtml(x.name)}</span>
-            `).join('')}
-        `;
-    }
-
-    function filterKbByCategory(catId) {
-        state.kbFilterCategory = catId;
-        document.getElementById('kbCategoryFilter').value = catId;
-        renderKbCategoryTree();
-        renderKb();
     }
 
     function renderKb() {
         const grid = document.getElementById('kbGrid');
         const empty = document.getElementById('kbEmpty');
-
         let list = state.kbItems.slice();
         const keyword = (document.getElementById('kbSearch').value || '').trim().toLowerCase();
-        const catFilter = document.getElementById('kbCategoryFilter').value;
         const statusFilter = document.getElementById('kbStatusFilter').value;
-        const sortBy = document.getElementById('kbSortBy').value;
 
         if (keyword) {
             list = list.filter(x => {
@@ -1886,19 +3398,8 @@
                 return hay.includes(keyword);
             });
         }
-        if (catFilter !== 'all') {
-            list = list.filter(x => x.category === catFilter);
-        }
         if (statusFilter === 'enabled') list = list.filter(x => x.enabled !== false);
         if (statusFilter === 'disabled') list = list.filter(x => x.enabled === false);
-        if (statusFilter === 'pinned') list = list.filter(x => x.pinned);
-
-        if (sortBy === 'hit') {
-            const stats = state.kbStats || {};
-            list.sort((a, b) => (stats[b.id]?.hit_count || 0) - (stats[a.id]?.hit_count || 0));
-        } else if (sortBy === 'title') {
-            list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-        }
 
         if (list.length === 0) {
             grid.innerHTML = '';
@@ -1907,422 +3408,19 @@
         }
         empty.style.display = 'none';
 
-        grid.innerHTML = list.map(item => {
-            const enabled = item.enabled !== false;
-            const pinned = !!item.pinned;
-            const hitCount = (state.kbStats && state.kbStats[item.id]?.hit_count) || 0;
-            const tagBadges = (item.tags || []).map(t => `<span class="kb-tag">${escapeHtml(t)}</span>`).join('');
-
-            return `
-                <div class="kb-card ${enabled ? '' : 'disabled'} ${pinned ? 'pinned' : ''}">
-                    <div class="kb-head">
-                        <div class="kb-title">${pinned ? '<i class="fas fa-thumbtack" style="color:#f5b342;margin-right:4px;"></i>' : ''}${escapeHtml(item.title)}</div>
-                        <div class="kb-cat">${escapeHtml(item.category_name || item.category || '未分类')}</div>
-                    </div>
-                    <div class="kb-summary">${escapeHtml((item.content || '').slice(0, 150))}...</div>
-                    ${tagBadges ? `<div class="kb-tags">${tagBadges}</div>` : ''}
-                    <div class="kb-foot">
-                        <span><i class="fas fa-clock"></i> ${item.updated_at || item.uploaded_at || ''}</span>
-                        <span title="命中次数"><i class="fas fa-fire"></i> ${hitCount}</span>
-                    </div>
-                    <div class="kb-card-actions">
-                        <button class="kb-act-btn" onclick="editKb('${item.id}')" title="编辑">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="kb-act-btn" onclick="toggleKb('${item.id}', ${!enabled})" title="${enabled ? '停用' : '启用'}">
-                            <i class="fas fa-${enabled ? 'toggle-on' : 'toggle-off'}"></i>
-                        </button>
-                        <button class="kb-act-btn" onclick="pinKb('${item.id}', ${!pinned})" title="${pinned ? '取消置顶' : '置顶'}">
-                            <i class="fas fa-thumbtack"></i>
-                        </button>
-                        <button class="kb-act-btn danger" onclick="deleteKb('${item.id}')" title="删除">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
+        grid.innerHTML = list.map(item => `
+            <div class="kb-card ${item.enabled === false ? 'disabled' : ''}">
+                <div class="kb-head">
+                    <div class="kb-title">${escapeHtml(item.title)}</div>
+                    <div class="kb-cat">${escapeHtml(item.category_name || item.category || '')}</div>
                 </div>
-            `;
-        }).join('');
+                <div class="kb-summary">${escapeHtml((item.content || '').slice(0, 100))}</div>
+            </div>
+        `).join('');
     }
 
     function filterKb() { renderKb(); }
 
-    async function deleteKb(id) {
-        if (!confirm('确定删除该知识？')) return;
-        try {
-            const res = await fetch(BACKEND_URL + '/api/kb/delete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
-            });
-            const data = await res.json();
-            if (data.success) {
-                showToast('✅ ' + data.message);
-                loadKb();
-            } else {
-                showToast('❌ ' + (data.message || '删除失败'));
-            }
-        } catch (e) {
-            showToast('❌ 网络错误');
-        }
-    }
-
-    // 编辑
-    async function editKb(id) {
-        const item = state.kbItems.find(x => x.id === id);
-        if (!item) return;
-
-        const newTitle = prompt('标题：', item.title);
-        if (newTitle === null) return;
-        const newContent = prompt('内容（可留空不改）：', (item.content || '').slice(0, 2000));
-        if (newContent === null) return;
-        const newTags = prompt('标签（逗号分隔）：', (item.tags || []).join(','));
-        if (newTags === null) return;
-
-        try {
-            const res = await fetch(BACKEND_URL + '/api/kb/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: id,
-                    title: newTitle,
-                    content: newContent,
-                    tags: newTags.split(',').map(t => t.trim()).filter(Boolean)
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                showToast('✅ 已更新');
-                loadKb();
-            } else {
-                showToast('❌ ' + (data.message || '更新失败'));
-            }
-        } catch (e) {
-            showToast('❌ 网络错误');
-        }
-    }
-
-    // 启用/停用
-    async function toggleKb(id, enabled) {
-        try {
-            const res = await fetch(BACKEND_URL + '/api/kb/toggle', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, enabled })
-            });
-            const data = await res.json();
-            if (data.success) {
-                showToast('✅ ' + data.message);
-                loadKb();
-            }
-        } catch (e) {
-            showToast('❌ 网络错误');
-        }
-    }
-
-    // 置顶
-    async function pinKb(id, pinned) {
-        try {
-            const res = await fetch(BACKEND_URL + '/api/kb/pin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, pinned })
-            });
-            const data = await res.json();
-            if (data.success) {
-                showToast('✅ ' + data.message);
-                loadKb();
-            }
-        } catch (e) {
-            showToast('❌ 网络错误');
-        }
-    }
-
-    // 批量导入
-    function openKbBatchUpload() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.multiple = true;
-        input.accept = '.txt,.md,.markdown,.json,.csv,.pdf,.docx';
-        input.onchange = async function () {
-            const files = Array.from(input.files);
-            if (files.length === 0) return;
-            if (files.length > 20) {
-                showToast('⚠️ 单次最多 20 个文件');
-                return;
-            }
-            const catId = document.getElementById('kbCategoryFilter').value;
-            const category = catId !== 'all' ? catId : 'cat_other';
-
-            const formData = new FormData();
-            files.forEach(f => formData.append('files', f));
-            formData.append('category', category);
-            formData.append('tags', '');
-
-            showToast('⏳ 正在上传 ' + files.length + ' 个文件...');
-            try {
-                const res = await fetch(BACKEND_URL + '/api/kb/batch-upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.success) {
-                    showToast('✅ ' + data.message);
-                    loadKb();
-                } else {
-                    showToast('❌ ' + (data.message || '上传失败'));
-                }
-            } catch (e) {
-                showToast('❌ 网络错误');
-            }
-        };
-        input.click();
-    }
-
-    // AI 提炼
-    function openKbAutoGenerate() {
-        if (!state.currentId) {
-            showToast('⚠️ 请先打开一个会话');
-            return;
-        }
-        if (!confirm('将根据当前会话的对话记录自动提炼 FAQ，是否继续？')) return;
-
-        const history = [];
-        if (state.currentId && state.messagesMap[state.currentId]) {
-            state.messagesMap[state.currentId].slice(-20).forEach(m => {
-                history.push({ role: m.from === 'user' ? 'user' : 'ai', text: m.text || '' });
-            });
-        }
-        if (history.length === 0) {
-            showToast('⚠️ 当前会话没有对话记录');
-            return;
-        }
-
-        showToast('🤖 AI 正在提炼 FAQ...');
-        fetch(BACKEND_URL + '/api/kb/auto-generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                history: history,
-                category: 'cat_faq'
-            })
-        }).then(r => r.json()).then(data => {
-            if (data.success) {
-                showToast('✅ ' + data.message);
-                loadKb();
-            } else {
-                showToast('❌ ' + (data.message || '提炼失败'));
-            }
-        }).catch(() => {
-            showToast('❌ 网络错误');
-        });
-    }
-
-    // 统计
-    async function showKbStats() {
-        try {
-            const res = await fetch(BACKEND_URL + '/api/kb/stats');
-            const data = await res.json();
-            if (!data.success) {
-                showToast('❌ 加载失败');
-                return;
-            }
-            const stats = data.stats || [];
-            let html = '<h3 style="margin-bottom:12px;color:#0a1e2f;">📊 知识库访问统计</h3>';
-            if (stats.length === 0) {
-                html += '<p style="color:#94a3b8;">暂无数据</p>';
-            } else {
-                html += '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
-                html += '<thead><tr style="border-bottom:2px solid #e8edf4;text-align:left;">';
-                html += '<th style="padding:8px;">标题</th><th>分类</th><th>命中</th><th>👍</th><th>👎</th><th>最近命中</th>';
-                html += '</tr></thead><tbody>';
-                stats.slice(0, 30).forEach(s => {
-                    html += `<tr style="border-bottom:1px solid #f0f4f9;">
-                        <td style="padding:8px;">${escapeHtml(s.title)}</td>
-                        <td style="color:#5f7d95;font-size:12px;">${escapeHtml(s.category_name || '')}</td>
-                        <td><strong>${s.hit_count}</strong></td>
-                        <td style="color:#0d7c4f;">${s.satisfied}</td>
-                        <td style="color:#b51a3f;">${s.unsatisfied}</td>
-                        <td style="color:#94a3b8;font-size:11px;">${s.last_hit || '-'}</td>
-                    </tr>`;
-                });
-                html += '</tbody></table>';
-            }
-
-            const w = window.open('', '_blank', 'width=800,height=600');
-            w.document.write(`
-                <html><head><title>知识库统计</title>
-                <style>
-                    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:24px;background:#fff;color:#0a1e2f;}
-                    table{width:100%;}
-                    th{text-align:left;padding:8px;color:#5f7d95;font-size:12px;}
-                </style>
-                </head><body>${html}</body></html>
-            `);
-        } catch (e) {
-            showToast('❌ 网络错误');
-        }
-    }
-
-    // 显示知识详情
-    function showKbDetail(id) {
-        const item = state.kbItems.find(x => x.id === id);
-        if (!item) {
-            showToast('⚠️ 知识不存在');
-            return;
-        }
-        alert(`标题：${item.title}\n分类：${item.category_name || item.category || '-'}\n标签：${(item.tags || []).join(', ') || '-'}\n\n内容：\n${(item.content || '').slice(0, 1000)}`);
-    }
-
-    // 反馈
-    async function kbFeedback(messageId, satisfied) {
-        let itemId = null;
-        for (const msgs of Object.values(state.messagesMap)) {
-            const m = msgs.find(x => x.id === messageId);
-            if (m && m.kb_hits && m.kb_hits.length > 0) {
-                itemId = m.kb_hits[0].id;
-                break;
-            }
-        }
-        if (!itemId) return;
-        try {
-            await fetch(BACKEND_URL + '/api/kb/feedback', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: itemId, satisfied })
-            });
-            showToast(satisfied ? '👍 感谢反馈' : '👎 会持续改进');
-        } catch (e) {}
-    }
-
-    // ★ 智能推荐
-    let _recommendTimer = null;
-    function handleKbRecommendInput() {
-        clearTimeout(_recommendTimer);
-        const text = document.getElementById('msgInput').value.trim();
-        if (text.length < 2) {
-            hideKbRecommend();
-            return;
-        }
-        _recommendTimer = setTimeout(() => {
-            fetchKbRecommend(text);
-        }, 400);
-    }
-
-    async function fetchKbRecommend(text) {
-        try {
-            const res = await fetch(BACKEND_URL + '/api/kb/recommend', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, top_k: 3 })
-            });
-            const data = await res.json();
-            if (data.success && data.results.length > 0) {
-                showKbRecommend(data.results);
-            } else {
-                hideKbRecommend();
-            }
-        } catch (e) {}
-    }
-
-    function showKbRecommend(results) {
-        let box = document.getElementById('kbRecommendBox');
-        if (!box) {
-            box = document.createElement('div');
-            box.id = 'kbRecommendBox';
-            box.className = 'kb-recommend-box';
-            const inputArea = document.querySelector('.chat-input-area');
-            inputArea.parentNode.insertBefore(box, inputArea);
-        }
-        box.innerHTML = `
-            <div style="font-size:11px;color:#5f7d95;padding:6px 14px 2px;">
-                <i class="fas fa-lightbulb" style="color:#f5b342;"></i> 相关知识推荐（点击插入）：
-            </div>
-            ${results.map(r => `
-                <div class="kb-recommend-item" onclick="insertKbRecommend('${r.id}')">
-                    <div class="kb-rec-title">${escapeHtml(r.title)}</div>
-                    <div class="kb-rec-summary">${escapeHtml(r.summary)}</div>
-                </div>
-            `).join('')}
-        `;
-        box.style.display = 'block';
-    }
-
-    function hideKbRecommend() {
-        const box = document.getElementById('kbRecommendBox');
-        if (box) box.style.display = 'none';
-    }
-
-    function insertKbRecommend(id) {
-        const item = state.kbItems.find(x => x.id === id);
-        if (!item) return;
-        const input = document.getElementById('msgInput');
-        input.value = (item.content || '').slice(0, 500);
-        autoResize(input);
-        updateSendBtn();
-        hideKbRecommend();
-    }
-
-    /* ============================================================
-       知识库上传弹窗
-       ============================================================ */
-    function openKbUpload() {
-        document.getElementById('kbTitle').value = '';
-        document.getElementById('kbTags').value = '';
-        document.getElementById('kbFileInput').value = '';
-        document.getElementById('kbSelectedFile').classList.remove('show');
-        state.kbFile = null;
-        document.getElementById('kbUploadModal').classList.add('show');
-    }
-    function closeKbUpload() {
-        document.getElementById('kbUploadModal').classList.remove('show');
-    }
-    function onKbFileSelected(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        state.kbFile = file;
-        document.getElementById('kbFileName').textContent = file.name;
-        document.getElementById('kbFileSize').textContent = formatSize(file.size);
-        document.getElementById('kbSelectedFile').classList.add('show');
-    }
-    async function submitKbUpload() {
-        const title = document.getElementById('kbTitle').value.trim();
-        if (!title) { showToast('⚠️ 请填写标题'); return; }
-        if (!state.kbFile) { showToast('⚠️ 请选择文件'); return; }
-
-        const btn = document.getElementById('kbSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
-
-        try {
-            const formData = new FormData();
-            formData.append('file', state.kbFile);
-            formData.append('title', title);
-            formData.append('category', document.getElementById('kbCategory').value);
-            formData.append('tags', document.getElementById('kbTags').value);
-
-            const res = await fetch(BACKEND_URL + '/api/kb/upload', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if (data.success) {
-                showToast('✅ ' + data.message);
-                closeKbUpload();
-                loadKb();
-            } else {
-                showToast('❌ ' + (data.message || '上传失败'));
-            }
-        } catch (e) {
-            showToast('❌ 网络错误');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-upload"></i> 上传';
-        }
-    }
-
-    /* ============================================================
-       素材库
-       ============================================================ */
     async function loadAssets() {
         try {
             const res = await fetch(BACKEND_URL + '/api/assets/list');
@@ -2331,31 +3429,23 @@
                 state.assetItems = data.items || [];
                 renderAssets();
                 updateBadges();
-            } else {
-                state.assetItems = [];
-                renderAssets();
             }
         } catch (e) {
             console.warn('加载素材库失败', e);
-            state.assetItems = [];
-            renderAssets();
         }
     }
 
     function renderAssets() {
         const grid = document.getElementById('assetGrid');
         const empty = document.getElementById('assetEmpty');
-
         let list = state.assetItems;
         const keyword = (document.getElementById('assetSearch').value || '').trim().toLowerCase();
         const typeFilter = document.getElementById('assetTypeFilter').value;
 
-        if (typeFilter !== 'all') {
-            list = list.filter(x => x.type === typeFilter);
-        }
+        if (typeFilter !== 'all') list = list.filter(x => x.type === typeFilter);
         if (keyword) {
             list = list.filter(x => {
-                const hay = (x.name + ' ' + (x.tags || []).join(' ') + ' ' + (x.product_name || '') + ' ' + (x.category || '')).toLowerCase();
+                const hay = (x.name + ' ' + (x.tags || []).join(' ') + ' ' + (x.product_name || '')).toLowerCase();
                 return hay.includes(keyword);
             });
         }
@@ -2369,31 +3459,20 @@
 
         grid.innerHTML = list.map(a => {
             const preview = a.type === 'image'
-                ? `<img src="${a.url}" alt="${escapeHtml(a.name)}" loading="lazy"
-                       onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\\'fas fa-image\\' style=\\'font-size:32px;color:#94a3b8;\\'></i>'">`
-                : `<video src="${a.url}" preload="metadata" muted playsinline
-                       onmouseover="this.play()" onmouseout="this.pause();this.currentTime=0"></video>
-                   <i class="fas fa-play video-icon"></i>`;
-
+                ? `<img src="${a.url}" alt="${escapeHtml(a.name)}" loading="lazy">`
+                : `<video src="${a.url}" preload="metadata" muted playsinline></video><i class="fas fa-play video-icon"></i>`;
             return `
-                <div class="asset-card" onclick="previewAsset('${a.id}')">
+                <div class="asset-card">
                     <div class="asset-preview">
                         ${preview}
                         <span class="asset-type-badge">${a.type === 'image' ? '🖼️ 图' : '🎬 视频'}</span>
                     </div>
                     <div class="asset-info">
-                        <div class="asset-name" title="${escapeHtml(a.name)}">${escapeHtml(a.name)}</div>
-                        <div class="asset-meta">
-                            <span>${escapeHtml(a.category || '其他')}</span>
-                            <span>${formatSize(a.file_size)}</span>
-                        </div>
+                        <div class="asset-name">${escapeHtml(a.name)}</div>
                     </div>
                     <div class="asset-actions">
-                        <button class="asset-btn send" onclick="event.stopPropagation(); sendAsset('${a.id}')">
+                        <button class="asset-btn send" onclick="sendAsset('${a.id}')">
                             <i class="fas fa-paper-plane"></i> 发送
-                        </button>
-                        <button class="asset-btn del" onclick="event.stopPropagation(); deleteAsset('${a.id}')" title="删除">
-                            <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
                 </div>
@@ -2403,42 +3482,12 @@
 
     function filterAssets() { renderAssets(); }
 
-    function previewAsset(id) {
+    function sendAsset(id) {
         const a = state.assetItems.find(x => x.id === id);
         if (!a) return;
-        window.open(a.url, '_blank');
-    }
-
-    async function deleteAsset(id) {
-        if (!confirm('确定删除该素材？')) return;
-        try {
-            const res = await fetch(BACKEND_URL + '/api/assets/delete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
-            });
-            const data = await res.json();
-            if (data.success) {
-                showToast('✅ ' + data.message);
-                loadAssets();
-            } else {
-                showToast('❌ ' + (data.message || '删除失败'));
-            }
-        } catch (e) {
-            showToast('❌ 网络错误');
-        }
-    }
-
-    async function sendAsset(id) {
-        const a = state.assetItems.find(x => x.id === id);
-        if (!a) return;
-        if (!state.currentId) {
-            showToast('⚠️ 请先选择会话');
-            return;
-        }
+        if (!state.currentId) { showToast('⚠️ 请先选择会话'); return; }
 
         switchTab('chat', document.querySelectorAll('.chat-tab')[0]);
-        await new Promise(r => setTimeout(r, 100));
 
         if (!state.messagesMap[state.currentId]) state.messagesMap[state.currentId] = [];
         state.messagesMap[state.currentId].push({
@@ -2458,65 +3507,18 @@
         renderMessages(state.currentId);
         renderConvList();
         scrollMessagesToBottom();
-        showToast('📤 已发送素材给客户');
+        showToast('📤 已发送素材');
     }
 
     function quickSendAsset() {
         switchTab('assets', document.querySelectorAll('.chat-tab')[2]);
     }
 
-    function openAssetUpload() {
-        document.getElementById('assetProductName').value = '';
-        document.getElementById('assetCategory').value = '产品图';
-        document.getElementById('assetTags').value = '';
-        document.getElementById('assetFileInput').value = '';
-        document.getElementById('assetSelectedFile').classList.remove('show');
-        state.assetFile = null;
-        document.getElementById('assetUploadModal').classList.add('show');
-    }
-    function closeAssetUpload() {
-        document.getElementById('assetUploadModal').classList.remove('show');
-    }
-    function onAssetFileSelected(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        state.assetFile = file;
-        document.getElementById('assetFileName').textContent = file.name;
-        document.getElementById('assetFileSize').textContent = formatSize(file.size);
-        document.getElementById('assetSelectedFile').classList.add('show');
-    }
-    async function submitAssetUpload() {
-        if (!state.assetFile) { showToast('⚠️ 请选择文件'); return; }
-
-        const btn = document.getElementById('assetSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
-
-        try {
-            const formData = new FormData();
-            formData.append('file', state.assetFile);
-            formData.append('tags', document.getElementById('assetTags').value);
-            formData.append('product_name', document.getElementById('assetProductName').value);
-            formData.append('category', document.getElementById('assetCategory').value);
-
-            const res = await fetch(BACKEND_URL + '/api/assets/upload', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if (data.success) {
-                showToast('✅ ' + data.message);
-                closeAssetUpload();
-                loadAssets();
-            } else {
-                showToast('❌ ' + (data.message || '上传失败'));
-            }
-        } catch (e) {
-            showToast('❌ 网络错误');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-upload"></i> 上传';
-        }
+    function updateBadges() {
+        document.getElementById('kbBadge').textContent = state.kbItems.length;
+        document.getElementById('assetsBadge').textContent = state.assetItems.length;
+        document.getElementById('toolbarKbCount').textContent = state.kbItems.length;
+        document.getElementById('toolbarAssetCount').textContent = state.assetItems.length;
     }
 
     /* ============================================================
@@ -2531,7 +3533,7 @@
         sendSystemMessage(convId, '【系统】会话已转人工客服');
         renderChatActions(convId);
         renderConvList();
-        showToast('👤 已转人工，AI 已停止自动回复');
+        showToast('👤 已转人工');
     }
 
     function takeOver() {
@@ -2541,7 +3543,7 @@
         sendSystemMessage(convId, '【系统】AI 已接管本会话');
         renderChatActions(convId);
         renderConvList();
-        showToast('🤖 AI 已接管，将继续自动回复');
+        showToast('🤖 AI 已接管');
     }
 
     function releaseToAI() {
@@ -2590,21 +3592,12 @@
     /* ============================================================
        工具
        ============================================================ */
-    function updateBadges() {
-        const kbCount = state.kbItems.length;
-        const assetCount = state.assetItems.length;
-        document.getElementById('kbBadge').textContent = kbCount;
-        document.getElementById('assetsBadge').textContent = assetCount;
-        document.getElementById('statKb').textContent = kbCount;
-        document.getElementById('statAssets').textContent = assetCount;
-        document.getElementById('toolbarKbCount').textContent = kbCount;
-        document.getElementById('toolbarAssetCount').textContent = assetCount;
-    }
-
     function refreshAll() {
         renderConvList();
         loadKb();
         loadAssets();
+        loadProducts();
+        loadCoupons();
         if (state.currentId) renderChatActions(state.currentId);
         showToast('🔄 已刷新');
     }
@@ -2613,6 +3606,12 @@
         state.conversations.forEach(c => c.unread = 0);
         renderConvList();
         showToast('✅ 已全部标记为已读');
+    }
+
+    function showKbDetail(id) {
+        const item = state.kbItems.find(x => x.id === id);
+        if (!item) return;
+        alert(`标题：${item.title}\n分类：${item.category_name || item.category || '-'}\n\n内容：\n${(item.content || '').slice(0, 800)}`);
     }
 
     function nowTime() {
@@ -2626,11 +3625,10 @@
         })[c]);
     }
 
-    function formatSize(bytes) {
-        if (!bytes) return '0B';
-        if (bytes < 1024) return bytes + 'B';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
-        return (bytes / 1024 / 1024).toFixed(1) + 'MB';
+    function formatNumber(n) {
+        if (!n) return '0';
+        if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+        return n.toLocaleString('zh-CN');
     }
 
     function autoResize(el) {
@@ -2660,11 +3658,14 @@
         t._timer = setTimeout(() => t.classList.remove('show'), 2200);
     }
 
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('show');
+    }
+
     /* ============================================================
        全局暴露
        ============================================================ */
     window.switchTab = switchTab;
-    window.switchTabByName = switchTabByName;
     window.openConv = openConv;
     window.filterConv = filterConv;
     window.sendMsg = sendMsg;
@@ -2677,35 +3678,43 @@
     window.markAllRead = markAllRead;
     window.handleMsgKey = handleMsgKey;
     window.autoResize = autoResize;
-
-    window.openKbUpload = openKbUpload;
-    window.closeKbUpload = closeKbUpload;
-    window.onKbFileSelected = onKbFileSelected;
-    window.submitKbUpload = submitKbUpload;
-    window.filterKb = filterKb;
-    window.filterKbByCategory = filterKbByCategory;
-    window.deleteKb = deleteKb;
-    window.editKb = editKb;
-    window.toggleKb = toggleKb;
-    window.pinKb = pinKb;
-    window.openKbBatchUpload = openKbBatchUpload;
-    window.openKbAutoGenerate = openKbAutoGenerate;
-    window.showKbStats = showKbStats;
     window.showKbDetail = showKbDetail;
-    window.kbFeedback = kbFeedback;
-    window.insertKbRecommend = insertKbRecommend;
-
-    window.openAssetUpload = openAssetUpload;
-    window.closeAssetUpload = closeAssetUpload;
-    window.onAssetFileSelected = onAssetFileSelected;
-    window.submitAssetUpload = submitAssetUpload;
+    window.filterKb = filterKb;
     window.filterAssets = filterAssets;
-    window.deleteAsset = deleteAsset;
     window.sendAsset = sendAsset;
-    window.previewAsset = previewAsset;
     window.quickSendAsset = quickSendAsset;
+    window.closeLightbox = closeLightbox;
 
-    console.log('💬 AI 客服页已加载（含知识库完整版 + 素材库 + 多轮上下文 + 引用溯源）');
+    // 商品卡片
+    window.openProductPicker = openProductPicker;
+    window.closeProductPicker = closeProductPicker;
+    window.togglePickProduct = togglePickProduct;
+    window.clearProductPick = clearProductPick;
+    window.filterProductPicker = filterProductPicker;
+    window.sendPickedProducts = sendPickedProducts;
+    window.onCardClick = onCardClick;
+    window.onCardAction = onCardAction;
+    window.scrollCarousel = scrollCarousel;
+    window.onCarouselScroll = onCarouselScroll;
+
+    // 优惠券
+    window.openCouponPicker = openCouponPicker;
+    window.closeCouponPicker = closeCouponPicker;
+    window.pickCoupon = pickCoupon;
+    window.sendPickedCoupon = sendPickedCoupon;
+    window.claimCoupon = claimCoupon;
+
+    // 样式
+    window.openCardStyleModal = openCardStyleModal;
+    window.closeCardStyleModal = closeCardStyleModal;
+    window.pickColor = pickColor;
+    window.saveCardStyle = saveCardStyle;
+    window.resetCardStyle = resetCardStyle;
+
+    // 统计
+    window.showClickStats = showClickStats;
+
+    console.log('💬 AI 客服页已加载（商品卡片 + 点击追踪 + 模板自定义 + 多商品轮播 + 优惠券 + AI 智能选品）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
