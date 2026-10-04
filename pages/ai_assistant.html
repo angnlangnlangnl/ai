@@ -854,7 +854,6 @@
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
-        /* ★★★ 引用消息条 */
         .quote-bar {
             padding: 8px 20px 0;
             animation: quoteIn 0.2s ease;
@@ -1255,7 +1254,7 @@
     };
 
     /* ============================================================
-       ★★★ 会话 ID & 会话级持久化
+       会话 ID & 会话级持久化
        ============================================================ */
     function getOrCreateSessionId() {
         let sid = safeStorage.get('ai_session_id');
@@ -2463,6 +2462,56 @@
     // ================================================================
     function parseGenerationIntent(text) {
         const t = text.trim();
+
+        // ★★★ 延续型短语：无名词但有指代
+        const CONTINUE_PATTERNS = [
+            /^再来\s*[一二三四五六七八九十\d]*\s*[张个条]/,
+            /^再\s*[一二三四五六七八九十\d]*\s*[张个条]/,
+            /^继续/,
+            /^接着/,
+            /^同样/,
+            /^一样的/,
+            /^再生成/,
+            /^再画/,
+            /^再出/,
+            /^换(一|个|成|掉)?/,
+            /^改(成|为|一下)?/,
+            /^重(新)?(生成|做|画|来)/,
+            /^多(来|生成|加|出)\s*[一二三四五六七八九十\d]*\s*[张个条]?/,
+            /^加上?\s*[一二三四五六七八九十\d]+\s*[张个条]?/,
+            /^补(充|上)?\s*[一二三四五六七八九十\d]*\s*[张个条]?/,
+        ];
+        const isContinue = CONTINUE_PATTERNS.some(re => re.test(t));
+
+        if (isContinue) {
+            const last = loadLastGeneration();
+            if (last) {
+                let cnt = 1;
+                const m = t.match(/[一二三四五六七八九十\d]+/);
+                if (m) {
+                    const numMap = { '一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10 };
+                    cnt = numMap[m[0]] || parseInt(m[0], 10) || 1;
+                    cnt = Math.min(cnt, 5);
+                }
+
+                let extraDesc = '';
+                const changeMatch = t.match(/(?:换|改)(?:成|为|一下)?(.+)$/);
+                if (changeMatch) extraDesc = changeMatch[1].trim();
+
+                return {
+                    kind: last.kind || 'images',
+                    count: cnt,
+                    productName: last.product_name || '',
+                    seconds: last.seconds || '5',
+                    posterType: last.posterType || '促销海报',
+                    freeTheme: last.theme || '',
+                    extraDesc,
+                    isContinue: true,
+                    lastGenerated: last
+                };
+            }
+        }
+
         const imgKeywords = ['生成', '做', '画', '出', '来', '弄', '制作', '设计'];
         const imgNouns = ['主图', '图片', '商品图', '轮播图', '详情图'];
         const videoNouns = ['视频', '短视频', '种草视频', '广告片', '同款'];
@@ -2925,7 +2974,7 @@
             state.pendingActions[applyId] = m.card.rawAction;
             updateMessageNode(m);
         }
-        rememberLastGeneration({ kind: 'poster', theme, product_name: '', posterUrl });
+        rememberLastGeneration({ kind: 'poster', theme, product_name: '', posterType, posterUrl });
     }
 
     // ================================================================
@@ -3023,7 +3072,13 @@
             state.pendingActions[syncId] = m.card.rawAction;
             updateMessageNode(m);
         }
-        rememberLastGeneration({ kind: 'images', theme: productName, product_name: productName, urls: urls.filter(Boolean) });
+        rememberLastGeneration({
+            kind: 'images',
+            theme: productName,
+            product_name: productName,
+            category: category || '',
+            urls: urls.filter(Boolean)
+        });
     }
 
     async function generateVideoWithProduct(productName, seconds, refSnapshot, category) {
@@ -3098,7 +3153,14 @@
             state.pendingActions[syncId] = m.card.rawAction;
             updateMessageNode(m);
         }
-        rememberLastGeneration({ kind: 'video', theme: productName, product_name: productName, videoUrl });
+        rememberLastGeneration({
+            kind: 'video',
+            theme: productName,
+            product_name: productName,
+            category: category || '',
+            seconds: seconds,
+            videoUrl
+        });
     }
 
     // ================================================================
@@ -3296,7 +3358,6 @@
         if (text.length > 500) { showToast('⚠️ 输入内容不能超过500字'); return; }
         if (state.isProcessing) return;
 
-        // ★ 如果有引用消息，拼接
         let finalText = text;
         if (state.quotedMessage) {
             finalText = `[引用] ${state.quotedMessage.text.slice(0, 80)}\n${text}`;
@@ -3325,7 +3386,6 @@
         updateCharCount();
         updateSendBtn();
 
-        // ★ 清空引用
         state.quotedMessage = null;
         renderQuoteBar();
 
@@ -3338,6 +3398,64 @@
         if (isGenerationIntent) {
             document.getElementById('typingIndicator').classList.remove('show');
             try {
+                // ★★★ 延续型：直接用上次参数重新生成
+                if (genIntent && genIntent.isContinue) {
+                    const last = genIntent.lastGenerated;
+                    const kindName = genIntent.kind === 'video' ? '视频'
+                                   : genIntent.kind === 'poster' ? '海报' : '主图';
+                    const themeName = last.product_name || last.theme || '商品';
+                    appendMessage({
+                        role: 'ai',
+                        text: `🔁 沿用上次参数，继续生成 ${genIntent.count} 张「${themeName}」${kindName}...`,
+                        time: nowTime()
+                    });
+
+                    if (genIntent.kind === 'images') {
+                        if (last.product_name) {
+                            await generateImagesWithProduct(
+                                last.product_name,
+                                genIntent.count,
+                                genIntent.extraDesc,
+                                refSnapshot,
+                                last.category || ''
+                            );
+                        } else {
+                            await generateImagesFree(
+                                last.theme || '商品',
+                                genIntent.count,
+                                refSnapshot.images || [],
+                                genIntent.extraDesc || ''
+                            );
+                        }
+                    } else if (genIntent.kind === 'video') {
+                        if (last.product_name) {
+                            await generateVideoWithProduct(
+                                last.product_name,
+                                genIntent.seconds || last.seconds || '5',
+                                refSnapshot,
+                                last.category || ''
+                            );
+                        } else {
+                            await generateVideoFree(
+                                last.theme || '商品',
+                                genIntent.seconds || '5',
+                                refSnapshot,
+                                genIntent.extraDesc || ''
+                            );
+                        }
+                    } else if (genIntent.kind === 'poster') {
+                        await generatePosterFree(
+                            last.theme || last.product_name || '创意设计',
+                            last.posterType || genIntent.posterType || '促销海报',
+                            refSnapshot.images || []
+                        );
+                    }
+                    state.isProcessing = false;
+                    updateSendBtn();
+                    return;
+                }
+
+                // 非延续分支
                 const intentType = detectIntentType(text);
                 if (intentType.type === 'bound') {
                     await handleGenerationIntent(genIntent, text, refSnapshot);
@@ -3358,7 +3476,6 @@
         document.getElementById('messageContainer').scrollTop = document.getElementById('messageContainer').scrollHeight;
 
         try {
-            // ★ 组装上下文
             const recentHistory = state.currentMessages
                 .slice(-8)
                 .map(m => ({ role: m.role, text: m.text || '' }))
@@ -3589,9 +3706,6 @@
         showToast('✏️ 已填入输入框');
     }
 
-    /* ============================================================
-       ★★★ 引用消息
-       ============================================================ */
     function quoteMessage(btn) {
         const msgDiv = btn.closest('.message');
         const msgId = msgDiv.dataset.msgId;
@@ -3763,17 +3877,14 @@
             }
         });
 
-        // ★ 恢复参考素材
         loadReferenceFromSession();
 
-        // ★ 恢复上次生成结果
         const lastGen = loadLastGeneration();
         if (lastGen) {
             state.lastGeneratedMedia = lastGen;
             console.log('🔄 已恢复上次生成结果:', lastGen);
         }
 
-        // ★ 渲染引用条
         renderQuoteBar();
     });
 
@@ -3781,7 +3892,6 @@
         if (window.innerWidth > 768) closeSidebar();
     });
 
-    // 全局暴露
     window.toggleSidebar = toggleSidebar;
     window.closeSidebar = closeSidebar;
     window.newChat = newChat;
@@ -3811,7 +3921,7 @@
     window.quoteMessage = quoteMessage;
     window.cancelQuote = cancelQuote;
 
-    console.log('🤖 AI 助手已加载（Agnes 后端代理 + 5级智能匹配 + 创建商品 + 多轮上下文 + 引用消息）');
+    console.log('🤖 AI 助手已加载（Agnes 后端代理 + 5级智能匹配 + 创建商品 + 多轮上下文 + 引用消息 + 延续生成）');
     console.log('💡 后端:', BACKEND_URL);
     console.log('🆔 Session:', SESSION_ID);
 </script>
