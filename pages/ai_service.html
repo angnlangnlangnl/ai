@@ -1089,7 +1089,7 @@
         }
 
         /* ============================================================
-           商品选择弹窗（★ 修复：按钮固定高度 + 状态显示）
+           商品选择弹窗
            ============================================================ */
         .product-picker-modal {
             position: fixed; inset: 0;
@@ -1295,7 +1295,6 @@
             display: block;
         }
 
-        /* ★ 修复：底部固定 + 状态清晰 */
         .product-picker-foot {
             padding: 12px 22px;
             border-top: 1px solid #e8edf4;
@@ -2688,18 +2687,18 @@
     }
 
     /* ============================================================
-       ★ 商品选择器（修复版）
+       商品选择器（修复版 + 发送后关闭弹窗）
        ============================================================ */
     function openProductPicker() {
         if (!state.currentId) {
             showToast('⚠️ 请先选择会话');
             return;
         }
-        // ★ 每次打开都重置选中状态
+        // 每次打开都重置选中状态
         state.pickedProducts = [];
         document.getElementById('productPickerSearch').value = '';
 
-        // ★ 若商品列表为空，先尝试加载
+        // 若商品列表为空，先尝试加载
         if (!state.productsCache || state.productsCache.length === 0) {
             loadProducts().then(() => {
                 renderProductPickerList(state.productsCache);
@@ -2708,11 +2707,11 @@
             renderProductPickerList(state.productsCache);
         }
 
-        // ★ 立即更新按钮状态
+        // 立即更新按钮状态
         updatePickedCount();
         document.getElementById('productPickerModal').classList.add('show');
 
-        // ★ 延迟 100ms 再刷新一次按钮状态（防止 DOM 没就绪）
+        // 延迟 100ms 再刷新一次按钮状态（防止 DOM 没就绪）
         setTimeout(updatePickedCount, 100);
     }
 
@@ -2757,7 +2756,7 @@
         }).join('');
     }
 
-    // ★ 核心修复：选中/取消逻辑
+    // 选中/取消逻辑
     function togglePickProduct(productId) {
         const p = state.productsCache.find(x => x.id === productId);
         if (!p) {
@@ -2778,26 +2777,20 @@
             state.pickedProducts.push(p);
         }
 
-        // ★ 重新渲染列表（更新选中样式）
+        // 重新渲染列表（更新选中样式）
         renderProductPickerList(state.productsCache);
-        // ★ 强制更新按钮状态
+        // 强制更新按钮状态
         updatePickedCount();
     }
 
-    // ★ 核心修复：按钮状态更新（加日志排查）
+    // 按钮状态更新
     function updatePickedCount() {
         const n = state.pickedProducts.length;
         const countEl = document.getElementById('pickedCount');
         const btnEl = document.getElementById('sendProductBtn');
 
-        console.log('[updatePickedCount] 已选商品数:', n, '按钮:', btnEl, '按钮当前disabled:', btnEl ? btnEl.disabled : 'N/A');
-
         if (countEl) countEl.textContent = n;
-
-        if (btnEl) {
-            btnEl.disabled = (n === 0);
-            console.log('[updatePickedCount] 设置后 disabled =', btnEl.disabled);
-        }
+        if (btnEl) btnEl.disabled = (n === 0);
     }
 
     function clearProductPick() {
@@ -2818,12 +2811,8 @@
         renderProductPickerList(list);
     }
 
-    // ★ 核心修复：发送逻辑（加详细日志）
+    // ★ 发送商品：发送后关闭弹窗
     async function sendPickedProducts() {
-        console.log('[sendPickedProducts] 被调用');
-        console.log('  pickedProducts:', state.pickedProducts);
-        console.log('  currentId:', state.currentId);
-
         if (state.pickedProducts.length === 0) {
             showToast('⚠️ 请先选择商品');
             return;
@@ -2873,10 +2862,12 @@
         renderMessages(convId);
         renderConvList();
         scrollMessagesToBottom();
-        closeProductPicker();
-        showToast(`✅ 已发送 ${cards.length} 个商品`);
 
-        console.log('[sendPickedProducts] 发送完成');
+        // 关闭弹窗并重置选中
+        closeProductPicker();
+        state.pickedProducts = [];
+
+        showToast(`✅ 已发送 ${cards.length} 个商品`);
     }
 
     function generateProductUrl(p) {
@@ -2892,7 +2883,7 @@
     }
 
     /* ============================================================
-       优惠券选择器
+       优惠券选择器（发送后关闭弹窗）
        ============================================================ */
     function openCouponPicker() {
         if (!state.currentId) {
@@ -2941,6 +2932,7 @@
         document.getElementById('sendCouponBtn').disabled = false;
     }
 
+    // ★ 发送优惠券：发送后关闭弹窗
     async function sendPickedCoupon() {
         if (!state.pickedCoupon) return;
         if (!state.currentId) return;
@@ -2966,7 +2958,11 @@
         renderMessages(convId);
         renderConvList();
         scrollMessagesToBottom();
+
+        // 关闭弹窗并重置选中
         closeCouponPicker();
+        state.pickedCoupon = null;
+
         showToast(`🎟️ 已发送「${c.name}」`);
     }
 
