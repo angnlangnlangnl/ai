@@ -1806,7 +1806,6 @@
 
 <div class="global-toast" id="toast"></div>
 
-<!-- ⬇⬇⬇ 第 3 段（JavaScript）从这里开始 ⬇⬇⬇ -->
 <script>
     /* ============================================================
        配置
@@ -1987,7 +1986,43 @@
         bindGlobalShortcuts();
         bindScrollListener();
         updateStatsBar();
+
+        // ★ 从 products.html 跳过来：自动打开会话 + 发送"我想咨询【商品名】"
+        handleFromProduct();
     });
+
+    // ★ 处理 URL 参数 from_product
+    async function handleFromProduct() {
+        const params = new URLSearchParams(window.location.search);
+        const fromProductId = params.get('from_product');
+        if (!fromProductId) return;
+
+        // 等商品加载完（最多等 3 秒）
+        let tries = 0;
+        while (!state.productsCache || state.productsCache.length === 0) {
+            await new Promise(r => setTimeout(r, 200));
+            tries++;
+            if (tries > 15) break;
+        }
+
+        const p = state.productsCache.find(x => String(x.id) === String(fromProductId));
+        if (!p) return;
+
+        // 打开第一个会话（或新建）
+        if (state.conversations.length === 0) return;
+        const conv = state.conversations[0];
+        openConv(conv.id);
+
+        // 延迟一下，等界面就绪再发消息
+        setTimeout(() => {
+            const input = document.getElementById('msgInput');
+            if (!input) return;
+            input.value = `我想咨询【${p.name}】`;
+            autoResize(input);
+            updateSendBtn();
+            sendMsg();
+        }, 600);
+    }
 
     function bindInputEvents() {
         const input = document.getElementById('msgInput');
@@ -2470,6 +2505,11 @@
         state.clickStats.byProduct[productId].clicked++;
         updateStatsBar();
         reportClick(productId, name, 'view');
+        // ★ 优先跳自己的商品详情页
+        if (productId) {
+            window.open('products.html?id=' + productId, '_blank');
+            return;
+        }
         if (url && url !== '#') {
             window.open(url, '_blank');
         } else {
@@ -3514,4 +3554,4 @@
     console.log('💡 销售接口: POST /api/sales/chat');
 </script>
 </body>
-</html>                            
+</html>
