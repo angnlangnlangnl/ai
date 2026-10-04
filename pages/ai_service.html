@@ -43,9 +43,7 @@
             cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
             transition: 0.12s; font-family: inherit; white-space: nowrap;
         }
-        .toolbar .tb-btn:hover {
-            border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
-        }
+        .toolbar .tb-btn:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
         .toolbar .tb-btn i { color: #5f7d95; }
         .toolbar .tb-btn:hover i { color: #4dabf7; }
 
@@ -70,11 +68,6 @@
             letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 6px;
         }
         .stat-card .value small { font-size: 12px; color: #5f7d95; font-weight: 400; }
-        .stat-card .trend {
-            font-size: 11px; font-weight: 500;
-            background: #e6f7ec; color: #0d7c4f;
-            padding: 1px 8px; border-radius: 20px; display: inline-block;
-        }
 
         /* ===== 主体 ===== */
         .app-body {
@@ -188,59 +181,34 @@
             min-width: 0; min-height: 0; overflow: hidden;
         }
 
-        /* ★ Tab 切换 */
         .chat-tabs {
-            display: flex;
-            gap: 2px;
-            padding: 8px 12px 0;
-            border-bottom: 1px solid #e8edf4;
-            background: #fff;
-            flex-shrink: 0;
+            display: flex; gap: 2px; padding: 8px 12px 0;
+            border-bottom: 1px solid #e8edf4; background: #fff; flex-shrink: 0;
         }
         .chat-tab {
-            padding: 10px 16px;
-            border: none;
-            background: transparent;
-            font-size: 13px;
-            font-weight: 500;
-            color: #5f7d95;
-            cursor: pointer;
-            border-radius: 10px 10px 0 0;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: 0.12s;
-            font-family: inherit;
-            position: relative;
+            padding: 10px 16px; border: none; background: transparent;
+            font-size: 13px; font-weight: 500; color: #5f7d95;
+            cursor: pointer; border-radius: 10px 10px 0 0;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: 0.12s; font-family: inherit; position: relative;
         }
         .chat-tab:hover { color: #2a7faa; background: #f5f9fe; }
         .chat-tab.active {
-            color: #0a1e2f;
-            background: #f0f7fe;
-            font-weight: 600;
+            color: #0a1e2f; background: #f0f7fe; font-weight: 600;
         }
         .chat-tab.active::after {
-            content: '';
-            position: absolute;
-            left: 12px; right: 12px; bottom: -1px;
-            height: 2px; background: #4dabf7;
-            border-radius: 2px;
+            content: ''; position: absolute; left: 12px; right: 12px; bottom: -1px;
+            height: 2px; background: #4dabf7; border-radius: 2px;
         }
         .chat-tab i { color: currentColor; font-size: 13px; }
         .tab-badge {
-            background: #4dabf7;
-            color: #fff;
-            font-size: 10px;
-            padding: 1px 6px;
-            border-radius: 10px;
-            font-weight: 600;
-            margin-left: 2px;
+            background: #4dabf7; color: #fff; font-size: 10px;
+            padding: 1px 6px; border-radius: 10px;
+            font-weight: 600; margin-left: 2px;
         }
 
-        /* 面板容器 */
         .panel-container {
-            flex: 1; min-height: 0; display: flex; flex-direction: column;
-            overflow: hidden;
+            flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
         }
         .panel { display: none; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; }
         .panel.active { display: flex; }
@@ -353,7 +321,6 @@
             border-radius: 14px 4px 14px 14px;
         }
 
-        /* 消息里的图片/视频 */
         .msg-media {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -361,12 +328,9 @@
             margin-top: 8px;
         }
         .msg-media .media-item {
-            border-radius: 10px;
-            overflow: hidden;
-            background: #f0f7fe;
-            position: relative;
-            cursor: pointer;
-            transition: 0.15s;
+            border-radius: 10px; overflow: hidden;
+            background: #f0f7fe; position: relative;
+            cursor: pointer; transition: 0.15s;
             aspect-ratio: 1/1;
         }
         .msg-media .media-item:hover { transform: scale(1.02); }
@@ -381,10 +345,8 @@
         }
         .msg-media video {
             grid-column: 1 / -1;
-            max-height: 280px;
-            border-radius: 10px;
-            background: #000;
-            display: block;
+            max-height: 280px; border-radius: 10px;
+            background: #000; display: block;
         }
 
         .msg-row .meta {
@@ -414,7 +376,16 @@
             font-size: 9px; font-weight: 600;
         }
 
-        /* typing */
+        .kb-trace {
+            margin-top: 6px; padding-top: 6px;
+            border-top: 1px dashed #e8edf4;
+            font-size: 11px; color: #5f7d95;
+        }
+        .kb-trace a {
+            color: #2a7faa; text-decoration: none;
+        }
+        .kb-trace a:hover { text-decoration: underline; }
+
         .typing-indicator {
             display: none; align-items: center; gap: 10px;
             padding: 6px 0; align-self: flex-start;
@@ -442,7 +413,6 @@
             30% { transform: translateY(-4px); opacity: 1; }
         }
 
-        /* 快捷回复 */
         .quick-replies {
             padding: 8px 18px 0;
             border-top: 1px solid #e8edf4;
@@ -461,7 +431,6 @@
         }
         .qr-btn:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
 
-        /* 输入区 */
         .chat-input-area {
             background: #fff;
             padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px));
@@ -508,7 +477,29 @@
             opacity: 0.4; cursor: not-allowed; transform: none;
         }
 
-        /* 空状态 */
+        .kb-recommend-box {
+            background: #fff8e6;
+            border-top: 1px solid #ffd88c;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        .kb-recommend-item {
+            padding: 8px 14px;
+            border-bottom: 1px solid #ffeccc;
+            cursor: pointer;
+            transition: 0.12s;
+        }
+        .kb-recommend-item:hover { background: #fff5db; }
+        .kb-rec-title {
+            font-size: 13px; font-weight: 600; color: #8a5a00;
+        }
+        .kb-rec-summary {
+            font-size: 11px; color: #b57a00;
+            margin-top: 2px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
         .empty-chat {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -527,12 +518,12 @@
         .lib-panel::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
 
         .lib-toolbar {
-            display: flex; gap: 10px; align-items: center;
-            margin-bottom: 16px; flex-wrap: wrap;
+            display: flex; gap: 8px; align-items: center;
+            margin-bottom: 14px; flex-wrap: wrap;
         }
         .lib-toolbar input[type="text"],
         .lib-toolbar select {
-            padding: 8px 14px; border-radius: 10px;
+            padding: 8px 12px; border-radius: 10px;
             border: 1px solid #dce5ef;
             background: #fff; font-size: 13px;
             font-family: inherit; outline: none; color: #0a1e2f;
@@ -542,12 +533,12 @@
             border-color: #4dabf7;
             box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
         }
-        .lib-toolbar input[type="text"] { flex: 1; min-width: 160px; }
+        .lib-toolbar input[type="text"] { flex: 1; min-width: 140px; }
         .lib-toolbar .lib-btn {
-            padding: 8px 16px; border-radius: 20px;
-            border: none; font-size: 13px; font-weight: 500;
+            padding: 8px 14px; border-radius: 20px;
+            border: none; font-size: 12px; font-weight: 500;
             cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-            transition: 0.12s; font-family: inherit;
+            transition: 0.12s; font-family: inherit; white-space: nowrap;
         }
         .lib-toolbar .lib-btn.primary {
             background: #0a1e2f; color: #fff;
@@ -561,7 +552,31 @@
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
         }
 
-        /* 知识卡片 */
+        .kb-category-tree {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-bottom: 14px;
+            padding: 10px 12px;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e8edf4;
+        }
+        .kb-category-tree:empty { display: none; }
+        .kb-cat-chip {
+            padding: 4px 10px; border-radius: 20px;
+            background: #f0f7fe; color: #2a7faa;
+            font-size: 11px; cursor: pointer;
+            border: 1px solid #dce5ef;
+            transition: 0.12s;
+        }
+        .kb-cat-chip:hover {
+            border-color: #4dabf7;
+            background: #e6f3ff;
+        }
+        .kb-cat-chip.active {
+            background: #0a1e2f; color: #fff;
+            border-color: #0a1e2f;
+        }
+
         .kb-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -575,6 +590,14 @@
         .kb-card:hover {
             box-shadow: 0 6px 20px rgba(10,30,47,0.06);
             border-color: #c8d8e8;
+        }
+        .kb-card.disabled {
+            opacity: 0.55;
+            background: #f5f7fa;
+        }
+        .kb-card.pinned {
+            border-color: #f5b342;
+            box-shadow: 0 0 0 1px #f5b342 inset;
         }
         .kb-card .kb-head {
             display: flex; justify-content: space-between;
@@ -616,15 +639,33 @@
             padding-top: 8px; border-top: 1px solid #f0f4f9;
             gap: 8px;
         }
-        .kb-card .kb-del {
-            width: 24px; height: 24px; border-radius: 6px;
-            border: none; background: transparent;
-            color: #cbd5e1; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.12s; font-size: 12px;
+        .kb-card-actions {
+            display: flex; gap: 4px;
+            padding-top: 8px;
+            margin-top: 8px;
+            border-top: 1px solid #f0f4f9;
         }
-        .kb-card .kb-del:hover {
-            background: #fde8ed; color: #b51a3f;
+        .kb-act-btn {
+            flex: 1;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            color: #5f7d95;
+            cursor: pointer;
+            font-size: 11px;
+            transition: 0.12s;
+            font-family: inherit;
+        }
+        .kb-act-btn:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+            background: #f5f9fe;
+        }
+        .kb-act-btn.danger:hover {
+            border-color: #b51a3f;
+            color: #b51a3f;
+            background: #fde8ed;
         }
 
         /* 素材网格 */
@@ -710,7 +751,6 @@
             background: #fde8ed; border-color: #b51a3f;
         }
 
-        /* 空状态 */
         .lib-empty {
             text-align: center; padding: 60px 20px;
             color: #94a3b8;
@@ -723,22 +763,6 @@
             font-size: 16px; color: #0a1e2f; margin-bottom: 6px;
         }
         .lib-empty p { font-size: 13px; }
-
-        /* ===== Toast ===== */
-        .global-toast {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%);
-            background: #0a1e2f; color: #fff;
-            padding: 12px 28px; border-radius: 40px;
-            font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 9999; white-space: nowrap; display: none;
-            max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
-        }
-        .global-toast.show { display: block; animation: fadeUp 0.3s ease; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
 
         /* ===== 上传弹窗 ===== */
         .upload-modal {
@@ -850,6 +874,21 @@
             flex: 0 0 auto;
         }
         .upload-foot .btn.outline:hover { background: #f5f8fc; }
+
+        .global-toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f; color: #fff;
+            padding: 12px 28px; border-radius: 40px;
+            font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 9999; white-space: nowrap; display: none;
+            max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+        }
+        .global-toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
 
         /* ===== 响应式 ===== */
         @media (max-width: 1200px) {
@@ -1019,28 +1058,45 @@
             <div class="panel" id="panel-kb">
                 <div class="lib-panel">
                     <div class="lib-toolbar">
-                        <input type="text" id="kbSearch" placeholder="搜索知识标题/标签..." oninput="filterKb()">
+                        <input type="text" id="kbSearch" placeholder="搜索知识标题/内容/标签..." oninput="filterKb()">
                         <select id="kbCategoryFilter" onchange="filterKb()">
                             <option value="all">全部分类</option>
-                            <option value="FAQ">FAQ</option>
-                            <option value="产品文档">产品文档</option>
-                            <option value="售后政策">售后政策</option>
-                            <option value="物流说明">物流说明</option>
-                            <option value="其他">其他</option>
+                        </select>
+                        <select id="kbStatusFilter" onchange="filterKb()">
+                            <option value="all">全部状态</option>
+                            <option value="enabled">仅启用</option>
+                            <option value="disabled">仅停用</option>
+                            <option value="pinned">仅置顶</option>
+                        </select>
+                        <select id="kbSortBy" onchange="filterKb()">
+                            <option value="time">按时间</option>
+                            <option value="hit">按命中次数</option>
+                            <option value="title">按标题</option>
                         </select>
                         <button class="lib-btn primary" onclick="openKbUpload()">
                             <i class="fas fa-cloud-upload-alt"></i> 上传知识
+                        </button>
+                        <button class="lib-btn outline" onclick="openKbBatchUpload()">
+                            <i class="fas fa-file-import"></i> 批量导入
+                        </button>
+                        <button class="lib-btn outline" onclick="openKbAutoGenerate()">
+                            <i class="fas fa-magic"></i> AI 提炼
+                        </button>
+                        <button class="lib-btn outline" onclick="showKbStats()">
+                            <i class="fas fa-chart-bar"></i> 统计
                         </button>
                         <button class="lib-btn outline" onclick="loadKb()">
                             <i class="fas fa-sync-alt"></i> 刷新
                         </button>
                     </div>
 
+                    <div class="kb-category-tree" id="kbCategoryTree"></div>
+
                     <div class="kb-grid" id="kbGrid"></div>
                     <div class="lib-empty" id="kbEmpty" style="display:none;">
                         <i class="fas fa-book-open"></i>
                         <h3>还没有知识内容</h3>
-                        <p>点击右上角"上传知识"，支持 .txt / .md / .json / .csv</p>
+                        <p>点击"上传知识"或"批量导入"，支持 txt/md/json/csv/pdf/docx</p>
                     </div>
                 </div>
             </div>
@@ -1067,7 +1123,7 @@
                     <div class="lib-empty" id="assetEmpty" style="display:none;">
                         <i class="fas fa-images"></i>
                         <h3>还没有素材</h3>
-                        <p>点击右上角"上传素材"，支持图片和视频</p>
+                        <p>点击"上传素材"，支持图片和视频</p>
                     </div>
                 </div>
             </div>
@@ -1090,11 +1146,7 @@
             <div class="form-group">
                 <label>分类</label>
                 <select id="kbCategory">
-                    <option value="FAQ">FAQ</option>
-                    <option value="产品文档">产品文档</option>
-                    <option value="售后政策">售后政策</option>
-                    <option value="物流说明">物流说明</option>
-                    <option value="其他">其他</option>
+                    <option value="cat_other">📝 其他</option>
                 </select>
             </div>
             <div class="form-group">
@@ -1106,9 +1158,9 @@
                 <div class="file-input-wrap" id="kbFileWrap" onclick="document.getElementById('kbFileInput').click()">
                     <i class="fas fa-file-upload"></i>
                     <p>点击选择文件，或拖拽到此处</p>
-                    <small>支持 .txt / .md / .json / .csv，≤ 10MB</small>
+                    <small>支持 .txt / .md / .json / .csv / .pdf / .docx，≤ 20MB</small>
                 </div>
-                <input type="file" id="kbFileInput" accept=".txt,.md,.markdown,.json,.csv" style="display:none;"
+                <input type="file" id="kbFileInput" accept=".txt,.md,.markdown,.json,.csv,.pdf,.docx" style="display:none;"
                     onchange="onKbFileSelected(event)">
                 <div class="selected-file" id="kbSelectedFile">
                     <i class="fas fa-file-alt"></i>
@@ -1198,8 +1250,10 @@
         aiAutoReplyOn: true,
         takeoverState: {},
         aiTimers: {},
-        // 知识库 / 素材库
         kbItems: [],
+        kbStats: {},
+        kbCategories: [],
+        kbFilterCategory: 'all',
         assetItems: [],
         kbFile: null,
         assetFile: null,
@@ -1207,7 +1261,7 @@
     };
 
     /* ============================================================
-       模拟数据
+       模拟会话数据
        ============================================================ */
     const DEMO_CONVERSATIONS = [
         { id: 'c1', name: '王*婷', avatarText: '王', avatarColor: '#b55a1a', platform: '抖音', online: true, lastTime: '14:32', unread: 2, lastMsg: '这款茶叶礼盒可以定制包装吗？' },
@@ -1242,7 +1296,7 @@
         ],
         c6: [
             { id: 'm1', from: 'user', text: '茶叶礼盒的保质期？', time: '12:50' },
-            { id: 'm2', from: 'ai', text: '保质期18个月。', time: '12:50' }
+            { m2: null, from: 'ai', text: '保质期18个月。', time: '12:50' }
         ]
     };
 
@@ -1257,10 +1311,24 @@
         loadKb();
         loadAssets();
         bindDragEvents();
+        bindInputEvents();
+
+        // ★ URL hash 自动切换 Tab
+        const h = location.hash.replace('#', '');
+        if (h === 'kb' || h === 'assets') {
+            setTimeout(() => switchTabByName(h), 150);
+        }
     });
 
+    function bindInputEvents() {
+        const input = document.getElementById('msgInput');
+        input.addEventListener('input', function () {
+            updateSendBtn();
+            handleKbRecommendInput();
+        });
+    }
+
     function bindDragEvents() {
-        // 知识库文件拖拽
         const kbWrap = document.getElementById('kbFileWrap');
         ['dragenter', 'dragover'].forEach(ev => kbWrap.addEventListener(ev, e => {
             e.preventDefault(); kbWrap.classList.add('dragover');
@@ -1276,7 +1344,6 @@
             }
         });
 
-        // 素材库文件拖拽
         const assetWrap = document.getElementById('assetFileWrap');
         ['dragenter', 'dragover'].forEach(ev => assetWrap.addEventListener(ev, e => {
             e.preventDefault(); assetWrap.classList.add('dragover');
@@ -1299,15 +1366,24 @@
     function switchTab(name, el) {
         state.currentTab = name;
         document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
+        if (el) el.classList.add('active');
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         document.getElementById('panel-' + name).classList.add('active');
-
-        // 切换后滚动到底部
         if (name === 'chat' && state.currentId) {
             setTimeout(scrollMessagesToBottom, 50);
         }
     }
+
+    function switchTabByName(name) {
+        if (!name) return;
+        const tabs = document.querySelectorAll('.chat-tab');
+        const tabMap = { 'chat': 0, 'kb': 1, 'assets': 2 };
+        const idx = tabMap[name];
+        if (idx !== undefined && tabs[idx]) {
+            tabs[idx].click();
+        }
+    }
+    window.switchTabByName = switchTabByName;
 
     /* ============================================================
        会话列表
@@ -1419,7 +1495,7 @@
     }
 
     /* ============================================================
-       消息渲染（支持带图/视频）
+       消息渲染
        ============================================================ */
     function renderMessages(convId) {
         const list = document.getElementById('messagesList');
@@ -1441,11 +1517,38 @@
                     ? '<span class="agent-tag">客服</span>'
                     : (m.system ? '<span class="system-tag">系统</span>' : ''));
 
-            const kbTag = (m.kb_hits && m.kb_hits.length > 0)
-                ? `<span class="kb-tag" title="引用知识库"><i class="fas fa-book"></i> ${m.kb_hits.length}</span>`
-                : '';
+            // ★ 引用溯源
+            let kbTraceHtml = '';
+            if (m.kb_hits && m.kb_hits.length > 0) {
+                kbTraceHtml = `
+                    <div class="kb-trace">
+                        <div style="margin-bottom:4px;">
+                            <i class="fas fa-book" style="color:#4dabf7;"></i>
+                            引用了 ${m.kb_hits.length} 条知识：
+                        </div>
+                        ${m.kb_hits.map(k => `
+                            <div style="padding-left:12px;">
+                                · <a href="javascript:void(0)" onclick="showKbDetail('${k.id}')">
+                                    ${escapeHtml(k.title)}
+                                  </a>
+                                ${k.match_type ? `<span style="font-size:10px;color:#94a3b8;">（${k.match_type}）</span>` : ''}
+                            </div>
+                        `).join('')}
+                        <div style="margin-top:6px;">
+                            <button onclick="kbFeedback('${m.id}', true)"
+                                style="font-size:10px;padding:2px 8px;border:1px solid #0d7c4f;background:transparent;color:#0d7c4f;border-radius:10px;cursor:pointer;">
+                                👍 有帮助
+                            </button>
+                            <button onclick="kbFeedback('${m.id}', false)"
+                                style="font-size:10px;padding:2px 8px;border:1px solid #b51a3f;background:transparent;color:#b51a3f;border-radius:10px;cursor:pointer;">
+                                👎 没帮助
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
 
-            // 处理媒体
+            // 媒体
             let mediaHtml = '';
             if (m.assets && m.assets.length > 0) {
                 mediaHtml += '<div class="msg-media">';
@@ -1462,7 +1565,6 @@
                 mediaHtml += '</div>';
             }
 
-            // 文本换行
             const textHtml = escapeHtml(m.text || '').replace(/\n/g, '<br>');
 
             return `
@@ -1472,10 +1574,10 @@
                         <div class="bubble">
                             ${textHtml}
                             ${mediaHtml}
+                            ${kbTraceHtml}
                         </div>
                         <div class="meta">
                             ${tagHtml}
-                            ${kbTag}
                             <span>${m.time}</span>
                         </div>
                     </div>
@@ -1519,8 +1621,8 @@
         renderMessages(convId);
         renderConvList();
         scrollMessagesToBottom();
+        hideKbRecommend();
 
-        // 模拟客户回复
         state.isReplying = true;
         setTimeout(() => {
             simulateCustomerReply(convId);
@@ -1537,7 +1639,7 @@
     }
 
     /* ============================================================
-       客户回复 + AI 自动回复（调后端 /api/ai/parse）
+       客户回复 + AI 自动回复
        ============================================================ */
     function simulateCustomerReply(convId) {
         const replies = [
@@ -1574,7 +1676,6 @@
         }
         renderConvList();
 
-        // AI 回复（受接管状态控制）
         const takeover = state.takeoverState[convId] || 'ai';
         if (state.aiAutoReplyOn && takeover === 'ai' && state.currentId === convId) {
             if (state.aiTimers[convId]) clearTimeout(state.aiTimers[convId]);
@@ -1589,14 +1690,12 @@
     async function autoAIReply(convId, userText) {
         if (state.takeoverState[convId] !== 'ai') return;
 
-        // 显示打字动画
         const typing = document.getElementById('typingIndicator');
         if (state.currentId === convId) {
             typing.classList.add('show');
             scrollMessagesToBottom();
         }
 
-        // 构造会话历史
         const msgs = state.messagesMap[convId] || [];
         const history = msgs.slice(-8).map(m => ({
             role: m.from === 'user' ? 'user' : 'ai',
@@ -1620,7 +1719,6 @@
             console.warn('后端 AI 回复失败，走本地规则', e);
         }
 
-        // 后端失败 → 本地规则兜底
         let replyText = '';
         let kbHits = [];
         let assets = [];
@@ -1630,15 +1728,12 @@
             kbHits = replyData.kb_hits || [];
             assets = replyData.assets || [];
         } else {
-            // 本地规则
             replyText = generateLocalReply(userText) || '好的，我帮您看看~';
-            // 如果本地规则要求发送素材
             if (/图|看看|实物|视频/.test(userText)) {
                 assets = searchLocalAssets(userText).slice(0, 2);
             }
         }
 
-        // 打字动画后发送
         setTimeout(() => {
             if (state.takeoverState[convId] !== 'ai') {
                 typing.classList.remove('show');
@@ -1708,6 +1803,10 @@
             const data = await res.json();
             if (data.success) {
                 state.kbItems = data.items || [];
+                state.kbStats = data.stats || {};
+                state.kbCategories = data.categories || [];
+                fillKbCategorySelects();
+                renderKbCategoryTree();
                 renderKb();
                 updateBadges();
             } else {
@@ -1721,22 +1820,84 @@
         }
     }
 
+    function flattenCategories(tree, depth, result) {
+        if (!result) result = [];
+        tree.forEach(n => {
+            result.push({ id: n.id, name: '　'.repeat(depth) + (n.icon || '') + ' ' + n.name, depth: depth });
+            if (n.children && n.children.length > 0) {
+                flattenCategories(n.children, depth + 1, result);
+            }
+        });
+        return result;
+    }
+
+    function fillKbCategorySelects() {
+        const flat = flattenCategories(state.kbCategories || [], 0, []);
+        // 顶部筛选
+        const sel = document.getElementById('kbCategoryFilter');
+        const cur = sel.value;
+        sel.innerHTML = '<option value="all">全部分类</option>' +
+            flat.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');
+        sel.value = cur || 'all';
+        // 上传弹窗
+        const catSel = document.getElementById('kbCategory');
+        if (catSel) {
+            catSel.innerHTML = flat.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');
+        }
+    }
+
+    function renderKbCategoryTree() {
+        const tree = document.getElementById('kbCategoryTree');
+        const flat = flattenCategories(state.kbCategories || [], 0, []);
+        if (flat.length === 0) {
+            tree.innerHTML = '';
+            return;
+        }
+        tree.innerHTML = `
+            <span class="kb-cat-chip ${state.kbFilterCategory === 'all' ? 'active' : ''}"
+                  onclick="filterKbByCategory('all')">全部</span>
+            ${flat.map(x => `
+                <span class="kb-cat-chip ${state.kbFilterCategory === x.id ? 'active' : ''}"
+                      onclick="filterKbByCategory('${x.id}')">${escapeHtml(x.name)}</span>
+            `).join('')}
+        `;
+    }
+
+    function filterKbByCategory(catId) {
+        state.kbFilterCategory = catId;
+        document.getElementById('kbCategoryFilter').value = catId;
+        renderKbCategoryTree();
+        renderKb();
+    }
+
     function renderKb() {
         const grid = document.getElementById('kbGrid');
         const empty = document.getElementById('kbEmpty');
 
-        let list = state.kbItems;
+        let list = state.kbItems.slice();
         const keyword = (document.getElementById('kbSearch').value || '').trim().toLowerCase();
-        const cat = document.getElementById('kbCategoryFilter').value;
+        const catFilter = document.getElementById('kbCategoryFilter').value;
+        const statusFilter = document.getElementById('kbStatusFilter').value;
+        const sortBy = document.getElementById('kbSortBy').value;
 
         if (keyword) {
             list = list.filter(x => {
-                const hay = (x.title + ' ' + (x.tags || []).join(' ')).toLowerCase();
+                const hay = (x.title + ' ' + (x.content || '') + ' ' + (x.tags || []).join(' ')).toLowerCase();
                 return hay.includes(keyword);
             });
         }
-        if (cat !== 'all') {
-            list = list.filter(x => x.category === cat);
+        if (catFilter !== 'all') {
+            list = list.filter(x => x.category === catFilter);
+        }
+        if (statusFilter === 'enabled') list = list.filter(x => x.enabled !== false);
+        if (statusFilter === 'disabled') list = list.filter(x => x.enabled === false);
+        if (statusFilter === 'pinned') list = list.filter(x => x.pinned);
+
+        if (sortBy === 'hit') {
+            const stats = state.kbStats || {};
+            list.sort((a, b) => (stats[b.id]?.hit_count || 0) - (stats[a.id]?.hit_count || 0));
+        } else if (sortBy === 'title') {
+            list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
         }
 
         if (list.length === 0) {
@@ -1746,26 +1907,41 @@
         }
         empty.style.display = 'none';
 
-        grid.innerHTML = list.map(item => `
-            <div class="kb-card">
-                <div class="kb-head">
-                    <div class="kb-title">${escapeHtml(item.title)}</div>
-                    <div class="kb-cat">${escapeHtml(item.category || '其他')}</div>
-                </div>
-                <div class="kb-summary">${escapeHtml((item.content || '').slice(0, 150))}...</div>
-                ${(item.tags && item.tags.length > 0) ? `
-                    <div class="kb-tags">
-                        ${item.tags.map(t => `<span class="kb-tag">${escapeHtml(t)}</span>`).join('')}
+        grid.innerHTML = list.map(item => {
+            const enabled = item.enabled !== false;
+            const pinned = !!item.pinned;
+            const hitCount = (state.kbStats && state.kbStats[item.id]?.hit_count) || 0;
+            const tagBadges = (item.tags || []).map(t => `<span class="kb-tag">${escapeHtml(t)}</span>`).join('');
+
+            return `
+                <div class="kb-card ${enabled ? '' : 'disabled'} ${pinned ? 'pinned' : ''}">
+                    <div class="kb-head">
+                        <div class="kb-title">${pinned ? '<i class="fas fa-thumbtack" style="color:#f5b342;margin-right:4px;"></i>' : ''}${escapeHtml(item.title)}</div>
+                        <div class="kb-cat">${escapeHtml(item.category_name || item.category || '未分类')}</div>
                     </div>
-                ` : ''}
-                <div class="kb-foot">
-                    <span><i class="fas fa-clock"></i> ${item.uploaded_at || ''}</span>
-                    <button class="kb-del" onclick="deleteKb('${item.id}')" title="删除">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+                    <div class="kb-summary">${escapeHtml((item.content || '').slice(0, 150))}...</div>
+                    ${tagBadges ? `<div class="kb-tags">${tagBadges}</div>` : ''}
+                    <div class="kb-foot">
+                        <span><i class="fas fa-clock"></i> ${item.updated_at || item.uploaded_at || ''}</span>
+                        <span title="命中次数"><i class="fas fa-fire"></i> ${hitCount}</span>
+                    </div>
+                    <div class="kb-card-actions">
+                        <button class="kb-act-btn" onclick="editKb('${item.id}')" title="编辑">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="kb-act-btn" onclick="toggleKb('${item.id}', ${!enabled})" title="${enabled ? '停用' : '启用'}">
+                            <i class="fas fa-${enabled ? 'toggle-on' : 'toggle-off'}"></i>
+                        </button>
+                        <button class="kb-act-btn" onclick="pinKb('${item.id}', ${!pinned})" title="${pinned ? '取消置顶' : '置顶'}">
+                            <i class="fas fa-thumbtack"></i>
+                        </button>
+                        <button class="kb-act-btn danger" onclick="deleteKb('${item.id}')" title="删除">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     function filterKb() { renderKb(); }
@@ -1790,9 +1966,307 @@
         }
     }
 
+    // 编辑
+    async function editKb(id) {
+        const item = state.kbItems.find(x => x.id === id);
+        if (!item) return;
+
+        const newTitle = prompt('标题：', item.title);
+        if (newTitle === null) return;
+        const newContent = prompt('内容（可留空不改）：', (item.content || '').slice(0, 2000));
+        if (newContent === null) return;
+        const newTags = prompt('标签（逗号分隔）：', (item.tags || []).join(','));
+        if (newTags === null) return;
+
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: id,
+                    title: newTitle,
+                    content: newContent,
+                    tags: newTags.split(',').map(t => t.trim()).filter(Boolean)
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ 已更新');
+                loadKb();
+            } else {
+                showToast('❌ ' + (data.message || '更新失败'));
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+
+    // 启用/停用
+    async function toggleKb(id, enabled) {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, enabled })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ ' + data.message);
+                loadKb();
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+
+    // 置顶
+    async function pinKb(id, pinned) {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/pin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, pinned })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ ' + data.message);
+                loadKb();
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+
+    // 批量导入
+    function openKbBatchUpload() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = '.txt,.md,.markdown,.json,.csv,.pdf,.docx';
+        input.onchange = async function () {
+            const files = Array.from(input.files);
+            if (files.length === 0) return;
+            if (files.length > 20) {
+                showToast('⚠️ 单次最多 20 个文件');
+                return;
+            }
+            const catId = document.getElementById('kbCategoryFilter').value;
+            const category = catId !== 'all' ? catId : 'cat_other';
+
+            const formData = new FormData();
+            files.forEach(f => formData.append('files', f));
+            formData.append('category', category);
+            formData.append('tags', '');
+
+            showToast('⏳ 正在上传 ' + files.length + ' 个文件...');
+            try {
+                const res = await fetch(BACKEND_URL + '/api/kb/batch-upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                    loadKb();
+                } else {
+                    showToast('❌ ' + (data.message || '上传失败'));
+                }
+            } catch (e) {
+                showToast('❌ 网络错误');
+            }
+        };
+        input.click();
+    }
+
+    // AI 提炼
+    function openKbAutoGenerate() {
+        if (!state.currentId) {
+            showToast('⚠️ 请先打开一个会话');
+            return;
+        }
+        if (!confirm('将根据当前会话的对话记录自动提炼 FAQ，是否继续？')) return;
+
+        const history = [];
+        if (state.currentId && state.messagesMap[state.currentId]) {
+            state.messagesMap[state.currentId].slice(-20).forEach(m => {
+                history.push({ role: m.from === 'user' ? 'user' : 'ai', text: m.text || '' });
+            });
+        }
+        if (history.length === 0) {
+            showToast('⚠️ 当前会话没有对话记录');
+            return;
+        }
+
+        showToast('🤖 AI 正在提炼 FAQ...');
+        fetch(BACKEND_URL + '/api/kb/auto-generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                history: history,
+                category: 'cat_faq'
+            })
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                showToast('✅ ' + data.message);
+                loadKb();
+            } else {
+                showToast('❌ ' + (data.message || '提炼失败'));
+            }
+        }).catch(() => {
+            showToast('❌ 网络错误');
+        });
+    }
+
+    // 统计
+    async function showKbStats() {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/stats');
+            const data = await res.json();
+            if (!data.success) {
+                showToast('❌ 加载失败');
+                return;
+            }
+            const stats = data.stats || [];
+            let html = '<h3 style="margin-bottom:12px;color:#0a1e2f;">📊 知识库访问统计</h3>';
+            if (stats.length === 0) {
+                html += '<p style="color:#94a3b8;">暂无数据</p>';
+            } else {
+                html += '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+                html += '<thead><tr style="border-bottom:2px solid #e8edf4;text-align:left;">';
+                html += '<th style="padding:8px;">标题</th><th>分类</th><th>命中</th><th>👍</th><th>👎</th><th>最近命中</th>';
+                html += '</tr></thead><tbody>';
+                stats.slice(0, 30).forEach(s => {
+                    html += `<tr style="border-bottom:1px solid #f0f4f9;">
+                        <td style="padding:8px;">${escapeHtml(s.title)}</td>
+                        <td style="color:#5f7d95;font-size:12px;">${escapeHtml(s.category_name || '')}</td>
+                        <td><strong>${s.hit_count}</strong></td>
+                        <td style="color:#0d7c4f;">${s.satisfied}</td>
+                        <td style="color:#b51a3f;">${s.unsatisfied}</td>
+                        <td style="color:#94a3b8;font-size:11px;">${s.last_hit || '-'}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+            }
+
+            const w = window.open('', '_blank', 'width=800,height=600');
+            w.document.write(`
+                <html><head><title>知识库统计</title>
+                <style>
+                    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:24px;background:#fff;color:#0a1e2f;}
+                    table{width:100%;}
+                    th{text-align:left;padding:8px;color:#5f7d95;font-size:12px;}
+                </style>
+                </head><body>${html}</body></html>
+            `);
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+
+    // 显示知识详情
+    function showKbDetail(id) {
+        const item = state.kbItems.find(x => x.id === id);
+        if (!item) {
+            showToast('⚠️ 知识不存在');
+            return;
+        }
+        alert(`标题：${item.title}\n分类：${item.category_name || item.category || '-'}\n标签：${(item.tags || []).join(', ') || '-'}\n\n内容：\n${(item.content || '').slice(0, 1000)}`);
+    }
+
+    // 反馈
+    async function kbFeedback(messageId, satisfied) {
+        let itemId = null;
+        for (const msgs of Object.values(state.messagesMap)) {
+            const m = msgs.find(x => x.id === messageId);
+            if (m && m.kb_hits && m.kb_hits.length > 0) {
+                itemId = m.kb_hits[0].id;
+                break;
+            }
+        }
+        if (!itemId) return;
+        try {
+            await fetch(BACKEND_URL + '/api/kb/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: itemId, satisfied })
+            });
+            showToast(satisfied ? '👍 感谢反馈' : '👎 会持续改进');
+        } catch (e) {}
+    }
+
+    // ★ 智能推荐
+    let _recommendTimer = null;
+    function handleKbRecommendInput() {
+        clearTimeout(_recommendTimer);
+        const text = document.getElementById('msgInput').value.trim();
+        if (text.length < 2) {
+            hideKbRecommend();
+            return;
+        }
+        _recommendTimer = setTimeout(() => {
+            fetchKbRecommend(text);
+        }, 400);
+    }
+
+    async function fetchKbRecommend(text) {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/recommend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, top_k: 3 })
+            });
+            const data = await res.json();
+            if (data.success && data.results.length > 0) {
+                showKbRecommend(data.results);
+            } else {
+                hideKbRecommend();
+            }
+        } catch (e) {}
+    }
+
+    function showKbRecommend(results) {
+        let box = document.getElementById('kbRecommendBox');
+        if (!box) {
+            box = document.createElement('div');
+            box.id = 'kbRecommendBox';
+            box.className = 'kb-recommend-box';
+            const inputArea = document.querySelector('.chat-input-area');
+            inputArea.parentNode.insertBefore(box, inputArea);
+        }
+        box.innerHTML = `
+            <div style="font-size:11px;color:#5f7d95;padding:6px 14px 2px;">
+                <i class="fas fa-lightbulb" style="color:#f5b342;"></i> 相关知识推荐（点击插入）：
+            </div>
+            ${results.map(r => `
+                <div class="kb-recommend-item" onclick="insertKbRecommend('${r.id}')">
+                    <div class="kb-rec-title">${escapeHtml(r.title)}</div>
+                    <div class="kb-rec-summary">${escapeHtml(r.summary)}</div>
+                </div>
+            `).join('')}
+        `;
+        box.style.display = 'block';
+    }
+
+    function hideKbRecommend() {
+        const box = document.getElementById('kbRecommendBox');
+        if (box) box.style.display = 'none';
+    }
+
+    function insertKbRecommend(id) {
+        const item = state.kbItems.find(x => x.id === id);
+        if (!item) return;
+        const input = document.getElementById('msgInput');
+        input.value = (item.content || '').slice(0, 500);
+        autoResize(input);
+        updateSendBtn();
+        hideKbRecommend();
+    }
+
+    /* ============================================================
+       知识库上传弹窗
+       ============================================================ */
     function openKbUpload() {
         document.getElementById('kbTitle').value = '';
-        document.getElementById('kbCategory').value = 'FAQ';
         document.getElementById('kbTags').value = '';
         document.getElementById('kbFileInput').value = '';
         document.getElementById('kbSelectedFile').classList.remove('show');
@@ -1958,10 +2432,12 @@
     async function sendAsset(id) {
         const a = state.assetItems.find(x => x.id === id);
         if (!a) return;
-        if (!state.currentId) { showToast('⚠️ 请先选择会话'); return; }
+        if (!state.currentId) {
+            showToast('⚠️ 请先选择会话');
+            return;
+        }
 
-        // 切到对话 Tab
-        switchTab('chat', document.querySelector('.chat-tab'));
+        switchTab('chat', document.querySelectorAll('.chat-tab')[0]);
         await new Promise(r => setTimeout(r, 100));
 
         if (!state.messagesMap[state.currentId]) state.messagesMap[state.currentId] = [];
@@ -1974,7 +2450,10 @@
         });
 
         const conv = state.conversations.find(c => c.id === state.currentId);
-        if (conv) { conv.lastMsg = `[${a.type === 'image' ? '图片' : '视频'}] ${a.name}`; conv.lastTime = nowTime(); }
+        if (conv) {
+            conv.lastMsg = `[${a.type === 'image' ? '图片' : '视频'}] ${a.name}`;
+            conv.lastTime = nowTime();
+        }
 
         renderMessages(state.currentId);
         renderConvList();
@@ -2112,12 +2591,14 @@
        工具
        ============================================================ */
     function updateBadges() {
-        document.getElementById('kbBadge').textContent = state.kbItems.length;
-        document.getElementById('assetsBadge').textContent = state.assetItems.length;
-        document.getElementById('statKb').textContent = state.kbItems.length;
-        document.getElementById('statAssets').textContent = state.assetItems.length;
-        document.getElementById('toolbarKbCount').textContent = state.kbItems.length;
-        document.getElementById('toolbarAssetCount').textContent = state.assetItems.length;
+        const kbCount = state.kbItems.length;
+        const assetCount = state.assetItems.length;
+        document.getElementById('kbBadge').textContent = kbCount;
+        document.getElementById('assetsBadge').textContent = assetCount;
+        document.getElementById('statKb').textContent = kbCount;
+        document.getElementById('statAssets').textContent = assetCount;
+        document.getElementById('toolbarKbCount').textContent = kbCount;
+        document.getElementById('toolbarAssetCount').textContent = assetCount;
     }
 
     function refreshAll() {
@@ -2138,33 +2619,39 @@
         const d = new Date();
         return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
     }
+
     function escapeHtml(s) {
         return String(s || '').replace(/[&<>"']/g, c => ({
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
         })[c]);
     }
+
     function formatSize(bytes) {
         if (!bytes) return '0B';
         if (bytes < 1024) return bytes + 'B';
         if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
         return (bytes / 1024 / 1024).toFixed(1) + 'MB';
     }
+
     function autoResize(el) {
         el.style.height = 'auto';
         el.style.height = Math.min(el.scrollHeight, 100) + 'px';
         updateSendBtn();
     }
+
     function updateSendBtn() {
         const input = document.getElementById('msgInput');
         const btn = document.getElementById('sendBtn');
         btn.disabled = !input.value.trim() || state.isReplying;
     }
+
     function handleMsgKey(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendMsg();
         }
     }
+
     function showToast(msg) {
         const t = document.getElementById('toast');
         t.textContent = msg;
@@ -2173,8 +2660,11 @@
         t._timer = setTimeout(() => t.classList.remove('show'), 2200);
     }
 
-    // 暴露全局
+    /* ============================================================
+       全局暴露
+       ============================================================ */
     window.switchTab = switchTab;
+    window.switchTabByName = switchTabByName;
     window.openConv = openConv;
     window.filterConv = filterConv;
     window.sendMsg = sendMsg;
@@ -2187,12 +2677,24 @@
     window.markAllRead = markAllRead;
     window.handleMsgKey = handleMsgKey;
     window.autoResize = autoResize;
+
     window.openKbUpload = openKbUpload;
     window.closeKbUpload = closeKbUpload;
     window.onKbFileSelected = onKbFileSelected;
     window.submitKbUpload = submitKbUpload;
     window.filterKb = filterKb;
+    window.filterKbByCategory = filterKbByCategory;
     window.deleteKb = deleteKb;
+    window.editKb = editKb;
+    window.toggleKb = toggleKb;
+    window.pinKb = pinKb;
+    window.openKbBatchUpload = openKbBatchUpload;
+    window.openKbAutoGenerate = openKbAutoGenerate;
+    window.showKbStats = showKbStats;
+    window.showKbDetail = showKbDetail;
+    window.kbFeedback = kbFeedback;
+    window.insertKbRecommend = insertKbRecommend;
+
     window.openAssetUpload = openAssetUpload;
     window.closeAssetUpload = closeAssetUpload;
     window.onAssetFileSelected = onAssetFileSelected;
@@ -2203,7 +2705,7 @@
     window.previewAsset = previewAsset;
     window.quickSendAsset = quickSendAsset;
 
-    console.log('💬 AI 客服页已加载（含知识库 + 素材库）');
+    console.log('💬 AI 客服页已加载（含知识库完整版 + 素材库 + 多轮上下文 + 引用溯源）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
