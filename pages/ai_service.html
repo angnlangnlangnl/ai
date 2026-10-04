@@ -258,6 +258,7 @@
         }
         .chat-head .actions .btn-sm:disabled i { color: #94a3b8; }
 
+        /* ★ 修复：消息区 flex 布局，不再被快捷操作遮挡 */
         .chat-messages {
             flex: 1; overflow-y: auto; padding: 18px 22px;
             background: #f8fafc;
@@ -406,11 +407,12 @@
             30% { transform: translateY(-4px); opacity: 1; }
         }
 
+        /* ★ 修复：快捷操作改为独立固定区，不再覆盖消息 */
         .quick-replies {
-            padding: 8px 18px 0;
+            padding: 10px 18px;
             border-top: 1px solid #e8edf4;
             display: flex; gap: 6px; flex-wrap: wrap;
-            flex-shrink: 0; background: #fff;
+            flex-shrink: 0; background: #fafcfe;
             align-items: center;
         }
         .quick-replies .qr-label {
@@ -447,6 +449,7 @@
             background: #fff;
             padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px));
             display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0;
+            border-top: 1px solid #e8edf4;
         }
         .chat-input-area .attach-btn {
             width: 38px; height: 38px; border-radius: 50%;
@@ -1629,7 +1632,7 @@
             .msg-row { max-width: 88%; }
             .msg-row .bubble { font-size: 13.5px; padding: 9px 12px; }
             .msg-row .avatar { width: 30px; height: 30px; font-size: 12px; }
-            .quick-replies { padding: 6px 12px 0; }
+            .quick-replies { padding: 8px 12px; }
             .chat-input-area { padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px)); }
             .chat-input-area textarea { font-size: 16px; }
             .lib-panel { padding: 12px; }
@@ -1753,6 +1756,7 @@
                     </div>
                 </div>
 
+                <!-- ★ 修复：快捷操作固定区，不再遮挡消息 -->
                 <div class="quick-replies" id="quickReplies" style="display:none;">
                     <span class="qr-label">快捷操作：</span>
                     <button class="qr-btn product" onclick="openProductPicker()">
@@ -2117,7 +2121,7 @@
     }
 
     /* ============================================================
-       打开会话
+       打开会话（含 typing 重置）
        ============================================================ */
     function openConv(id) {
         const conv = state.conversations.find(c => c.id === id);
@@ -2132,6 +2136,9 @@
         document.getElementById('quickReplies').style.display = 'flex';
         document.getElementById('chatInputArea').style.display = 'flex';
 
+        // ✅ 切换会话时重置 typing 指示器
+        document.getElementById('typingIndicator').classList.remove('show');
+
         document.getElementById('chatAvatar').textContent = conv.avatarText;
         document.getElementById('chatAvatar').style.background = conv.avatarColor;
         document.getElementById('chatName').innerHTML =
@@ -2145,9 +2152,13 @@
         setTimeout(() => document.getElementById('msgInput').focus(), 100);
     }
 
+    /* ============================================================
+       ★ 修复：聊天操作按钮（语义清晰，去掉冗余的「AI 接管」）
+       ============================================================ */
     function renderChatActions(convId) {
         const actions = document.getElementById('chatActions');
         const takeover = state.takeoverState[convId] || 'ai';
+
         if (takeover === 'human') {
             actions.innerHTML = `
                 <button class="btn-sm taken-over" disabled>
@@ -2162,11 +2173,8 @@
             `;
         } else {
             actions.innerHTML = `
-                <button class="btn-sm" onclick="transferToHuman()">
+                <button class="btn-sm primary" onclick="transferToHuman()">
                     <i class="fas fa-user-headset"></i> <span>转人工</span>
-                </button>
-                <button class="btn-sm primary" onclick="takeOver()">
-                    <i class="fas fa-robot"></i> <span>AI 接管</span>
                 </button>
                 <button class="btn-sm" onclick="closeCurrentConv()">
                     <i class="fas fa-check"></i> <span>结束会话</span>
@@ -2687,18 +2695,16 @@
     }
 
     /* ============================================================
-       商品选择器（修复版 + 发送后关闭弹窗）
+       商品选择器（发送后关闭弹窗）
        ============================================================ */
     function openProductPicker() {
         if (!state.currentId) {
             showToast('⚠️ 请先选择会话');
             return;
         }
-        // 每次打开都重置选中状态
         state.pickedProducts = [];
         document.getElementById('productPickerSearch').value = '';
 
-        // 若商品列表为空，先尝试加载
         if (!state.productsCache || state.productsCache.length === 0) {
             loadProducts().then(() => {
                 renderProductPickerList(state.productsCache);
@@ -2707,11 +2713,8 @@
             renderProductPickerList(state.productsCache);
         }
 
-        // 立即更新按钮状态
         updatePickedCount();
         document.getElementById('productPickerModal').classList.add('show');
-
-        // 延迟 100ms 再刷新一次按钮状态（防止 DOM 没就绪）
         setTimeout(updatePickedCount, 100);
     }
 
@@ -2756,7 +2759,6 @@
         }).join('');
     }
 
-    // 选中/取消逻辑
     function togglePickProduct(productId) {
         const p = state.productsCache.find(x => x.id === productId);
         if (!p) {
@@ -2766,10 +2768,8 @@
 
         const idx = state.pickedProducts.findIndex(x => x.id === productId);
         if (idx >= 0) {
-            // 取消选中
             state.pickedProducts.splice(idx, 1);
         } else {
-            // 加入选中（最多 3 个）
             if (state.pickedProducts.length >= 3) {
                 showToast('⚠️ 一次最多选 3 个商品');
                 return;
@@ -2777,13 +2777,10 @@
             state.pickedProducts.push(p);
         }
 
-        // 重新渲染列表（更新选中样式）
         renderProductPickerList(state.productsCache);
-        // 强制更新按钮状态
         updatePickedCount();
     }
 
-    // 按钮状态更新
     function updatePickedCount() {
         const n = state.pickedProducts.length;
         const countEl = document.getElementById('pickedCount');
@@ -2811,7 +2808,6 @@
         renderProductPickerList(list);
     }
 
-    // ★ 发送商品：发送后关闭弹窗
     async function sendPickedProducts() {
         if (state.pickedProducts.length === 0) {
             showToast('⚠️ 请先选择商品');
@@ -2863,7 +2859,6 @@
         renderConvList();
         scrollMessagesToBottom();
 
-        // 关闭弹窗并重置选中
         closeProductPicker();
         state.pickedProducts = [];
 
@@ -2932,7 +2927,6 @@
         document.getElementById('sendCouponBtn').disabled = false;
     }
 
-    // ★ 发送优惠券：发送后关闭弹窗
     async function sendPickedCoupon() {
         if (!state.pickedCoupon) return;
         if (!state.currentId) return;
@@ -2959,7 +2953,6 @@
         renderConvList();
         scrollMessagesToBottom();
 
-        // 关闭弹窗并重置选中
         closeCouponPicker();
         state.pickedCoupon = null;
 
@@ -3393,34 +3386,41 @@
     }
 
     /* ============================================================
-       接管 / 转人工
+       ★ 修复：接管 / 转人工 / 结束会话
        ============================================================ */
     function transferToHuman() {
         if (!state.currentId) return;
         const convId = state.currentId;
-        if (state.aiTimers[convId]) { clearTimeout(state.aiTimers[convId]); delete state.aiTimers[convId]; }
-        state.takeoverState[convId] = 'human';
-        document.getElementById('typingIndicator').classList.remove('show');
-        sendSystemMessage(convId, '【系统】会话已转人工客服');
-        renderChatActions(convId);
-        renderConvList();
-        showToast('👤 已转人工');
-    }
+        if (state.takeoverState[convId] === 'human') return; // 已是人工，不重复
 
-    function takeOver() {
-        if (!state.currentId) return;
-        const convId = state.currentId;
-        state.takeoverState[convId] = 'ai';
-        sendSystemMessage(convId, '【系统】AI 已接管本会话');
+        // 1. 清理该会话所有待执行的 AI 定时器
+        if (state.aiTimers[convId]) {
+            clearTimeout(state.aiTimers[convId]);
+            delete state.aiTimers[convId];
+        }
+
+        // 2. 切状态
+        state.takeoverState[convId] = 'human';
+
+        // 3. 隐藏打字指示器
+        document.getElementById('typingIndicator').classList.remove('show');
+
+        // 4. 发系统消息
+        sendSystemMessage(convId, '【系统】会话已转人工客服');
+
+        // 5. 刷新 UI
         renderChatActions(convId);
         renderConvList();
-        showToast('🤖 AI 已接管');
+        showToast('👤 已转人工接管');
     }
 
     function releaseToAI() {
         if (!state.currentId) return;
         const convId = state.currentId;
+        if (state.takeoverState[convId] === 'ai') return; // 已是 AI，不重复
+
         state.takeoverState[convId] = 'ai';
+        document.getElementById('typingIndicator').classList.remove('show');
         sendSystemMessage(convId, '【系统】已释放给 AI 接管');
         renderChatActions(convId);
         renderConvList();
@@ -3431,11 +3431,23 @@
         if (!state.currentId) return;
         if (!confirm('确定结束当前会话？')) return;
         const convId = state.currentId;
-        if (state.aiTimers[convId]) { clearTimeout(state.aiTimers[convId]); delete state.aiTimers[convId]; }
+
+        // 1. 清理定时器
+        if (state.aiTimers[convId]) {
+            clearTimeout(state.aiTimers[convId]);
+            delete state.aiTimers[convId];
+        }
+
+        // 2. 隐藏 typing
+        document.getElementById('typingIndicator').classList.remove('show');
+
+        // 3. 移除会话数据
         state.conversations = state.conversations.filter(c => c.id !== convId);
         delete state.messagesMap[convId];
         delete state.takeoverState[convId];
         state.currentId = null;
+
+        // 4. 重置 UI
         renderConvList();
         document.getElementById('emptyChat').style.display = 'flex';
         document.getElementById('chatHead').style.display = 'none';
@@ -3539,7 +3551,6 @@
     window.sendMsg = sendMsg;
     window.sendQuick = sendQuick;
     window.transferToHuman = transferToHuman;
-    window.takeOver = takeOver;
     window.releaseToAI = releaseToAI;
     window.closeCurrentConv = closeCurrentConv;
     window.refreshAll = refreshAll;
@@ -3578,7 +3589,7 @@
 
     window.showClickStats = showClickStats;
 
-    console.log('💬 AI 客服页已加载（修复商品发送按钮版）');
+    console.log('💬 AI 客服页已加载（修复商品发送按钮 + 转人工/AI接管/结束会话 + 快捷操作遮挡）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
