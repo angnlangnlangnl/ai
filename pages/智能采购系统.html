@@ -1,1 +1,1461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智控电商 · 智能采购系统</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== 全局重置 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #eef2f8;
+            color: #0a1a2b;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* ===== 左侧导航 ===== */
+        .sidebar {
+            width: 220px;
+            background: #0a1e2f;
+            color: #b8cfe0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 20px rgba(10,30,47,0.08);
+            z-index: 100;
+            transition: 0.2s;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        .sidebar .logo {
+            padding: 22px 20px 28px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar .logo i {
+            font-size: 26px;
+            color: #4dabf7;
+            background: rgba(77,171,247,0.12);
+            padding: 8px;
+            border-radius: 12px;
+        }
+        .sidebar .logo span {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        .sidebar .logo .badge {
+            font-size: 10px;
+            background: #4dabf7;
+            color: #0a1e2f;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .sidebar .nav {
+            flex: 1;
+            padding: 16px 12px 20px;
+        }
+        .sidebar .nav .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #5a7f99;
+            padding: 14px 12px 6px 12px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .sidebar .nav .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: #9bb4cc;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-bottom: 2px;
+            position: relative;
+        }
+        .sidebar .nav .item i { width: 18px; font-size: 15px; text-align: center; color: #5a7f99; }
+        .sidebar .nav .item:hover { background: rgba(255,255,255,0.05); color: #d4e4f0; }
+        .sidebar .nav .item:hover i { color: #7aaed9; }
+        .sidebar .nav .item.active { background: rgba(77,171,247,0.12); color: white; }
+        .sidebar .nav .item.active i { color: #4dabf7; }
+        .sidebar .nav .item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 3px;
+            background: #4dabf7;
+            border-radius: 0 4px 4px 0;
+        }
+        .sidebar .nav .item .tag {
+            margin-left: auto;
+            background: rgba(77,171,247,0.15);
+            color: #4dabf7;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .sidebar .bottom {
+            padding: 16px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+            color: #5a7f99;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar .bottom i { font-size: 16px; }
+        /* ===== 主内容 ===== */
+        .main { flex: 1; padding: 20px 28px 40px; max-width: calc(100% - 220px); min-width: 0; }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .topbar .left h2 { font-size: 20px; font-weight: 600; color: #0a1e2f; }
+        .topbar .left p { font-size: 13px; color: #5f7d95; margin-top: 2px; }
+        .topbar .right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .topbar .right .btn {
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .topbar .right .btn:hover { background: #f5f8fc; }
+        .topbar .right .btn-primary { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .topbar .right .btn-primary:hover { background: #1a3a5a; }
+        .topbar .right .btn-success { background: #0d7c4f; border-color: #0d7c4f; color: white; }
+        .topbar .right .btn-success:hover { background: #0e9a5a; }
+        .topbar .right .btn-danger { background: #b51a3f; border-color: #b51a3f; color: white; }
+        .topbar .right .btn-danger:hover { background: #c91e47; }
+        .topbar .right .avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: #4dabf7;
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 600;
+        }
+        /* ===== 页面容器 ===== */
+        .page { display: none; animation: fadeIn 0.25s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0.6; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        /* ===== 统计卡片 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 16px 18px;
+            border-radius: 14px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+        }
+        .stat-card:hover { box-shadow: 0 6px 20px rgba(10,30,47,0.06); border-color: #c8d8e8; }
+        .stat-card .label { font-size: 12px; font-weight: 500; color: #5f7d95; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .stat-card .value { font-size: 26px; font-weight: 700; color: #0a1e2f; letter-spacing: -0.02em; }
+        .stat-card .sub { font-size: 12px; color: #5f7d95; margin-top: 2px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .stat-card .trend {
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+            background: #e6f7ec;
+            color: #0d7c4f;
+            padding: 2px 10px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .stat-card .trend.down { background: #fde8ed; color: #b51a3f; }
+        /* ===== 卡片 ===== */
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px 18px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+            margin-bottom: 16px;
+        }
+        .card:hover { border-color: #c8d8e8; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .card-header h3 { font-size: 15px; font-weight: 600; color: #0a1e2f; display: flex; align-items: center; gap: 6px; }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action { font-size: 12px; color: #4dabf7; font-weight: 500; cursor: pointer; }
+        .card-header .action:hover { color: #2a7faa; }
+        /* ===== 采购列表项 ===== */
+        .procurement-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f4f9;
+        }
+        .procurement-item:last-child { border: none; }
+        .procurement-item .info { flex: 1; min-width: 0; }
+        .procurement-item .info .name { font-weight: 600; color: #0a1e2f; font-size: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .procurement-item .info .meta { font-size: 13px; color: #5f7d95; display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
+        .procurement-item .info .meta i { width: 14px; color: #7e9cb0; }
+        .procurement-item .right { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+        .procurement-item .right .actions { display: flex; gap: 4px; flex-wrap: wrap; }
+        /* ===== 通用组件 ===== */
+        .badge {
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .badge.warning { background: #fef0e6; color: #b55a1a; }
+        .badge.danger { background: #fde8ed; color: #b51a3f; }
+        .badge.info { background: #e9f0ff; color: #1a5bb5; }
+        .badge.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .badge.pending { background: #fef3e2; color: #a67c00; }
+        .badge.paid { background: #e6f7ec; color: #0d7c4f; }
+        .badge.shipped { background: #e9f0ff; color: #1a5bb5; }
+        .badge.cancelled { background: #fde8ed; color: #b51a3f; }
+        .badge.refund { background: #fde8ed; color: #b51a3f; }
+        .btn-sm {
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-sm:active { transform: scale(0.95); }
+        .btn-sm.primary { background: #0a1e2f; color: white; }
+        .btn-sm.primary:hover { background: #1a3a5a; }
+        .btn-sm.success { background: #e6f7ec; color: #0d7c4f; }
+        .btn-sm.success:hover { background: #c8f0d8; }
+        .btn-sm.danger { background: #fde8ed; color: #b51a3f; }
+        .btn-sm.danger:hover { background: #fcd0d9; }
+        .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm.outline:hover { background: #f5f8fc; }
+        .btn-sm.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .btn-sm.blue:hover { background: rgba(77,171,247,0.2); }
+        .flex { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .mt-2 { margin-top: 10px; }
+        .row-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .row-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
 
+        /* ===== 弹窗 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 28px 32px;
+            max-width: 520px;
+            width: 92%;
+            max-height: 85vh;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+            animation: dialogIn 0.25s ease;
+            overflow-y: auto;
+        }
+        .modal-box::-webkit-scrollbar { width: 4px; }
+        .modal-box::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
+        .modal-box::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        @keyframes dialogIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-box .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e8edf4;
+        }
+        .modal-box .modal-header h3 { font-size: 18px; color: #0a1e2f; display: flex; align-items: center; gap: 10px; }
+        .modal-box .modal-header .close {
+            font-size: 24px; color: #94a3b8; cursor: pointer;
+            background: none; border: none; padding: 0 8px;
+        }
+        .modal-box .modal-header .close:hover { color: #0a1e2f; }
+        .modal-box .modal-body { font-size: 14px; color: #0a1e2f; }
+        .modal-box .modal-body .detail-row {
+            display: flex; padding: 6px 0; border-bottom: 1px solid #f5f8fc;
+        }
+        .modal-box .modal-body .detail-row .label { color: #94a3b8; width: 90px; flex-shrink: 0; }
+        .modal-box .modal-body .detail-row .value { flex: 1; font-weight: 500; }
+        .modal-box .modal-actions {
+            display: flex; gap: 10px; justify-content: flex-end;
+            padding-top: 14px; border-top: 1px solid #e8edf4; margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .modal-box .form-group { margin-bottom: 12px; }
+        .modal-box .form-group label { display: block; font-size: 13px; font-weight: 500; color: #0a1e2f; margin-bottom: 4px; }
+        .modal-box .form-group input, .modal-box .form-group textarea, .modal-box .form-group select {
+            width: 100%; padding: 8px 14px; border: 1px solid #dce5ef; border-radius: 8px;
+            font-size: 14px; background: #fafcfe; font-family: inherit;
+        }
+        .modal-box .form-group input:focus, .modal-box .form-group textarea:focus {
+            outline: none; border-color: #4dabf7; box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .modal-box .form-group textarea { min-height: 60px; resize: vertical; }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 999;
+            white-space: nowrap;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .toast i { margin-right: 8px; }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .row-two { grid-template-columns: 1fr; }
+            .row-three { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar .logo span, .sidebar .logo .badge, .sidebar .nav .item span,
+            .sidebar .nav .section-label, .sidebar .bottom span, .sidebar .nav .item .tag { display: none; }
+            .sidebar .logo { padding: 16px 12px; justify-content: center; }
+            .sidebar .logo i { font-size: 20px; padding: 6px; }
+            .sidebar .nav .item { justify-content: center; padding: 12px; }
+            .sidebar .nav .item i { font-size: 18px; width: auto; }
+            .sidebar .bottom { justify-content: center; }
+            .main { max-width: calc(100% - 60px); padding: 14px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .row-three { grid-template-columns: 1fr; }
+            .topbar { flex-direction: column; align-items: flex-start; }
+            .procurement-item { flex-wrap: wrap; }
+            .procurement-item .right { width: 100%; align-items: flex-start; }
+            .modal-box { padding: 20px; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+        /* ===== 平台标签 ===== */
+        .platform-tag {
+            display: inline-block;
+            padding: 1px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .platform-tag.taobao { background: #fef0e6; color: #b55a1a; }
+        .platform-tag.douyin { background: #e9f0ff; color: #1a5bb5; }
+        .platform-tag.pdd { background: #fde8ed; color: #b51a3f; }
+        .platform-tag.jd { background: #e6f7ec; color: #0d7c4f; }
+        .platform-tag.other { background: #f0f4f9; color: #5f7d95; }
+
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+        .status-dot.online { background: #0d7c4f; }
+        .status-dot.offline { background: #b51a3f; }
+        .status-dot.warning { background: #b55a1a; }
+
+        .scroll-list { max-height: 300px; overflow-y: auto; padding-right: 4px; }
+        .scroll-list::-webkit-scrollbar { width: 4px; }
+        .scroll-list::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
+        .scroll-list::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        .border-left-warning { border-left: 4px solid #f5b342; }
+        .border-left-danger { border-left: 4px solid #b51a3f; }
+        .border-left-success { border-left: 4px solid #0d7c4f; }
+        .border-left-info { border-left: 4px solid #4dabf7; }
+    </style>
+</head>
+<body>
+    <!-- ===== 左侧导航 ===== -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-bolt"></i>
+            <span>智控电商</span>
+            <span class="badge">v3.0</span>
+        </div>
+        <div class="nav">
+            <div class="section-label">经营总览</div>
+            <div class="item" data-page="page-dashboard"><i class="fas fa-chart-pie"></i><span>数据总览</span></div>
+            <div class="item" data-page="page-ai"><i class="fas fa-stethoscope"></i><span>店铺经营诊断</span></div>
+            <div class="item" data-page="page-competitor"><i class="fas fa-eye"></i><span>同行竞品分析</span></div>
+            <div class="section-label">交易核心</div>
+            <div class="item" data-page="page-orders"><i class="fas fa-shopping-cart"></i><span>订单管理</span><span class="tag">23</span></div>
+            <div class="item" data-page="page-products"><i class="fas fa-box"></i><span>商品管理</span></div>
+            <div class="item" data-page="page-inventory"><i class="fas fa-warehouse"></i><span>库存管理</span></div>
+            <div class="section-label">AI 智能赋能</div>
+            <div class="item" data-page="page-ai-service"><i class="fas fa-headset"></i><span>AI 客服</span><span class="tag">NEW</span></div>
+            <div class="item" data-page="page-ai-assistant"><i class="fas fa-robot"></i><span>AI 助手</span></div>
+            <div class="item" data-page="page-customer"><i class="fas fa-users"></i><span>客资聚合</span><span class="tag">89</span></div>
+            <div class="section-label">运营支持</div>
+            <div class="item" data-page="page-logistics"><i class="fas fa-truck"></i><span>物流管理</span></div>
+            <div class="item" data-page="page-sourcing"><i class="fas fa-store-alt"></i><span>素材生成</span></div>
+            <div class="item" data-page="page-channels"><i class="fas fa-plug"></i><span>渠道货源</span></div>
+            <div class="item active" data-page="page-procurement"><i class="fas fa-cart-plus"></i><span>智能采购</span><span class="tag">NEW</span></div>
+            <div class="section-label">系统配置</div>
+            <div class="item" data-page="page-channels-config"><i class="fas fa-plug"></i><span>渠道管理</span></div>
+            <div class="item" data-page="page-agents"><i class="fas fa-handshake"></i><span>服务商管理</span></div>
+            <div class="item" data-page="page-settings"><i class="fas fa-cog"></i><span>系统设置</span></div>
+        </div>
+        <div class="bottom">
+            <i class="fas fa-shield-alt"></i>
+            <span>数据加密 · 安全</span>
+        </div>
+    </div>
+
+    <!-- ===== 主内容 ===== -->
+    <div class="main">
+        <div id="page-procurement" class="page active">
+            <!-- 顶部栏 -->
+            <div class="topbar">
+                <div class="left">
+                    <h2><i class="fas fa-cart-plus" style="color:#4dabf7; margin-right:8px;"></i>智能采购系统</h2>
+                    <p>多平台订单监控 · 自动追溯货源 · 人工确认支付 · 退款管理</p>
+                </div>
+                <div class="right">
+                    <span class="btn" id="monitorStatus"><i class="fas fa-circle" style="color:#0d7c4f; font-size:10px;"></i> 监控运行中</span>
+                    <span class="btn btn-primary" onclick="manualScan()"><i class="fas fa-sync-alt"></i> 立即扫描</span>
+                    <span class="btn btn-success" onclick="simulateNewOrder()"><i class="fas fa-plus"></i> 模拟订单</span>
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label"><i class="fas fa-shopping-cart" style="color:#4dabf7;"></i> 今日订单</div>
+                    <div class="value" id="todayOrders">0</div>
+                    <div class="sub">较昨日 <span class="trend"><i class="fas fa-arrow-up"></i> 12%</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="label"><i class="fas fa-clock" style="color:#f5b342;"></i> 待确认支付</div>
+                    <div class="value" id="pendingCount">0</div>
+                    <div class="sub">需人工审核</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label"><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 已支付</div>
+                    <div class="value" id="paidCount">0</div>
+                    <div class="sub">已下单供应商</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label"><i class="fas fa-truck" style="color:#4dabf7;"></i> 已发货</div>
+                    <div class="value" id="shippedCount">0</div>
+                    <div class="sub">物流在途</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label"><i class="fas fa-hand-holding-usd" style="color:#b51a3f;"></i> 退款申请</div>
+                    <div class="value" id="refundCount">0</div>
+                    <div class="sub"><span style="color:#b51a3f;" id="refundPendingCount">0</span> 待审核</div>
+                </div>
+            </div>
+
+            <!-- 待确认采购单 -->
+            <div class="card border-left-warning">
+                <div class="card-header">
+                    <h3><i class="fas fa-clock" style="color:#f5b342;"></i> 待确认采购单</h3>
+                    <span class="action">共 <span id="pendingListCount">0</span> 单</span>
+                </div>
+                <div class="scroll-list" id="pendingOrderList">
+                    <div style="text-align:center;padding:20px;color:#94a3b8;">暂无待确认的采购单</div>
+                </div>
+            </div>
+
+            <!-- 已支付 + 已发货 两列 -->
+            <div class="row-two">
+                <div class="card border-left-success">
+                    <div class="card-header">
+                        <h3><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 已支付 · 待发货</h3>
+                        <span class="action">共 <span id="paidListCount">0</span> 单</span>
+                    </div>
+                    <div class="scroll-list" id="paidOrderList">
+                        <div style="text-align:center;padding:20px;color:#94a3b8;">暂无已支付的采购单</div>
+                    </div>
+                </div>
+                <div class="card border-left-info">
+                    <div class="card-header">
+                        <h3><i class="fas fa-truck" style="color:#4dabf7;"></i> 已发货 · 运输中</h3>
+                        <span class="action">共 <span id="shippedListCount">0</span> 单</span>
+                    </div>
+                    <div class="scroll-list" id="shippedOrderList">
+                        <div style="text-align:center;padding:20px;color:#94a3b8;">暂无已发货的采购单</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 退款管理 -->
+            <div class="card border-left-danger">
+                <div class="card-header">
+                    <h3><i class="fas fa-hand-holding-usd" style="color:#b51a3f;"></i> 退款管理</h3>
+                    <span class="action" onclick="showApplyRefundModal()"><i class="fas fa-plus"></i> 发起退款</span>
+                </div>
+                <div class="scroll-list" id="refundList">
+                    <div style="text-align:center;padding:20px;color:#94a3b8;">暂无退款申请</div>
+                </div>
+            </div>
+
+            <!-- 货源映射配置 -->
+            <div class="card border-left-info">
+                <div class="card-header">
+                    <h3><i class="fas fa-link" style="color:#4dabf7;"></i> 商品-货源映射配置</h3>
+                    <span class="action" onclick="showAddMappingModal()"><i class="fas fa-plus"></i> 添加映射</span>
+                </div>
+                <div class="scroll-list" id="mappingList">
+                    <!-- 由JS动态渲染 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 确认支付弹窗 ===== -->
+    <div class="modal-overlay" id="confirmModal" onclick="if(event.target===this) closeModal('confirmModal')">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 确认支付</h3>
+                <button class="close" onclick="closeModal('confirmModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="confirmModalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-sm outline" onclick="closeModal('confirmModal')">取消</button>
+                <button class="btn-sm success" id="confirmPayBtn" onclick="doConfirmPay()"><i class="fas fa-check"></i> 确认支付</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 取消采购单弹窗 ===== -->
+    <div class="modal-overlay" id="cancelModal" onclick="if(event.target===this) closeModal('cancelModal')">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-times-circle" style="color:#b51a3f;"></i> 取消采购单</h3>
+                <button class="close" onclick="closeModal('cancelModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>取消原因</label>
+                    <input type="text" id="cancelReason" placeholder="请输入取消原因...">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-sm outline" onclick="closeModal('cancelModal')">返回</button>
+                <button class="btn-sm danger" id="confirmCancelBtn" onclick="doConfirmCancel()"><i class="fas fa-times"></i> 确认取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 退款弹窗 ===== -->
+    <div class="modal-overlay" id="refundModal" onclick="if(event.target===this) closeModal('refundModal')">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-hand-holding-usd" style="color:#b51a3f;"></i> 退款申请</h3>
+                <button class="close" onclick="closeModal('refundModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="refundModalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-sm outline" onclick="closeModal('refundModal')">取消</button>
+                <button class="btn-sm primary" id="refundSubmitBtn" onclick="doSubmitRefund()"><i class="fas fa-paper-plane"></i> 提交申请</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 添加映射弹窗 ===== -->
+    <div class="modal-overlay" id="mappingModal" onclick="if(event.target===this) closeModal('mappingModal')">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-link" style="color:#4dabf7;"></i> 添加货源映射</h3>
+                <button class="close" onclick="closeModal('mappingModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>在售商品名称</label>
+                    <input type="text" id="mapProductName" placeholder="例如: 云山茶叶礼盒">
+                </div>
+                <div class="form-group">
+                    <label>销售平台</label>
+                    <select id="mapPlatform">
+                        <option value="淘宝">淘宝</option>
+                        <option value="抖音">抖音</option>
+                        <option value="拼多多">拼多多</option>
+                        <option value="京东">京东</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>供应商</label>
+                    <select id="mapSupplier">
+                        <option value="s1">云山茶厂</option>
+                        <option value="s2">竹艺工坊</option>
+                        <option value="s3">文房四宝</option>
+                        <option value="s4">坚果源食品</option>
+                        <option value="s5">云山文创</option>
+                        <option value="s6">陶瓷厂</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>供应商SKU</label>
+                    <input type="text" id="mapSourceSku" placeholder="例如: YS-2026-001">
+                </div>
+                <div class="form-group">
+                    <label>采购单价 (¥)</label>
+                    <input type="number" id="mapSourcePrice" placeholder="例如: 68">
+                </div>
+                <div class="form-group">
+                    <label>起批量</label>
+                    <input type="number" id="mapMinOrder" placeholder="例如: 100" value="50">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-sm outline" onclick="closeModal('mappingModal')">取消</button>
+                <button class="btn-sm primary" onclick="doAddMapping()"><i class="fas fa-plus"></i> 添加映射</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Toast ===== -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ================================================================
+        // ===== Toast =====
+        // ================================================================
+        function showToast(msg) {
+            var toast = document.getElementById('toast');
+            toast.innerHTML = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(function() { toast.classList.remove('show'); }, 3500);
+        }
+
+        // ================================================================
+        // ===== 弹窗管理 =====
+        // ================================================================
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        // ================================================================
+        // ===== 数据层 =====
+        // ================================================================
+
+        // 供应商数据
+        var supplierData = [
+            { id: 's1', name: '云山茶厂', platform: '1688', price: 68, deliveryDays: 3, rating: 4.9, categories: ['茶叶'], minOrder: 100, status: '金牌' },
+            { id: 's2', name: '竹艺工坊', platform: '1688', price: 45, deliveryDays: 4, rating: 4.8, categories: ['手工艺'], minOrder: 50, status: '实力商家' },
+            { id: 's3', name: '文房四宝', platform: '淘宝', price: 35, deliveryDays: 2, rating: 4.7, categories: ['文创'], minOrder: 30, status: '金牌' },
+            { id: 's4', name: '坚果源食品', platform: '拼多多', price: 42, deliveryDays: 3, rating: 4.6, categories: ['食品'], minOrder: 200, status: '诚信通' },
+            { id: 's5', name: '云山文创', platform: '京东', price: 79, deliveryDays: 2, rating: 4.8, categories: ['文创'], minOrder: 50, status: '金牌' },
+            { id: 's6', name: '陶瓷厂', platform: '1688', price: 58, deliveryDays: 5, rating: 4.5, categories: ['手工艺'], minOrder: 100, status: '实力商家' },
+        ];
+
+        // 商品-货源映射表
+        var productSourceMap = [
+            { id: 'm1', productName: '云山茶叶礼盒', platform: '抖音', sourceSupplierId: 's1', sourceSupplierName: '云山茶厂', sourceSku: 'YS-2026-001', sourcePrice: 68, sourceMinOrder: 100, mappingRule: '1:1', status: 'active' },
+            { id: 'm2', productName: '手工竹编包', platform: '淘宝', sourceSupplierId: 's2', sourceSupplierName: '竹艺工坊', sourceSku: 'ZB-2026-002', sourcePrice: 45, sourceMinOrder: 50, mappingRule: '1:1', status: 'active' },
+            { id: 'm3', productName: '山核桃仁 250g', platform: '拼多多', sourceSupplierId: 's4', sourceSupplierName: '坚果源食品', sourceSku: 'HT-2026-003', sourcePrice: 42, sourceMinOrder: 200, mappingRule: '1:1', status: 'active' },
+            { id: 'm4', productName: '云山手工皂套装', platform: '京东', sourceSupplierId: 's5', sourceSupplierName: '云山文创', sourceSku: 'SZ-2026-004', sourcePrice: 79, sourceMinOrder: 50, mappingRule: '1:1', status: 'active' },
+            { id: 'm5', productName: '云山陶瓷杯', platform: '淘宝', sourceSupplierId: 's6', sourceSupplierName: '陶瓷厂', sourceSku: 'TC-2026-005', sourcePrice: 58, sourceMinOrder: 100, mappingRule: '1:1', status: 'active' },
+            { id: 'm6', productName: '手写书法折扇', platform: '抖音', sourceSupplierId: 's3', sourceSupplierName: '文房四宝', sourceSku: 'FS-2026-006', sourcePrice: 35, sourceMinOrder: 30, mappingRule: '1:1', status: 'active' },
+        ];
+
+        // 采购订单存储
+        var procurementOrders = [];
+        var orderIdCounter = 1000;
+
+        // ================================================================
+        // ===== 核心业务类 =====
+        // ================================================================
+
+        // 多平台订单监控
+        var monitorTimer = null;
+        var isMonitorRunning = true;
+        var todayOrderCount = 0;
+
+        function startMonitor() {
+            if (monitorTimer) return;
+            isMonitorRunning = true;
+            document.getElementById('monitorStatus').innerHTML = '<i class="fas fa-circle" style="color:#0d7c4f; font-size:10px;"></i> 监控运行中';
+            monitorTimer = setInterval(function() {
+                if (isMonitorRunning) {
+                    checkNewOrders();
+                }
+            }, 8000);
+            console.log('🔄 多平台订单监控已启动');
+        }
+
+        function stopMonitor() {
+            isMonitorRunning = false;
+            if (monitorTimer) {
+                clearInterval(monitorTimer);
+                monitorTimer = null;
+            }
+            document.getElementById('monitorStatus').innerHTML = '<i class="fas fa-circle" style="color:#b55a1a; font-size:10px;"></i> 监控已暂停';
+            console.log('⏹️ 多平台订单监控已停止');
+        }
+
+        function toggleMonitor() {
+            if (isMonitorRunning) {
+                stopMonitor();
+            } else {
+                startMonitor();
+            }
+        }
+
+        // 模拟新订单检测
+        function checkNewOrders() {
+            var platforms = ['淘宝', '抖音', '拼多多', '京东'];
+            var productNames = productSourceMap.map(function(m) { return m.productName; });
+            var products = productSourceMap.map(function(m) { 
+                return { name: m.productName, platform: m.platform }; 
+            });
+
+            // 随机生成0-2个新订单
+            var count = Math.floor(Math.random() * 3);
+            for (var i = 0; i < count; i++) {
+                var product = products[Math.floor(Math.random() * products.length)];
+                var platform = platforms[Math.floor(Math.random() * platforms.length)];
+                var quantity = Math.floor(Math.random() * 3) + 1;
+                var unitPrice = 50 + Math.floor(Math.random() * 150);
+                
+                var order = {
+                    orderId: 'ORD-' + Date.now() + '-' + String(Math.random()).slice(2, 6),
+                    platform: platform,
+                    productName: product.name,
+                    quantity: quantity,
+                    unitPrice: unitPrice,
+                    totalAmount: unitPrice * quantity,
+                    buyerName: randomName(),
+                    buyerPhone: '1' + String(Math.floor(Math.random() * 9000000000) + 1000000000),
+                    address: randomAddress(),
+                    createdAt: new Date().toLocaleString(),
+                    status: '已支付'
+                };
+                
+                // 处理订单 -> 追溯货源
+                processOrder(order);
+                todayOrderCount++;
+            }
+            document.getElementById('todayOrders').textContent = todayOrderCount;
+        }
+
+        function randomName() {
+            var surnames = ['王', '张', '李', '刘', '陈', '赵', '周', '吴', '孙', '马'];
+            var names = ['婷', '豪', '萱', '阳', '琳', '瑶', '伟', '芳', '军', '敏'];
+            return surnames[Math.floor(Math.random() * surnames.length)] + names[Math.floor(Math.random() * names.length)];
+        }
+
+        function randomAddress() {
+            var cities = ['北京市朝阳区', '上海市浦东新区', '广州市天河区', '深圳市南山区', '杭州市西湖区'];
+            var streets = ['建国路88号', '张杨路88号', '天河路188号', '科技园路68号', '文三路118号'];
+            return cities[Math.floor(Math.random() * cities.length)] + streets[Math.floor(Math.random() * streets.length)];
+        }
+
+        // 手动触发扫描
+        function manualScan() {
+            showToast('🔄 正在扫描平台订单...');
+            var count = Math.floor(Math.random() * 3) + 1;
+            for (var i = 0; i < count; i++) {
+                var platforms = ['淘宝', '抖音', '拼多多', '京东'];
+                var productNames = productSourceMap.map(function(m) { return m.productName; });
+                var name = productNames[Math.floor(Math.random() * productNames.length)];
+                var platform = platforms[Math.floor(Math.random() * platforms.length)];
+                var quantity = Math.floor(Math.random() * 3) + 1;
+                var unitPrice = 50 + Math.floor(Math.random() * 150);
+                
+                var order = {
+                    orderId: 'ORD-' + Date.now() + '-' + String(Math.random()).slice(2, 6),
+                    platform: platform,
+                    productName: name,
+                    quantity: quantity,
+                    unitPrice: unitPrice,
+                    totalAmount: unitPrice * quantity,
+                    buyerName: randomName(),
+                    buyerPhone: '1' + String(Math.floor(Math.random() * 9000000000) + 1000000000),
+                    address: randomAddress(),
+                    createdAt: new Date().toLocaleString(),
+                    status: '已支付'
+                };
+                processOrder(order);
+                todayOrderCount++;
+            }
+            document.getElementById('todayOrders').textContent = todayOrderCount;
+            renderAll();
+            showToast('✅ 扫描完成，发现 ' + count + ' 个新订单');
+        }
+
+        // 模拟单个新订单（手动测试）
+        function simulateNewOrder() {
+            var platforms = ['淘宝', '抖音', '拼多多', '京东'];
+            var productNames = productSourceMap.map(function(m) { return m.productName; });
+            var name = productNames[Math.floor(Math.random() * productNames.length)];
+            var platform = platforms[Math.floor(Math.random() * platforms.length)];
+            var quantity = Math.floor(Math.random() * 3) + 1;
+            var unitPrice = 50 + Math.floor(Math.random() * 150);
+            
+            var order = {
+                orderId: 'ORD-' + Date.now() + '-' + String(Math.random()).slice(2, 6),
+                platform: platform,
+                productName: name,
+                quantity: quantity,
+                unitPrice: unitPrice,
+                totalAmount: unitPrice * quantity,
+                buyerName: randomName(),
+                buyerPhone: '1' + String(Math.floor(Math.random() * 9000000000) + 1000000000),
+                address: randomAddress(),
+                createdAt: new Date().toLocaleString(),
+                status: '已支付'
+            };
+            processOrder(order);
+            todayOrderCount++;
+            document.getElementById('todayOrders').textContent = todayOrderCount;
+            renderAll();
+            showToast('📦 模拟订单 ' + order.orderId + ' 已创建');
+        }
+
+        // ================================================================
+        // ===== 追溯货源 + 创建采购单 =====
+        // ================================================================
+
+        function processOrder(customerOrder) {
+            // Step 1: 查找货源映射
+            var sourceMap = productSourceMap.find(function(m) {
+                return m.productName === customerOrder.productName;
+            });
+
+            if (!sourceMap) {
+                showToast('⚠️ 商品 "' + customerOrder.productName + '" 未配置货源映射');
+                return;
+            }
+
+            // Step 2: 查找供应商
+            var supplier = supplierData.find(function(s) { return s.id === sourceMap.sourceSupplierId; });
+            if (!supplier) {
+                showToast('❌ 供应商不存在: ' + sourceMap.sourceSupplierName);
+                return;
+            }
+
+            // Step 3: 计算采购数量
+            var procurementQty = customerOrder.quantity;
+            if (procurementQty < sourceMap.sourceMinOrder) {
+                procurementQty = sourceMap.sourceMinOrder;
+            }
+
+            // Step 4: 生成采购单
+            var order = {
+                id: 'PO-' + Date.now() + '-' + String(++orderIdCounter).padStart(4, '0'),
+                sourceOrderId: customerOrder.orderId,
+                sourcePlatform: customerOrder.platform,
+                sourceProduct: customerOrder.productName,
+                sourceQuantity: customerOrder.quantity,
+                sourceTotalAmount: customerOrder.totalAmount,
+                
+                productName: customerOrder.productName,
+                supplierId: supplier.id,
+                supplierName: supplier.name,
+                supplierSku: sourceMap.sourceSku,
+                quantity: procurementQty,
+                unitPrice: supplier.price,
+                totalAmount: supplier.price * procurementQty,
+                
+                deliveryAddress: customerOrder.address,
+                buyerName: customerOrder.buyerName,
+                buyerPhone: customerOrder.buyerPhone,
+                
+                status: '待确认支付',
+                paymentStatus: '待支付',
+                
+                createdAt: new Date().toLocaleString(),
+                customerOrderCreatedAt: customerOrder.createdAt,
+                confirmedAt: null,
+                paidAt: null,
+                shippedAt: null,
+                trackingNumber: null,
+                completedAt: null,
+                
+                refundStatus: null,
+                refundAmount: null,
+                refundReason: null,
+                refundAppliedAt: null,
+                refundApprovedAt: null,
+                refundCompletedAt: null
+            };
+
+            procurementOrders.push(order);
+            addLog('info', '采购单 ' + order.id + ' 已创建，商品: ' + order.productName + '，数量: ' + order.quantity + '，来源订单: ' + customerOrder.orderId);
+            showToast('📋 采购单 ' + order.id + ' 已生成，请确认支付');
+            renderAll();
+        }
+
+        // ================================================================
+        // ===== 采购单操作 =====
+        // ================================================================
+
+        var currentOrderId = null;
+
+        // 确认支付
+        function confirmPayment(orderId) {
+            currentOrderId = orderId;
+            var order = procurementOrders.find(function(o) { return o.id === orderId; });
+            if (!order) { showToast('❌ 采购单不存在'); return; }
+            if (order.status !== '待确认支付') { showToast('⚠️ 采购单状态不是"待确认支付"'); return; }
+
+            var body = document.getElementById('confirmModalBody');
+            body.innerHTML = `
+                <div class="detail-row"><span class="label">采购单号</span><span class="value">${order.id}</span></div>
+                <div class="detail-row"><span class="label">商品</span><span class="value">${order.productName}</span></div>
+                <div class="detail-row"><span class="label">供应商</span><span class="value">${order.supplierName}</span></div>
+                <div class="detail-row"><span class="label">数量</span><span class="value">${order.quantity} 件</span></div>
+                <div class="detail-row"><span class="label">单价</span><span class="value">¥${order.unitPrice.toFixed(2)}</span></div>
+                <div class="detail-row"><span class="label">总金额</span><span class="value" style="color:#b51a3f;font-weight:700;font-size:18px;">¥${order.totalAmount.toFixed(2)}</span></div>
+                <div class="detail-row"><span class="label">买家</span><span class="value">${order.buyerName}</span></div>
+                <div class="detail-row"><span class="label">收货地址</span><span class="value">${order.deliveryAddress}</span></div>
+                <div style="margin-top:10px;padding:10px;background:#fef3e2;border-radius:8px;font-size:13px;color:#a67c00;">
+                    <i class="fas fa-info-circle"></i> 确认支付后，系统将自动向供应商下单
+                </div>
+            `;
+            openModal('confirmModal');
+        }
+
+        function doConfirmPay() {
+            var order = procurementOrders.find(function(o) { return o.id === currentOrderId; });
+            if (!order) { showToast('❌ 采购单不存在'); return; }
+
+            order.status = '已支付';
+            order.paymentStatus = '已支付';
+            order.confirmedAt = new Date().toLocaleString();
+            order.paidAt = new Date().toLocaleString();
+
+            addLog('success', '采购单 ' + order.id + ' 已确认支付，供应商: ' + order.supplierName);
+            showToast('✅ 采购单 ' + order.id + ' 已确认支付');
+
+            closeModal('confirmModal');
+            renderAll();
+
+            // 模拟供应商接单
+            setTimeout(function() {
+                order.status = '已下单';
+                order.supplierOrderId = 'SO-' + Date.now();
+                addLog('info', '供应商 ' + order.supplierName + ' 已接单，订单号: ' + order.supplierOrderId);
+                renderAll();
+                showToast('📦 供应商 ' + order.supplierName + ' 已接单');
+
+                // 模拟发货
+                setTimeout(function() {
+                    order.status = '已发货';
+                    order.shippedAt = new Date().toLocaleString();
+                    order.trackingNumber = 'SF' + String(Math.floor(Math.random() * 10000000000));
+                    addLog('success', '采购单 ' + order.id + ' 已发货，物流单号: ' + order.trackingNumber);
+                    renderAll();
+                    showToast('🚚 采购单 ' + order.id + ' 已发货');
+                }, 3000);
+            }, 1500);
+        }
+
+        // 取消采购单
+        var cancelOrderId = null;
+
+        function cancelProcurementOrder(orderId) {
+            cancelOrderId = orderId;
+            document.getElementById('cancelReason').value = '';
+            openModal('cancelModal');
+        }
+
+        function doConfirmCancel() {
+            var reason = document.getElementById('cancelReason').value || '人工取消';
+            var order = procurementOrders.find(function(o) { return o.id === cancelOrderId; });
+            if (!order) { showToast('❌ 采购单不存在'); return; }
+
+            order.status = '已取消';
+            order.cancelReason = reason;
+            order.canceledAt = new Date().toLocaleString();
+
+            addLog('warning', '采购单 ' + order.id + ' 已取消，原因: ' + reason);
+            showToast('⛔ 采购单 ' + order.id + ' 已取消');
+            closeModal('cancelModal');
+            renderAll();
+        }
+
+        // ================================================================
+        // ===== 退款管理 =====
+        // ================================================================
+
+        var refundTargetOrderId = null;
+
+        function showApplyRefundModal() {
+            // 获取已支付的订单列表供选择
+            var paidOrders = procurementOrders.filter(function(o) {
+                return o.status === '已支付' || o.status === '已下单' || o.status === '已发货';
+            });
+            if (paidOrders.length === 0) {
+                showToast('📭 暂无可退款的采购单');
+                return;
+            }
+
+            var body = document.getElementById('refundModalBody');
+            var options = paidOrders.map(function(o) {
+                return '<option value="' + o.id + '">' + o.id + ' - ' + o.productName + ' (¥' + o.totalAmount.toFixed(2) + ')</option>';
+            }).join('');
+
+            body.innerHTML = `
+                <div class="form-group">
+                    <label>选择采购单</label>
+                    <select id="refundOrderSelect">${options}</select>
+                </div>
+                <div class="form-group">
+                    <label>退款金额</label>
+                    <input type="number" id="refundAmount" placeholder="请输入退款金额" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>退款原因</label>
+                    <textarea id="refundReason" placeholder="请描述退款原因..."></textarea>
+                </div>
+            `;
+            openModal('refundModal');
+        }
+
+        function doSubmitRefund() {
+            var orderId = document.getElementById('refundOrderSelect').value;
+            var amount = parseFloat(document.getElementById('refundAmount').value);
+            var reason = document.getElementById('refundReason').value || '客户申请退款';
+
+            if (!amount || amount <= 0) {
+                showToast('⚠️ 请输入有效的退款金额');
+                return;
+            }
+
+            var order = procurementOrders.find(function(o) { return o.id === orderId; });
+            if (!order) { showToast('❌ 采购单不存在'); return; }
+
+            if (order.refundStatus === '申请中') {
+                showToast('⚠️ 该采购单已有退款申请在处理中');
+                return;
+            }
+
+            order.refundStatus = '申请中';
+            order.refundAmount = amount;
+            order.refundReason = reason;
+            order.refundAppliedAt = new Date().toLocaleString();
+
+            addLog('warning', '退款申请已提交: 采购单 ' + order.id + '，金额 ¥' + amount.toFixed(2));
+            showToast('💰 退款申请已提交，等待审核');
+            closeModal('refundModal');
+            renderAll();
+        }
+
+        // 审核退款 - 通过
+        function approveRefund(orderId) {
+            var order = procurementOrders.find(function(o) { return o.id === orderId; });
+            if (!order) { showToast('❌ 采购单不存在'); return; }
+            if (order.refundStatus !== '申请中') { showToast('⚠️ 该订单没有待审核的退款申请'); return; }
+
+            order.refundStatus = '已退款';
+            order.refundApprovedAt = new Date().toLocaleString();
+            order.refundCompletedAt = new Date().toLocaleString();
+            
+            // 如果采购单未发货，取消采购单
+            if (order.status === '已支付' || order.status === '待确认支付') {
+                order.status = '已取消';
+                order.cancelReason = '客户退款';
+                order.canceledAt = new Date().toLocaleString();
+            }
+
+            addLog('success', '退款申请已通过: 采购单 ' + order.id + '，金额 ¥' + order.refundAmount.toFixed(2));
+            showToast('✅ 退款已通过，金额 ¥' + order.refundAmount.toFixed(2));
+            renderAll();
+        }
+
+        // 审核退款 - 拒绝
+        function rejectRefund(orderId) {
+            var order = procurementOrders.find(function(o) { return o.id === orderId; });
+            if (!order) { showToast('❌ 采购单不存在'); return; }
+            if (order.refundStatus !== '申请中') { showToast('⚠️ 该订单没有待审核的退款申请'); return; }
+
+            order.refundStatus = '已拒绝';
+            order.refundApprovedAt = new Date().toLocaleString();
+
+            addLog('warning', '退款申请已拒绝: 采购单 ' + order.id);
+            showToast('❌ 退款已拒绝');
+            renderAll();
+        }
+
+        // ================================================================
+        // ===== 货源映射管理 =====
+        // ================================================================
+
+        function showAddMappingModal() {
+            document.getElementById('mapProductName').value = '';
+            document.getElementById('mapSourceSku').value = '';
+            document.getElementById('mapSourcePrice').value = '';
+            document.getElementById('mapMinOrder').value = '50';
+            openModal('mappingModal');
+        }
+
+        function doAddMapping() {
+            var productName = document.getElementById('mapProductName').value.trim();
+            var platform = document.getElementById('mapPlatform').value;
+            var supplierId = document.getElementById('mapSupplier').value;
+            var sourceSku = document.getElementById('mapSourceSku').value.trim();
+            var sourcePrice = parseFloat(document.getElementById('mapSourcePrice').value);
+            var minOrder = parseInt(document.getElementById('mapMinOrder').value);
+
+            if (!productName) { showToast('⚠️ 请输入商品名称'); return; }
+            if (!sourceSku) { showToast('⚠️ 请输入供应商SKU'); return; }
+            if (!sourcePrice || sourcePrice <= 0) { showToast('⚠️ 请输入有效的采购单价'); return; }
+            if (!minOrder || minOrder <= 0) { showToast('⚠️ 请输入有效的起批量'); return; }
+
+            var supplier = supplierData.find(function(s) { return s.id === supplierId; });
+            if (!supplier) { showToast('❌ 供应商不存在'); return; }
+
+            // 检查是否已存在
+            var exists = productSourceMap.some(function(m) {
+                return m.productName === productName && m.platform === platform;
+            });
+            if (exists) {
+                showToast('⚠️ 该商品已存在映射配置');
+                return;
+            }
+
+            productSourceMap.push({
+                id: 'm' + Date.now(),
+                productName: productName,
+                platform: platform,
+                sourceSupplierId: supplierId,
+                sourceSupplierName: supplier.name,
+                sourceSku: sourceSku,
+                sourcePrice: sourcePrice,
+                sourceMinOrder: minOrder,
+                mappingRule: '1:1',
+                status: 'active'
+            });
+
+            addLog('info', '新增货源映射: ' + productName + ' -> ' + supplier.name);
+            showToast('✅ 货源映射已添加');
+            closeModal('mappingModal');
+            renderAll();
+        }
+
+        // ================================================================
+        // ===== 日志系统 =====
+        // ================================================================
+
+        var systemLogs = [];
+
+        function addLog(level, msg) {
+            systemLogs.unshift({
+                time: new Date().toLocaleTimeString(),
+                level: level,
+                msg: msg
+            });
+            if (systemLogs.length > 200) systemLogs.pop();
+        }
+
+        // ================================================================
+        // ===== 渲染函数 =====
+        // ================================================================
+
+        function renderPendingOrders() {
+            var pending = procurementOrders.filter(function(o) { return o.status === '待确认支付'; });
+            var container = document.getElementById('pendingOrderList');
+            
+            if (pending.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">✅ 暂无待确认的采购单</div>';
+            } else {
+                var html = '';
+                pending.forEach(function(order) {
+                    html += `
+                        <div class="procurement-item">
+                            <div class="info">
+                                <div class="name">
+                                    ${order.productName}
+                                    <span class="badge warning">⏳ 待确认</span>
+                                    <span class="platform-tag ${order.sourcePlatform === '淘宝' ? 'taobao' : order.sourcePlatform === '抖音' ? 'douyin' : order.sourcePlatform === '拼多多' ? 'pdd' : order.sourcePlatform === '京东' ? 'jd' : 'other'}">${order.sourcePlatform}</span>
+                                </div>
+                                <div class="meta">
+                                    <span><i class="fas fa-shopping-cart"></i> 客户单: ${order.sourceOrderId}</span>
+                                    <span><i class="fas fa-store"></i> ${order.supplierName}</span>
+                                    <span><i class="fas fa-box"></i> ${order.quantity}件</span>
+                                    <span><i class="fas fa-money-bill"></i> ¥${order.totalAmount.toFixed(2)}</span>
+                                </div>
+                                <div class="meta" style="font-size:12px;color:#94a3b8;">
+                                    <span><i class="fas fa-user"></i> ${order.buyerName}</span>
+                                    <span><i class="fas fa-map-pin"></i> ${order.deliveryAddress}</span>
+                                    <span>${order.createdAt}</span>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <div class="actions">
+                                    <span class="btn-sm success" onclick="confirmPayment('${order.id}')"><i class="fas fa-check"></i> 确认支付</span>
+                                    <span class="btn-sm danger" onclick="cancelProcurementOrder('${order.id}')"><i class="fas fa-times"></i> 取消</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            document.getElementById('pendingListCount').textContent = pending.length;
+            document.getElementById('pendingCount').textContent = pending.length;
+        }
+
+        function renderPaidOrders() {
+            var paid = procurementOrders.filter(function(o) { return o.status === '已支付' || o.status === '已下单'; });
+            var container = document.getElementById('paidOrderList');
+            
+            if (paid.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">暂无已支付的采购单</div>';
+            } else {
+                var html = '';
+                paid.forEach(function(order) {
+                    var statusText = order.status === '已支付' ? '待发货' : '已接单';
+                    html += `
+                        <div class="procurement-item">
+                            <div class="info">
+                                <div class="name">
+                                    ${order.productName}
+                                    <span class="badge success">${statusText}</span>
+                                </div>
+                                <div class="meta">
+                                    <span><i class="fas fa-file-invoice"></i> ${order.id}</span>
+                                    <span><i class="fas fa-store"></i> ${order.supplierName}</span>
+                                    <span><i class="fas fa-box"></i> ${order.quantity}件</span>
+                                    <span><i class="fas fa-money-bill"></i> ¥${order.totalAmount.toFixed(2)}</span>
+                                    ${order.supplierOrderId ? '<span><i class="fas fa-check"></i> 供应商单: ' + order.supplierOrderId + '</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="right">
+                                <span style="font-size:12px;color:#94a3b8;">${order.paidAt || order.confirmedAt}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            document.getElementById('paidListCount').textContent = paid.length;
+            document.getElementById('paidCount').textContent = paid.length;
+        }
+
+        function renderShippedOrders() {
+            var shipped = procurementOrders.filter(function(o) { return o.status === '已发货'; });
+            var container = document.getElementById('shippedOrderList');
+            
+            if (shipped.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">暂无已发货的采购单</div>';
+            } else {
+                var html = '';
+                shipped.forEach(function(order) {
+                    html += `
+                        <div class="procurement-item">
+                            <div class="info">
+                                <div class="name">
+                                    ${order.productName}
+                                    <span class="badge info">🚚 运输中</span>
+                                </div>
+                                <div class="meta">
+                                    <span><i class="fas fa-file-invoice"></i> ${order.id}</span>
+                                    <span><i class="fas fa-store"></i> ${order.supplierName}</span>
+                                    <span><i class="fas fa-box"></i> ${order.quantity}件</span>
+                                    <span><i class="fas fa-tag"></i> ${order.trackingNumber}</span>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <span style="font-size:12px;color:#94a3b8;">${order.shippedAt}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            document.getElementById('shippedListCount').textContent = shipped.length;
+            document.getElementById('shippedCount').textContent = shipped.length;
+        }
+
+        function renderRefunds() {
+            var refundOrders = procurementOrders.filter(function(o) { return o.refundStatus !== null; });
+            var container = document.getElementById('refundList');
+            
+            if (refundOrders.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">📭 暂无退款申请</div>';
+            } else {
+                var html = '';
+                refundOrders.forEach(function(order) {
+                    var statusMap = {
+                        '申请中': 'warning',
+                        '已退款': 'success',
+                        '已拒绝': 'danger'
+                    };
+                    var statusText = order.refundStatus;
+                    html += `
+                        <div class="procurement-item">
+                            <div class="info">
+                                <div class="name">
+                                    退款申请 - ${order.productName}
+                                    <span class="badge ${statusMap[order.refundStatus] || 'info'}">${order.refundStatus}</span>
+                                </div>
+                                <div class="meta">
+                                    <span><i class="fas fa-file-invoice"></i> ${order.id}</span>
+                                    <span><i class="fas fa-money-bill"></i> 金额: ¥${order.refundAmount.toFixed(2)}</span>
+                                    <span><i class="fas fa-comment"></i> ${order.refundReason}</span>
+                                </div>
+                                <div class="meta" style="font-size:12px;color:#94a3b8;">
+                                    <span>申请: ${order.refundAppliedAt}</span>
+                                    ${order.refundApprovedAt ? '<span>处理: ' + order.refundApprovedAt + '</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="right">
+                                ${order.refundStatus === '申请中' ? `
+                                    <div class="actions">
+                                        <span class="btn-sm success" onclick="approveRefund('${order.id}')"><i class="fas fa-check"></i> 通过</span>
+                                        <span class="btn-sm danger" onclick="rejectRefund('${order.id}')"><i class="fas fa-times"></i> 拒绝</span>
+                                    </div>
+                                ` : `
+                                    <span class="badge ${statusMap[order.refundStatus] || 'info'}">${order.refundStatus}</span>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            
+            var pendingRefunds = procurementOrders.filter(function(o) { return o.refundStatus === '申请中'; });
+            document.getElementById('refundCount').textContent = refundOrders.length;
+            document.getElementById('refundPendingCount').textContent = pendingRefunds.length;
+        }
+
+        function renderMappings() {
+            var container = document.getElementById('mappingList');
+            if (productSourceMap.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:12px;color:#94a3b8;">暂无货源映射配置</div>';
+            } else {
+                var html = '';
+                productSourceMap.forEach(function(m) {
+                    html += `
+                        <div class="procurement-item" style="padding:6px 0;">
+                            <div class="info">
+                                <div class="name" style="font-size:13px;">
+                                    ${m.productName}
+                                    <span class="platform-tag ${m.platform === '淘宝' ? 'taobao' : m.platform === '抖音' ? 'douyin' : m.platform === '拼多多' ? 'pdd' : m.platform === '京东' ? 'jd' : 'other'}">${m.platform}</span>
+                                    <span class="badge blue">→</span>
+                                    ${m.sourceSupplierName}
+                                    <span class="badge info">${m.sourceSku}</span>
+                                    <span class="badge success">¥${m.sourcePrice}</span>
+                                    <span class="badge blue">起批${m.sourceMinOrder}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+        }
+
+        function renderAll() {
+            renderPendingOrders();
+            renderPaidOrders();
+            renderShippedOrders();
+            renderRefunds();
+            renderMappings();
+            document.getElementById('todayOrders').textContent = todayOrderCount;
+        }
+
+        // ================================================================
+        // ===== 初始化 =====
+        // ================================================================
+
+        // 页面切换（只保留智能采购）
+        document.querySelectorAll('.sidebar .item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar .item').forEach(function(i) { i.classList.remove('active'); });
+                this.classList.add('active');
+                var pageId = this.dataset.page;
+                document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+                var target = document.getElementById(pageId);
+                if (target) target.classList.add('active');
+                if (pageId !== 'page-procurement') {
+                    showToast('📌 其他模块已精简，仅保留「智能采购」内容');
+                }
+            });
+        });
+
+        // 监控状态点击切换
+        document.getElementById('monitorStatus').addEventListener('click', toggleMonitor);
+
+        // 启动
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAll();
+            startMonitor();
+            addLog('info', '智能采购系统启动，监控已开启');
+        });
+
+        // 暴露到全局
+        window.confirmPayment = confirmPayment;
+        window.doConfirmPay = doConfirmPay;
+        window.cancelProcurementOrder = cancelProcurementOrder;
+        window.doConfirmCancel = doConfirmCancel;
+        window.approveRefund = approveRefund;
+        window.rejectRefund = rejectRefund;
+        window.showApplyRefundModal = showApplyRefundModal;
+        window.doSubmitRefund = doSubmitRefund;
+        window.showAddMappingModal = showAddMappingModal;
+        window.doAddMapping = doAddMapping;
+        window.manualScan = manualScan;
+        window.simulateNewOrder = simulateNewOrder;
+        window.toggleMonitor = toggleMonitor;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
