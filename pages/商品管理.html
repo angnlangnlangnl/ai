@@ -1,1 +1,1961 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电商运营后台 · 商品管理（含新增/编辑弹窗）</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #eef2f8;
+            color: #0a1a2b;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 220px;
+            background: #0a1e2f;
+            color: #b8cfe0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 20px rgba(10,30,47,0.08);
+            z-index: 100;
+            transition: 0.2s;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        .sidebar .logo { padding: 22px 20px 28px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 12px; }
+        .sidebar .logo i { font-size: 26px; color: #4dabf7; background: rgba(77,171,247,0.12); padding: 8px; border-radius: 12px; }
+        .sidebar .logo span { font-size: 18px; font-weight: 700; color: white; letter-spacing: 0.5px; }
+        .sidebar .logo .badge { font-size: 10px; background: #4dabf7; color: #0a1e2f; padding: 2px 10px; border-radius: 30px; font-weight: 600; margin-left: auto; }
+        .sidebar .nav { flex: 1; padding: 16px 12px 20px; }
+        .sidebar .nav .section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #5a7f99; padding: 14px 12px 6px 12px; font-weight: 600; margin-top: 4px; }
+        .sidebar .nav .section-label:first-of-type { margin-top: 0; }
+        .sidebar .nav .item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: #9bb4cc; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.15s; margin-bottom: 2px; position: relative; }
+        .sidebar .nav .item i { width: 18px; font-size: 15px; text-align: center; color: #5a7f99; transition: 0.15s; }
+        .sidebar .nav .item:hover { background: rgba(255,255,255,0.05); color: #d4e4f0; }
+        .sidebar .nav .item:hover i { color: #7aaed9; }
+        .sidebar .nav .item.active { background: rgba(77,171,247,0.12); color: white; }
+        .sidebar .nav .item.active i { color: #4dabf7; }
+        .sidebar .nav .item.active::before { content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 3px; background: #4dabf7; border-radius: 0 4px 4px 0; }
+        .sidebar .nav .item .tag { margin-left: auto; background: rgba(77,171,247,0.15); color: #4dabf7; font-size: 10px; padding: 2px 10px; border-radius: 30px; font-weight: 600; }
+        .sidebar .bottom { padding: 16px 20px 20px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: #5a7f99; display: flex; align-items: center; gap: 10px; }
+        .sidebar .bottom i { font-size: 16px; }
 
+        .main { flex: 1; padding: 20px 28px 40px; max-width: calc(100% - 220px); min-width: 0; }
+
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
+        .topbar .left h2 { font-size: 20px; font-weight: 600; color: #0a1e2f; }
+        .topbar .left p { font-size: 13px; color: #5f7d95; margin-top: 2px; }
+        .topbar .right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .topbar .right .btn { padding: 6px 18px; border-radius: 30px; border: 1px solid #dce5ef; background: white; font-size: 13px; font-weight: 500; color: #1e3a5f; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.1s; }
+        .topbar .right .btn:hover { background: #f5f8fc; }
+        .topbar .right .btn-primary { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .topbar .right .btn-primary:hover { background: #1a3a5a; }
+        .topbar .right .btn-primary i { color: rgba(255,255,255,0.7); }
+        .topbar .right .btn i { color: #5f7d95; }
+        .topbar .right .avatar { width: 36px; height: 36px; border-radius: 50%; background: #4dabf7; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; }
+
+        .page { display: none; animation: fadeIn 0.25s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0.6; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: white; border-radius: 16px; padding: 18px 20px; border: 1px solid #e8edf4; box-shadow: 0 2px 8px rgba(10,30,47,0.02); transition: 0.15s; margin-bottom: 16px; }
+        .card:hover { border-color: #c8d8e8; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .card-header h3 { font-size: 15px; font-weight: 600; color: #0a1e2f; display: flex; align-items: center; gap: 6px; }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action { font-size: 12px; color: #4dabf7; font-weight: 500; cursor: pointer; }
+        .card-header .action i { margin-right: 4px; }
+
+        .table-wrap { overflow-x: auto; }
+        .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .table-wrap th { text-align: left; padding: 10px 4px 8px 0; font-weight: 600; color: #5f7d95; border-bottom: 1px solid #e8edf4; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .table-wrap td { padding: 10px 4px 10px 0; border-bottom: 1px solid #f0f4f9; color: #0a1e2f; }
+        .table-wrap tr:last-child td { border: none; }
+        .table-wrap .product-img { width: 40px; height: 40px; background: #e8edf4; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #7e9cb0; font-size: 18px; overflow: hidden; flex-shrink: 0; }
+        .table-wrap .product-img img { width: 100%; height: 100%; object-fit: cover; }
+
+        .filter-block { margin-bottom: 12px; }
+        .filter-block:last-child { margin-bottom: 0; }
+        .filter-block .filter-title { font-size: 12px; font-weight: 600; color: #5f7d95; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .filter-block .filter-title i { color: #4dabf7; }
+
+        .category-level { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .category-level .level-label { font-size: 12px; font-weight: 600; color: #5f7d95; margin-right: 4px; min-width: 36px; }
+        .category-level .cat-tag { padding: 3px 14px; border-radius: 30px; border: 1px solid #dce5ef; font-size: 12px; cursor: pointer; background: white; color: #5f7d95; transition: 0.15s; white-space: nowrap; }
+        .category-level .cat-tag:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
+        .category-level .cat-tag.active { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .category-level .cat-tag .count { font-size: 10px; color: #94a3b8; margin-left: 3px; }
+        .category-level .cat-tag.active .count { color: rgba(255,255,255,0.5); }
+
+        .tag-filter-wrap { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .tag-filter-item { padding: 3px 14px; border-radius: 30px; border: 1px solid #dce5ef; font-size: 12px; cursor: pointer; background: white; color: #5f7d95; transition: 0.15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+        .tag-filter-item:hover { border-color: #4dabf7; color: #2a7faa; }
+        .tag-filter-item.active { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .tag-filter-item .color-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .tag-filter-item .tag-count { font-size: 10px; color: #94a3b8; margin-left: 2px; }
+        .tag-filter-item.active .tag-count { color: rgba(255,255,255,0.6); }
+        .tag-add-btn { padding: 3px 14px; border-radius: 30px; border: 1px dashed #4dabf7; font-size: 12px; cursor: pointer; background: white; color: #4dabf7; transition: 0.15s; white-space: nowrap; }
+        .tag-add-btn:hover { background: #f0f7fe; }
+
+        .badge { padding: 3px 12px; border-radius: 30px; font-size: 11px; font-weight: 500; white-space: nowrap; display: inline-block; }
+        .badge.taobao { background: #fef0e6; color: #b55a1a; }
+        .badge.douyin { background: #e9f0ff; color: #1a5bb5; }
+        .badge.pdd { background: #fde8ed; color: #b51a3f; }
+        .badge.jd { background: #e6f7ec; color: #0d7c4f; }
+        .badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .badge.warning { background: #fef0e6; color: #b55a1a; }
+        .badge.danger { background: #fde8ed; color: #b51a3f; }
+        .badge.info { background: #e9f0ff; color: #1a5bb5; }
+        .badge.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .badge.orange { background: #fef0e6; color: #b55a1a; }
+        .badge.custom-tag { background: rgba(77,171,247,0.12); color: #2a7faa; font-size: 10px; padding: 2px 8px; border-radius: 4px; margin-right: 3px; display: inline-block; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: #0a1e2f; margin-bottom: 4px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 14px; border: 1px solid #dce5ef; border-radius: 8px; font-size: 14px; background: #fafcfe; transition: 0.15s; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #4dabf7; box-shadow: 0 0 0 3px rgba(77,171,247,0.08); }
+        .form-group textarea { min-height: 70px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .form-group.error input, .form-group.error select, .form-group.error textarea { border-color: #b51a3f; box-shadow: 0 0 0 3px rgba(181,26,63,0.08); background: #fff8f9; }
+        .form-group .error-msg { display: none; font-size: 12px; color: #b51a3f; margin-top: 4px; }
+        .form-group.error .error-msg { display: block; }
+
+        .cat-picker { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: #fafcfe; border: 1px solid #e8edf4; border-radius: 10px; }
+        .cat-picker-level { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .cat-picker-level .level-label { font-size: 12px; font-weight: 600; color: #5f7d95; min-width: 40px; }
+        .cat-picker-level .cat-opt { padding: 3px 12px; border-radius: 30px; border: 1px solid #dce5ef; font-size: 12px; cursor: pointer; background: white; color: #5f7d95; transition: 0.15s; white-space: nowrap; }
+        .cat-picker-level .cat-opt:hover { border-color: #4dabf7; color: #2a7faa; }
+        .cat-picker-level .cat-opt.active { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .cat-picker-level.empty { display: none; }
+
+        .tag-picker { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; background: #fafcfe; border: 1px solid #e8edf4; border-radius: 10px; min-height: 42px; }
+        .tag-picker .tag-opt { padding: 3px 12px; border-radius: 30px; border: 1px solid #dce5ef; font-size: 12px; cursor: pointer; background: white; color: #5f7d95; transition: 0.15s; display: inline-flex; align-items: center; gap: 4px; }
+        .tag-picker .tag-opt:hover { border-color: #4dabf7; }
+        .tag-picker .tag-opt.selected { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .tag-picker .tag-opt .color-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .tag-picker .tag-add-inline { padding: 3px 12px; border-radius: 30px; border: 1px dashed #4dabf7; font-size: 12px; cursor: pointer; background: white; color: #4dabf7; }
+        .tag-picker .tag-add-inline:hover { background: #f0f7fe; }
+
+        .btn-sm { padding: 5px 14px; border-radius: 20px; border: none; font-size: 12px; font-weight: 500; cursor: pointer; transition: 0.1s; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-sm.primary { background: #0a1e2f; color: white; }
+        .btn-sm.primary:hover { background: #1a3a5a; }
+        .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm.outline:hover { background: #f5f8fc; }
+        .btn-sm.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .btn-sm.blue:hover { background: rgba(77,171,247,0.2); }
+        .btn-sm.success { background: #e6f7ec; color: #0d7c4f; }
+        .btn-sm.success:hover { background: #c8f0d8; }
+        .btn-sm.danger { background: #fde8ed; color: #b51a3f; }
+        .btn-sm.danger:hover { background: #fcd0d9; }
+        .btn-sm:active { transform: scale(0.95); }
+
+        .flex { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .text-muted { color: #5f7d95; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #0a1e2f; color: white; padding: 12px 28px; border-radius: 40px; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: none; z-index: 9999; white-space: nowrap; }
+        .toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .toast.success { background: #0d7c4f; }
+        .toast.error { background: #b51a3f; }
+        .toast i { margin-right: 8px; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: white; border-radius: 20px; max-width: 860px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 40px 80px rgba(0,0,0,0.3); animation: dialogIn 0.25s ease; }
+        @keyframes dialogIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 28px 16px; border-bottom: 1px solid #e8edf4; flex-shrink: 0; }
+        .modal-header h3 { font-size: 18px; color: #0a1e2f; display: flex; align-items: center; gap: 10px; }
+        .modal-header h3 i { color: #4dabf7; }
+        .modal-header .close { font-size: 26px; color: #94a3b8; cursor: pointer; background: none; border: none; padding: 0 8px; line-height: 1; }
+        .modal-header .close:hover { color: #0a1e2f; }
+
+        .modal-tabs { display: flex; padding: 0 28px; border-bottom: 1px solid #e8edf4; flex-shrink: 0; gap: 4px; overflow-x: auto; }
+        .modal-tabs::-webkit-scrollbar { height: 2px; }
+        .modal-tabs::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        .modal-tab { padding: 12px 18px; font-size: 13px; font-weight: 500; color: #5f7d95; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.15s; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+        .modal-tab:hover { color: #0a1e2f; }
+        .modal-tab.active { color: #0a1e2f; border-bottom-color: #4dabf7; font-weight: 600; }
+
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px 28px; }
+        .modal-body::-webkit-scrollbar { width: 4px; }
+        .modal-body::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
+        .modal-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; padding: 16px 28px 20px; border-top: 1px solid #e8edf4; flex-shrink: 0; flex-wrap: wrap; }
+
+        .media-upload-section { margin-bottom: 18px; }
+        .media-upload-section .media-label { display: block; font-size: 13px; font-weight: 500; color: #0a1e2f; margin-bottom: 8px; }
+        .media-upload-section .media-label i { color: #4dabf7; margin-right: 4px; }
+
+        .main-upload-area { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+        .main-upload-preview { width: 180px; height: 180px; border-radius: 12px; border: 2px dashed #dce5ef; background: #fafcfe; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; position: relative; overflow: hidden; cursor: pointer; transition: 0.15s; flex-shrink: 0; }
+        .main-upload-preview:hover { border-color: #4dabf7; background: #f0f7fe; }
+        .main-upload-preview.has-image { border-style: solid; border-color: #e8edf4; background: white; }
+        .main-upload-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .main-upload-preview .placeholder { text-align: center; }
+        .main-upload-preview .placeholder i { font-size: 32px; display: block; margin-bottom: 6px; }
+        .main-upload-preview .placeholder span { font-size: 12px; }
+
+        .main-upload-actions { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 180px; }
+
+        .sub-upload-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .sub-upload-item { aspect-ratio: 1/1; border-radius: 10px; border: 2px dashed #dce5ef; background: #fafcfe; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; cursor: pointer; transition: 0.15s; font-size: 12px; position: relative; overflow: hidden; }
+        .sub-upload-item:hover { border-color: #4dabf7; background: #f0f7fe; color: #4dabf7; }
+        .sub-upload-item.filled { border-style: solid; border-color: #e8edf4; background: white; }
+        .sub-upload-item img { width: 100%; height: 100%; object-fit: cover; }
+        .sub-upload-item i { font-size: 22px; margin-bottom: 4px; }
+        .sub-upload-item .remove-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(181,26,63,0.9); color: white; border: none; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.15s; z-index: 2; }
+        .sub-upload-item:hover .remove-btn { opacity: 1; }
+
+        .video-upload-area { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+        .video-upload-preview { width: 240px; height: 135px; border-radius: 12px; border: 2px dashed #dce5ef; background: #fafcfe; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; position: relative; overflow: hidden; cursor: pointer; transition: 0.15s; flex-shrink: 0; }
+        .video-upload-preview:hover { border-color: #4dabf7; background: #f0f7fe; }
+        .video-upload-preview.has-video { border-style: solid; border-color: #e8edf4; background: #0a0e14; }
+        .video-upload-preview video { width: 100%; height: 100%; object-fit: contain; }
+        .video-upload-preview .placeholder i { font-size: 32px; display: block; margin-bottom: 4px; }
+        .video-upload-preview .placeholder span { font-size: 12px; }
+
+        .detail-editor-toolbar { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 10px; background: #fafcfe; border: 1px solid #e8edf4; border-radius: 10px 10px 0 0; border-bottom: none; }
+        .detail-editor-toolbar button { padding: 5px 10px; border: 1px solid #dce5ef; border-radius: 6px; background: white; color: #1e3a5f; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 3px; transition: 0.15s; }
+        .detail-editor-toolbar button:hover { border-color: #4dabf7; color: #2a7faa; background: #f0f7fe; }
+        .detail-editor-toolbar .separator { width: 1px; background: #e8edf4; margin: 3px 4px; }
+        .detail-editor-toolbar .upload-img-btn { position: relative; overflow: hidden; }
+        .detail-editor-toolbar .upload-img-btn input { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; cursor: pointer; }
+        .detail-editor { min-height: 200px; max-height: 400px; overflow-y: auto; padding: 12px 16px; border: 1px solid #e8edf4; border-radius: 0 0 10px 10px; background: white; font-size: 14px; line-height: 1.7; color: #0a1e2f; outline: none; }
+        .detail-editor:focus { border-color: #4dabf7; box-shadow: 0 0 0 3px rgba(77,171,247,0.08); }
+        .detail-editor:empty:before { content: attr(data-placeholder); color: #94a3b8; pointer-events: none; }
+        .detail-editor img { width: 100%; height: auto; max-width: 100%; border-radius: 6px; margin: 8px 0; display: block; }
+
+        .inline-upload-btn { position: relative; overflow: hidden; display: inline-flex !important; cursor: pointer; }
+        .inline-upload-btn input { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; cursor: pointer; }
+
+        .platform-sync-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .platform-sync-item { border: 1px solid #e8edf4; border-radius: 12px; padding: 14px 16px; background: #fafcfe; display: flex; align-items: center; gap: 12px; transition: 0.15s; }
+        .platform-sync-item:hover { border-color: #c8d8e8; }
+        .platform-sync-item .plat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; flex-shrink: 0; }
+        .platform-sync-item .plat-info { flex: 1; }
+        .platform-sync-item .plat-info .plat-name { font-weight: 600; font-size: 14px; color: #0a1e2f; }
+        .platform-sync-item .plat-info .plat-status { font-size: 12px; color: #5f7d95; }
+        .platform-sync-item .plat-toggle { flex-shrink: 0; }
+
+        .toggle { width: 40px; height: 22px; background: #dce5ef; border-radius: 30px; position: relative; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .toggle.active { background: #4dabf7; }
+        .toggle .knob { width: 16px; height: 16px; background: white; border-radius: 16px; position: absolute; top: 3px; left: 3px; transition: 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.10); }
+        .toggle.active .knob { left: 21px; }
+
+        .sku-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+        .sku-table th { text-align: left; padding: 8px 6px; font-weight: 600; color: #5f7d95; border-bottom: 1px solid #e8edf4; font-size: 12px; }
+        .sku-table td { padding: 6px 6px; border-bottom: 1px solid #f0f4f9; }
+        .sku-table input { width: 100%; padding: 6px 10px; border: 1px solid #dce5ef; border-radius: 6px; font-size: 13px; background: #fafcfe; }
+        .sku-table input:focus { outline: none; border-color: #4dabf7; }
+
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.85); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .loading-overlay.show { display: flex; }
+        .loading-overlay .spinner { width: 48px; height: 48px; border-radius: 50%; border: 4px solid #e8edf4; border-top-color: #4dabf7; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 1200px) {
+            .form-row { grid-template-columns: 1fr; }
+            .platform-sync-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar .logo span, .sidebar .logo .badge, .sidebar .nav .item span,
+            .sidebar .nav .section-label, .sidebar .bottom span, .sidebar .nav .item .tag { display: none; }
+            .sidebar .logo { padding: 16px 12px; justify-content: center; }
+            .sidebar .logo i { font-size: 20px; padding: 6px; }
+            .sidebar .nav .item { justify-content: center; padding: 12px; }
+            .sidebar .nav .item i { font-size: 18px; width: auto; }
+            .sidebar .bottom { justify-content: center; }
+            .sidebar .bottom i { font-size: 18px; }
+            .main { max-width: calc(100% - 60px); padding: 14px; }
+            .topbar { flex-direction: column; align-items: flex-start; }
+            .modal-box { max-width: 100%; width: 100%; max-height: 100vh; border-radius: 0; }
+            .modal-header { padding: 16px 18px 12px; }
+            .modal-tabs { padding: 0 18px; }
+            .modal-tab { padding: 10px 12px; font-size: 12px; }
+            .modal-body { padding: 16px 18px; }
+            .modal-footer { padding: 12px 18px 16px; }
+            .sub-upload-grid { grid-template-columns: repeat(3, 1fr); }
+            .form-row { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .sub-upload-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== 左侧导航 ===== -->
+<div class="sidebar">
+    <div class="logo"><i class="fas fa-bolt"></i><span>智控电商</span><span class="badge">v3.0</span></div>
+    <div class="nav">
+        <div class="section-label">经营总览</div>
+        <div class="item" data-page="page-dashboard"><i class="fas fa-chart-pie"></i><span>数据总览</span></div>
+        <div class="item" data-page="page-ai"><i class="fas fa-stethoscope"></i><span>店铺经营诊断</span></div>
+        <div class="item" data-page="page-competitor"><i class="fas fa-eye"></i><span>同行竞品分析</span></div>
+        <div class="section-label">交易核心</div>
+        <div class="item" data-page="page-orders"><i class="fas fa-shopping-cart"></i><span>订单管理</span><span class="tag">23</span></div>
+        <div class="item active" data-page="page-products"><i class="fas fa-box"></i><span>商品管理</span></div>
+        <div class="item" data-page="page-inventory"><i class="fas fa-warehouse"></i><span>库存管理</span></div>
+        <div class="section-label">AI 智能赋能</div>
+        <div class="item" data-page="page-ai-service"><i class="fas fa-headset"></i><span>AI 客服</span><span class="tag">NEW</span></div>
+        <div class="item" data-page="page-ai-assistant"><i class="fas fa-robot"></i><span>AI 助手</span></div>
+        <div class="item" data-page="page-customer"><i class="fas fa-users"></i><span>客资聚合</span><span class="tag">89</span></div>
+        <div class="section-label">运营支持</div>
+        <div class="item" data-page="page-logistics"><i class="fas fa-truck"></i><span>物流管理</span></div>
+        <div class="item" data-page="page-sourcing"><i class="fas fa-store-alt"></i><span>素材生成</span></div>
+        <div class="item" data-page="page-channels"><i class="fas fa-plug"></i><span>渠道货源</span></div>
+        <div class="item" data-page="page-procurement"><i class="fas fa-cart-plus"></i><span>智能采购</span><span class="tag">NEW</span></div>
+        <div class="section-label">系统配置</div>
+        <div class="item" data-page="page-channels-config"><i class="fas fa-plug"></i><span>渠道管理</span></div>
+        <div class="item" data-page="page-agents"><i class="fas fa-handshake"></i><span>服务商管理</span></div>
+        <div class="item" data-page="page-settings"><i class="fas fa-cog"></i><span>系统设置</span></div>
+    </div>
+    <div class="bottom"><i class="fas fa-shield-alt"></i><span>数据加密 · 安全</span></div>
+</div>
+
+<!-- ===== 主内容 ===== -->
+<div class="main">
+    <div id="page-products" class="page active">
+        <div class="topbar">
+            <div class="left"><h2><i class="fas fa-box" style="color:#4dabf7;"></i> 商品管理</h2><p>跨平台商品发布 · 库存同步 · 价格管理</p></div>
+            <div class="right">
+                <span class="btn btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> 新增商品</span>
+                <span class="btn" onclick="showToast('📤 批量发布功能演示')"><i class="fas fa-upload"></i> 批量发布</span>
+                <span class="avatar">T</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3><i class="fas fa-search"></i> 商品筛选</h3><span class="action" onclick="resetProductFilters()"><i class="fas fa-undo"></i> 重置</span></div>
+            <div class="form-row">
+                <div class="form-group"><label>关键词</label><input type="text" placeholder="商品名称 / SKU" id="productSearch" onkeyup="filterProducts()"></div>
+                <div class="form-group"><label>平台</label><select id="productPlatformFilter" onchange="filterProducts()"><option value="all">全部</option><option>淘宝</option><option>抖音</option><option>拼多多</option><option>京东</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>状态</label><select id="productStatusFilter" onchange="filterProducts()"><option value="all">全部</option><option>在售</option><option>下架</option><option>待审核</option></select></div>
+                <div class="form-group"><label>排序</label><select id="productSortFilter" onchange="filterProducts()"><option value="default">默认</option><option value="sales_desc">销量从高到低</option><option value="price_desc">价格从高到低</option><option value="price_asc">价格从低到高</option></select></div>
+            </div>
+        </div>
+
+        <div class="card" style="padding:12px 20px;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                <span style="font-weight:600; color:#0a1e2f; font-size:13px;"><i class="fas fa-sitemap" style="color:#4dabf7;"></i> 平台类目</span>
+                <span style="font-size:12px; color:#94a3b8;">行业标准 · 只读</span>
+                <span style="margin-left:auto; font-size:13px; color:#5f7d95;" id="productCount">加载中...</span>
+            </div>
+            <div id="categoryFilterContainer"><div style="text-align:center; padding:20px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> 加载类目...</div></div>
+        </div>
+
+        <div class="card" style="padding:12px 20px;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                <span style="font-weight:600; color:#0a1e2f; font-size:13px;"><i class="fas fa-tags" style="color:#4dabf7;"></i> 自定义标签</span>
+                <span style="font-size:12px; color:#94a3b8;">商家自建 · 多选筛选</span>
+            </div>
+            <div class="tag-filter-wrap" id="tagFilterContainer"><div style="text-align:center; padding:12px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> 加载标签...</div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-list"></i> 商品列表</h3>
+                <span class="action" onclick="loadProducts()"><i class="fas fa-sync-alt"></i> 刷新</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th style="width:50px;">图片</th>
+                            <th>商品名称</th>
+                            <th>规格</th>
+                            <th>SKU</th>
+                            <th>类目 / 标签</th>
+                            <th>平台</th>
+                            <th>价格</th>
+                            <th>库存</th>
+                            <th>销量</th>
+                            <th>评价</th>
+                            <th>状态</th>
+                            <th style="width:140px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <tr><td colspan="13" style="text-align:center; padding:30px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid #e8edf4; flex-wrap:wrap; gap:10px;">
+                <span style="font-size:13px; color:#5f7d95;" id="productCountFooter">加载中...</span>
+                <div style="display:flex; gap:8px;">
+                    <span class="btn-sm outline"><i class="fas fa-chevron-left"></i> 上一页</span>
+                    <span class="btn-sm primary">1</span>
+                    <span class="btn-sm outline">下一页 <i class="fas fa-chevron-right"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 编辑商品弹窗 -->
+<!-- ============================================================ -->
+<div class="modal-overlay" id="editModal" onclick="if(event.target===this) closeEditModal()">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-edit"></i> 编辑商品 · <span id="editModalTitle">云山茶叶礼盒</span></h3>
+            <button class="close" onclick="closeEditModal()">&times;</button>
+        </div>
+
+        <div class="modal-tabs" id="editModalTabs">
+            <button class="modal-tab active" data-tab="edit-tab-basic" onclick="switchEditTab('edit-tab-basic')">基础信息</button>
+            <button class="modal-tab" data-tab="edit-tab-images" onclick="switchEditTab('edit-tab-images')">图片详情</button>
+            <button class="modal-tab" data-tab="edit-tab-price" onclick="switchEditTab('edit-tab-price')">价格库存</button>
+            <button class="modal-tab" data-tab="edit-tab-logistics" onclick="switchEditTab('edit-tab-logistics')">物流售后</button>
+            <button class="modal-tab" data-tab="edit-tab-platform" onclick="switchEditTab('edit-tab-platform')">多平台同步</button>
+        </div>
+
+        <div class="modal-body" id="editModalBody">
+            <!-- Tab 1: 基础信息 -->
+            <div class="tab-panel active" id="edit-tab-basic">
+                <div class="form-row">
+                    <div class="form-group" id="editGroupName">
+                        <label>商品名称 <span style="color:#b51a3f;">*</span></label>
+                        <input type="text" id="editProductName" placeholder="请输入商品名称">
+                        <div class="error-msg">请输入商品名称</div>
+                    </div>
+                    <div class="form-group">
+                        <label>商品卖点</label>
+                        <input type="text" id="editProductSellPoint" placeholder="简短卖点，用于列表展示">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" id="editGroupSpec">
+                        <label>商品规格 <span style="color:#b51a3f;">*</span></label>
+                        <input type="text" id="editProductSpec" placeholder="如：500g×2 / 350ml">
+                        <div class="error-msg">请输入商品规格</div>
+                    </div>
+                    <div class="form-group" id="editGroupSku">
+                        <label>SKU 编码 <span style="color:#b51a3f;">*</span></label>
+                        <input type="text" id="editProductSku" placeholder="如：YS-2026-001">
+                        <div class="error-msg">请输入SKU编码</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-sitemap" style="color:#4dabf7;"></i> 平台类目（三级）</label>
+                    <div class="cat-picker" id="editCatPicker"></div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tags" style="color:#4dabf7;"></i> 自定义标签（多选）</label>
+                    <div class="tag-picker" id="editTagPicker"></div>
+                </div>
+                <div class="form-group">
+                    <label>商品状态</label>
+                    <select id="editProductStatus">
+                        <option value="在售">在售</option>
+                        <option value="下架">下架</option>
+                        <option value="待审核">待审核</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>商品简介</label>
+                    <textarea id="editProductDesc" placeholder="简短描述商品特点"></textarea>
+                </div>
+            </div>
+
+            <!-- Tab 2: 图片详情 -->
+            <div class="tab-panel" id="edit-tab-images">
+                <div class="media-upload-section">
+                    <label class="media-label"><i class="fas fa-star"></i> 商品主图（1 张）</label>
+                    <div class="main-upload-area">
+                        <div class="main-upload-preview" id="editMainPreview" onclick="document.getElementById('editMainInput').click()">
+                            <div class="placeholder"><i class="fas fa-image"></i><span>点击上传主图</span></div>
+                        </div>
+                        <div class="main-upload-actions">
+                            <button class="btn-sm primary inline-upload-btn" style="width:fit-content;">
+                                <i class="fas fa-upload"></i> <span id="editMainBtnText">上传主图</span>
+                                <input type="file" id="editMainInput" accept="image/*" onchange="handleEditMainUpload(event)">
+                            </button>
+                            <button class="btn-sm danger" id="editMainDeleteBtn" onclick="deleteEditMainImage()" disabled>
+                                <i class="fas fa-trash"></i> 删除主图
+                            </button>
+                            <p style="font-size:12px; color:#94a3b8; margin-top:4px;"><i class="fas fa-info-circle"></i> 支持 JPG、PNG、WEBP，单张不超过 2MB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="media-upload-section">
+                    <label class="media-label"><i class="fas fa-images"></i> 商品副图（最多 5 张）</label>
+                    <div class="sub-upload-grid" id="editSubGrid"></div>
+                    <input type="file" id="editSubInput" accept="image/*" style="display:none;" onchange="handleEditSubUpload(event)">
+                </div>
+                <div class="media-upload-section">
+                    <label class="media-label"><i class="fas fa-video"></i> 商品视频（1 个）</label>
+                    <div class="video-upload-area">
+                        <div class="video-upload-preview" id="editVideoPreview" onclick="document.getElementById('editVideoInput').click()">
+                            <div class="placeholder"><i class="fas fa-video"></i><span>点击上传视频</span></div>
+                        </div>
+                        <div class="main-upload-actions">
+                            <button class="btn-sm primary inline-upload-btn" style="width:fit-content;">
+                                <i class="fas fa-upload"></i> <span id="editVideoBtnText">上传视频</span>
+                                <input type="file" id="editVideoInput" accept="video/mp4,video/webm" onchange="handleEditVideoUpload(event)">
+                            </button>
+                            <button class="btn-sm danger" id="editVideoDeleteBtn" onclick="deleteEditVideo()" disabled>
+                                <i class="fas fa-trash"></i> 删除视频
+                            </button>
+                            <p style="font-size:12px; color:#94a3b8; margin-top:4px;"><i class="fas fa-info-circle"></i> 支持 MP4、WEBM，单个不超过 50MB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="media-upload-section">
+                    <label class="media-label"><i class="fas fa-align-left"></i> 图文详情（支持粘贴图片）</label>
+                    <div class="detail-editor-toolbar">
+                        <button type="button" onclick="execEditCmd('bold')"><i class="fas fa-bold"></i></button>
+                        <button type="button" onclick="execEditCmd('italic')"><i class="fas fa-italic"></i></button>
+                        <button type="button" onclick="execEditCmd('underline')"><i class="fas fa-underline"></i></button>
+                        <span class="separator"></span>
+                        <button type="button" onclick="execEditCmd('formatBlock', '<h2>')">H2</button>
+                        <button type="button" onclick="execEditCmd('formatBlock', '<h3>')">H3</button>
+                        <button type="button" onclick="execEditCmd('formatBlock', '<p>')">正文</button>
+                        <span class="separator"></span>
+                        <button type="button" onclick="execEditCmd('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+                        <button type="button" onclick="execEditCmd('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+                        <span class="separator"></span>
+                        <button type="button" onclick="execEditCmd('createLink', prompt('请输入链接地址：', 'https://'))"><i class="fas fa-link"></i></button>
+                        <button type="button" class="upload-img-btn" title="插入图片"><i class="fas fa-image"></i> 插入图片<input type="file" accept="image/*" onchange="handleEditDetailImageUpload(event)"></button>
+                        <span class="separator"></span>
+                        <button type="button" onclick="execEditCmd('removeFormat')"><i class="fas fa-eraser"></i></button>
+                    </div>
+                    <div class="detail-editor" id="editDetailEditor" contenteditable="true" data-placeholder="在这里输入商品图文详情，可以直接粘贴图片（Ctrl+V）..."></div>
+                </div>
+            </div>
+
+            <!-- Tab 3: 价格库存 -->
+            <div class="tab-panel" id="edit-tab-price">
+                <div class="form-row">
+                    <div class="form-group" id="editGroupPrice">
+                        <label>一口价（元）<span style="color:#b51a3f;">*</span></label>
+                        <input type="number" id="editProductPrice" value="0" step="0.01" min="0">
+                        <div class="error-msg">请输入有效的价格（大于0）</div>
+                    </div>
+                    <div class="form-group" id="editGroupStock">
+                        <label>总库存（件）<span style="color:#b51a3f;">*</span></label>
+                        <input type="number" id="editProductStock" value="0" min="0">
+                        <div class="error-msg">请输入有效的库存（≥0）</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>促销价（元）</label>
+                        <input type="number" id="editProductPromoPrice" value="" step="0.01" min="0" placeholder="留空则不设促销">
+                    </div>
+                    <div class="form-group">
+                        <label>库存预警线</label>
+                        <input type="number" id="editProductSafetyStock" value="50" min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>每人限购（件）</label>
+                        <input type="number" id="editProductLimit" value="0" min="0" placeholder="0 表示不限购">
+                    </div>
+                    <div class="form-group">
+                        <label>发货时效</label>
+                        <select id="editProductDeliveryTime">
+                            <option value="24小时">24小时内发货</option>
+                            <option value="48小时" selected>48小时内发货</option>
+                            <option value="72小时">72小时内发货</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-cubes" style="color:#4dabf7;"></i> SKU 多规格管理</label>
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <span class="btn-sm blue" onclick="addEditSkuRow()"><i class="fas fa-plus"></i> 添加规格</span>
+                        <span class="btn-sm outline" onclick="showToast('🔄 已重置SKU')"><i class="fas fa-undo"></i> 重置</span>
+                    </div>
+                    <table class="sku-table" id="editSkuTable">
+                        <thead><tr><th style="width:30%;">规格</th><th style="width:25%;">价格（元）</th><th style="width:25%;">库存（件）</th><th style="width:20%;">操作</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" placeholder="规格名"></td>
+                                <td><input type="number" value="0" step="0.01"></td>
+                                <td><input type="number" value="0"></td>
+                                <td><span class="btn-sm danger" onclick="removeEditSkuRow(this)"><i class="fas fa-trash"></i></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 4: 物流售后（补齐版） -->
+            <div class="tab-panel" id="edit-tab-logistics">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>运费模板</label>
+                        <select id="editFreightTemplate">
+                            <option value="默认模板">默认模板（全国包邮）</option>
+                            <option value="偏远地区加价">偏远地区加价模板</option>
+                            <option value="按重量计费">按重量计费模板</option>
+                            <option value="自定义">自定义运费</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>发货地</label>
+                        <input type="text" id="editShipFrom" placeholder="如：浙江省杭州市">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>物流公司</label>
+                        <select id="editLogisticsCompany">
+                            <option value="顺丰">顺丰速运</option>
+                            <option value="中通" selected>中通快递</option>
+                            <option value="圆通">圆通速递</option>
+                            <option value="德邦">德邦物流</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>运费（元）</label>
+                        <input type="number" id="editFreightPrice" value="0" step="0.01" min="0" placeholder="0 表示包邮">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-shield-alt" style="color:#0d7c4f;"></i> 售后保障</label>
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" checked style="width:16px; height:16px; accent-color:#4dabf7;"> 七天无理由退换
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" checked style="width:16px; height:16px; accent-color:#4dabf7;"> 运费险
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" style="width:16px; height:16px; accent-color:#4dabf7;"> 假一赔十
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" checked style="width:16px; height:16px; accent-color:#4dabf7;"> 极速退款
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>售后说明</label>
+                    <textarea id="editAfterSaleDesc" placeholder="补充售后说明" style="min-height:60px;">支持7天无理由退换，质量问题包退换运费。生鲜类商品不支持无理由退换。</textarea>
+                </div>
+            </div>
+
+            <!-- Tab 5: 多平台同步（补齐版） -->
+            <div class="tab-panel" id="edit-tab-platform">
+                <div style="background:#f0f7fe; border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13px; color:#475569;">
+                    <i class="fas fa-info-circle" style="color:#4dabf7;"></i> 开启同步后，商品信息将自动同步到对应平台。各平台可独立设置价格和库存。
+                </div>
+                <div class="platform-sync-grid" id="editPlatformSyncGrid">
+                    <div class="platform-sync-item">
+                        <div class="plat-icon" style="background:#b55a1a;"><i class="fab fa-taobao"></i></div>
+                        <div class="plat-info"><div class="plat-name">淘宝</div><div class="plat-status">已同步 · 最后同步 14:32</div></div>
+                        <div class="plat-toggle"><div class="toggle active" onclick="togglePlatformSync(this)"><div class="knob"></div></div></div>
+                    </div>
+                    <div class="platform-sync-item">
+                        <div class="plat-icon" style="background:#1a5bb5;"><i class="fab fa-tiktok"></i></div>
+                        <div class="plat-info"><div class="plat-name">抖音</div><div class="plat-status">已同步 · 最后同步 14:40</div></div>
+                        <div class="plat-toggle"><div class="toggle active" onclick="togglePlatformSync(this)"><div class="knob"></div></div></div>
+                    </div>
+                    <div class="platform-sync-item">
+                        <div class="plat-icon" style="background:#b51a3f;"><i class="fas fa-store"></i></div>
+                        <div class="plat-info"><div class="plat-name">拼多多</div><div class="plat-status">待同步 · 有修改未同步</div></div>
+                        <div class="plat-toggle"><div class="toggle" onclick="togglePlatformSync(this)"><div class="knob"></div></div></div>
+                    </div>
+                    <div class="platform-sync-item">
+                        <div class="plat-icon" style="background:#0d7c4f;"><i class="fas fa-box"></i></div>
+                        <div class="plat-info"><div class="plat-name">京东</div><div class="plat-status">已同步 · 最后同步 14:38</div></div>
+                        <div class="plat-toggle"><div class="toggle active" onclick="togglePlatformSync(this)"><div class="knob"></div></div></div>
+                    </div>
+                </div>
+                <div style="margin-top:16px;">
+                    <div class="form-group">
+                        <label>平台差异化设置</label>
+                        <div style="font-size:13px; color:#5f7d95; margin-bottom:8px;">可为不同平台设置独立价格和库存</div>
+                        <table class="sku-table">
+                            <thead><tr><th>平台</th><th>价格（元）</th><th>库存（件）</th><th>状态</th></tr></thead>
+                            <tbody>
+                                <tr><td><span class="badge taobao">淘宝</span></td><td><input type="number" value="128" step="0.01" style="width:90px;"></td><td><input type="number" value="234" style="width:90px;"></td><td><span class="badge success">已同步</span></td></tr>
+                                <tr><td><span class="badge douyin">抖音</span></td><td><input type="number" value="128" step="0.01" style="width:90px;"></td><td><input type="number" value="200" style="width:90px;"></td><td><span class="badge success">已同步</span></td></tr>
+                                <tr><td><span class="badge pdd">拼多多</span></td><td><input type="number" value="118" step="0.01" style="width:90px;"></td><td><input type="number" value="150" style="width:90px;"></td><td><span class="badge warning">待同步</span></td></tr>
+                                <tr><td><span class="badge jd">京东</span></td><td><input type="number" value="128" step="0.01" style="width:90px;"></td><td><input type="number" value="100" style="width:90px;"></td><td><span class="badge success">已同步</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div style="margin-top:12px; display:flex; gap:10px;">
+                    <span class="btn-sm primary" onclick="showToast('🔄 正在同步到所有已开启平台...')"><i class="fas fa-sync-alt"></i> 立即同步全部</span>
+                    <span class="btn-sm outline" onclick="showToast('📊 查看同步日志...')"><i class="fas fa-history"></i> 同步日志</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <span class="btn-sm outline" onclick="closeEditModal()">取消</span>
+            <span class="btn-sm outline" onclick="saveEditDraft()"><i class="fas fa-save"></i> 保存草稿</span>
+            <span class="btn-sm primary" onclick="saveEditAndPublish()"><i class="fas fa-check"></i> 保存并发布</span>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 新增商品弹窗 -->
+<!-- ============================================================ -->
+<div class="modal-overlay" id="addModal" onclick="if(event.target===this) closeAddModal()">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-plus-circle"></i> 新增商品</h3>
+            <button class="close" onclick="closeAddModal()">&times;</button>
+        </div>
+        <div class="modal-tabs" id="addModalTabs">
+            <button class="modal-tab active" data-tab="add-tab-basic" onclick="switchAddTab('add-tab-basic')">基础信息</button>
+            <button class="modal-tab" data-tab="add-tab-images" onclick="switchAddTab('add-tab-images')">图片详情</button>
+            <button class="modal-tab" data-tab="add-tab-price" onclick="switchAddTab('add-tab-price')">价格库存</button>
+            <button class="modal-tab" data-tab="add-tab-logistics" onclick="switchAddTab('add-tab-logistics')">物流售后</button>
+            <button class="modal-tab" data-tab="add-tab-platform" onclick="switchAddTab('add-tab-platform')">多平台同步</button>
+        </div>
+        <div class="modal-body" id="addModalBody">
+            <div class="tab-panel active" id="add-tab-basic">
+                <div class="form-row">
+                    <div class="form-group" id="addGroupName">
+                        <label>商品名称 <span style="color:#b51a3f;">*</span></label>
+                        <input type="text" id="addProductName" placeholder="请输入商品名称">
+                        <div class="error-msg">请输入商品名称</div>
+                    </div>
+                    <div class="form-group">
+                        <label>商品卖点</label>
+                        <input type="text" id="addProductSellPoint" placeholder="简短卖点">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" id="addGroupSpec">
+                        <label>商品规格 <span style="color:#b51a3f;">*</span></label>
+                        <input type="text" id="addProductSpec" placeholder="如：500g×2 / 350ml">
+                        <div class="error-msg">请输入商品规格</div>
+                    </div>
+                    <div class="form-group" id="addGroupSku">
+                        <label>SKU 编码 <span style="color:#b51a3f;">*</span></label>
+                        <input type="text" id="addProductSku" placeholder="如：YS-2026-009">
+                        <div class="error-msg">请输入SKU编码</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-sitemap" style="color:#4dabf7;"></i> 平台类目（三级）</label>
+                    <div class="cat-picker" id="addCatPicker"></div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tags" style="color:#4dabf7;"></i> 自定义标签（多选）</label>
+                    <div class="tag-picker" id="addTagPicker"></div>
+                </div>
+                <div class="form-group">
+                    <label>商品状态</label>
+                    <select id="addProductStatus">
+                        <option value="在售">在售</option>
+                        <option value="下架">下架</option>
+                        <option value="待审核">待审核</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>商品简介</label>
+                    <textarea id="addProductDesc" placeholder="简短描述商品特点"></textarea>
+                </div>
+            </div>
+            <div class="tab-panel" id="add-tab-images">
+                <div class="media-upload-section">
+                    <label class="media-label"><i class="fas fa-star"></i> 商品主图（1 张）</label>
+                    <div class="main-upload-area">
+                        <div class="main-upload-preview" id="addMainPreview" onclick="document.getElementById('addMainInput').click()">
+                            <div class="placeholder"><i class="fas fa-image"></i><span>点击上传主图</span></div>
+                        </div>
+                        <div class="main-upload-actions">
+                            <button class="btn-sm primary inline-upload-btn" style="width:fit-content;">
+                                <i class="fas fa-upload"></i> <span id="addMainBtnText">上传主图</span>
+                                <input type="file" id="addMainInput" accept="image/*" onchange="handleAddMainUpload(event)">
+                            </button>
+                            <button class="btn-sm danger" id="addMainDeleteBtn" onclick="deleteAddMainImage()" disabled>
+                                <i class="fas fa-trash"></i> 删除主图
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="media-upload-section">
+                    <label class="media-label"><i class="fas fa-images"></i> 商品副图（最多 5 张）</label>
+                    <div class="sub-upload-grid" id="addSubGrid"></div>
+                    <input type="file" id="addSubInput" accept="image/*" style="display:none;" onchange="handleAddSubUpload(event)">
+                </div>
+                <div class="media-upload-section">
+                    <label class="media-label"><i class="fas fa-video"></i> 商品视频（1 个）</label>
+                    <div class="video-upload-area">
+                        <div class="video-upload-preview" id="addVideoPreview" onclick="document.getElementById('addVideoInput').click()">
+                            <div class="placeholder"><i class="fas fa-video"></i><span>点击上传视频</span></div>
+                        </div>
+                        <div class="main-upload-actions">
+                            <button class="btn-sm primary inline-upload-btn" style="width:fit-content;">
+                                <i class="fas fa-upload"></i> <span id="addVideoBtnText">上传视频</span>
+                                <input type="file" id="addVideoInput" accept="video/mp4,video/webm" onchange="handleAddVideoUpload(event)">
+                            </button>
+                            <button class="btn-sm danger" id="addVideoDeleteBtn" onclick="deleteAddVideo()" disabled>
+                                <i class="fas fa-trash"></i> 删除视频
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="media-upload-section">
+                    <label class="media-label"><i class="fas fa-align-left"></i> 图文详情</label>
+                    <div class="detail-editor-toolbar">
+                        <button type="button" onclick="execAddCmd('bold')"><i class="fas fa-bold"></i></button>
+                        <button type="button" onclick="execAddCmd('italic')"><i class="fas fa-italic"></i></button>
+                        <button type="button" onclick="execAddCmd('underline')"><i class="fas fa-underline"></i></button>
+                        <span class="separator"></span>
+                        <button type="button" onclick="execAddCmd('formatBlock', '<h2>')">H2</button>
+                        <button type="button" onclick="execAddCmd('formatBlock', '<h3>')">H3</button>
+                        <button type="button" onclick="execAddCmd('formatBlock', '<p>')">正文</button>
+                        <span class="separator"></span>
+                        <button type="button" onclick="execAddCmd('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+                        <button type="button" onclick="execAddCmd('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+                        <span class="separator"></span>
+                        <button type="button" onclick="execAddCmd('createLink', prompt('请输入链接地址：', 'https://'))"><i class="fas fa-link"></i></button>
+                        <button type="button" class="upload-img-btn"><i class="fas fa-image"></i> 插入图片<input type="file" accept="image/*" onchange="handleAddDetailImageUpload(event)"></button>
+                        <span class="separator"></span>
+                        <button type="button" onclick="execAddCmd('removeFormat')"><i class="fas fa-eraser"></i></button>
+                    </div>
+                    <div class="detail-editor" id="addDetailEditor" contenteditable="true" data-placeholder="在这里输入商品图文详情..."></div>
+                </div>
+            </div>
+            <div class="tab-panel" id="add-tab-price">
+                <div class="form-row">
+                    <div class="form-group" id="addGroupPrice">
+                        <label>一口价（元）<span style="color:#b51a3f;">*</span></label>
+                        <input type="number" id="addProductPrice" value="" step="0.01" min="0" placeholder="请输入价格">
+                        <div class="error-msg">请输入有效的价格（大于0）</div>
+                    </div>
+                    <div class="form-group" id="addGroupStock">
+                        <label>总库存（件）<span style="color:#b51a3f;">*</span></label>
+                        <input type="number" id="addProductStock" value="" min="0" placeholder="请输入库存">
+                        <div class="error-msg">请输入有效的库存（≥0）</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>促销价（元）</label>
+                        <input type="number" id="addProductPromoPrice" value="" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>库存预警线</label>
+                        <input type="number" id="addProductSafetyStock" value="50" min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>每人限购（件）</label>
+                        <input type="number" id="addProductLimit" value="0" min="0" placeholder="0 表示不限购">
+                    </div>
+                    <div class="form-group">
+                        <label>发货时效</label>
+                        <select id="addProductDeliveryTime">
+                            <option value="24小时">24小时内发货</option>
+                            <option value="48小时" selected>48小时内发货</option>
+                            <option value="72小时">72小时内发货</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-cubes" style="color:#4dabf7;"></i> SKU 多规格管理</label>
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <span class="btn-sm blue" onclick="addAddSkuRow()"><i class="fas fa-plus"></i> 添加规格</span>
+                        <span class="btn-sm outline" onclick="showToast('🔄 已重置SKU')"><i class="fas fa-undo"></i> 重置</span>
+                    </div>
+                    <table class="sku-table" id="addSkuTable">
+                        <thead><tr><th style="width:30%;">规格</th><th style="width:25%;">价格（元）</th><th style="width:25%;">库存（件）</th><th style="width:20%;">操作</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" placeholder="规格名"></td>
+                                <td><input type="number" value="0" step="0.01"></td>
+                                <td><input type="number" value="0"></td>
+                                <td><span class="btn-sm danger" onclick="removeAddSkuRow(this)"><i class="fas fa-trash"></i></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-panel" id="add-tab-logistics">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>运费模板</label>
+                        <select id="addFreightTemplate">
+                            <option value="默认模板">默认模板（全国包邮）</option>
+                            <option value="偏远地区加价">偏远地区加价模板</option>
+                            <option value="按重量计费">按重量计费模板</option>
+                            <option value="自定义">自定义运费</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>发货地</label>
+                        <input type="text" id="addShipFrom" placeholder="如：浙江省杭州市">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>物流公司</label>
+                        <select id="addLogisticsCompany">
+                            <option value="顺丰">顺丰速运</option>
+                            <option value="中通" selected>中通快递</option>
+                            <option value="圆通">圆通速递</option>
+                            <option value="德邦">德邦物流</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>运费（元）</label>
+                        <input type="number" id="addFreightPrice" value="0" step="0.01" min="0" placeholder="0 表示包邮">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-shield-alt" style="color:#0d7c4f;"></i> 售后保障</label>
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" checked style="width:16px; height:16px; accent-color:#4dabf7;"> 七天无理由退换
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" checked style="width:16px; height:16px; accent-color:#4dabf7;"> 运费险
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" style="width:16px; height:16px; accent-color:#4dabf7;"> 假一赔十
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:14px; cursor:pointer;">
+                            <input type="checkbox" checked style="width:16px; height:16px; accent-color:#4dabf7;"> 极速退款
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>售后说明</label>
+                    <textarea id="addAfterSaleDesc" placeholder="补充售后说明" style="min-height:60px;"></textarea>
+                </div>
+            </div>
+            <div class="tab-panel" id="add-tab-platform">
+                <div style="background:#f0f7fe; border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13px; color:#475569;">
+                    <i class="fas fa-info-circle" style="color:#4dabf7;"></i> 开启同步后，商品信息将自动同步到对应平台。各平台可独立设置价格和库存。
+                </div>
+                <div class="platform-sync-grid" id="addPlatformSyncGrid">
+                    <div class="platform-sync-item">
+                        <div class="plat-icon" style="background:#b55a1a;"><i class="fab fa-taobao"></i></div>
+                        <div class="plat-info"><div class="plat-name">淘宝</div><div class="plat-status">未同步 · 将创建新商品</div></div>
+                        <div class="plat-toggle"><div class="toggle active" onclick="togglePlatformSync(this)"><div class="knob"></div></div></div>
+                    </div>
+                    <div class="platform-sync-item">
+                        <div class="plat-icon" style="background:#1a5bb5;"><i class="fab fa-tiktok"></i></div>
+                        <div class="plat-info"><div class="plat-name">抖音</div><div class="plat-status">未同步 · 将创建新商品</div></div>
+                        <div class="plat-toggle"><div class="toggle active" onclick="togglePlatformSync(this)"><div class="knob"></div></div></div>
+                    </div>
+                    <div class="platform-sync-item">
+                        <div class="plat-icon" style="background:#b51a3f;"><i class="fas fa-store"></i></div>
+                        <div class="plat-info"><div class="plat-name">拼多多</div><div class="plat-status">未同步 · 将创建新商品</div></div>
+                        <div class="plat-toggle"><div class="toggle" onclick="togglePlatformSync(this)"><div class="knob"></div></div></div>
+                    </div>
+                    <div class="platform-sync-item">
+                        <div class="plat-icon" style="background:#0d7c4f;"><i class="fas fa-box"></i></div>
+                        <div class="plat-info"><div class="plat-name">京东</div><div class="plat-status">未同步 · 将创建新商品</div></div>
+                        <div class="plat-toggle"><div class="toggle active" onclick="togglePlatformSync(this)"><div class="knob"></div></div></div>
+                    </div>
+                </div>
+                <div style="margin-top:16px;">
+                    <div class="form-group">
+                        <label>平台差异化设置</label>
+                        <div style="font-size:13px; color:#5f7d95; margin-bottom:8px;">可为不同平台设置独立价格和库存</div>
+                        <table class="sku-table">
+                            <thead><tr><th>平台</th><th>价格（元）</th><th>库存（件）</th><th>状态</th></tr></thead>
+                            <tbody>
+                                <tr><td><span class="badge taobao">淘宝</span></td><td><input type="number" value="0" step="0.01" style="width:90px;"></td><td><input type="number" value="0" style="width:90px;"></td><td><span class="badge warning">待创建</span></td></tr>
+                                <tr><td><span class="badge douyin">抖音</span></td><td><input type="number" value="0" step="0.01" style="width:90px;"></td><td><input type="number" value="0" style="width:90px;"></td><td><span class="badge warning">待创建</span></td></tr>
+                                <tr><td><span class="badge pdd">拼多多</span></td><td><input type="number" value="0" step="0.01" style="width:90px;"></td><td><input type="number" value="0" style="width:90px;"></td><td><span class="badge warning">待创建</span></td></tr>
+                                <tr><td><span class="badge jd">京东</span></td><td><input type="number" value="0" step="0.01" style="width:90px;"></td><td><input type="number" value="0" style="width:90px;"></td><td><span class="badge warning">待创建</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div style="margin-top:12px; display:flex; gap:10px;">
+                    <span class="btn-sm primary" onclick="showToast('🔄 正在同步到所有已开启平台...')"><i class="fas fa-sync-alt"></i> 立即同步全部</span>
+                    <span class="btn-sm outline" onclick="showToast('📊 查看同步日志...')"><i class="fas fa-history"></i> 同步日志</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span class="btn-sm outline" onclick="closeAddModal()">取消</span>
+            <span class="btn-sm outline" onclick="saveAddDraft()"><i class="fas fa-save"></i> 保存草稿</span>
+            <span class="btn-sm primary" onclick="saveAddAndPublish()"><i class="fas fa-check"></i> 保存并发布</span>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+    const BACKEND_URL = 'https://ai-ecommerce-backend-production-0776.up.railway.app';
+    const MAX_SUB_IMAGES = 5;
+
+    let allProducts = [];
+    let allTags = [];
+    let categoryTree = [];
+    let categoryMap = {};
+
+    let currentEditProduct = null;
+    let editSelectedCategoryPath = [];
+    let editSelectedTags = [];
+    let addSelectedCategoryPath = [];
+    let addSelectedTags = [];
+
+    function showToast(msg, type = '') {
+        var toast = document.getElementById('toast');
+        toast.className = 'toast ' + type;
+        toast.innerHTML = msg;
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(function() { toast.classList.remove('show'); }, 2500);
+    }
+    function showLoading(show) { document.getElementById('loadingOverlay').classList.toggle('show', show); }
+
+    document.querySelectorAll('.sidebar .item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.sidebar .item').forEach(function(i) { i.classList.remove('active'); });
+            this.classList.add('active');
+            var pageId = this.dataset.page;
+            if (pageId !== 'page-products') {
+                showToast('📌 当前仅展示「商品管理」内容，其他模块已精简');
+                document.querySelectorAll('.sidebar .item').forEach(function(i) { i.classList.remove('active'); });
+                document.querySelector('.sidebar .item[data-page="page-products"]').classList.add('active');
+            }
+        });
+    });
+
+    async function init() {
+        await Promise.all([loadCategoryTree(), loadTags()]);
+        await loadProducts();
+    }
+
+    async function loadCategoryTree() {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/categories/tree');
+            const data = await res.json();
+            categoryTree = data.categories || [];
+            const res2 = await fetch(BACKEND_URL + '/api/categories/map');
+            const data2 = await res2.json();
+            categoryMap = data2.map || {};
+            renderCategoryFilter();
+        } catch (err) {
+            document.getElementById('categoryFilterContainer').innerHTML = `<div style="text-align:center; padding:20px; color:#b51a3f;">类目加载失败：${err.message}</div>`;
+        }
+    }
+
+    async function loadTags() {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/tags');
+            const data = await res.json();
+            allTags = data.tags || [];
+            renderTagFilter();
+        } catch (err) {
+            document.getElementById('tagFilterContainer').innerHTML = `<div style="text-align:center; padding:12px; color:#b51a3f;">标签加载失败：${err.message}</div>`;
+        }
+    }
+
+    async function loadProducts() {
+        const tbody = document.getElementById('productTableBody');
+        try {
+            const res = await fetch(BACKEND_URL + '/api/products');
+            const data = await res.json();
+            allProducts = data.products || [];
+            renderProductTable(allProducts);
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i> 加载失败：${err.message}</td></tr>`;
+        }
+    }
+
+    var categoryFilters = { level1: null, level2: null, level3: null };
+
+    function renderCategoryFilter() {
+        var container = document.getElementById('categoryFilterContainer');
+        if (!categoryTree.length) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">暂无类目</div>';
+            return;
+        }
+        // 统计每个类目下的商品数
+        function countByPrefix(prefix) {
+            return allProducts.filter(p => (p.category_path || []).includes(prefix)).length;
+        }
+        var html = '';
+        html += `<div class="category-level" style="margin-bottom:6px;"><span class="level-label">一级</span>
+            <span class="cat-tag ${!categoryFilters.level1 ? 'active' : ''}" onclick="selectCategoryFilter(1, null, this)">全部 <span class="count">(${allProducts.length})</span></span>`;
+        categoryTree.forEach(function(cat) {
+            var active = categoryFilters.level1 === cat.id ? 'active' : '';
+            var cnt = countByPrefix(cat.id);
+            html += `<span class="cat-tag ${active}" onclick="selectCategoryFilter(1, '${cat.id}', this)">${cat.icon || ''} ${cat.name} <span class="count">(${cnt})</span></span>`;
+        });
+        html += '</div>';
+
+        if (categoryFilters.level1) {
+            var l1 = categoryTree.find(c => c.id === categoryFilters.level1);
+            if (l1 && l1.children) {
+                html += `<div class="category-level" style="margin-bottom:6px;"><span class="level-label">二级</span>
+                    <span class="cat-tag ${!categoryFilters.level2 ? 'active' : ''}" onclick="selectCategoryFilter(2, null, this)">全部 <span class="count">(${countByPrefix(l1.id)})</span></span>`;
+                l1.children.forEach(function(cat) {
+                    var active = categoryFilters.level2 === cat.id ? 'active' : '';
+                    var cnt = countByPrefix(cat.id);
+                    html += `<span class="cat-tag ${active}" onclick="selectCategoryFilter(2, '${cat.id}', this)">${cat.name} <span class="count">(${cnt})</span></span>`;
+                });
+                html += '</div>';
+            }
+        }
+
+        if (categoryFilters.level1 && categoryFilters.level2) {
+            var l1 = categoryTree.find(c => c.id === categoryFilters.level1);
+            if (l1) {
+                var l2 = l1.children.find(c => c.id === categoryFilters.level2);
+                if (l2 && l2.children) {
+                    html += `<div class="category-level"><span class="level-label">三级</span>
+                        <span class="cat-tag ${!categoryFilters.level3 ? 'active' : ''}" onclick="selectCategoryFilter(3, null, this)">全部 <span class="count">(${countByPrefix(l2.id)})</span></span>`;
+                    l2.children.forEach(function(cat) {
+                        var active = categoryFilters.level3 === cat.id ? 'active' : '';
+                        var cnt = countByPrefix(cat.id);
+                        html += `<span class="cat-tag ${active}" onclick="selectCategoryFilter(3, '${cat.id}', this)">${cat.name} <span class="count">(${cnt})</span></span>`;
+                    });
+                    html += '</div>';
+                }
+            }
+        }
+        container.innerHTML = html;
+    }
+
+    function selectCategoryFilter(level, catId, el) {
+        if (level === 1) { categoryFilters.level1 = catId; categoryFilters.level2 = null; categoryFilters.level3 = null; }
+        else if (level === 2) { categoryFilters.level2 = catId; categoryFilters.level3 = null; }
+        else if (level === 3) { categoryFilters.level3 = catId; }
+        renderCategoryFilter();
+        applyProductFilters();
+    }
+
+    var tagFilters = [];
+
+    function renderTagFilter() {
+        var container = document.getElementById('tagFilterContainer');
+        if (!allTags.length) { container.innerHTML = '<div style="padding:8px; color:#94a3b8; font-size:13px;">暂无标签</div>'; return; }
+        var html = '';
+        allTags.forEach(function(t) {
+            var active = tagFilters.includes(t.name) ? 'active' : '';
+            var count = allProducts.filter(p => (p.tags || []).includes(t.name)).length;
+            html += `<span class="tag-filter-item ${active}" onclick="toggleTagFilter('${t.name}')">
+                <span class="color-dot" style="background:${t.color || '#4dabf7'};"></span>${t.name}<span class="tag-count">${count}</span>
+            </span>`;
+        });
+        html += `<span class="tag-add-btn" onclick="openCreateTagDialog()"><i class="fas fa-plus"></i> 新建标签</span>`;
+        container.innerHTML = html;
+    }
+
+    function toggleTagFilter(tagName) {
+        var idx = tagFilters.indexOf(tagName);
+        if (idx >= 0) tagFilters.splice(idx, 1);
+        else tagFilters.push(tagName);
+        renderTagFilter();
+        applyProductFilters();
+    }
+
+    async function openCreateTagDialog() {
+        var name = prompt('请输入新标签名称：');
+        if (!name) return;
+        name = name.trim();
+        if (!name) return;
+        try {
+            var res = await fetch(BACKEND_URL + '/api/tags/create', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, color: '#4dabf7' })
+            });
+            var data = await res.json();
+            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadTags(); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showToast('❌ 创建失败：' + err.message, 'error'); }
+    }
+
+    function getPlatformBadgeClass(p) { return { '淘宝': 'taobao', '抖音': 'douyin', '拼多多': 'pdd', '京东': 'jd' }[p] || 'blue'; }
+    function getStatusBadgeClass(s) { return { '在售': 'success', '下架': 'danger', '待审核': 'warning' }[s] || 'info'; }
+    function getIconForCategory(c) { return { '茶叶': 'fa-leaf', '手工艺': 'fa-bag-shopping', '食品': 'fa-seedling', '文创': 'fa-palette' }[c] || 'fa-box'; }
+
+    function getCategoryPathNames(p) {
+        if (p.category_path && p.category_path.length) {
+            return p.category_path.map(id => (categoryMap[id] && categoryMap[id].name) || id).join(' > ');
+        }
+        return [p.category, p.subcat, p.third].filter(Boolean).join(' > ') || p.category || '—';
+    }
+
+    function renderProductTable(products) {
+        const tbody = document.getElementById('productTableBody');
+        if (products.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#94a3b8;"><i class="fas fa-box-open"></i> 暂无商品</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = products.map((p, idx) => {
+            const platformCls = getPlatformBadgeClass(p.platform);
+            const statusCls = getStatusBadgeClass(p.status);
+            const imgHTML = p.main_image
+                ? `<img src="${p.main_image}" alt="${p.name}" onerror="this.parentElement.innerHTML='<i class=\\'fas ${p.icon || getIconForCategory(p.category)}\\'></i>';">`
+                : `<i class="fas ${p.icon || getIconForCategory(p.category)}"></i>`;
+            const catPathText = getCategoryPathNames(p);
+            const tagsHTML = (p.tags || []).map(function(t) {
+                var tagDef = allTags.find(x => x.name === t);
+                var color = tagDef ? tagDef.color : '#4dabf7';
+                return `<span class="badge custom-tag" style="background:${color}22; color:${color};">${t}</span>`;
+            }).join('');
+            return `
+                <tr data-id="${p.id}" data-category-path="${(p.category_path || []).join(',')}" data-tags="${(p.tags || []).join(',')}" data-platform="${p.platform || ''}" data-status="${p.status || ''}">
+                    <td>${idx + 1}</td>
+                    <td><div class="product-img">${imgHTML}</div></td>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.spec || '—'}</td>
+                    <td><span style="font-size:12px;color:#94a3b8;">${p.sku || '—'}</span></td>
+                    <td>
+                        <div style="font-size:11px; color:#5f7d95; margin-bottom:2px;">${catPathText}</div>
+                        <div>${tagsHTML || '<span style="font-size:11px;color:#94a3b8;">无标签</span>'}</div>
+                    </td>
+                    <td><span class="badge ${platformCls}">${p.platform}</span></td>
+                    <td style="font-weight:600;color:#b55a1a;">¥${p.price}</td>
+                    <td>${p.stock}</td>
+                    <td>${(p.sales || 0).toLocaleString()}</td>
+                    <td><span class="badge ${p.rating && p.rating.includes('4.5') ? 'warning' : 'success'}">${p.rating || '—'}</span></td>
+                    <td><span class="badge ${statusCls}">${p.status}</span></td>
+                    <td>
+                        <span class="btn-sm outline" onclick="openEditModal(${p.id})"><i class="fas fa-edit"></i> 编辑</span>
+                        <span class="btn-sm blue" style="margin-left:4px;" onclick="showToast('🔄 同步商品：${p.name}')"><i class="fas fa-sync-alt"></i> 同步</span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        applyProductFilters();
+    }
+
+    function filterProducts() { applyProductFilters(); }
+
+    function applyProductFilters() {
+        var keyword = document.getElementById('productSearch').value.toLowerCase().trim();
+        var platform = document.getElementById('productPlatformFilter').value;
+        var status = document.getElementById('productStatusFilter').value;
+        var sortVal = document.getElementById('productSortFilter').value;
+        var rows = Array.from(document.querySelectorAll('#productTableBody tr'));
+        var visibleRows = [];
+        rows.forEach(function(row) {
+            var rowCatPath = (row.dataset.categoryPath || '').split(',').filter(Boolean);
+            var rowTags = (row.dataset.tags || '').split(',').filter(Boolean);
+            var rowPlatform = row.dataset.platform || '';
+            var rowStatus = row.dataset.status || '';
+            var rowText = row.textContent.toLowerCase();
+            var match = true;
+            if (categoryFilters.level1 && !rowCatPath.includes(categoryFilters.level1)) match = false;
+            if (categoryFilters.level2 && !rowCatPath.includes(categoryFilters.level2)) match = false;
+            if (categoryFilters.level3 && !rowCatPath.includes(categoryFilters.level3)) match = false;
+            if (tagFilters.length > 0) {
+                var allMatched = tagFilters.every(t => rowTags.includes(t));
+                if (!allMatched) match = false;
+            }
+            if (platform !== 'all' && rowPlatform !== platform) match = false;
+            if (status !== 'all' && rowStatus !== status) match = false;
+            if (keyword && !rowText.includes(keyword)) match = false;
+            row.style.display = match ? '' : 'none';
+            if (match) visibleRows.push(row);
+        });
+
+        // 排序
+        if (sortVal !== 'default' && visibleRows.length > 0) {
+            var tbody = document.getElementById('productTableBody');
+            visibleRows.sort((a, b) => {
+                var pa = allProducts.find(x => x.id === parseInt(a.dataset.id));
+                var pb = allProducts.find(x => x.id === parseInt(b.dataset.id));
+                if (!pa || !pb) return 0;
+                if (sortVal === 'sales_desc') return (pb.sales || 0) - (pa.sales || 0);
+                if (sortVal === 'price_desc') return pb.price - pa.price;
+                if (sortVal === 'price_asc') return pa.price - pb.price;
+                return 0;
+            });
+            visibleRows.forEach(r => tbody.appendChild(r));
+        }
+
+        document.getElementById('productCount').textContent = '共 ' + visibleRows.length + ' 件商品';
+        document.getElementById('productCountFooter').textContent = '共 ' + visibleRows.length + ' 件商品';
+    }
+
+    function resetProductFilters() {
+        document.getElementById('productSearch').value = '';
+        document.getElementById('productPlatformFilter').value = 'all';
+        document.getElementById('productStatusFilter').value = 'all';
+        document.getElementById('productSortFilter').value = 'default';
+        categoryFilters = { level1: null, level2: null, level3: null };
+        tagFilters = [];
+        renderCategoryFilter();
+        renderTagFilter();
+        applyProductFilters();
+        showToast('🔄 已重置筛选条件');
+    }
+
+    document.getElementById('productSearch').addEventListener('input', applyProductFilters);
+    document.getElementById('productPlatformFilter').addEventListener('change', applyProductFilters);
+    document.getElementById('productStatusFilter').addEventListener('change', applyProductFilters);
+    document.getElementById('productSortFilter').addEventListener('change', applyProductFilters);
+
+    // 类目选择器
+    function renderCatPicker(containerId, selectedPath, onChange) {
+        var container = document.getElementById(containerId);
+        if (!categoryTree.length) { container.innerHTML = '<div style="color:#94a3b8; font-size:12px;">类目加载中...</div>'; return; }
+        var html = '';
+        html += `<div class="cat-picker-level"><span class="level-label">一级</span>`;
+        categoryTree.forEach(function(cat) {
+            var active = selectedPath[0] === cat.id ? 'active' : '';
+            html += `<span class="cat-opt ${active}" onclick="pickCategory('${containerId}', 1, '${cat.id}', '${onChange}')">${cat.icon || ''} ${cat.name}</span>`;
+        });
+        html += '</div>';
+        if (selectedPath[0]) {
+            var l1 = categoryTree.find(c => c.id === selectedPath[0]);
+            if (l1 && l1.children) {
+                html += `<div class="cat-picker-level"><span class="level-label">二级</span>`;
+                l1.children.forEach(function(cat) {
+                    var active = selectedPath[1] === cat.id ? 'active' : '';
+                    html += `<span class="cat-opt ${active}" onclick="pickCategory('${containerId}', 2, '${cat.id}', '${onChange}')">${cat.name}</span>`;
+                });
+                html += '</div>';
+            }
+        }
+        if (selectedPath[0] && selectedPath[1]) {
+            var l1 = categoryTree.find(c => c.id === selectedPath[0]);
+            if (l1) {
+                var l2 = l1.children.find(c => c.id === selectedPath[1]);
+                if (l2 && l2.children) {
+                    html += `<div class="cat-picker-level"><span class="level-label">三级</span>`;
+                    l2.children.forEach(function(cat) {
+                        var active = selectedPath[2] === cat.id ? 'active' : '';
+                        html += `<span class="cat-opt ${active}" onclick="pickCategory('${containerId}', 3, '${cat.id}', '${onChange}')">${cat.name}</span>`;
+                    });
+                    html += '</div>';
+                }
+            }
+        }
+        container.innerHTML = html;
+    }
+
+    function pickCategory(containerId, level, catId, onChange) {
+        var path;
+        if (containerId === 'editCatPicker') path = editSelectedCategoryPath.slice();
+        else path = addSelectedCategoryPath.slice();
+        if (level === 1) path = [catId];
+        else if (level === 2) path = [path[0], catId];
+        else if (level === 3) path = [path[0], path[1], catId];
+        if (containerId === 'editCatPicker') {
+            editSelectedCategoryPath = path;
+            renderCatPicker('editCatPicker', editSelectedCategoryPath, 'edit');
+        } else {
+            addSelectedCategoryPath = path;
+            renderCatPicker('addCatPicker', addSelectedCategoryPath, 'add');
+        }
+    }
+
+    function renderTagPicker(containerId, selectedTags) {
+        var container = document.getElementById(containerId);
+        if (!allTags.length) { container.innerHTML = '<div style="color:#94a3b8; font-size:12px;">标签加载中...</div>'; return; }
+        var html = '';
+        allTags.forEach(function(t) {
+            var sel = selectedTags.includes(t.name) ? 'selected' : '';
+            html += `<span class="tag-opt ${sel}" onclick="toggleTagPick('${containerId}', '${t.name}')">
+                <span class="color-dot" style="background:${t.color || '#4dabf7'};"></span>${t.name}
+            </span>`;
+        });
+        html += `<span class="tag-add-inline" onclick="openCreateTagDialog()"><i class="fas fa-plus"></i> 新建</span>`;
+        container.innerHTML = html;
+    }
+
+    function toggleTagPick(containerId, tagName) {
+        if (containerId === 'editTagPicker') {
+            var idx = editSelectedTags.indexOf(tagName);
+            if (idx >= 0) editSelectedTags.splice(idx, 1);
+            else editSelectedTags.push(tagName);
+            renderTagPicker('editTagPicker', editSelectedTags);
+        } else {
+            var idx = addSelectedTags.indexOf(tagName);
+            if (idx >= 0) addSelectedTags.splice(idx, 1);
+            else addSelectedTags.push(tagName);
+            renderTagPicker('addTagPicker', addSelectedTags);
+        }
+    }
+
+    function setFieldError(groupId, hasError, msg) {
+        var group = document.getElementById(groupId);
+        if (!group) return;
+        if (hasError) {
+            group.classList.add('error');
+            var errEl = group.querySelector('.error-msg');
+            if (errEl && msg) errEl.textContent = msg;
+        } else group.classList.remove('error');
+    }
+    function clearAllErrors(prefix) {
+        var groups = document.querySelectorAll('[id^="' + prefix + 'Group"]');
+        groups.forEach(function(g) { g.classList.remove('error'); });
+    }
+    function validateProductForm(prefix) {
+        var errors = [];
+        var nameInput = document.getElementById(prefix + 'ProductName');
+        var name = nameInput.value.trim();
+        if (!name) { setFieldError(prefix + 'GroupName', true, '请输入商品名称'); errors.push({ tab: prefix + 'tab-basic', el: nameInput }); }
+        else if (name.length > 60) { setFieldError(prefix + 'GroupName', true, '商品名称不能超过60个字符'); errors.push({ tab: prefix + 'tab-basic', el: nameInput }); }
+        else setFieldError(prefix + 'GroupName', false);
+
+        var specInput = document.getElementById(prefix + 'ProductSpec');
+        if (!specInput.value.trim()) { setFieldError(prefix + 'GroupSpec', true, '请输入商品规格'); errors.push({ tab: prefix + 'tab-basic', el: specInput }); }
+        else setFieldError(prefix + 'GroupSpec', false);
+
+        var skuInput = document.getElementById(prefix + 'ProductSku');
+        var sku = skuInput.value.trim();
+        if (!sku) { setFieldError(prefix + 'GroupSku', true, '请输入SKU编码'); errors.push({ tab: prefix + 'tab-basic', el: skuInput }); }
+        else if (!/^[A-Za-z0-9\-_]+$/.test(sku)) { setFieldError(prefix + 'GroupSku', true, 'SKU编码只能包含字母、数字、横线、下划线'); errors.push({ tab: prefix + 'tab-basic', el: skuInput }); }
+        else setFieldError(prefix + 'GroupSku', false);
+
+        var priceInput = document.getElementById(prefix + 'ProductPrice');
+        var price = parseFloat(priceInput.value);
+        if (isNaN(price) || price <= 0) { setFieldError(prefix + 'GroupPrice', true, '请输入有效的价格（大于0）'); errors.push({ tab: prefix + 'tab-price', el: priceInput }); }
+        else setFieldError(prefix + 'GroupPrice', false);
+
+        var stockInput = document.getElementById(prefix + 'ProductStock');
+        var stock = parseInt(stockInput.value, 10);
+        if (isNaN(stock) || stock < 0) { setFieldError(prefix + 'GroupStock', true, '请输入有效的库存（≥0）'); errors.push({ tab: prefix + 'tab-price', el: stockInput }); }
+        else setFieldError(prefix + 'GroupStock', false);
+
+        return errors;
+    }
+    function focusFirstError(errors) {
+        if (errors.length === 0) return;
+        var first = errors[0];
+        if (first.tab.indexOf('edit') === 0) switchEditTab(first.tab);
+        else switchAddTab(first.tab);
+        setTimeout(function() {
+            if (first.el) { first.el.focus(); first.el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }, 100);
+    }
+
+    // ===== 编辑弹窗 =====
+    function openEditModal(productId) {
+        var p = allProducts.find(x => x.id === productId);
+        if (!p) { showToast('❌ 未找到商品', 'error'); return; }
+        currentEditProduct = p;
+        document.getElementById('editModalTitle').textContent = p.name;
+        document.getElementById('editProductName').value = p.name || '';
+        document.getElementById('editProductSpec').value = p.spec || '';
+        document.getElementById('editProductSku').value = p.sku || '';
+        document.getElementById('editProductPrice').value = p.price || 0;
+        document.getElementById('editProductStock').value = p.stock || 0;
+        document.getElementById('editProductStatus').value = p.status || '在售';
+        document.getElementById('editProductDesc').value = '';
+        editSelectedCategoryPath = (p.category_path || []).slice();
+        editSelectedTags = (p.tags || []).slice();
+        renderCatPicker('editCatPicker', editSelectedCategoryPath, 'edit');
+        renderTagPicker('editTagPicker', editSelectedTags);
+        renderEditMainImage(p);
+        renderEditSubImages(p);
+        renderEditVideo(p);
+        document.getElementById('editDetailEditor').innerHTML = p.detail_html || p.detail || '';
+        clearAllErrors('edit');
+        switchEditTab('edit-tab-basic');
+        document.getElementById('editModal').classList.add('show');
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('show');
+        currentEditProduct = null;
+    }
+
+    function switchEditTab(tabId) {
+        document.querySelectorAll('#editModalTabs .modal-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('#editModalTabs .modal-tab[data-tab="' + tabId + '"]').classList.add('active');
+        document.querySelectorAll('#editModalBody .tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function renderEditMainImage(p) {
+        var preview = document.getElementById('editMainPreview');
+        var deleteBtn = document.getElementById('editMainDeleteBtn');
+        var btnText = document.getElementById('editMainBtnText');
+        if (p.main_image) {
+            preview.className = 'main-upload-preview has-image';
+            preview.innerHTML = `<img src="${p.main_image}" alt="主图">`;
+            deleteBtn.disabled = false;
+            btnText.textContent = '替换主图';
+        } else {
+            preview.className = 'main-upload-preview';
+            preview.innerHTML = `<div class="placeholder"><i class="fas fa-image"></i><span>点击上传主图</span></div>`;
+            deleteBtn.disabled = true;
+            btnText.textContent = '上传主图';
+        }
+    }
+
+    function renderEditSubImages(p) {
+        var grid = document.getElementById('editSubGrid');
+        var subs = p.sub_images || [];
+        var html = '';
+        subs.forEach((img, i) => {
+            html += `<div class="sub-upload-item filled"><img src="${img}" alt="副图${i+1}"><button class="remove-btn" onclick="deleteEditSubImage(${i})"><i class="fas fa-times"></i></button></div>`;
+        });
+        if (subs.length < MAX_SUB_IMAGES) html += `<div class="sub-upload-item" onclick="document.getElementById('editSubInput').click()"><i class="fas fa-plus"></i><span>添加副图</span></div>`;
+        else html += `<div class="sub-upload-item" style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-check-circle"></i><span>已达上限</span></div>`;
+        grid.innerHTML = html;
+    }
+
+    function renderEditVideo(p) {
+        var preview = document.getElementById('editVideoPreview');
+        var deleteBtn = document.getElementById('editVideoDeleteBtn');
+        var btnText = document.getElementById('editVideoBtnText');
+        if (p.video) {
+            preview.className = 'video-upload-preview has-video';
+            preview.innerHTML = `<video src="${p.video}" controls preload="metadata" onclick="event.stopPropagation();"></video>`;
+            deleteBtn.disabled = false;
+            btnText.textContent = '替换视频';
+        } else {
+            preview.className = 'video-upload-preview';
+            preview.innerHTML = `<div class="placeholder"><i class="fas fa-video"></i><span>点击上传视频</span></div>`;
+            deleteBtn.disabled = true;
+            btnText.textContent = '上传视频';
+        }
+    }
+
+    async function handleEditMainUpload(event) {
+        var file = event.target.files[0];
+        if (!file || !currentEditProduct) return;
+        if (!file.type.startsWith('image/')) { showToast('❌ 只支持图片文件', 'error'); return; }
+        if (file.size > 2 * 1024 * 1024) { showToast('❌ 图片不能超过 2MB', 'error'); return; }
+        showLoading(true);
+        try {
+            var fd = new FormData();
+            fd.append('product_name', currentEditProduct.name);
+            fd.append('image_type', 'main');
+            fd.append('file', file);
+            var res = await fetch(BACKEND_URL + '/api/images/upload', { method: 'POST', body: fd });
+            var data = await res.json();
+            showLoading(false);
+            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditMainImage(currentEditProduct); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showLoading(false); showToast('❌ 上传失败：' + err.message, 'error'); }
+        event.target.value = '';
+    }
+
+    async function deleteEditMainImage() {
+        if (!currentEditProduct || !currentEditProduct.main_image) return;
+        if (!confirm('确定要删除主图吗？')) return;
+        showLoading(true);
+        try {
+            var res = await fetch(BACKEND_URL + '/api/images/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'main' }) });
+            var data = await res.json();
+            showLoading(false);
+            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditMainImage(currentEditProduct); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showLoading(false); showToast('❌ 删除失败：' + err.message, 'error'); }
+    }
+
+    async function handleEditSubUpload(event) {
+        var file = event.target.files[0];
+        if (!file || !currentEditProduct) return;
+        var subs = currentEditProduct.sub_images || [];
+        if (subs.length >= MAX_SUB_IMAGES) { showToast('❌ 副图已达上限', 'error'); return; }
+        if (!file.type.startsWith('image/')) { showToast('❌ 只支持图片文件', 'error'); return; }
+        if (file.size > 2 * 1024 * 1024) { showToast('❌ 图片不能超过 2MB', 'error'); return; }
+        showLoading(true);
+        try {
+            var fd = new FormData();
+            fd.append('product_name', currentEditProduct.name);
+            fd.append('image_type', 'sub');
+            fd.append('file', file);
+            var res = await fetch(BACKEND_URL + '/api/images/upload', { method: 'POST', body: fd });
+            var data = await res.json();
+            showLoading(false);
+            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditSubImages(currentEditProduct); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showLoading(false); showToast('❌ 上传失败：' + err.message, 'error'); }
+        event.target.value = '';
+    }
+
+    async function deleteEditSubImage(index) {
+        if (!currentEditProduct) return;
+        if (!confirm('确定要删除第 ' + (index + 1) + ' 张副图吗？')) return;
+        showLoading(true);
+        try {
+            var res = await fetch(BACKEND_URL + '/api/images/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'sub', index: index }) });
+            var data = await res.json();
+            showLoading(false);
+            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditSubImages(currentEditProduct); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showLoading(false); showToast('❌ 删除失败：' + err.message, 'error'); }
+    }
+
+    async function handleEditVideoUpload(event) {
+        var file = event.target.files[0];
+        if (!file || !currentEditProduct) return;
+        if (!file.type.startsWith('video/')) { showToast('❌ 只支持视频文件', 'error'); return; }
+        if (file.size > 50 * 1024 * 1024) { showToast('❌ 视频不能超过 50MB', 'error'); return; }
+        showLoading(true);
+        try {
+            var fd = new FormData();
+            fd.append('product_name', currentEditProduct.name);
+            fd.append('image_type', 'video');
+            fd.append('file', file);
+            var res = await fetch(BACKEND_URL + '/api/images/upload', { method: 'POST', body: fd });
+            var data = await res.json();
+            showLoading(false);
+            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditVideo(currentEditProduct); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showLoading(false); showToast('❌ 上传失败：' + err.message, 'error'); }
+        event.target.value = '';
+    }
+
+    async function deleteEditVideo() {
+        if (!currentEditProduct || !currentEditProduct.video) return;
+        if (!confirm('确定要删除视频吗？')) return;
+        showLoading(true);
+        try {
+            var res = await fetch(BACKEND_URL + '/api/images/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'video' }) });
+            var data = await res.json();
+            showLoading(false);
+            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditVideo(currentEditProduct); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showLoading(false); showToast('❌ 删除失败：' + err.message, 'error'); }
+    }
+
+    function execEditCmd(command, value = null) {
+        document.execCommand(command, false, value);
+        document.getElementById('editDetailEditor').focus();
+    }
+
+    async function handleEditDetailImageUpload(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { showToast('❌ 只支持图片文件', 'error'); return; }
+        if (file.size > 2 * 1024 * 1024) { showToast('❌ 图片不能超过 2MB', 'error'); return; }
+        showLoading(true);
+        try {
+            var fd = new FormData();
+            fd.append('product_name', currentEditProduct ? currentEditProduct.name : '');
+            fd.append('image_type', 'detail');
+            fd.append('file', file);
+            var res = await fetch(BACKEND_URL + '/api/images/upload', { method: 'POST', body: fd });
+            var data = await res.json();
+            showLoading(false);
+            if (data.success && data.url) { document.getElementById('editDetailEditor').focus(); document.execCommand('insertImage', false, data.url); showToast('✅ 图片已插入', 'success'); }
+            else showToast('❌ ' + (data.message || '上传失败'), 'error');
+        } catch (err) { showLoading(false); showToast('❌ 上传失败：' + err.message, 'error'); }
+        event.target.value = '';
+    }
+
+    function addEditSkuRow() {
+        var tbody = document.querySelector('#editSkuTable tbody');
+        var tr = document.createElement('tr');
+        tr.innerHTML = `<td><input type="text" placeholder="规格名"></td><td><input type="number" value="0" step="0.01"></td><td><input type="number" value="0"></td><td><span class="btn-sm danger" onclick="removeEditSkuRow(this)"><i class="fas fa-trash"></i></span></td>`;
+        tbody.appendChild(tr);
+    }
+    function removeEditSkuRow(btn) {
+        var tr = btn.closest('tr');
+        if (tr.parentElement.children.length <= 1) { showToast('⚠️ 至少保留一个规格'); return; }
+        tr.remove();
+    }
+
+    function saveEditDraft() {
+        var name = document.getElementById('editProductName').value.trim();
+        if (!name) { setFieldError('editGroupName', true, '请输入商品名称后再保存草稿'); switchEditTab('edit-tab-basic'); document.getElementById('editProductName').focus(); return; }
+        showToast('💾 草稿已保存：' + name);
+        closeEditModal();
+    }
+
+    async function saveEditAndPublish() {
+        clearAllErrors('edit');
+        var errors = validateProductForm('edit');
+        if (errors.length > 0) { showToast('⚠️ 有 ' + errors.length + ' 项信息需要修正'); focusFirstError(errors); return; }
+        if (!currentEditProduct) return;
+        var fields = {
+            name: document.getElementById('editProductName').value.trim(),
+            spec: document.getElementById('editProductSpec').value.trim(),
+            sku: document.getElementById('editProductSku').value.trim(),
+            price: parseFloat(document.getElementById('editProductPrice').value),
+            stock: parseInt(document.getElementById('editProductStock').value, 10),
+            status: document.getElementById('editProductStatus').value,
+            category_path: editSelectedCategoryPath,
+            tags: editSelectedTags,
+        };
+        showLoading(true);
+        try {
+            var res = await fetch(BACKEND_URL + '/api/products/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: currentEditProduct.name, fields: fields }) });
+            var data = await res.json();
+            var detailHtml = document.getElementById('editDetailEditor').innerHTML;
+            await fetch(BACKEND_URL + '/api/products/detail', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: fields.name, detail_html: detailHtml }) });
+            showLoading(false);
+            if (data.success) { showToast('✅ 商品「' + fields.name + '」已保存', 'success'); closeEditModal(); await loadProducts(); renderTagFilter(); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showLoading(false); showToast('❌ 保存失败：' + err.message, 'error'); }
+    }
+
+    // ===== 新增弹窗 =====
+    function openAddModal() {
+        document.getElementById('addProductName').value = '';
+        document.getElementById('addProductSellPoint').value = '';
+        document.getElementById('addProductSpec').value = '';
+        document.getElementById('addProductSku').value = '';
+        document.getElementById('addProductDesc').value = '';
+        document.getElementById('addProductPrice').value = '';
+        document.getElementById('addProductStock').value = '';
+        document.getElementById('addProductPromoPrice').value = '';
+        document.getElementById('addProductSafetyStock').value = '50';
+        document.getElementById('addProductLimit').value = '0';
+        document.getElementById('addProductDeliveryTime').value = '48小时';
+        document.getElementById('addShipFrom').value = '';
+        document.getElementById('addFreightPrice').value = '0';
+        document.getElementById('addAfterSaleDesc').value = '';
+        document.getElementById('addProductStatus').value = '在售';
+        addSelectedCategoryPath = [];
+        addSelectedTags = [];
+        renderCatPicker('addCatPicker', addSelectedCategoryPath, 'add');
+        renderTagPicker('addTagPicker', addSelectedTags);
+        clearAllErrors('add');
+        document.getElementById('addMainPreview').className = 'main-upload-preview';
+        document.getElementById('addMainPreview').innerHTML = `<div class="placeholder"><i class="fas fa-image"></i><span>点击上传主图</span></div>`;
+        document.getElementById('addMainDeleteBtn').disabled = true;
+        document.getElementById('addMainBtnText').textContent = '上传主图';
+        renderAddSubImages([]);
+        document.getElementById('addVideoPreview').className = 'video-upload-preview';
+        document.getElementById('addVideoPreview').innerHTML = `<div class="placeholder"><i class="fas fa-video"></i><span>点击上传视频</span></div>`;
+        document.getElementById('addVideoDeleteBtn').disabled = true;
+        document.getElementById('addVideoBtnText').textContent = '上传视频';
+        document.getElementById('addDetailEditor').innerHTML = '';
+        document.querySelector('#addSkuTable tbody').innerHTML = `<tr><td><input type="text" placeholder="规格名"></td><td><input type="number" value="0" step="0.01"></td><td><input type="number" value="0"></td><td><span class="btn-sm danger" onclick="removeAddSkuRow(this)"><i class="fas fa-trash"></i></span></td></tr>`;
+        window._addTemp = { main_image: '', sub_images: [], video: '', detail_html: '' };
+        switchAddTab('add-tab-basic');
+        document.getElementById('addModal').classList.add('show');
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').classList.remove('show');
+        window._addTemp = null;
+    }
+
+    function switchAddTab(tabId) {
+        document.querySelectorAll('#addModalTabs .modal-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('#addModalTabs .modal-tab[data-tab="' + tabId + '"]').classList.add('active');
+        document.querySelectorAll('#addModalBody .tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function renderAddSubImages(subs) {
+        var grid = document.getElementById('addSubGrid');
+        var html = '';
+        subs.forEach((img, i) => { html += `<div class="sub-upload-item filled"><img src="${img}" alt="副图${i+1}"><button class="remove-btn" onclick="deleteAddSubImage(${i})"><i class="fas fa-times"></i></button></div>`; });
+        if (subs.length < MAX_SUB_IMAGES) html += `<div class="sub-upload-item" onclick="document.getElementById('addSubInput').click()"><i class="fas fa-plus"></i><span>添加副图</span></div>`;
+        else html += `<div class="sub-upload-item" style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-check-circle"></i><span>已达上限</span></div>`;
+        grid.innerHTML = html;
+    }
+
+    function handleAddMainUpload(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { showToast('❌ 只支持图片文件', 'error'); return; }
+        if (file.size > 2 * 1024 * 1024) { showToast('❌ 图片不能超过 2MB', 'error'); return; }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            window._addTemp.main_image = e.target.result;
+            var preview = document.getElementById('addMainPreview');
+            preview.className = 'main-upload-preview has-image';
+            preview.innerHTML = `<img src="${e.target.result}" alt="主图">`;
+            document.getElementById('addMainDeleteBtn').disabled = false;
+            document.getElementById('addMainBtnText').textContent = '替换主图';
+            showToast('✅ 主图已选择', 'success');
+        };
+        reader.readAsDataURL(file);
+        event.target.value = '';
+    }
+
+    function deleteAddMainImage() {
+        if (!window._addTemp) return;
+        window._addTemp.main_image = '';
+        document.getElementById('addMainPreview').className = 'main-upload-preview';
+        document.getElementById('addMainPreview').innerHTML = `<div class="placeholder"><i class="fas fa-image"></i><span>点击上传主图</span></div>`;
+        document.getElementById('addMainDeleteBtn').disabled = true;
+        document.getElementById('addMainBtnText').textContent = '上传主图';
+    }
+
+    function handleAddSubUpload(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        if (!window._addTemp) window._addTemp = { sub_images: [] };
+        var subs = window._addTemp.sub_images || [];
+        if (subs.length >= MAX_SUB_IMAGES) { showToast('❌ 副图已达上限', 'error'); return; }
+        if (!file.type.startsWith('image/')) { showToast('❌ 只支持图片文件', 'error'); return; }
+        if (file.size > 2 * 1024 * 1024) { showToast('❌ 图片不能超过 2MB', 'error'); return; }
+        var reader = new FileReader();
+        reader.onload = function(e) { subs.push(e.target.result); window._addTemp.sub_images = subs; renderAddSubImages(subs); showToast('✅ 已添加副图', 'success'); };
+        reader.readAsDataURL(file);
+        event.target.value = '';
+    }
+
+    function deleteAddSubImage(index) {
+        if (!window._addTemp) return;
+        window._addTemp.sub_images.splice(index, 1);
+        renderAddSubImages(window._addTemp.sub_images);
+    }
+
+    function handleAddVideoUpload(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('video/')) { showToast('❌ 只支持视频文件', 'error'); return; }
+        if (file.size > 50 * 1024 * 1024) { showToast('❌ 视频不能超过 50MB', 'error'); return; }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            window._addTemp.video = e.target.result;
+            var preview = document.getElementById('addVideoPreview');
+            preview.className = 'video-upload-preview has-video';
+            preview.innerHTML = `<video src="${e.target.result}" controls preload="metadata" onclick="event.stopPropagation();"></video>`;
+            document.getElementById('addVideoDeleteBtn').disabled = false;
+            document.getElementById('addVideoBtnText').textContent = '替换视频';
+            showToast('✅ 视频已选择', 'success');
+        };
+        reader.readAsDataURL(file);
+        event.target.value = '';
+    }
+
+    function deleteAddVideo() {
+        if (!window._addTemp) return;
+        window._addTemp.video = '';
+        document.getElementById('addVideoPreview').className = 'video-upload-preview';
+        document.getElementById('addVideoPreview').innerHTML = `<div class="placeholder"><i class="fas fa-video"></i><span>点击上传视频</span></div>`;
+        document.getElementById('addVideoDeleteBtn').disabled = true;
+        document.getElementById('addVideoBtnText').textContent = '上传视频';
+    }
+
+    function execAddCmd(command, value = null) {
+        document.execCommand(command, false, value);
+        document.getElementById('addDetailEditor').focus();
+    }
+
+    function handleAddDetailImageUpload(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { showToast('❌ 只支持图片文件', 'error'); return; }
+        if (file.size > 2 * 1024 * 1024) { showToast('❌ 图片不能超过 2MB', 'error'); return; }
+        var reader = new FileReader();
+        reader.onload = function(e) { document.getElementById('addDetailEditor').focus(); document.execCommand('insertImage', false, e.target.result); showToast('✅ 图片已插入', 'success'); };
+        reader.readAsDataURL(file);
+        event.target.value = '';
+    }
+
+    function addAddSkuRow() {
+        var tbody = document.querySelector('#addSkuTable tbody');
+        var tr = document.createElement('tr');
+        tr.innerHTML = `<td><input type="text" placeholder="规格名"></td><td><input type="number" value="0" step="0.01"></td><td><input type="number" value="0"></td><td><span class="btn-sm danger" onclick="removeAddSkuRow(this)"><i class="fas fa-trash"></i></span></td>`;
+        tbody.appendChild(tr);
+    }
+    function removeAddSkuRow(btn) {
+        var tr = btn.closest('tr');
+        if (tr.parentElement.children.length <= 1) { showToast('⚠️ 至少保留一个规格'); return; }
+        tr.remove();
+    }
+
+    function saveAddDraft() {
+        var name = document.getElementById('addProductName').value.trim();
+        if (!name) { setFieldError('addGroupName', true, '请输入商品名称后再保存草稿'); switchAddTab('add-tab-basic'); document.getElementById('addProductName').focus(); return; }
+        showToast('💾 草稿已保存：' + name);
+        closeAddModal();
+    }
+
+    async function saveAddAndPublish() {
+        clearAllErrors('add');
+        var errors = validateProductForm('add');
+        if (errors.length > 0) { showToast('⚠️ 有 ' + errors.length + ' 项信息需要修正'); focusFirstError(errors); return; }
+        var fields = {
+            name: document.getElementById('addProductName').value.trim(),
+            spec: document.getElementById('addProductSpec').value.trim(),
+            sku: document.getElementById('addProductSku').value.trim(),
+            price: parseFloat(document.getElementById('addProductPrice').value),
+            stock: parseInt(document.getElementById('addProductStock').value, 10),
+            status: document.getElementById('addProductStatus').value,
+            category_path: addSelectedCategoryPath,
+            tags: addSelectedTags,
+            platform: '淘宝',
+            main_image: (window._addTemp && window._addTemp.main_image) || '',
+            sub_images: (window._addTemp && window._addTemp.sub_images) || [],
+            video: (window._addTemp && window._addTemp.video) || '',
+            detail_html: document.getElementById('addDetailEditor').innerHTML || '',
+        };
+        var platformMap = { '淘宝': 'taobao', '抖音': 'douyin', '拼多多': 'pdd', '京东': 'jd' };
+        var platformItems = document.querySelectorAll('#addPlatformSyncGrid .platform-sync-item');
+        platformItems.forEach(function(item) {
+            var toggle = item.querySelector('.toggle');
+            if (toggle && toggle.classList.contains('active')) {
+                var pName = item.querySelector('.plat-name').textContent.trim();
+                if (platformMap[pName]) fields.platform = pName;
+            }
+        });
+        showLoading(true);
+        try {
+            var res = await fetch(BACKEND_URL + '/api/products/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: fields }) });
+            var data = await res.json();
+            showLoading(false);
+            if (data.success) { showToast('✅ 商品「' + fields.name + '」已创建', 'success'); closeAddModal(); await loadProducts(); renderTagFilter(); }
+            else showToast('❌ ' + data.message, 'error');
+        } catch (err) { showLoading(false); showToast('❌ 创建失败：' + err.message, 'error'); }
+    }
+
+    function togglePlatformSync(el) { el.classList.toggle('active'); }
+
+    function setupPasteHandler(editorId) {
+        var editor = document.getElementById(editorId);
+        if (!editor) return;
+        var savedRange = null;
+        editor.addEventListener('keyup', saveSelection);
+        editor.addEventListener('mouseup', saveSelection);
+        editor.addEventListener('blur', saveSelection);
+        function saveSelection() {
+            var sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                var range = sel.getRangeAt(0);
+                if (editor.contains(range.commonAncestorContainer)) savedRange = range.cloneRange();
+            }
+        }
+        editor.addEventListener('paste', function(e) {
+            var items = e.clipboardData.items;
+            var imageFile = null;
+            for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') !== -1) { imageFile = items[i].getAsFile(); break; } }
+            if (imageFile) {
+                e.preventDefault();
+                if (imageFile.size > 2 * 1024 * 1024) { showToast('❌ 粘贴的图片不能超过 2MB', 'error'); return; }
+                var sel = window.getSelection();
+                if (sel.rangeCount > 0) {
+                    var range = sel.getRangeAt(0);
+                    if (editor.contains(range.commonAncestorContainer)) savedRange = range.cloneRange();
+                }
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    editor.focus();
+                    if (savedRange) { var newSel = window.getSelection(); newSel.removeAllRanges(); newSel.addRange(savedRange); }
+                    document.execCommand('insertImage', false, ev.target.result);
+                    showToast('✅ 图片已粘贴', 'success');
+                };
+                reader.readAsDataURL(imageFile);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+        setupPasteHandler('editDetailEditor');
+        setupPasteHandler('addDetailPane');
+    });
+</script>
+</body>
+</html>
