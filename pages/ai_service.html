@@ -18,8 +18,6 @@
             color: #0a1a2b;
             display: flex; flex-direction: column; overflow: hidden;
         }
-
-        /* ===== 工具条 ===== */
         .toolbar {
             background: #fff; border-bottom: 1px solid #e8edf4;
             padding: 10px 20px; display: flex; justify-content: space-between;
@@ -46,8 +44,6 @@
         .toolbar .tb-btn:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
         .toolbar .tb-btn i { color: #5f7d95; }
         .toolbar .tb-btn:hover i { color: #4dabf7; }
-
-        /* ===== 统计卡片 ===== */
         .stats-grid {
             display: grid; grid-template-columns: repeat(4, 1fr);
             gap: 14px; padding: 16px 20px 8px; flex-shrink: 0;
@@ -68,14 +64,10 @@
             letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 6px;
         }
         .stat-card .value small { font-size: 12px; color: #5f7d95; font-weight: 400; }
-
-        /* ===== 主体 ===== */
         .app-body {
             flex: 1; display: flex; overflow: hidden;
             padding: 8px 20px 20px; gap: 14px; min-height: 0;
         }
-
-        /* ===== 左侧会话 ===== */
         .conv-side {
             width: 280px; background: #fff; border-radius: 14px;
             border: 1px solid #e8edf4; display: flex; flex-direction: column;
@@ -98,7 +90,6 @@
             display: flex; align-items: center; justify-content: center; transition: 0.12s;
         }
         .conv-side .conv-head .refresh-btn:hover { background: #f0f7fe; color: #2a7faa; }
-
         .conv-filters {
             padding: 8px 12px; border-bottom: 1px solid #e8edf4;
             display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0;
@@ -111,13 +102,11 @@
         }
         .conv-filter:hover { border-color: #4dabf7; color: #2a7faa; }
         .conv-filter.active { background: #0a1e2f; border-color: #0a1e2f; color: #fff; }
-
         .conv-list {
             flex: 1; overflow-y: auto; padding: 8px 10px; min-height: 0;
         }
         .conv-list::-webkit-scrollbar { width: 4px; }
         .conv-list::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
-
         .conv-item {
             display: flex; gap: 10px; padding: 10px 10px;
             border-radius: 10px; margin-bottom: 4px; cursor: pointer;
@@ -125,7 +114,6 @@
         }
         .conv-item:hover { background: #f5f8fc; border-color: #e8edf4; }
         .conv-item.active { background: #f0f7fe; border-color: rgba(77,171,247,0.3); }
-
         .conv-avatar {
             width: 38px; height: 38px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -146,7 +134,6 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 7px; color: #fff;
         }
-
         .conv-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
         .conv-info .conv-name {
             font-size: 13px; font-weight: 600; color: #0a1e2f;
@@ -172,15 +159,12 @@
         .plat-tag.douyin { background: #e9f0ff; color: #1a5bb5; }
         .plat-tag.pdd { background: #fde8ed; color: #b51a3f; }
         .plat-tag.jd { background: #e6f7ec; color: #0d7c4f; }
-
-        /* ===== 右侧 ===== */
         .chat-panel {
             flex: 1; background: #fff; border-radius: 14px;
             border: 1px solid #e8edf4;
             display: flex; flex-direction: column;
             min-width: 0; min-height: 0; overflow: hidden;
         }
-
         .chat-tabs {
             display: flex; gap: 2px; padding: 8px 12px 0;
             border-bottom: 1px solid #e8edf4; background: #fff; flex-shrink: 0;
@@ -206,21 +190,17 @@
             padding: 1px 6px; border-radius: 10px;
             font-weight: 600; margin-left: 2px;
         }
-
         .panel-container {
             flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
         }
         .panel { display: none; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; }
         .panel.active { display: flex; }
-
-        /* ===== 对话 Tab ===== */
         .chat-head {
             padding: 12px 18px; border-bottom: 1px solid #e8edf4;
             display: flex; justify-content: space-between;
             align-items: center; flex-shrink: 0; gap: 10px; flex-wrap: wrap;
             transition: 0.25s;
         }
-        /* ★ 头部状态高亮：人工态整体换底色，AI 态白色 */
         .chat-head.state-human {
             background: linear-gradient(90deg, #f0faf5 0%, #ffffff 60%);
             border-bottom-color: #b8e6cd;
@@ -234,7 +214,6 @@
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
             position: relative;
         }
-        /* ★ 人工态头像外圈绿环 */
         .chat-head.state-human .user-info .avatar::after {
             content: ''; position: absolute; inset: -3px;
             border-radius: 50%; border: 2px solid #0d7c4f;
@@ -250,9 +229,7 @@
         }
         .chat-head .user-info .sub { font-size: 12px; color: #5f7d95; margin-top: 2px; }
         .chat-head.state-human .user-info .sub { color: #0d7c4f; font-weight: 500; }
-
         .chat-head .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
         .chat-head .actions .btn-sm {
             padding: 6px 14px; border-radius: 20px;
             border: 1px solid #dce5ef; background: #fff;
@@ -273,8 +250,6 @@
             box-shadow: 0 4px 14px rgba(10,30,47,0.35);
         }
         .chat-head .actions .btn-sm.primary i { color: rgba(255,255,255,0.7); }
-
-        /* ★ 人工接管中按钮：实心绿 + 呼吸光晕 */
         .chat-head .actions .btn-sm.taken-over {
             background: #0d7c4f; border-color: #0d7c4f; color: #fff;
             cursor: default; font-weight: 600;
@@ -287,7 +262,6 @@
             70% { box-shadow: 0 0 0 8px rgba(13,124,79,0); }
             100% { box-shadow: 0 0 0 0 rgba(13,124,79,0); }
         }
-        /* ★ 释放给 AI 按钮：绿边风格，与"转人工"区分 */
         .chat-head .actions .btn-sm.release {
             border-color: #0d7c4f; color: #0d7c4f; background: #f0faf5;
         }
@@ -296,13 +270,11 @@
         }
         .chat-head .actions .btn-sm.release:hover:not(:disabled) i { color: #fff; }
         .chat-head .actions .btn-sm.release i { color: #0d7c4f; }
-
         .chat-head .actions .btn-sm:disabled {
             opacity: 0.4; cursor: not-allowed;
             background: #f5f7fa; color: #94a3b8; border-color: #e8edf4;
         }
         .chat-head .actions .btn-sm:disabled i { color: #94a3b8; }
-
         .chat-messages {
             flex: 1; overflow-y: auto; padding: 18px 22px;
             background: #f8fafc;
@@ -312,7 +284,6 @@
         }
         .chat-messages::-webkit-scrollbar { width: 5px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
-
         #messagesList {
             display: flex; flex-direction: column; gap: 14px;
             width: 100%; padding: 0;
@@ -342,7 +313,6 @@
         .msg-row.from-user .avatar { background: #b55a1a; }
         .msg-row.from-ai .avatar { background: linear-gradient(135deg, #4dabf7, #2a7faa); }
         .msg-row.from-agent .avatar { background: #0d7c4f; }
-
         .msg-row .bubble-wrap {
             display: flex; flex-direction: column; gap: 4px;
             min-width: 0; max-width: 100%;
@@ -366,7 +336,6 @@
             background: #0a1e2f; color: #fff;
             border-radius: 14px 4px 14px 14px;
         }
-
         .msg-media {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -394,7 +363,6 @@
             max-height: 280px; border-radius: 10px;
             background: #000; display: block;
         }
-
         .msg-row .meta {
             font-size: 10px; color: #94a3b8;
             display: flex; gap: 6px; align-items: center;
@@ -416,7 +384,6 @@
             padding: 1px 6px; border-radius: 8px;
             font-size: 9px; font-weight: 600;
         }
-
         .kb-trace {
             margin-top: 6px; padding-top: 6px;
             border-top: 1px dashed #e8edf4;
@@ -424,7 +391,6 @@
         }
         .kb-trace a { color: #2a7faa; text-decoration: none; }
         .kb-trace a:hover { text-decoration: underline; }
-
         .typing-indicator {
             display: none; align-items: center; gap: 10px;
             padding: 6px 0; align-self: flex-start;
@@ -451,8 +417,6 @@
             0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
             30% { transform: translateY(-4px); opacity: 1; }
         }
-
-        /* ★ 滚动到底按钮 */
         .scroll-bottom-btn {
             position: absolute;
             right: 24px;
@@ -480,12 +444,9 @@
             width: 8px; height: 8px; border-radius: 50%;
             background: #b51a3f;
         }
-
-        /* 快捷操作区（已移除按钮，保留容器但隐藏） */
         .quick-replies {
             display: none !important;
         }
-
         .chat-input-area {
             background: #fff;
             padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px));
@@ -501,20 +462,10 @@
         .chat-input-area .attach-btn:hover {
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
         }
-        .chat-input-area .attach-btn.product {
-            color: #ff5000;
-        }
-        .chat-input-area .attach-btn.product:hover {
-            border-color: #ff5000;
-            background: #fff5f0;
-        }
-        .chat-input-area .attach-btn.coupon {
-            color: #ff5000;
-        }
-        .chat-input-area .attach-btn.coupon:hover {
-            border-color: #ff5000;
-            background: #fff5f0;
-        }
+        .chat-input-area .attach-btn.product { color: #ff5000; }
+        .chat-input-area .attach-btn.product:hover { border-color: #ff5000; background: #fff5f0; }
+        .chat-input-area .attach-btn.coupon { color: #ff5000; }
+        .chat-input-area .attach-btn.coupon:hover { border-color: #ff5000; background: #fff5f0; }
         .chat-input-area .input-wrap {
             flex: 1; background: #f8fafc;
             border: 1px solid #e8edf4; border-radius: 12px;
@@ -545,7 +496,6 @@
         .chat-input-area .send-btn:disabled {
             opacity: 0.4; cursor: not-allowed; transform: none;
         }
-
         .empty-chat {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -554,15 +504,12 @@
         .empty-chat i { font-size: 56px; color: #dce5ef; margin-bottom: 16px; }
         .empty-chat h3 { font-size: 18px; color: #0a1e2f; margin-bottom: 6px; }
         .empty-chat p { font-size: 13px; max-width: 400px; line-height: 1.6; }
-
-        /* ===== 知识库 / 素材库面板 ===== */
         .lib-panel {
             flex: 1; overflow-y: auto; padding: 18px 22px;
             background: #f8fafc; min-height: 0;
         }
         .lib-panel::-webkit-scrollbar { width: 5px; }
         .lib-panel::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
-
         .lib-toolbar {
             display: flex; gap: 10px; align-items: center;
             margin-bottom: 14px; flex-wrap: wrap;
@@ -586,9 +533,7 @@
             cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
             transition: 0.12s; font-family: inherit; white-space: nowrap;
         }
-        .lib-toolbar .lib-btn.primary {
-            background: #0a1e2f; color: #fff;
-        }
+        .lib-toolbar .lib-btn.primary { background: #0a1e2f; color: #fff; }
         .lib-toolbar .lib-btn.primary:hover { background: #1a3a5a; }
         .lib-toolbar .lib-btn.outline {
             background: #fff; color: #1e3a5f;
@@ -597,7 +542,6 @@
         .lib-toolbar .lib-btn.outline:hover {
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
         }
-
         .kb-category-tree {
             display: flex; flex-wrap: wrap; gap: 6px;
             margin-bottom: 14px;
@@ -622,7 +566,6 @@
             background: #0a1e2f; color: #fff;
             border-color: #0a1e2f;
         }
-
         .kb-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -665,21 +608,6 @@
             display: -webkit-box; -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
         }
-        .kb-card .kb-tags {
-            display: flex; gap: 4px; flex-wrap: wrap; margin: 8px 0;
-        }
-        .kb-card .kb-tag {
-            font-size: 10px; padding: 2px 8px; border-radius: 20px;
-            background: #f0f4f9; color: #5f7d95;
-        }
-        .kb-card .kb-foot {
-            display: flex; justify-content: space-between;
-            align-items: center;
-            font-size: 11px; color: #94a3b8;
-            padding-top: 8px; border-top: 1px solid #f0f4f9;
-            gap: 8px;
-        }
-
         .asset-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -728,11 +656,6 @@
             overflow: hidden; text-overflow: ellipsis;
             white-space: nowrap; margin-bottom: 4px;
         }
-        .asset-card .asset-meta {
-            font-size: 11px; color: #94a3b8;
-            display: flex; justify-content: space-between;
-            gap: 6px;
-        }
         .asset-card .asset-actions {
             display: flex; gap: 4px;
             padding: 0 10px 10px;
@@ -752,14 +675,6 @@
             background: #0d7c4f; border-color: #0d7c4f; color: #fff;
         }
         .asset-card .asset-btn.send:hover { filter: brightness(1.05); }
-        .asset-card .asset-btn.del {
-            flex: 0 0 34px;
-            color: #b51a3f;
-        }
-        .asset-card .asset-btn.del:hover {
-            background: #fde8ed; border-color: #b51a3f;
-        }
-
         .lib-empty {
             text-align: center; padding: 60px 20px;
             color: #94a3b8;
@@ -770,10 +685,6 @@
         }
         .lib-empty h3 { font-size: 16px; color: #0a1e2f; margin-bottom: 6px; }
         .lib-empty p { font-size: 13px; }
-
-        /* ============================================================
-           商品链接卡片
-           ============================================================ */
         .product-card {
             background: #fff;
             border-radius: 12px;
@@ -858,7 +769,6 @@
             font-weight: 700;
             color: #ff5000;
             letter-spacing: -0.02em;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .product-card .pc-price small {
             font-size: 12px;
@@ -877,10 +787,6 @@
             align-items: center;
             flex-wrap: wrap;
             margin-top: 2px;
-        }
-        .product-card .pc-meta .rating {
-            color: #ff5000;
-            font-weight: 500;
         }
         .product-card .pc-tags {
             display: flex;
@@ -916,9 +822,7 @@
             gap: 4px;
             color: #0a1e2f;
         }
-        .product-card .pc-btn:first-child {
-            border-right: 1px solid #f0f4f9;
-        }
+        .product-card .pc-btn:first-child { border-right: 1px solid #f0f4f9; }
         .product-card .pc-btn.cart { color: #5f7d95; }
         .product-card .pc-btn.cart:hover { background: #f5f9fe; color: #2a7faa; }
         .product-card .pc-btn.buy {
@@ -928,9 +832,6 @@
         .product-card .pc-btn.buy:hover {
             background: linear-gradient(135deg, #ff5000, #e63c00);
         }
-        .product-card .pc-btn:active { transform: scale(0.98); }
-
-        /* ===== 多商品轮播卡片 ===== */
         .product-carousel {
             margin-top: 8px;
             background: #fff;
@@ -952,9 +853,6 @@
             align-items: center;
             gap: 6px;
         }
-        .product-carousel .pc-title-bar i {
-            color: #ff7733;
-        }
         .product-carousel .pc-list {
             display: flex;
             overflow-x: auto;
@@ -972,9 +870,7 @@
             cursor: pointer;
             transition: 0.15s;
         }
-        .product-carousel .pc-slide:hover {
-            background: #fafcfe;
-        }
+        .product-carousel .pc-slide:hover { background: #fafcfe; }
         .product-carousel .pc-slide .pc-image {
             width: 88px;
             height: 88px;
@@ -1030,8 +926,6 @@
             border-radius: 4px;
             background: #ff5000;
         }
-
-        /* ===== 优惠券卡片 ===== */
         .coupon-card {
             margin-top: 8px;
             display: flex;
@@ -1130,11 +1024,9 @@
             filter: brightness(1.05);
             transform: translateY(-50%) scale(1.02);
         }
-
-        /* ============================================================
-           商品选择弹窗
-           ============================================================ */
-        .product-picker-modal {
+        .product-picker-modal,
+        .coupon-picker-modal,
+        .card-style-modal {
             position: fixed; inset: 0;
             background: rgba(10,30,47,0.55);
             backdrop-filter: blur(4px);
@@ -1144,14 +1036,39 @@
             justify-content: center;
             padding: 20px;
         }
-        .product-picker-modal.show {
+        .product-picker-modal.show,
+        .coupon-picker-modal.show,
+        .card-style-modal.show {
             display: flex;
             animation: fadeIn 0.2s ease;
         }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         .product-picker-box {
             background: #fff;
             border-radius: 16px;
             max-width: 720px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+        }
+        .coupon-picker-box {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+        }
+        .card-style-box {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 540px;
             width: 100%;
             max-height: 85vh;
             display: flex;
@@ -1278,9 +1195,7 @@
             font-size: 12px;
             opacity: 0;
         }
-        .product-picker-item.selected .pitem-checkbox i {
-            opacity: 1;
-        }
+        .product-picker-item.selected .pitem-checkbox i { opacity: 1; }
         .product-picker-item .pitem-img {
             width: 60px; height: 60px;
             border-radius: 8px;
@@ -1293,10 +1208,7 @@
         .product-picker-item .pitem-img img {
             width: 100%; height: 100%; object-fit: cover;
         }
-        .product-picker-item .pitem-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .product-picker-item .pitem-info { flex: 1; min-width: 0; }
         .product-picker-item .pitem-name {
             font-size: 13px;
             font-weight: 600;
@@ -1337,7 +1249,6 @@
             margin-bottom: 10px;
             display: block;
         }
-
         .product-picker-foot {
             padding: 12px 22px;
             border-top: 1px solid #e8edf4;
@@ -1379,57 +1290,21 @@
             border: 1px solid #dce5ef;
             color: #1e3a5f;
         }
-        .product-picker-foot .btn.outline:hover {
-            background: #f5f8fc;
-        }
+        .product-picker-foot .btn.outline:hover { background: #f5f8fc; }
         .product-picker-foot .btn.primary {
             background: linear-gradient(135deg, #ff7733, #ff5000);
             color: #fff;
         }
-        .product-picker-foot .btn.primary:hover {
-            filter: brightness(1.05);
-        }
+        .product-picker-foot .btn.primary:hover { filter: brightness(1.05); }
         .product-picker-foot .btn.primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             background: #c8d8e8;
         }
-
-        /* ===== 优惠券选择弹窗 ===== */
-        .coupon-picker-modal {
-            position: fixed; inset: 0;
-            background: rgba(10,30,47,0.55);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .coupon-picker-modal.show {
-            display: flex;
-            animation: fadeIn 0.2s ease;
-        }
-        .coupon-picker-box {
-            background: #fff;
-            border-radius: 16px;
-            max-width: 560px;
-            width: 100%;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
-        }
         .coupon-picker-body {
             padding: 18px 22px;
             overflow-y: auto;
             flex: 1;
-        }
-        .coupon-picker-body::-webkit-scrollbar { width: 6px; }
-        .coupon-picker-body::-webkit-scrollbar-thumb {
-            background: #dce5ef;
-            border-radius: 10px;
         }
         .coupon-item {
             display: flex;
@@ -1505,36 +1380,7 @@
             opacity: 0;
             transition: 0.12s;
         }
-        .coupon-item.selected .ci-check {
-            opacity: 1;
-        }
-
-        /* ===== 卡片样式设置弹窗 ===== */
-        .card-style-modal {
-            position: fixed; inset: 0;
-            background: rgba(10,30,47,0.55);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .card-style-modal.show {
-            display: flex;
-            animation: fadeIn 0.2s ease;
-        }
-        .card-style-box {
-            background: #fff;
-            border-radius: 16px;
-            max-width: 540px;
-            width: 100%;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
-        }
+        .coupon-item.selected .ci-check { opacity: 1; }
         .card-style-body {
             padding: 18px 22px;
             overflow-y: auto;
@@ -1583,8 +1429,6 @@
             border-color: #0a1e2f;
             box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0a1e2f;
         }
-
-        /* ===== 灯箱 ===== */
         .lightbox {
             position: fixed;
             inset: 0;
@@ -1625,8 +1469,6 @@
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-
-        /* ===== Toast ===== */
         .global-toast {
             position: fixed;
             bottom: 30px;
@@ -1650,7 +1492,6 @@
             from { opacity: 0; transform: translateX(-50%) translateY(20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-
         @media (max-width: 1200px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
@@ -1965,6 +1806,7 @@
 
 <div class="global-toast" id="toast"></div>
 
+<!-- ⬇⬇⬇ 第 3 段（JavaScript）从这里开始 ⬇⬇⬇ -->
 <script>
     /* ============================================================
        配置
@@ -2012,31 +1854,19 @@
             byProduct: {}
         },
 
-        // ★ 滚动状态：是否用户主动上翻（不强制贴底）
+        // 滚动状态
         userScrolledUp: false,
         hasNewMessageWhileScrolledUp: false
     };
 
     /* ============================================================
-       ★★★ 关键修复：函数声明提前 ★★★
-       说明：scrollMessagesToBottom 使用了默认参数（force = false），
-             这会阻止函数提升（hoisting），导致前面调用时 "not defined"。
-             解决方法：
-             ① 把它改成不带默认参数的普通函数声明，手动处理默认值
-             ② 并且把它放在调用它的函数之前
-       这里先放置滚动相关函数，确保任何地方调用都不会报错。
+       ★ 滚动相关函数（提前声明，修复提升问题）
        ============================================================ */
-
-    /**
-     * 智能滚动：仅当用户未主动上翻时滚到底
-     * @param {boolean} force - 是否强制滚动（打开会话、发送消息时使用）
-     */
     function scrollMessagesToBottom(force) {
         if (force === undefined) force = false;
         const chatMessages = document.getElementById('chatMessages');
         if (!chatMessages) return;
 
-        // 用户已上翻且非强制 → 不滚动，并显示"新消息"小红点
         if (!force && state.userScrolledUp) {
             state.hasNewMessageWhileScrolledUp = true;
             updateScrollBottomBtn();
@@ -2050,9 +1880,6 @@
         });
     }
 
-    /**
-     * 强制滚动到底（用于"回到最新"按钮）
-     */
     function forceScrollToBottom() {
         state.userScrolledUp = false;
         state.hasNewMessageWhileScrolledUp = false;
@@ -2065,9 +1892,6 @@
         });
     }
 
-    /**
-     * 监听图片加载，加载完成后如果仍在贴底状态则修正位置
-     */
     function attachImageLoadHandlers() {
         const imgs = document.querySelectorAll('#messagesList img');
         imgs.forEach(img => {
@@ -2093,9 +1917,6 @@
         });
     }
 
-    /**
-     * 更新"回到最新"按钮的显示状态
-     */
     function updateScrollBottomBtn() {
         const btn = document.getElementById('scrollBottomBtn');
         const dot = document.getElementById('scrollBottomDot');
@@ -2188,7 +2009,6 @@
         });
     }
 
-    /* ★ 绑定滚动监听：判断用户是否主动上翻 */
     function bindScrollListener() {
         const chatMessages = document.getElementById('chatMessages');
         if (!chatMessages) return;
@@ -2296,6 +2116,19 @@
 
         renderChatActions(id);
         renderMessages(id);
+
+        // ★ 恢复输入框状态
+        const inputArea = document.getElementById('chatInputArea');
+        if (inputArea) {
+            inputArea.style.opacity = '1';
+            inputArea.style.pointerEvents = 'auto';
+        }
+        const msgInput = document.getElementById('msgInput');
+        if (msgInput) {
+            msgInput.disabled = false;
+            msgInput.placeholder = '输入回复内容，回车发送，Shift+回车换行...';
+        }
+
         requestAnimationFrame(() => {
             forceScrollToBottom();
         });
@@ -3201,6 +3034,7 @@
         }
     }
 
+    /* ★ 对接销售型 AI 客服 */
     async function autoAIReply(convId, userText) {
         if (state.takeoverState[convId] !== 'ai') return;
 
@@ -3210,45 +3044,37 @@
             scrollMessagesToBottom();
         }
 
-        const msgs = state.messagesMap[convId] || [];
-        const history = msgs.slice(-8).map(m => ({
-            role: m.from === 'user' ? 'user' : 'ai',
-            text: m.text || ''
-        })).filter(m => m.text);
-
         let replyData = null;
         try {
-            const res = await fetch(BACKEND_URL + '/api/ai/parse', {
+            const res = await fetch(BACKEND_URL + '/api/sales/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    text: userText,
                     session_id: 'conv_' + convId,
-                    history: history,
+                    text: userText,
                     conv_id: convId
                 })
             });
             if (res.ok) replyData = await res.json();
         } catch (e) {
-            console.warn('后端 AI 回复失败', e);
+            console.warn('销售 AI 失败', e);
         }
 
-        let replyText = '';
-        let kbHits = [];
-        let assets = [];
-
-        if (replyData && replyData.type === 'chat' && replyData.text) {
-            replyText = replyData.text;
-            kbHits = replyData.kb_hits || [];
-            assets = replyData.assets || [];
-        } else {
-            replyText = generateLocalReply(userText) || '好的，我帮您看看~';
-            if (/图|看看|实物|视频/.test(userText)) {
-                assets = searchLocalAssets(userText).slice(0, 2);
-            }
+        if (!replyData || !replyData.text) {
+            replyData = {
+                type: 'chat',
+                text: generateLocalReply(userText) || '好的，我帮您看看~',
+                stage: 'exploring',
+                products: [],
+                kb_hits: [],
+                farewell: false
+            };
         }
 
-        const recommendedProducts = await smartRecommendProducts(userText);
+        const replyText = replyData.text || '';
+        const kbHits = replyData.kb_hits || [];
+        const products = replyData.products || [];
+        const farewell = !!replyData.farewell;
 
         setTimeout(async () => {
             if (state.takeoverState[convId] !== 'ai') {
@@ -3259,24 +3085,25 @@
 
             if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
 
+            // 推送 AI 文本
             state.messagesMap[convId].push({
                 id: 'm_' + Date.now(),
                 from: 'ai',
                 text: replyText,
                 time: nowTime(),
-                kb_hits: kbHits,
-                assets: assets
+                kb_hits: kbHits
             });
 
-            if (recommendedProducts && recommendedProducts.length > 0) {
-                const cards = recommendedProducts.map(p => ({
+            // 推送商品卡片
+            if (products && products.length > 0) {
+                const cards = products.map(p => ({
                     id: p.id, name: p.name, price: p.price,
                     original_price: p.original_price || null,
                     main_image: p.main_image || '',
                     sales: p.sales || 0, stock: p.stock || 0,
                     platform: p.platform || '', spec: p.spec || '',
                     rating: p.rating || '', tags: p.tags || [],
-                    url: generateProductUrl(p)
+                    url: p.url || ''
                 }));
 
                 if (cards.length === 1) {
@@ -3294,6 +3121,29 @@
                 }
             }
 
+            // 会话结束标记
+            if (farewell) {
+                state.messagesMap[convId].push({
+                    id: 'm_' + Date.now() + '_end',
+                    from: 'ai',
+                    text: '✅ 会话已结束，感谢您的光临～',
+                    time: nowTime(),
+                    system: true
+                });
+                if (state.currentId === convId) {
+                    const inputArea = document.getElementById('chatInputArea');
+                    if (inputArea) {
+                        inputArea.style.opacity = '0.5';
+                        inputArea.style.pointerEvents = 'none';
+                    }
+                    const msgInput = document.getElementById('msgInput');
+                    if (msgInput) {
+                        msgInput.disabled = true;
+                        msgInput.placeholder = '会话已结束';
+                    }
+                }
+            }
+
             const conv = state.conversations.find(c => c.id === convId);
             if (conv) {
                 conv.lastMsg = replyText.slice(0, 30);
@@ -3305,66 +3155,7 @@
                 scrollMessagesToBottom();
             }
             renderConvList();
-        }, 800);
-    }
-
-    async function smartRecommendProducts(userText) {
-        const triggers = ['多少钱', '什么价格', '有哪些', '有什么', '推荐', '款式', '看看', '商品', '款', '什么价位', '报价'];
-        const shouldTrigger = triggers.some(w => userText.includes(w));
-        if (!shouldTrigger) return [];
-
-        if (!state.productsCache || state.productsCache.length === 0) {
-            await loadProducts();
-        }
-        if (state.productsCache.length === 0) return [];
-
-        try {
-            const res = await fetch(BACKEND_URL + '/api/ai/recommend-products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: userText, max_results: 3 })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.success && data.products && data.products.length > 0) {
-                    return data.products;
-                }
-            }
-        } catch (e) {
-            console.warn('AI 推荐失败，降级到本地匹配', e);
-        }
-
-        return localRecommendProducts(userText);
-    }
-
-    function localRecommendProducts(userText) {
-        const keywords = ['茶', '竹编', '核桃', '皂', '陶瓷', '扇', '姜茶', '丝巾', '礼盒'];
-        let matches = [];
-        for (const kw of keywords) {
-            if (userText.includes(kw)) {
-                const found = state.productsCache.filter(p =>
-                    (p.name + ' ' + (p.tags || []).join(' ')).includes(kw)
-                );
-                matches.push(...found);
-            }
-        }
-        const seen = new Set();
-        matches = matches.filter(p => {
-            if (seen.has(p.id)) return false;
-            seen.add(p.id);
-            return true;
-        });
-        if (matches.length < 3) {
-            const sorted = state.productsCache.slice().sort((a, b) => (b.sales || 0) - (a.sales || 0));
-            for (const p of sorted) {
-                if (matches.length >= 3) break;
-                if (!seen.has(p.id)) {
-                    matches.push(p);
-                    seen.add(p.id);
-                }
-            }
-        }
-        return matches.slice(0, 3);
+        }, 600);
     }
 
     function generateLocalReply(text) {
@@ -3375,15 +3166,6 @@
         if (t.includes('下单') || t.includes('买')) return '好的，感谢您的支持！我们会尽快为您安排发货~';
         if (t.includes('谢谢') || t.includes('感谢')) return '不客气，祝您购物愉快！有需要随时联系我~';
         return null;
-    }
-
-    function searchLocalAssets(text) {
-        const keywords = text.replace(/[能发个看看吗有实物图视频的教程]/g, '').trim();
-        if (!keywords) return state.assetItems.slice(0, 2);
-        return state.assetItems.filter(a => {
-            const hay = (a.name + ' ' + (a.tags || []).join(' ') + ' ' + (a.product_name || '')).toLowerCase();
-            return keywords.split('').some(ch => ch.length > 0 && hay.includes(ch));
-        }).slice(0, 2);
     }
 
     /* ============================================================
@@ -3538,7 +3320,7 @@
     }
 
     /* ============================================================
-       接管 / 转人工（功能逻辑保持不变）
+       接管 / 转人工
        ============================================================ */
     function transferToHuman() {
         if (!state.currentId) return;
@@ -3727,8 +3509,9 @@
 
     window.showClickStats = showClickStats;
 
-    console.log('💬 AI 客服页已加载（修复 scrollMessagesToBottom 提升问题）');
+    console.log('💬 AI 客服页已加载（对接销售型 AI 客服）');
     console.log('💡 后端:', BACKEND_URL);
+    console.log('💡 销售接口: POST /api/sales/chat');
 </script>
 </body>
-</html>
+</html>                            
