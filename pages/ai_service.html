@@ -216,6 +216,14 @@
             background: #94a3b8;
             border: 2px solid #fff;
         }
+        .conv-avatar .takenover-badge {
+            position: absolute; top: -4px; left: -4px;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #0d7c4f;
+            border: 2px solid #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 7px; color: #fff;
+        }
 
         .conv-info {
             flex: 1; min-width: 0;
@@ -296,23 +304,54 @@
             margin-top: 2px;
         }
         .chat-panel .chat-head .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* ===== 修复 4：按钮状态变化样式 ===== */
         .chat-panel .chat-head .actions .btn-sm {
             padding: 6px 14px; border-radius: 20px;
             border: 1px solid #dce5ef; background: #fff;
             font-size: 12px; color: #1e3a5f; cursor: pointer;
             display: inline-flex; align-items: center; gap: 4px;
             transition: 0.12s; font-family: inherit;
+            white-space: nowrap;
         }
-        .chat-panel .chat-head .actions .btn-sm:hover {
+        .chat-panel .chat-head .actions .btn-sm:hover:not(:disabled) {
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
         }
         .chat-panel .chat-head .actions .btn-sm.primary {
             background: #0a1e2f; border-color: #0a1e2f; color: #fff;
         }
-        .chat-panel .chat-head .actions .btn-sm.primary:hover {
+        .chat-panel .chat-head .actions .btn-sm.primary:hover:not(:disabled) {
             background: #1a3a5a;
         }
         .chat-panel .chat-head .actions .btn-sm.primary i { color: rgba(255,255,255,0.7); }
+
+        /* 接管后的激活态 */
+        .chat-panel .chat-head .actions .btn-sm.taken-over {
+            background: #0d7c4f;
+            border-color: #0d7c4f;
+            color: #fff;
+            cursor: default;
+        }
+        .chat-panel .chat-head .actions .btn-sm.taken-over i {
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* 禁用态 */
+        .chat-panel .chat-head .actions .btn-sm:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f7fa;
+            color: #94a3b8;
+            border-color: #e8edf4;
+        }
+        .chat-panel .chat-head .actions .btn-sm:disabled i {
+            color: #94a3b8;
+        }
+        .chat-panel .chat-head .actions .btn-sm.success {
+            background: #e6f7ec;
+            border-color: #a4d9bd;
+            color: #0d7c4f;
+        }
 
         /* 消息列表 */
         .chat-messages {
@@ -326,19 +365,47 @@
         .chat-messages::-webkit-scrollbar { width: 5px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
 
+        /* ===== 修复 3：消息气泡右边距兼容 ===== */
+        #messagesList {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            /* 关键：让客服消息从右侧算边距，客服消息右边距统一为 0 */
+            padding-right: 0;
+            padding-left: 0;
+        }
         .msg-row {
             display: flex;
             gap: 10px;
             max-width: 78%;
             animation: msgIn 0.3s ease;
+            /* 关键：默认从左侧对齐 */
+            align-self: flex-start;
+            margin-right: 0;
+            margin-left: 0;
         }
         @keyframes msgIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .msg-row.from-user { align-self: flex-start; }
-        .msg-row.from-ai { align-self: flex-start; }
-        .msg-row.from-agent { align-self: flex-end; flex-direction: row-reverse; }
+
+        /* 客服消息：靠右，右边距与容器一致 */
+        .msg-row.from-agent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+            /* 关键：客服消息右侧不额外加 margin，与容器右边距一致 */
+            margin-right: 0;
+            margin-left: auto;
+        }
+
+        /* 客户/AI 消息：靠左 */
+        .msg-row.from-user,
+        .msg-row.from-ai {
+            align-self: flex-start;
+            margin-left: 0;
+            margin-right: auto;
+        }
 
         .msg-row .avatar {
             width: 34px; height: 34px; border-radius: 50%;
@@ -354,6 +421,7 @@
         .msg-row .bubble-wrap {
             display: flex; flex-direction: column; gap: 4px;
             min-width: 0;
+            max-width: 100%;
         }
         .msg-row .bubble {
             padding: 10px 14px;
@@ -374,11 +442,6 @@
             border: 1px solid #b8d8f7;
             border-radius: 4px 14px 14px 14px;
             color: #0a1e2f;
-        }
-        .msg-row.from-ai .bubble::before {
-            content: '';
-            display: block;
-            height: 0;
         }
         .msg-row.from-agent .bubble {
             background: #0a1e2f;
@@ -410,6 +473,14 @@
             font-size: 9px;
             font-weight: 600;
         }
+        .msg-row .meta .system-tag {
+            background: #94a3b8;
+            color: #fff;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 600;
+        }
 
         /* AI 正在输入 */
         .typing-indicator {
@@ -417,6 +488,7 @@
             align-items: center;
             gap: 10px;
             padding: 6px 0;
+            align-self: flex-start;
         }
         .typing-indicator.show { display: flex; }
         .typing-indicator .avatar {
@@ -638,6 +710,7 @@
             .conv-side { max-height: 180px; }
             .toolbar .tb-btn span { display: none; }
             .chat-panel .chat-head .actions .btn-sm span { display: none; }
+            .msg-row { max-width: 92%; }
         }
     </style>
 </head>
@@ -720,16 +793,8 @@
                     <div class="sub" id="chatSub">客户 ID: C-2026-0001 · 在线</div>
                 </div>
             </div>
-            <div class="actions">
-                <button class="btn-sm" onclick="transferToHuman()" title="转人工">
-                    <i class="fas fa-user-headset"></i> <span>转人工</span>
-                </button>
-                <button class="btn-sm primary" onclick="takeOver()" title="接管会话">
-                    <i class="fas fa-hand-paper"></i> <span>接管</span>
-                </button>
-                <button class="btn-sm" onclick="closeCurrentConv()" title="结束会话">
-                    <i class="fas fa-check"></i> <span>结束</span>
-                </button>
+            <div class="actions" id="chatActions">
+                <!-- 由 JS 动态渲染 -->
             </div>
         </div>
 
@@ -773,12 +838,16 @@
        状态
        ============================================================ */
     const state = {
-        conversations: [],       // 会话列表
-        currentId: null,         // 当前会话 ID
-        filterPlatform: 'all',   // 当前筛选平台
-        messagesMap: {},         // { convId: [messages] }
+        conversations: [],
+        currentId: null,
+        filterPlatform: 'all',
+        messagesMap: {},
         isReplying: false,
-        aiAutoReplyOn: true
+        aiAutoReplyOn: true,
+        // ★ 修复 1：每个会话的接管状态
+        takeoverState: {},  // { convId: 'ai' | 'human' | null }
+        // ★ 修复 1：AI 回复计时器，用于接管后取消
+        aiTimers: {}        // { convId: timerId }
     };
 
     /* ============================================================
@@ -895,6 +964,10 @@
     document.addEventListener('DOMContentLoaded', function () {
         state.conversations = JSON.parse(JSON.stringify(DEMO_CONVERSATIONS));
         state.messagesMap = JSON.parse(JSON.stringify(DEMO_MESSAGES));
+        // 初始化接管状态
+        state.conversations.forEach(c => {
+            state.takeoverState[c.id] = 'ai';  // 默认 AI 接管
+        });
         renderConvList();
         bindInputEvents();
     });
@@ -927,24 +1000,33 @@
             '京东': 'jd'
         };
 
-        container.innerHTML = list.map(c => `
-            <div class="conv-item ${c.id === state.currentId ? 'active' : ''}"
-                 onclick="openConv('${c.id}')">
-                <div class="conv-avatar" style="background:${c.avatarColor};">
-                    ${c.avatarText}
-                    <span class="${c.online ? 'online-dot' : 'offline-dot'}"></span>
-                </div>
-                <div class="conv-info">
-                    <div class="conv-name">
-                        ${escapeHtml(c.name)}
-                        <span class="plat-tag ${platClass[c.platform] || ''}">${c.platform}</span>
+        container.innerHTML = list.map(c => {
+            // ★ 修复 4：会话列表中显示接管状态
+            const takeover = state.takeoverState[c.id];
+            const takenoverBadge = takeover === 'human'
+                ? `<span class="takenover-badge" title="人工接管中"><i class="fas fa-user"></i></span>`
+                : '';
+
+            return `
+                <div class="conv-item ${c.id === state.currentId ? 'active' : ''}"
+                     onclick="openConv('${c.id}')">
+                    <div class="conv-avatar" style="background:${c.avatarColor};">
+                        ${c.avatarText}
+                        <span class="${c.online ? 'online-dot' : 'offline-dot'}"></span>
+                        ${takenoverBadge}
                     </div>
-                    <div class="conv-preview">${escapeHtml(c.lastMsg)}</div>
-                    <div class="conv-time">${c.lastTime}</div>
+                    <div class="conv-info">
+                        <div class="conv-name">
+                            ${escapeHtml(c.name)}
+                            <span class="plat-tag ${platClass[c.platform] || ''}">${c.platform}</span>
+                        </div>
+                        <div class="conv-preview">${escapeHtml(c.lastMsg)}</div>
+                        <div class="conv-time">${c.lastTime}</div>
+                    </div>
+                    ${c.unread > 0 ? `<div class="conv-unread">${c.unread > 99 ? '99+' : c.unread}</div>` : ''}
                 </div>
-                ${c.unread > 0 ? `<div class="conv-unread">${c.unread > 99 ? '99+' : c.unread}</div>` : ''}
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     /* ============================================================
@@ -984,6 +1066,9 @@
         document.getElementById('chatSub').textContent =
             `客户 ID: ${conv.id.toUpperCase()} · ${conv.online ? '在线' : '离线'}`;
 
+        // ★ 修复 4：渲染按钮
+        renderChatActions(id);
+
         // 渲染消息
         renderMessages(id);
 
@@ -999,6 +1084,42 @@
     }
 
     /* ============================================================
+       ★ 修复 4：动态渲染按钮（根据接管状态）
+       ============================================================ */
+    function renderChatActions(convId) {
+        const actions = document.getElementById('chatActions');
+        const takeover = state.takeoverState[convId] || 'ai';
+
+        if (takeover === 'human') {
+            // 人工接管中
+            actions.innerHTML = `
+                <button class="btn-sm taken-over" disabled title="当前为人工接管">
+                    <i class="fas fa-user-check"></i> <span>人工接管中</span>
+                </button>
+                <button class="btn-sm" onclick="releaseToAI()" title="释放给 AI">
+                    <i class="fas fa-robot"></i> <span>释放给 AI</span>
+                </button>
+                <button class="btn-sm" onclick="closeCurrentConv()" title="结束会话">
+                    <i class="fas fa-check"></i> <span>结束会话</span>
+                </button>
+            `;
+        } else {
+            // AI 接管中
+            actions.innerHTML = `
+                <button class="btn-sm" onclick="transferToHuman()" title="转人工">
+                    <i class="fas fa-user-headset"></i> <span>转人工</span>
+                </button>
+                <button class="btn-sm primary" onclick="takeOver()" title="AI 接管">
+                    <i class="fas fa-robot"></i> <span>AI 接管</span>
+                </button>
+                <button class="btn-sm" onclick="closeCurrentConv()" title="结束会话">
+                    <i class="fas fa-check"></i> <span>结束会话</span>
+                </button>
+            `;
+        }
+    }
+
+    /* ============================================================
        消息渲染
        ============================================================ */
     function renderMessages(convId) {
@@ -1011,29 +1132,27 @@
         }
 
         list.innerHTML = msgs.map(m => {
-            const avatarText = m.from === 'agent' ? '客服'
-                              : m.from === 'ai' ? 'AI'
-                              : '客';
             const avatarIcon = m.from === 'agent'
                 ? '<i class="fas fa-user-headset"></i>'
                 : m.from === 'ai'
                     ? '<i class="fas fa-robot"></i>'
                     : '<i class="fas fa-user"></i>';
 
-            const meta = `
-                <div class="meta">
-                    ${m.from === 'ai' ? '<span class="ai-tag">AI</span>' : ''}
-                    ${m.from === 'agent' ? '<span class="agent-tag">客服</span>' : ''}
-                    <span>${m.time}</span>
-                </div>
-            `;
+            const tagHtml = m.from === 'ai'
+                ? '<span class="ai-tag">AI</span>'
+                : (m.from === 'agent'
+                    ? '<span class="agent-tag">客服</span>'
+                    : (m.system ? '<span class="system-tag">系统</span>' : ''));
 
             return `
-                <div class="msg-row from-${m.from}">
+                <div class="msg-row from-${m.from} ${m.system ? 'system-msg' : ''}">
                     <div class="avatar">${avatarIcon}</div>
                     <div class="bubble-wrap">
                         <div class="bubble">${escapeHtml(m.text).replace(/\n/g, '<br>')}</div>
-                        ${meta}
+                        <div class="meta">
+                            ${tagHtml}
+                            <span>${m.time}</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -1062,7 +1181,7 @@
         const convId = state.currentId;
         const time = nowTime();
 
-        // 加入消息
+        // 加入消息（人工发的消息，from 为 agent）
         if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
         state.messagesMap[convId].push({
             id: 'm_' + Date.now(),
@@ -1088,7 +1207,7 @@
         renderConvList();
         scrollMessagesToBottom();
 
-        // 模拟客户回复（2秒后）
+        // 模拟客户回复（2 秒后）
         state.isReplying = true;
         setTimeout(() => {
             simulateCustomerReply(convId);
@@ -1105,7 +1224,7 @@
     }
 
     /* ============================================================
-       模拟客户回复
+       ★ 修复 1：模拟客户回复 + AI 自动回复（受接管状态控制）
        ============================================================ */
     function simulateCustomerReply(convId) {
         const replies = [
@@ -1144,9 +1263,22 @@
         }
         renderConvList();
 
-        // AI 自动回复（可选）
-        if (state.aiAutoReplyOn && state.currentId === convId) {
-            setTimeout(() => autoAIReply(convId, reply), 1200);
+        // ★ 修复 1：只有 AI 接管 + 自动回复开启时，才触发 AI 自动回复
+        const takeover = state.takeoverState[convId] || 'ai';
+        if (state.aiAutoReplyOn && takeover === 'ai' && state.currentId === convId) {
+            // 用计时器包装，便于接管后取消
+            if (state.aiTimers[convId]) {
+                clearTimeout(state.aiTimers[convId]);
+            }
+            state.aiTimers[convId] = setTimeout(() => {
+                // 二次校验：接管状态可能已经变化
+                if (state.takeoverState[convId] !== 'ai') {
+                    console.log(`[AI 客服] 会话 ${convId} 已人工接管，取消 AI 回复`);
+                    return;
+                }
+                autoAIReply(convId, reply);
+                delete state.aiTimers[convId];
+            }, 1200);
         }
     }
 
@@ -1154,6 +1286,9 @@
        AI 自动回复
        ============================================================ */
     function autoAIReply(convId, userText) {
+        // ★ 修复 1：二次守卫
+        if (state.takeoverState[convId] !== 'ai') return;
+
         const aiReply = generateAIReply(userText);
         if (!aiReply) return;
 
@@ -1164,6 +1299,12 @@
         }
 
         setTimeout(() => {
+            // ★ 修复 1：三次守卫，防止延迟期间状态变化
+            if (state.takeoverState[convId] !== 'ai') {
+                typing.classList.remove('show');
+                return;
+            }
+
             typing.classList.remove('show');
             if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
             state.messagesMap[convId].push({
@@ -1207,36 +1348,88 @@
         if (t.includes('谢谢') || t.includes('感谢')) {
             return '不客气，祝您购物愉快！有需要随时联系我~';
         }
-        return null; // 不自动回复
+        return null;
     }
 
     /* ============================================================
-       转人工 / 接管 / 结束
+       ★ 修复 4：转人工 / AI 接管 / 释放给 AI / 结束
        ============================================================ */
     function transferToHuman() {
         if (!state.currentId) return;
-        showToast('🔄 已转接人工客服，请稍等...');
-        setTimeout(() => {
-            sendSystemMessage(state.currentId, '【系统】会话已转人工客服');
-        }, 600);
+        const convId = state.currentId;
+
+        // 取消挂起的 AI 回复
+        if (state.aiTimers[convId]) {
+            clearTimeout(state.aiTimers[convId]);
+            delete state.aiTimers[convId];
+        }
+
+        // 切换状态
+        state.takeoverState[convId] = 'human';
+
+        // 隐藏打字动画
+        const typing = document.getElementById('typingIndicator');
+        typing.classList.remove('show');
+
+        // 系统消息
+        sendSystemMessage(convId, '【系统】会话已转人工客服');
+
+        // 更新按钮
+        renderChatActions(convId);
+
+        // 更新左侧列表（显示接管标记）
+        renderConvList();
+
+        showToast('👤 已转人工，AI 已停止自动回复');
     }
 
     function takeOver() {
         if (!state.currentId) return;
-        showToast('✋ 你已接管此会话');
-        sendSystemMessage(state.currentId, '【系统】客服已接管本会话');
+        const convId = state.currentId;
+
+        // 切换到 AI 接管
+        state.takeoverState[convId] = 'ai';
+
+        // 系统消息
+        sendSystemMessage(convId, '【系统】AI 已接管本会话');
+
+        // 更新按钮
+        renderChatActions(convId);
+        renderConvList();
+
+        showToast('🤖 AI 已接管，将继续自动回复');
+    }
+
+    function releaseToAI() {
+        if (!state.currentId) return;
+        const convId = state.currentId;
+
+        state.takeoverState[convId] = 'ai';
+
+        sendSystemMessage(convId, '【系统】已释放给 AI 接管');
+        renderChatActions(convId);
+        renderConvList();
+
+        showToast('🤖 已释放给 AI');
     }
 
     function closeCurrentConv() {
         if (!state.currentId) return;
         if (!confirm('确定结束当前会话？')) return;
         const convId = state.currentId;
+
+        // 清理
+        if (state.aiTimers[convId]) {
+            clearTimeout(state.aiTimers[convId]);
+            delete state.aiTimers[convId];
+        }
+
         state.conversations = state.conversations.filter(c => c.id !== convId);
         delete state.messagesMap[convId];
+        delete state.takeoverState[convId];
         state.currentId = null;
         renderConvList();
 
-        // 隐藏聊天区
         document.getElementById('emptyChat').style.display = 'flex';
         document.getElementById('chatHead').style.display = 'none';
         document.getElementById('chatMessages').style.display = 'none';
@@ -1266,6 +1459,9 @@
        ============================================================ */
     function refreshAll() {
         renderConvList();
+        if (state.currentId) {
+            renderChatActions(state.currentId);
+        }
         showToast('🔄 已刷新会话列表');
     }
 
@@ -1316,20 +1512,20 @@
         t._timer = setTimeout(() => t.classList.remove('show'), 2200);
     }
 
-    /* 暴露到全局 */
     window.openConv = openConv;
     window.filterConv = filterConv;
     window.sendMsg = sendMsg;
     window.sendQuick = sendQuick;
     window.transferToHuman = transferToHuman;
     window.takeOver = takeOver;
+    window.releaseToAI = releaseToAI;
     window.closeCurrentConv = closeCurrentConv;
     window.refreshAll = refreshAll;
     window.markAllRead = markAllRead;
     window.handleMsgKey = handleMsgKey;
     window.autoResize = autoResize;
 
-    console.log('💬 AI 客服页已加载');
+    console.log('💬 AI 客服页已加载（支持接管状态管理）');
 </script>
 </body>
 </html>
