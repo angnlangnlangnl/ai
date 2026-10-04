@@ -542,6 +542,317 @@
         }
         .upload-foot .btn.outline:hover { background: #f5f8fc; }
 
+        /* ============================================================
+           ★ 编辑弹窗：加宽 + 分屏 + 富文本
+           ============================================================ */
+        .edit-modal .upload-box {
+            max-width: 1200px;
+            width: 94vw;
+            max-height: 94vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0;
+        }
+        .edit-modal .upload-head {
+            padding: 16px 24px 14px;
+            background: #fff;
+            border-bottom: 1px solid #e8edf4;
+            flex-shrink: 0;
+        }
+        .edit-modal .upload-head .head-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 12px;
+        }
+        .edit-modal .upload-head .head-actions .mode-btn {
+            padding: 5px 12px;
+            border-radius: 8px;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            color: #5f7d95;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.12s;
+            font-family: inherit;
+        }
+        .edit-modal .upload-head .head-actions .mode-btn:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+        }
+        .edit-modal .upload-head .head-actions .mode-btn.active {
+            background: #0a1e2f;
+            color: #fff;
+            border-color: #0a1e2f;
+        }
+
+        .edit-modal .upload-body {
+            padding: 16px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .edit-modal .upload-body::-webkit-scrollbar { width: 6px; }
+        .edit-modal .upload-body::-webkit-scrollbar-thumb {
+            background: #c8d8e8;
+            border-radius: 10px;
+        }
+
+        .edit-modal .edit-meta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        /* ===== 工具栏 ===== */
+        .md-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 8px 10px;
+            background: #f8fafc;
+            border: 1px solid #e8edf4;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+            align-items: center;
+        }
+        .md-tool-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: #5f7d95;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            transition: 0.12s;
+            font-family: inherit;
+        }
+        .md-tool-btn:hover {
+            background: #e8edf4;
+            color: #2a7faa;
+        }
+        .md-tool-btn.active {
+            background: #0a1e2f;
+            color: #fff;
+        }
+        .md-tool-divider {
+            width: 1px;
+            height: 20px;
+            background: #dce5ef;
+            margin: 0 4px;
+        }
+
+        /* ===== 分屏容器 ===== */
+        .edit-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            min-height: 480px;
+        }
+        .edit-split.mode-edit-only { grid-template-columns: 1fr; }
+        .edit-split.mode-preview-only { grid-template-columns: 1fr; }
+        .edit-split.mode-edit-only .edit-preview-wrap { display: none; }
+        .edit-split.mode-preview-only .edit-editor-wrap { display: none; }
+
+        .edit-editor-wrap,
+        .edit-preview-wrap {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            border: 1px solid #e8edf4;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .edit-pane-head {
+            padding: 8px 14px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e8edf4;
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f7d95;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .edit-pane-head .pane-count {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .edit-content-area {
+            flex: 1;
+            width: 100%;
+            padding: 14px 18px;
+            border: none;
+            background: #fff;
+            font-size: 14px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace;
+            line-height: 1.7;
+            outline: none;
+            color: #0a1e2f;
+            resize: none;
+            min-height: 440px;
+        }
+        .edit-content-area::placeholder { color: #b8c8d8; }
+
+        /* ===== Markdown 预览 ===== */
+        .edit-preview {
+            flex: 1;
+            padding: 14px 20px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.75;
+            color: #0a1e2f;
+            background: #fff;
+            min-height: 440px;
+        }
+        .edit-preview::-webkit-scrollbar { width: 6px; }
+        .edit-preview::-webkit-scrollbar-thumb {
+            background: #dce5ef;
+            border-radius: 10px;
+        }
+        .edit-preview h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 16px 0 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e8edf4;
+            color: #0a1e2f;
+        }
+        .edit-preview h1:first-child { margin-top: 0; }
+        .edit-preview h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 18px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e8edf4;
+            color: #0a1e2f;
+        }
+        .edit-preview h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 14px 0 8px;
+            color: #0a1e2f;
+        }
+        .edit-preview h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 12px 0 6px;
+            color: #2a7faa;
+        }
+        .edit-preview p {
+            margin: 8px 0;
+        }
+        .edit-preview strong { font-weight: 700; color: #0a1e2f; }
+        .edit-preview em { font-style: italic; color: #5f7d95; }
+        .edit-preview code {
+            background: #f0f4f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #b55a1a;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        .edit-preview pre {
+            background: #0a1e2f;
+            color: #e2e8f0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 13px;
+            font-family: 'SF Mono', Monaco, monospace;
+            line-height: 1.6;
+        }
+        .edit-preview pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        .edit-preview ul,
+        .edit-preview ol {
+            margin: 8px 0 8px 24px;
+        }
+        .edit-preview li {
+            margin: 4px 0;
+        }
+        .edit-preview blockquote {
+            border-left: 4px solid #4dabf7;
+            background: #f0f7fe;
+            padding: 8px 14px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            color: #2a7faa;
+        }
+        .edit-preview a {
+            color: #4dabf7;
+            text-decoration: none;
+            border-bottom: 1px dashed #4dabf7;
+        }
+        .edit-preview a:hover {
+            color: #00d4ff;
+            border-bottom-style: solid;
+        }
+        .edit-preview hr {
+            border: none;
+            border-top: 2px dashed #e8edf4;
+            margin: 16px 0;
+        }
+        .edit-preview table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+        .edit-preview table th,
+        .edit-preview table td {
+            border: 1px solid #e8edf4;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .edit-preview table th {
+            background: #f0f7fe;
+            font-weight: 600;
+            color: #0a1e2f;
+        }
+        .edit-preview table tr:hover td {
+            background: #f8fafc;
+        }
+        .edit-preview .md-empty {
+            color: #b8c8d8;
+            font-style: italic;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        /* 分屏响应式 */
+        @media (max-width: 900px) {
+            .edit-modal .upload-box { max-width: 96vw; width: 96vw; }
+            .edit-split { grid-template-columns: 1fr; }
+            .edit-split.mode-preview-only .edit-editor-wrap { display: none; }
+            .edit-split.mode-edit-only .edit-preview-wrap { display: none; }
+        }
+        @media (max-width: 640px) {
+            .edit-modal .edit-meta-row { grid-template-columns: 1fr; }
+            .edit-modal .upload-body { padding: 12px 16px; }
+            .edit-modal .upload-head { padding: 12px 16px 10px; }
+            .md-toolbar { padding: 6px 8px; }
+            .md-tool-btn { width: 28px; height: 28px; font-size: 12px; }
+            .edit-content-area, .edit-preview { min-height: 320px; font-size: 13px; }
+        }
+
         /* ===== Toast ===== */
         .global-toast {
             position: fixed;
@@ -609,7 +920,6 @@
 <!-- ===== 主体 ===== -->
 <div class="app-body">
 
-    <!-- 统计卡片 -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="label"><i class="fas fa-book"></i> 知识总数</div>
@@ -633,7 +943,6 @@
         </div>
     </div>
 
-    <!-- 筛选 + 分类 -->
     <div class="card" style="padding:14px 20px;">
         <div class="filter-bar">
             <input type="text" id="kbSearch" placeholder="搜索知识标题/内容/标签..." oninput="renderKb()">
@@ -655,7 +964,6 @@
         <div class="kb-category-tree" id="kbCategoryTree"></div>
     </div>
 
-    <!-- 知识列表 -->
     <div class="kb-grid" id="kbGrid"></div>
     <div class="empty-state" id="kbEmpty" style="display:none;">
         <i class="fas fa-book-open"></i>
@@ -712,38 +1020,103 @@
     </div>
 </div>
 
-<!-- ===== 编辑知识弹窗 ===== -->
-<div class="upload-modal" id="kbEditModal" onclick="if(event.target===this) closeKbEdit()">
+<!-- ===== 编辑知识弹窗（★ 富文本 + 分屏 + 快捷键） ===== -->
+<div class="upload-modal edit-modal" id="kbEditModal" onclick="if(event.target===this) closeKbEdit()">
     <div class="upload-box">
         <div class="upload-head">
             <h3><i class="fas fa-edit"></i> 编辑知识</h3>
+            <div class="head-actions">
+                <button class="mode-btn active" data-mode="split" onclick="switchEditMode('split')">
+                    <i class="fas fa-columns"></i> 分屏
+                </button>
+                <button class="mode-btn" data-mode="edit" onclick="switchEditMode('edit')">
+                    <i class="fas fa-pen"></i> 编辑
+                </button>
+                <button class="mode-btn" data-mode="preview" onclick="switchEditMode('preview')">
+                    <i class="fas fa-eye"></i> 预览
+                </button>
+            </div>
             <button class="close" onclick="closeKbEdit()">×</button>
         </div>
+
         <div class="upload-body">
             <input type="hidden" id="editKbId">
-            <div class="form-group">
-                <label>标题 <span class="req">*</span></label>
-                <input type="text" id="editKbTitle" placeholder="知识标题">
+
+            <div class="edit-meta-row">
+                <div class="form-group">
+                    <label>标题 <span class="req">*</span></label>
+                    <input type="text" id="editKbTitle" placeholder="知识标题">
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="editKbCategory"></select>
+                </div>
             </div>
-            <div class="form-group">
-                <label>分类</label>
-                <select id="editKbCategory"></select>
-            </div>
+
             <div class="form-group">
                 <label>标签（逗号分隔）</label>
                 <input type="text" id="editKbTags" placeholder="例如：退货,售后">
             </div>
+
             <div class="form-group">
-                <label>内容</label>
-                <textarea id="editKbContent" rows="10"
-                    style="width:100%;padding:10px 14px;border:1px solid #dce5ef;border-radius:10px;background:#fafcfe;font-size:13px;font-family:inherit;outline:none;color:#0a1e2f;resize:vertical;min-height:150px;"
-                    placeholder="知识内容..."></textarea>
+                <label>
+                    内容
+                    <span style="color:#94a3b8;font-weight:400;margin-left:8px;font-size:11px;" id="editKbContentLen"></span>
+                </label>
+
+                <!-- Markdown 工具栏 -->
+                <div class="md-toolbar">
+                    <button class="md-tool-btn" onclick="mdCmd('bold')" title="加粗 (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                    <button class="md-tool-btn" onclick="mdCmd('italic')" title="斜体 (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                    <button class="md-tool-btn" onclick="mdCmd('strike')" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                    <div class="md-tool-divider"></div>
+                    <button class="md-tool-btn" onclick="mdCmd('h1')" title="标题1 (Ctrl+1)">H1</button>
+                    <button class="md-tool-btn" onclick="mdCmd('h2')" title="标题2 (Ctrl+2)">H2</button>
+                    <button class="md-tool-btn" onclick="mdCmd('h3')" title="标题3 (Ctrl+3)">H3</button>
+                    <div class="md-tool-divider"></div>
+                    <button class="md-tool-btn" onclick="mdCmd('ul')" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                    <button class="md-tool-btn" onclick="mdCmd('ol')" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                    <button class="md-tool-btn" onclick="mdCmd('quote')" title="引用"><i class="fas fa-quote-right"></i></button>
+                    <div class="md-tool-divider"></div>
+                    <button class="md-tool-btn" onclick="mdCmd('code')" title="行内代码"><i class="fas fa-code"></i></button>
+                    <button class="md-tool-btn" onclick="mdCmd('codeblock')" title="代码块"><i class="fas fa-file-code"></i></button>
+                    <button class="md-tool-btn" onclick="mdCmd('link')" title="链接 (Ctrl+K)"><i class="fas fa-link"></i></button>
+                    <button class="md-tool-btn" onclick="mdCmd('table')" title="表格"><i class="fas fa-table"></i></button>
+                    <button class="md-tool-btn" onclick="mdCmd('hr')" title="分割线"><i class="fas fa-minus"></i></button>
+                    <div class="md-tool-divider"></div>
+                    <button class="md-tool-btn" onclick="mdCmd('undo')" title="撤销"><i class="fas fa-undo"></i></button>
+                </div>
+
+                <!-- 分屏容器 -->
+                <div class="edit-split" id="editSplit">
+                    <div class="edit-editor-wrap">
+                        <div class="edit-pane-head">
+                            <span><i class="fas fa-pen"></i> Markdown 编辑</span>
+                            <span class="pane-count" id="editPaneCount">0 字</span>
+                        </div>
+                        <textarea id="editKbContent"
+                            class="edit-content-area"
+                            placeholder="# 标题&#10;&#10;正文内容...&#10;&#10;- 支持 **加粗** / *斜体* / `代码`&#10;- 支持 # 标题、- 列表、> 引用&#10;- 支持表格、链接、代码块"
+                            oninput="onEditInput()"
+                            onkeydown="onEditKeyDown(event)"
+                            onscroll="syncScroll()"></textarea>
+                    </div>
+
+                    <div class="edit-preview-wrap">
+                        <div class="edit-pane-head">
+                            <span><i class="fas fa-eye"></i> 实时预览</span>
+                            <span class="pane-count">Markdown 渲染</span>
+                        </div>
+                        <div class="edit-preview" id="editPreview"></div>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="upload-foot">
             <button class="btn outline" onclick="closeKbEdit()">取消</button>
             <button class="btn primary" id="kbEditSubmitBtn" onclick="submitKbEdit()">
-                <i class="fas fa-save"></i> 保存
+                <i class="fas fa-save"></i> 保存 (Ctrl+S)
             </button>
         </div>
     </div>
@@ -790,12 +1163,14 @@
         kbStats: {},
         kbCategories: [],
         kbFilterCategory: 'all',
-        kbFile: null
+        kbFile: null,
+        editMode: 'split'
     };
 
     document.addEventListener('DOMContentLoaded', function () {
         loadKb();
         bindDragEvents();
+        bindGlobalShortcuts();
     });
 
     function bindDragEvents() {
@@ -817,7 +1192,374 @@
         });
     }
 
-    // ===== 加载 =====
+    // ★ 全局快捷键（弹窗打开时）
+    function bindGlobalShortcuts() {
+        document.addEventListener('keydown', function (e) {
+            const modal = document.getElementById('kbEditModal');
+            if (!modal || !modal.classList.contains('show')) return;
+
+            // Ctrl+S 保存
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                submitKbEdit();
+            }
+            // Esc 关闭
+            if (e.key === 'Escape') {
+                closeKbEdit();
+            }
+        });
+    }
+
+    // ============================================================
+    // Markdown 编辑
+    // ============================================================
+    function onEditInput() {
+        const ta = document.getElementById('editKbContent');
+        const preview = document.getElementById('editPreview');
+        const count = document.getElementById('editPaneCount');
+        const counter = document.getElementById('editKbContentLen');
+
+        const text = ta.value;
+        if (count) count.textContent = text.length + ' 字';
+        if (counter) counter.textContent = `（${text.length} 字）`;
+
+        renderMarkdownPreview(text, preview);
+    }
+
+    function renderMarkdownPreview(text, preview) {
+        if (!text || !text.trim()) {
+            preview.innerHTML = '<div class="md-empty"><i class="fas fa-eye"></i><br>暂无内容，输入后自动预览</div>';
+            return;
+        }
+        preview.innerHTML = markdownToHtml(text);
+    }
+
+    // ============================================================
+    // 极简 Markdown 渲染（不依赖第三方库）
+    // ============================================================
+    function markdownToHtml(md) {
+        let html = escapeHtml(md);
+
+        // 代码块 ```xxx```
+        const codeBlocks = [];
+        html = html.replace(/```([\s\S]*?)```/g, function (_, code) {
+            const idx = codeBlocks.length;
+            codeBlocks.push(code);
+            return `\u0000CODE${idx}\u0000`;
+        });
+
+        // 行内代码 `xxx`
+        html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+
+        // 分割线
+        html = html.replace(/^---$/gm, '<hr>');
+
+        // 标题
+        html = html.replace(/^###### (.+)$/gm, '<h4>$1</h4>');
+        html = html.replace(/^##### (.+)$/gm, '<h4>$1</h4>');
+        html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+        // 引用
+        html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+        html = html.replace(/<\/blockquote>\n<blockquote>/g, '\n');
+
+        // 加粗 / 斜体 / 删除线
+        html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+        html = html.replace(/~~([^~\n]+)~~/g, '<del>$1</del>');
+
+        // 链接 [text](url)
+        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+        // 表格
+        html = renderTables(html);
+
+        // 列表
+        html = renderLists(html);
+
+        // 段落换行
+        html = html.split('\n\n').map(function (block) {
+            if (/^<(h[1-6]|ul|ol|blockquote|pre|table|hr|div)/.test(block.trim())) {
+                return block;
+            }
+            return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+        }).join('\n');
+
+        // 还原代码块
+        html = html.replace(/\u0000CODE(\d+)\u0000/g, function (_, i) {
+            return '<pre><code>' + codeBlocks[parseInt(i, 10)] + '</code></pre>';
+        });
+
+        return html;
+    }
+
+    function renderTables(html) {
+        const lines = html.split('\n');
+        const out = [];
+        let i = 0;
+        while (i < lines.length) {
+            if (lines[i].includes('|') && i + 1 < lines.length && /^\s*\|?[\s\-:|]+\|[\s\-:|]+$/.test(lines[i + 1])) {
+                const header = lines[i].split('|').map(s => s.trim()).filter(s => s);
+                const rows = [];
+                i += 2;
+                while (i < lines.length && lines[i].includes('|')) {
+                    const cells = lines[i].split('|').map(s => s.trim());
+                    rows.push(cells.filter((_, idx) => idx > 0 && idx < cells.length - 1));
+                    i++;
+                }
+                let table = '<table><thead><tr>';
+                header.forEach(h => { table += `<th>${h}</th>`; });
+                table += '</tr></thead><tbody>';
+                rows.forEach(row => {
+                    table += '<tr>';
+                    row.forEach(c => { table += `<td>${c}</td>`; });
+                    table += '</tr>';
+                });
+                table += '</tbody></table>';
+                out.push(table);
+            } else {
+                out.push(lines[i]);
+                i++;
+            }
+        }
+        return out.join('\n');
+    }
+
+    function renderLists(html) {
+        const lines = html.split('\n');
+        const out = [];
+        let inUl = false, inOl = false;
+        lines.forEach(line => {
+            if (/^\s*[-*]\s+(.+)$/.test(line)) {
+                if (inOl) { out.push('</ol>'); inOl = false; }
+                if (!inUl) { out.push('<ul>'); inUl = true; }
+                out.push('<li>' + line.replace(/^\s*[-*]\s+/, '') + '</li>');
+            } else if (/^\s*\d+\.\s+(.+)$/.test(line)) {
+                if (inUl) { out.push('</ul>'); inUl = false; }
+                if (!inOl) { out.push('<ol>'); inOl = true; }
+                out.push('<li>' + line.replace(/^\s*\d+\.\s+/, '') + '</li>');
+            } else {
+                if (inUl) { out.push('</ul>'); inUl = false; }
+                if (inOl) { out.push('</ol>'); inOl = false; }
+                out.push(line);
+            }
+        });
+        if (inUl) out.push('</ul>');
+        if (inOl) out.push('</ol>');
+        return out.join('\n');
+    }
+
+    // ============================================================
+    // 工具栏命令
+    // ============================================================
+    function mdCmd(cmd) {
+        const ta = document.getElementById('editKbContent');
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const selected = ta.value.substring(start, end);
+        const before = ta.value.substring(0, start);
+        const after = ta.value.substring(end);
+
+        let newText = '', newCursorStart = start, newCursorEnd = start;
+
+        const wrap = (pre, suf, placeholder) => {
+            const content = selected || placeholder;
+            newText = pre + content + suf;
+            newCursorStart = start + pre.length;
+            newCursorEnd = newCursorStart + content.length;
+        };
+
+        const prefixLine = (prefix, placeholder) => {
+            const lineStart = before.lastIndexOf('\n') + 1;
+            const insertAt = lineStart;
+            newText = prefix + (selected || placeholder);
+            // 简化：在当前位置插入
+            ta.value = ta.value.substring(0, start) + newText + after;
+            ta.selectionStart = start + prefix.length;
+            ta.selectionEnd = start + prefix.length + (selected || placeholder).length;
+            onEditInput();
+            ta.focus();
+            return;
+        };
+
+        switch (cmd) {
+            case 'bold': wrap('**', '**', '粗体文字'); break;
+            case 'italic': wrap('*', '*', '斜体文字'); break;
+            case 'strike': wrap('~~', '~~', '删除线'); break;
+            case 'code': wrap('`', '`', 'code'); break;
+            case 'codeblock':
+                newText = '\n```\n' + (selected || 'code here') + '\n```\n';
+                newCursorStart = start + 4;
+                newCursorEnd = newCursorStart + (selected || 'code here').length;
+                break;
+            case 'link': wrap('[', '](https://)', '链接文字'); break;
+            case 'h1': prefixLine('# ', '标题1'); return;
+            case 'h2': prefixLine('## ', '标题2'); return;
+            case 'h3': prefixLine('### ', '标题3'); return;
+            case 'ul': prefixLine('- ', '列表项'); return;
+            case 'ol': prefixLine('1. ', '列表项'); return;
+            case 'quote': prefixLine('> ', '引用内容'); return;
+            case 'table':
+                newText = '\n| 列1 | 列2 | 列3 |\n| --- | --- | --- |\n| 内容 | 内容 | 内容 |\n';
+                newCursorStart = start + newText.length;
+                newCursorEnd = newCursorStart;
+                break;
+            case 'hr':
+                newText = '\n---\n';
+                newCursorStart = start + newText.length;
+                newCursorEnd = newCursorStart;
+                break;
+            case 'undo':
+                document.execCommand && document.execCommand('undo');
+                return;
+            default: return;
+        }
+
+        ta.value = before + newText + after;
+        ta.selectionStart = newCursorStart;
+        ta.selectionEnd = newCursorEnd;
+        onEditInput();
+        ta.focus();
+    }
+
+    // ============================================================
+    // 编辑区快捷键
+    // ============================================================
+    function onEditKeyDown(e) {
+        const ta = e.target;
+
+        // Ctrl+S 保存
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+            submitKbEdit();
+            return;
+        }
+        // Ctrl+B 加粗
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+            e.preventDefault();
+            mdCmd('bold');
+            return;
+        }
+        // Ctrl+I 斜体
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
+            e.preventDefault();
+            mdCmd('italic');
+            return;
+        }
+        // Ctrl+K 链接
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            mdCmd('link');
+            return;
+        }
+        // Ctrl+1~4 标题
+        if ((e.ctrlKey || e.metaKey) && ['1', '2', '3', '4'].includes(e.key)) {
+            e.preventDefault();
+            mdCmd('h' + e.key);
+            return;
+        }
+        // Tab 缩进
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = ta.selectionStart;
+            const end = ta.selectionEnd;
+            if (e.shiftKey) {
+                // Shift+Tab 取消缩进
+                const before = ta.value.substring(0, start);
+                const lineStart = before.lastIndexOf('\n') + 1;
+                if (ta.value.substring(lineStart, lineStart + 4) === '    ') {
+                    ta.value = ta.value.substring(0, lineStart) + ta.value.substring(lineStart + 4);
+                    ta.selectionStart = ta.selectionEnd = Math.max(lineStart, start - 4);
+                } else if (ta.value.substring(lineStart, lineStart + 1) === '\t') {
+                    ta.value = ta.value.substring(0, lineStart) + ta.value.substring(lineStart + 1);
+                    ta.selectionStart = ta.selectionEnd = Math.max(lineStart, start - 1);
+                }
+            } else {
+                // Tab 插入 4 空格
+                ta.value = ta.value.substring(0, start) + '    ' + ta.value.substring(end);
+                ta.selectionStart = ta.selectionEnd = start + 4;
+            }
+            onEditInput();
+            return;
+        }
+        // Enter 自动续写列表
+        if (e.key === 'Enter' && !e.shiftKey) {
+            const start = ta.selectionStart;
+            const before = ta.value.substring(0, start);
+            const lineStart = before.lastIndexOf('\n') + 1;
+            const lineText = before.substring(lineStart);
+            const ulMatch = lineText.match(/^(\s*)([-*])\s+(.*)$/);
+            const olMatch = lineText.match(/^(\s*)(\d+)\.\s+(.*)$/);
+            if (ulMatch) {
+                if (ulMatch[3].trim() === '') {
+                    // 空列表 → 取消列表
+                    e.preventDefault();
+                    ta.value = ta.value.substring(0, lineStart) + ta.value.substring(start);
+                    ta.selectionStart = ta.selectionEnd = lineStart;
+                    onEditInput();
+                } else {
+                    e.preventDefault();
+                    const indent = ulMatch[1];
+                    const ins = '\n' + indent + ulMatch[2] + ' ';
+                    ta.value = ta.value.substring(0, start) + ins + ta.value.substring(ta.selectionEnd);
+                    ta.selectionStart = ta.selectionEnd = start + ins.length;
+                    onEditInput();
+                }
+            } else if (olMatch) {
+                if (olMatch[3].trim() === '') {
+                    e.preventDefault();
+                    ta.value = ta.value.substring(0, lineStart) + ta.value.substring(start);
+                    ta.selectionStart = ta.selectionEnd = lineStart;
+                    onEditInput();
+                } else {
+                    e.preventDefault();
+                    const indent = olMatch[1];
+                    const nextNum = parseInt(olMatch[2], 10) + 1;
+                    const ins = '\n' + indent + nextNum + '. ';
+                    ta.value = ta.value.substring(0, start) + ins + ta.value.substring(ta.selectionEnd);
+                    ta.selectionStart = ta.selectionEnd = start + ins.length;
+                    onEditInput();
+                }
+            }
+        }
+    }
+
+    // ============================================================
+    // 分屏同步滚动（可选）
+    // ============================================================
+    function syncScroll() {
+        // 只同步滚动比例，不严格对齐
+        const ta = document.getElementById('editKbContent');
+        const preview = document.getElementById('editPreview');
+        if (!ta || !preview) return;
+        const ratio = ta.scrollTop / Math.max(1, ta.scrollHeight - ta.clientHeight);
+        preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
+    }
+
+    // ============================================================
+    // 模式切换
+    // ============================================================
+    function switchEditMode(mode) {
+        state.editMode = mode;
+        const split = document.getElementById('editSplit');
+        split.classList.remove('mode-edit-only', 'mode-preview-only');
+        if (mode === 'edit') split.classList.add('mode-edit-only');
+        if (mode === 'preview') split.classList.add('mode-preview-only');
+
+        document.querySelectorAll('.edit-modal .mode-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+
+        // 更新预览
+        onEditInput();
+    }
+
+    // ============================================================
+    // 加载
+    // ============================================================
     async function loadKb() {
         try {
             const res = await fetch(BACKEND_URL + '/api/kb/list');
@@ -875,17 +1617,14 @@
 
     function fillKbCategorySelects() {
         const flat = flattenCategories(state.kbCategories || [], 0, []);
-        // 上传弹窗
         const catSel = document.getElementById('kbCategory');
         if (catSel) {
             catSel.innerHTML = flat.map(x => `<option value="${x.id}">${'　'.repeat(x.depth)}${x.icon} ${escapeHtml(x.name)}</option>`).join('');
         }
-        // 编辑弹窗
         const editSel = document.getElementById('editKbCategory');
         if (editSel) {
             editSel.innerHTML = flat.map(x => `<option value="${x.id}">${'　'.repeat(x.depth)}${x.icon} ${escapeHtml(x.name)}</option>`).join('');
         }
-        // 父分类
         const parentSel = document.getElementById('newCatParent');
         if (parentSel) {
             const cur = parentSel.value;
@@ -1005,7 +1744,9 @@
         }).join('');
     }
 
-    // ===== 上传 =====
+    // ============================================================
+    // 上传
+    // ============================================================
     function openKbUpload() {
         document.getElementById('kbTitle').value = '';
         document.getElementById('kbTags').value = '';
@@ -1061,7 +1802,9 @@
         }
     }
 
-    // ===== 批量导入 =====
+    // ============================================================
+    // 批量导入
+    // ============================================================
     function openKbBatchUpload() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -1098,7 +1841,9 @@
         input.click();
     }
 
-    // ===== 编辑 =====
+    // ============================================================
+    // 编辑
+    // ============================================================
     function editKb(id) {
         const item = state.kbItems.find(x => x.id === id);
         if (!item) return;
@@ -1106,10 +1851,24 @@
         document.getElementById('editKbTitle').value = item.title || '';
         document.getElementById('editKbTags').value = (item.tags || []).join(',');
         document.getElementById('editKbContent').value = item.content || '';
+
+        // 重置为分屏模式
+        switchEditMode('split');
+
+        // 首次渲染预览
+        onEditInput();
+
+        // 设置分类
         setTimeout(() => {
             document.getElementById('editKbCategory').value = item.category || 'cat_other';
         }, 50);
+
         document.getElementById('kbEditModal').classList.add('show');
+
+        // 聚焦编辑器
+        setTimeout(() => {
+            document.getElementById('editKbContent').focus();
+        }, 100);
     }
     function closeKbEdit() {
         document.getElementById('kbEditModal').classList.remove('show');
@@ -1147,11 +1906,13 @@
             showToast('❌ 网络错误');
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i> 保存';
+            btn.innerHTML = '<i class="fas fa-save"></i> 保存 (Ctrl+S)';
         }
     }
 
-    // ===== 启用/停用 =====
+    // ============================================================
+    // 启用/停用、置顶、删除
+    // ============================================================
     async function toggleKb(id, enabled) {
         try {
             const res = await fetch(BACKEND_URL + '/api/kb/toggle', {
@@ -1169,7 +1930,6 @@
         }
     }
 
-    // ===== 置顶 =====
     async function pinKb(id, pinned) {
         try {
             const res = await fetch(BACKEND_URL + '/api/kb/pin', {
@@ -1187,7 +1947,6 @@
         }
     }
 
-    // ===== 删除 =====
     async function deleteKb(id) {
         if (!confirm('确定删除该知识？')) return;
         try {
@@ -1208,12 +1967,16 @@
         }
     }
 
-    // ===== AI 提炼 =====
+    // ============================================================
+    // AI 提炼
+    // ============================================================
     function openKbAutoGenerate() {
         showToast('⏳ 请到 AI 客服页面使用"AI 提炼"功能');
     }
 
-    // ===== 分类管理 =====
+    // ============================================================
+    // 分类管理
+    // ============================================================
     function openKbCategoryModal() {
         renderCategoryList();
         document.getElementById('kbCategoryModal').classList.add('show');
@@ -1225,7 +1988,7 @@
         const list = document.getElementById('kbCategoryList');
         const flat = flattenCategories(state.kbCategories || [], 0, []);
         list.innerHTML = flat.map(x => `
-            <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;hover:background:#f0f7fe;">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;">
                 <span style="flex:1;font-size:13px;color:#0a1e2f;">
                     ${'　'.repeat(x.depth)}${x.icon} ${escapeHtml(x.name)}
                 </span>
@@ -1281,7 +2044,9 @@
         }
     }
 
-    // ===== 工具 =====
+    // ============================================================
+    // 工具
+    // ============================================================
     function escapeHtml(s) {
         return String(s || '').replace(/[&<>"']/g, c => ({
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -1318,8 +2083,13 @@
     window.closeKbCategoryModal = closeKbCategoryModal;
     window.submitNewCategory = submitNewCategory;
     window.deleteCategory = deleteCategory;
+    window.switchEditMode = switchEditMode;
+    window.mdCmd = mdCmd;
+    window.onEditInput = onEditInput;
+    window.onEditKeyDown = onEditKeyDown;
+    window.syncScroll = syncScroll;
 
-    console.log('📚 知识库管理页已加载');
+    console.log('📚 知识库管理页已加载（富文本 + 实时预览 + 分屏 + 快捷键）');
 </script>
 </body>
 </html>
