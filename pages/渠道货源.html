@@ -1,1 +1,1428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智控电商 · 渠道货源</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #eef2f8;
+            color: #0a1a2b;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* ===== 左侧导航 ===== */
+        .sidebar {
+            width: 220px;
+            background: #0a1e2f;
+            color: #b8cfe0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 20px rgba(10,30,47,0.08);
+            z-index: 100;
+            transition: 0.2s;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        .sidebar .logo {
+            padding: 22px 20px 28px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar .logo i {
+            font-size: 26px;
+            color: #4dabf7;
+            background: rgba(77,171,247,0.12);
+            padding: 8px;
+            border-radius: 12px;
+        }
+        .sidebar .logo span {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        .sidebar .logo .badge {
+            font-size: 10px;
+            background: #4dabf7;
+            color: #0a1e2f;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .sidebar .nav {
+            flex: 1;
+            padding: 16px 12px 20px;
+        }
+        .sidebar .nav .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #5a7f99;
+            padding: 14px 12px 6px 12px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .sidebar .nav .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: #9bb4cc;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-bottom: 2px;
+            position: relative;
+        }
+        .sidebar .nav .item i { width: 18px; font-size: 15px; text-align: center; color: #5a7f99; }
+        .sidebar .nav .item:hover { background: rgba(255,255,255,0.05); color: #d4e4f0; }
+        .sidebar .nav .item:hover i { color: #7aaed9; }
+        .sidebar .nav .item.active { background: rgba(77,171,247,0.12); color: white; }
+        .sidebar .nav .item.active i { color: #4dabf7; }
+        .sidebar .nav .item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 3px;
+            background: #4dabf7;
+            border-radius: 0 4px 4px 0;
+        }
+        .sidebar .nav .item .tag {
+            margin-left: auto;
+            background: rgba(77,171,247,0.15);
+            color: #4dabf7;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .sidebar .bottom {
+            padding: 16px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+            color: #5a7f99;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar .bottom i { font-size: 16px; }
+        /* ===== 主内容 ===== */
+        .main { flex: 1; padding: 20px 28px 40px; max-width: calc(100% - 220px); min-width: 0; }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .topbar .left h2 { font-size: 20px; font-weight: 600; color: #0a1e2f; }
+        .topbar .left p { font-size: 13px; color: #5f7d95; margin-top: 2px; }
+        .topbar .right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .topbar .right .btn {
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: default;
+        }
+        .topbar .right .btn-primary { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .topbar .right .btn-primary i { color: rgba(255,255,255,0.7); }
+        .topbar .right .avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: #4dabf7;
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 600;
+        }
+        /* ===== 页面容器 ===== */
+        .page { display: none; animation: fadeIn 0.25s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0.6; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        /* ===== 统计卡片 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 16px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+        }
+        .stat-card:hover { box-shadow: 0 6px 20px rgba(10,30,47,0.06); border-color: #c8d8e8; }
+        .stat-card .label { font-size: 13px; font-weight: 500; color: #5f7d95; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: #0a1e2f; letter-spacing: -0.02em; }
+        .stat-card .sub { font-size: 12px; color: #5f7d95; margin-top: 4px; display: flex; gap: 14px; flex-wrap: wrap; }
+        /* ===== 卡片 ===== */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+        }
+        .card:hover { border-color: #c8d8e8; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-header h3 { font-size: 15px; font-weight: 600; color: #0a1e2f; display: flex; align-items: center; gap: 6px; }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action { font-size: 12px; color: #4dabf7; font-weight: 500; cursor: default; }
+        /* ===== 三级分类筛选 ===== */
+        .category-filter-container { display: flex; flex-direction: column; gap: 8px; padding: 10px 0 4px 0; width: 100%; }
+        .category-level { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .category-level .level-label { font-size: 12px; font-weight: 600; color: #5f7d95; margin-right: 4px; min-width: 36px; }
+        .cat-tag {
+            padding: 3px 14px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            font-size: 12px;
+            cursor: pointer;
+            background: white;
+            color: #5f7d95;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+        .cat-tag:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
+        .cat-tag.active { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .cat-tag .count { font-size: 10px; color: #94a3b8; margin-left: 3px; }
+        .cat-tag.active .count { color: rgba(255,255,255,0.5); }
+        .category-divider { width: 100%; height: 1px; background: #e8edf4; margin: 4px 0; }
+        /* ===== 货源铺货专用 ===== */
+        .product-pick-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f4f9;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .product-pick-item:last-child { border: none; }
+        .product-pick-item:hover { background: #f5f8fc; }
+        .product-pick-item.active { background: #f0f7fe; border-color: #4dabf7; border-radius: 8px; }
+        .product-pick-item .thumb {
+            width: 60px; height: 60px; background: #e8edf4; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #7e9cb0; flex-shrink: 0;
+        }
+        .product-pick-item .info { flex: 1; }
+        .product-pick-item .info .name { font-weight: 600; color: #0a1e2f; font-size: 14px; }
+        .product-pick-item .info .meta { font-size: 13px; color: #5f7d95; display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
+        .product-pick-item .info .meta i { width: 14px; color: #7e9cb0; }
+        .product-pick-item .right { text-align: right; flex-shrink: 0; }
+        .product-pick-item .right .price { font-weight: 700; color: #b55a1a; font-size: 16px; }
+        .product-pick-item .right .price small { font-size: 12px; font-weight: 400; color: #5f7d95; }
+        .product-pick-item .right .actions { margin-top: 4px; display: flex; gap: 4px; justify-content: flex-end; }
+        .btn-sm {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-sm.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .btn-sm.green { background: #e6f7ec; color: #0d7c4f; }
+        .btn-sm.primary { background: #0a1e2f; color: white; }
+        .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm:active { transform: scale(0.95); }
 
+        /* ===== 渠道货源-产品详情面板（1:1复制产品详情排版） ===== */
+        .source-detail-panel {
+            padding: 16px 18px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e8edf4;
+            min-height: 400px;
+            max-height: 560px;
+            overflow-y: auto;
+        }
+        .source-detail-panel::-webkit-scrollbar { width: 4px; }
+        .source-detail-panel::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
+        .source-detail-panel::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+
+        .source-detail-panel .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #94a3b8;
+            text-align: center;
+        }
+        .source-detail-panel .empty-state i { font-size: 40px; margin-bottom: 12px; color: #dce5ef; }
+        .source-detail-panel .empty-state p { font-size: 14px; }
+
+        /* ===== 1:1 完整产品详情排版 ===== */
+        .product-detail-1to1 {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #ffffff;
+            padding: 4px 0;
+        }
+        /* 主图区 - 1:1 占比大图 */
+        .product-detail-1to1 .detail-cover {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #f5f7fa;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 72px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #eef2f6;
+        }
+        .product-detail-1to1 .detail-cover .cover-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(10,30,47,0.75);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+        }
+        .product-detail-1to1 .detail-cover .cover-tag {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: #b55a1a;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        /* 商品标题 - 1:1 复制 */
+        .product-detail-1to1 .detail-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0a1e2f;
+            line-height: 1.5;
+            margin-bottom: 4px;
+        }
+        .product-detail-1to1 .detail-subtitle {
+            font-size: 14px;
+            color: #5f7d95;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eef2f6;
+            padding-bottom: 10px;
+        }
+        /* 价格区 - 1:1 复制电商详情页 */
+        .product-detail-1to1 .detail-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 10px 0;
+            border-top: 1px solid #eef2f6;
+            border-bottom: 1px solid #eef2f6;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .product-detail-1to1 .detail-price-row .price-current {
+            font-size: 26px;
+            font-weight: 700;
+            color: #b51a3f;
+        }
+        .product-detail-1to1 .detail-price-row .price-original {
+            font-size: 15px;
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+        .product-detail-1to1 .detail-price-row .price-discount {
+            font-size: 12px;
+            color: #0d7c4f;
+            background: #e6f7ec;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        .product-detail-1to1 .detail-price-row .price-extra {
+            font-size: 13px;
+            color: #5f7d95;
+            margin-left: auto;
+        }
+        /* 规格参数 - 1:1 复制 */
+        .product-detail-1to1 .detail-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eef2f6;
+            margin-bottom: 10px;
+        }
+        .product-detail-1to1 .detail-specs .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #0a1e2f;
+            padding: 3px 0;
+        }
+        .product-detail-1to1 .detail-specs .spec-item .label {
+            color: #94a3b8;
+            min-width: 52px;
+            font-weight: 400;
+        }
+        .product-detail-1to1 .detail-specs .spec-item .value {
+            font-weight: 500;
+        }
+        /* 标签区 - 1:1 复制 */
+        .product-detail-1to1 .detail-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 8px 0 10px 0;
+            border-bottom: 1px solid #eef2f6;
+            margin-bottom: 10px;
+        }
+        .product-detail-1to1 .detail-tags .tag {
+            font-size: 12px;
+            padding: 3px 14px;
+            border-radius: 30px;
+            background: #f0f7fe;
+            color: #2a7faa;
+            border: 1px solid #dce5ef;
+        }
+        .product-detail-1to1 .detail-tags .tag.highlight {
+            background: #fef0e6;
+            color: #b55a1a;
+            border-color: #fde8d0;
+        }
+        .product-detail-1to1 .detail-tags .tag.sale {
+            background: #fde8ed;
+            color: #b51a3f;
+            border-color: #fcd0d9;
+        }
+        /* 详情描述 - 1:1 复制 */
+        .product-detail-1to1 .detail-desc {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.9;
+            padding: 6px 0 10px 0;
+            border-bottom: 1px solid #eef2f6;
+            margin-bottom: 10px;
+        }
+        .product-detail-1to1 .detail-desc p { margin-bottom: 8px; }
+        .product-detail-1to1 .detail-desc ul {
+            margin: 8px 0 8px 20px;
+            list-style: disc;
+        }
+        .product-detail-1to1 .detail-desc ul li { margin-bottom: 4px; color: #475569; }
+        .product-detail-1to1 .detail-desc .desc-title {
+            font-weight: 600;
+            color: #0a1e2f;
+            font-size: 15px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        /* 详情图区 - 1:1 复制 (网格展示) */
+        .product-detail-1to1 .detail-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 6px 0 10px 0;
+            border-bottom: 1px solid #eef2f6;
+            margin-bottom: 10px;
+        }
+        .product-detail-1to1 .detail-images .img-item {
+            aspect-ratio: 1 / 1;
+            background: #f5f7fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #94a3b8;
+            border: 1px solid #e8edf4;
+            transition: 0.15s;
+        }
+        .product-detail-1to1 .detail-images .img-item:hover {
+            border-color: #4dabf7;
+            background: #f0f7fe;
+        }
+        .product-detail-1to1 .detail-images .img-item .img-label {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        /* 操作区 - 1:1 复制 */
+        .product-detail-1to1 .detail-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: #0a1e2f; margin-bottom: 4px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 8px 14px; border: 1px solid #dce5ef; border-radius: 8px;
+            font-size: 14px; background: #fafcfe; font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #4dabf7; box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .badge {
+            padding: 3px 12px; border-radius: 30px; font-size: 11px; font-weight: 500;
+            white-space: nowrap; display: inline-block;
+        }
+        .badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .badge.warning { background: #fef0e6; color: #b55a1a; }
+        .badge.danger { background: #fde8ed; color: #b51a3f; }
+        .badge.info { background: #e9f0ff; color: #1a5bb5; }
+        .badge.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .flex { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        /* ===== 平台标签样式 ===== */
+        .platform-tag {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f0f7fe;
+            color: #2a7faa;
+            border: 1px solid #dce5ef;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .platform-tag:hover {
+            border-color: #4dabf7;
+            background: #e8f3fe;
+        }
+        .platform-tag.active {
+            background: #0a1e2f;
+            border-color: #0a1e2f;
+            color: white;
+        }
+        .platform-tag .count {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-left: 3px;
+        }
+        .platform-tag.active .count {
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* ===== 铺货平台选择弹窗 ===== */
+        .platform-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .platform-modal-overlay.show { display: flex; }
+        .platform-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 32px 36px;
+            max-width: 580px;
+            width: 92%;
+            max-height: 85vh;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+            animation: dialogIn 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .platform-modal::-webkit-scrollbar { width: 4px; }
+        .platform-modal::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
+        .platform-modal::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        @keyframes dialogIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .platform-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #e8edf4;
+            flex-shrink: 0;
+        }
+        .platform-modal .modal-header h3 {
+            font-size: 18px;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .platform-modal .modal-header .close {
+            font-size: 24px;
+            color: #94a3b8;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0 8px;
+        }
+        .platform-modal .modal-header .close:hover { color: #0a1e2f; }
+        .platform-modal .modal-sub {
+            font-size: 14px;
+            color: #5f7d95;
+            margin-bottom: 14px;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        .platform-modal .modal-sub strong { color: #0a1e2f; }
+        .platform-search-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .platform-search-bar .search-input {
+            flex: 1;
+            padding: 8px 14px;
+            border: 1px solid #dce5ef;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            background: #fafcfe;
+            transition: 0.15s;
+            min-width: 120px;
+        }
+        .platform-search-bar .search-input:focus {
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .platform-search-bar .btn-all {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #dce5ef;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a5f;
+            cursor: pointer;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+        .platform-search-bar .btn-all:hover { background: #f5f8fc; border-color: #c8d8e8; }
+        .platform-search-bar .btn-all.active { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .platform-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 6px 0 16px 0;
+            overflow-y: auto;
+            flex: 1;
+            max-height: 280px;
+            padding-right: 4px;
+        }
+        .platform-list::-webkit-scrollbar { width: 4px; }
+        .platform-list::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
+        .platform-list::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+
+        .platform-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border: 2px solid #e8edf4;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.15s;
+            background: white;
+        }
+        .platform-option:hover { border-color: #c8d8e8; background: #fafcfe; }
+        .platform-option.selected { border-color: #4dabf7; background: #f0f7fe; }
+        .platform-option .platform-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .platform-option .platform-info { flex: 1; min-width: 0; }
+        .platform-option .platform-info .name { font-weight: 600; color: #0a1e2f; font-size: 15px; }
+        .platform-option .platform-info .desc { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+        .platform-option .platform-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #dce5ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+            flex-shrink: 0;
+        }
+        .platform-option.selected .platform-check { border-color: #4dabf7; background: #4dabf7; }
+        .platform-option.selected .platform-check i { color: white; font-size: 12px; }
+        .platform-option .platform-check i { opacity: 0; transition: 0.15s; }
+        .platform-option.selected .platform-check i { opacity: 1; }
+        .platform-option.hidden { display: none; }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding-top: 16px;
+            border-top: 1px solid #e8edf4;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .modal-actions .btn {
+            padding: 8px 28px;
+            border-radius: 30px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .modal-actions .btn-primary { background: #0a1e2f; color: white; }
+        .modal-actions .btn-primary:hover { background: #1a3a5a; }
+        .modal-actions .btn-outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .modal-actions .btn-outline:hover { background: #f5f8fc; }
+        .modal-actions .btn:active { transform: scale(0.95); }
+        .modal-actions .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 999;
+            white-space: nowrap;
+        }
+        .toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .toast i { margin-right: 8px; }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar .logo span, .sidebar .logo .badge, .sidebar .nav .item span,
+            .sidebar .nav .section-label, .sidebar .bottom span, .sidebar .nav .item .tag { display: none; }
+            .sidebar .logo { padding: 16px 12px; justify-content: center; }
+            .sidebar .logo i { font-size: 20px; padding: 6px; }
+            .sidebar .nav .item { justify-content: center; padding: 12px; }
+            .sidebar .nav .item i { font-size: 18px; width: auto; }
+            .sidebar .bottom { justify-content: center; }
+            .main { max-width: calc(100% - 60px); padding: 14px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .topbar { flex-direction: column; align-items: flex-start; }
+            .product-pick-item { flex-wrap: wrap; }
+            .platform-modal { padding: 20px; }
+            .platform-search-bar { flex-wrap: wrap; }
+            .platform-search-bar .search-input { min-width: 100px; }
+            .product-detail-1to1 .detail-specs { grid-template-columns: 1fr; }
+            .product-detail-1to1 .detail-images { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== 左侧导航 ===== -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-bolt"></i>
+            <span>智控电商</span>
+            <span class="badge">v3.0</span>
+        </div>
+        <div class="nav">
+            <div class="section-label">经营总览</div>
+            <div class="item" data-page="page-dashboard"><i class="fas fa-chart-pie"></i><span>数据总览</span></div>
+            <div class="item" data-page="page-ai"><i class="fas fa-stethoscope"></i><span>店铺经营诊断</span></div>
+            <div class="item" data-page="page-competitor"><i class="fas fa-eye"></i><span>同行竞品分析</span></div>
+            <div class="section-label">交易核心</div>
+            <div class="item" data-page="page-orders"><i class="fas fa-shopping-cart"></i><span>订单管理</span><span class="tag">23</span></div>
+            <div class="item" data-page="page-products"><i class="fas fa-box"></i><span>商品管理</span></div>
+            <div class="item" data-page="page-inventory"><i class="fas fa-warehouse"></i><span>库存管理</span></div>
+            <div class="section-label">AI 智能赋能</div>
+            <div class="item" data-page="page-ai-service"><i class="fas fa-headset"></i><span>AI 客服</span><span class="tag">NEW</span></div>
+            <div class="item" data-page="page-ai-assistant"><i class="fas fa-robot"></i><span>AI 助手</span></div>
+            <div class="item" data-page="page-customer"><i class="fas fa-users"></i><span>客资聚合</span><span class="tag">89</span></div>
+            <div class="section-label">运营支持</div>
+            <div class="item" data-page="page-logistics"><i class="fas fa-truck"></i><span>物流管理</span></div>
+            <div class="item" data-page="page-sourcing"><i class="fas fa-store-alt"></i><span>素材生成</span></div>
+            <div class="item active" data-page="page-channels"><i class="fas fa-plug"></i><span>渠道货源</span></div>
+            <div class="item" data-page="page-procurement"><i class="fas fa-cart-plus"></i><span>智能采购</span><span class="tag">NEW</span></div>
+            <div class="section-label">系统配置</div>
+            <div class="item" data-page="page-channels-config"><i class="fas fa-plug"></i><span>渠道管理</span></div>
+            <div class="item" data-page="page-agents"><i class="fas fa-handshake"></i><span>服务商管理</span></div>
+            <div class="item" data-page="page-settings"><i class="fas fa-cog"></i><span>系统设置</span></div>
+        </div>
+        <div class="bottom">
+            <i class="fas fa-shield-alt"></i>
+            <span>数据加密 · 安全</span>
+        </div>
+    </div>
+
+    <!-- ===== 主内容 ===== -->
+    <div class="main">
+        <!-- 渠道货源 -->
+        <div id="page-channels" class="page active">
+            <div class="topbar">
+                <div class="left"><h2><i class="fas fa-plug" style="color:#4dabf7;"></i> 渠道货源</h2><p>1688/供应链选品 · 一键铺货 · 新品调研</p></div>
+                <div class="right">
+                    <span class="btn btn-primary" onclick="showToast('🔍 正在搜索1688货源...')"><i class="fas fa-search"></i> 搜索货源</span>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="label"><i class="fas fa-store" style="color:#4dabf7;"></i> 可选供应商</div><div class="value">234</div><div class="sub">1688 海量货源</div></div>
+                <div class="stat-card"><div class="label"><i class="fas fa-tag" style="color:#4dabf7;"></i> 已选商品</div><div class="value">23</div><div class="sub">待铺货</div></div>
+                <div class="stat-card"><div class="label"><i class="fas fa-rocket" style="color:#4dabf7;"></i> 已铺货</div><div class="value">156</div><div class="sub">今日 +12</div></div>
+                <div class="stat-card"><div class="label"><i class="fas fa-shield-alt" style="color:#4dabf7;"></i> 合规检测</div><div class="value">98%</div><div class="sub">通过率</div></div>
+            </div>
+
+            <!-- ===== 选品搜索卡片 ===== -->
+            <div class="card" style="margin-bottom:16px;">
+                <div class="card-header"><h3><i class="fas fa-search"></i> 选品搜索</h3><span class="action"><i class="fas fa-sliders-h"></i> 高级筛选</span></div>
+                <!-- 第一排：货前10大货源平台 -->
+                <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid #eef2f6;">
+                    <span style="font-weight:600; color:#0a1e2f; font-size:13px; margin-right:6px;"><i class="fas fa-globe" style="color:#4dabf7;"></i> 货源平台</span>
+                    <span class="platform-tag active" onclick="this.classList.toggle('active')">全部 <span class="count">(234)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">1688 <span class="count">(89)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">淘宝 <span class="count">(56)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">抖音 <span class="count">(34)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">拼多多 <span class="count">(28)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">京东 <span class="count">(12)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">亚马逊 <span class="count">(8)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">Shopify <span class="count">(4)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">速卖通 <span class="count">(2)</span></span>
+                    <span class="platform-tag" onclick="this.classList.toggle('active')">Shopee <span class="count">(1)</span></span>
+                </div>
+                <!-- 第二排：关键词 + 价格区间 -->
+                <div class="form-row">
+                    <div class="form-group"><label>关键词</label><input type="text" placeholder="输入商品名称、品类..." id="channelSearchInput" oninput="filterChannelList()"></div>
+                    <div class="form-group"><label>价格区间</label>
+                        <div style="display:flex; gap:8px;"><input type="text" placeholder="最低价" style="width:50%;"><input type="text" placeholder="最高价" style="width:50%;"></div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
+                    <span class="btn-sm blue" onclick="showToast('🔍 正在搜索1688货源...')"><i class="fas fa-search"></i> 搜索货源</span>
+                    <span class="btn-sm outline"><i class="fas fa-undo"></i> 重置</span>
+                    <span style="margin-left:auto; font-size:13px; color:#5f7d95;">共 234 个供应商</span>
+                </div>
+            </div>
+
+            <!-- ===== 三级分类筛选 ===== -->
+            <div class="card" style="margin-bottom:16px; padding:12px 20px;">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                    <span style="font-weight:600; color:#0a1e2f; font-size:13px;"><i class="fas fa-tags" style="color:#4dabf7;"></i> 分类筛选</span>
+                    <span style="font-size:12px; color:#94a3b8;">三级分类 · 点击切换</span>
+                    <span style="margin-left:auto; font-size:13px; color:#5f7d95;">共 3 个货源</span>
+                </div>
+                <div class="category-filter-container">
+                    <div class="category-level">
+                        <span class="level-label">一级</span>
+                        <span class="cat-tag active" data-level="1" data-cat="all" onclick="filterChannelCategory(1,'all',this)">全部 <span class="count">(3)</span></span>
+                        <span class="cat-tag" data-level="1" data-cat="食品" onclick="filterChannelCategory(1,'食品',this)">🍜 食品 <span class="count">(1)</span></span>
+                        <span class="cat-tag" data-level="1" data-cat="手工艺" onclick="filterChannelCategory(1,'手工艺',this)">🎨 手工艺 <span class="count">(1)</span></span>
+                        <span class="cat-tag" data-level="1" data-cat="文创" onclick="filterChannelCategory(1,'文创',this)">📚 文创 <span class="count">(1)</span></span>
+                    </div>
+                    <div class="category-divider"></div>
+                    <div class="category-level">
+                        <span class="level-label">二级</span>
+                        <span class="cat-tag active" data-level="2" data-cat="all" onclick="filterChannelCategory(2,'all',this)">全部 <span class="count">(3)</span></span>
+                        <span class="cat-tag" data-level="2" data-cat="坚果" onclick="filterChannelCategory(2,'坚果',this)">🥜 坚果 <span class="count">(1)</span></span>
+                        <span class="cat-tag" data-level="2" data-cat="编织" onclick="filterChannelCategory(2,'编织',this)">🧶 编织 <span class="count">(1)</span></span>
+                        <span class="cat-tag" data-level="2" data-cat="纸艺" onclick="filterChannelCategory(2,'纸艺',this)">📄 纸艺 <span class="count">(1)</span></span>
+                    </div>
+                    <div class="category-divider"></div>
+                    <div class="category-level">
+                        <span class="level-label">三级</span>
+                        <span class="cat-tag active" data-level="3" data-cat="all" onclick="filterChannelCategory(3,'all',this)">全部 <span class="count">(3)</span></span>
+                        <span class="cat-tag" data-level="3" data-cat="礼盒装" onclick="filterChannelCategory(3,'礼盒装',this)">🎁 礼盒装 <span class="count">(1)</span></span>
+                        <span class="cat-tag" data-level="3" data-cat="手工" onclick="filterChannelCategory(3,'手工',this)">✋ 手工 <span class="count">(1)</span></span>
+                        <span class="cat-tag" data-level="3" data-cat="定制" onclick="filterChannelCategory(3,'定制',this)">🎨 定制 <span class="count">(1)</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 左右布局：左侧货源列表 + 右侧详情面板 -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:18px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list"></i> 货源列表</h3>
+                        <div class="flex" style="gap:8px;">
+                            <span class="action"><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 已选 23 件</span>
+                        </div>
+                    </div>
+                    <div id="channelSourceList">
+                        <div class="product-pick-item active" data-category="茶叶" data-subcat="茶饮" data-third="礼盒装" onclick="showChannelDetail(this, 0)">
+                            <div class="thumb"><i class="fas fa-leaf"></i></div>
+                            <div class="info">
+                                <div class="name">云山茶叶礼盒 · 2026春茶</div>
+                                <div class="meta">
+                                    <span><i class="fas fa-store"></i> 云山茶厂 · 金牌</span>
+                                    <span><i class="fas fa-star" style="color:#f5b342;"></i> 4.9</span>
+                                </div>
+                                <div class="meta"><span><i class="fas fa-tag"></i> 月销 8,234件</span></div>
+                            </div>
+                            <div class="right">
+                                <div class="price">¥68.00 <small>起批</small></div>
+                                <div class="actions">
+                                    <span class="btn-sm blue" onclick="event.stopPropagation();showToast('✅ 已加入铺货清单')"><i class="fas fa-plus"></i> 选品</span>
+                                    <span class="btn-sm green" onclick="event.stopPropagation();openPlatformModal('云山茶叶礼盒 · 2026春茶')"><i class="fas fa-rocket"></i> 铺货</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-pick-item" data-category="手工艺" data-subcat="编织" data-third="手工" onclick="showChannelDetail(this, 1)">
+                            <div class="thumb"><i class="fas fa-bag-shopping"></i></div>
+                            <div class="info">
+                                <div class="name">手工竹编包 · 复古简约</div>
+                                <div class="meta">
+                                    <span><i class="fas fa-store"></i> 竹艺工坊 · 实力</span>
+                                    <span><i class="fas fa-star" style="color:#f5b342;"></i> 4.8</span>
+                                </div>
+                                <div class="meta"><span><i class="fas fa-tag"></i> 月销 3,456件</span></div>
+                            </div>
+                            <div class="right">
+                                <div class="price">¥45.00 <small>起批</small></div>
+                                <div class="actions">
+                                    <span class="btn-sm blue" onclick="event.stopPropagation();showToast('✅ 已加入铺货清单')"><i class="fas fa-plus"></i> 选品</span>
+                                    <span class="btn-sm green" onclick="event.stopPropagation();openPlatformModal('手工竹编包 · 复古简约')"><i class="fas fa-rocket"></i> 铺货</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-pick-item" data-category="文创" data-subcat="纸艺" data-third="定制" onclick="showChannelDetail(this, 2)">
+                            <div class="thumb"><i class="fas fa-scroll"></i></div>
+                            <div class="info">
+                                <div class="name">手写书法折扇 · 文创定制</div>
+                                <div class="meta">
+                                    <span><i class="fas fa-store"></i> 文房四宝 · 金牌</span>
+                                    <span><i class="fas fa-star" style="color:#f5b342;"></i> 4.7</span>
+                                </div>
+                                <div class="meta"><span><i class="fas fa-tag"></i> 月销 1,234件</span></div>
+                            </div>
+                            <div class="right">
+                                <div class="price">¥35.00 <small>起批</small></div>
+                                <div class="actions">
+                                    <span class="btn-sm blue" onclick="event.stopPropagation();showToast('✅ 已加入铺货清单')"><i class="fas fa-plus"></i> 选品</span>
+                                    <span class="btn-sm green" onclick="event.stopPropagation();openPlatformModal('手写书法折扇 · 文创定制')"><i class="fas fa-rocket"></i> 铺货</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid #e8edf4; flex-wrap:wrap; gap:10px;">
+                        <span style="font-size:13px; color:#5f7d95;">共 3 件</span>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <span class="btn-sm outline" onclick="showToast('📋 已生成铺货清单')"><i class="fas fa-file-alt"></i> 生成清单</span>
+                            <span class="btn-sm primary" onclick="openPlatformModal('多个商品 (共3件)')"><i class="fas fa-rocket"></i> 一键铺货</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== 右侧：产品详情展示（1:1 复制产品详情排版） ===== -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-info-circle" style="color:#4dabf7;"></i> 产品详情</h3>
+                        <span class="action" id="detailProductName">云山茶叶礼盒</span>
+                    </div>
+                    <div class="source-detail-panel" id="sourceDetailPanel">
+                        <div id="detailContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 铺货平台选择弹窗 ===== -->
+    <div class="platform-modal-overlay" id="platformModal" onclick="if(event.target===this) closePlatformModal()">
+        <div class="platform-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-store-alt" style="color:#4dabf7;"></i> 选择铺货平台</h3>
+                <button class="close" onclick="closePlatformModal()">&times;</button>
+            </div>
+            <div class="modal-sub" id="modalProductInfo">
+                正在为 <strong>云山茶叶礼盒 · 2026春茶</strong> 选择铺货店铺
+            </div>
+            <div class="platform-search-bar">
+                <input type="text" class="search-input" id="platformSearchInput" placeholder="搜索店铺名称..." oninput="filterPlatformList()">
+                <button class="btn-all" id="selectAllBtn" onclick="toggleSelectAll()">全部</button>
+            </div>
+            <div class="platform-list" id="platformList">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closePlatformModal()">取消</button>
+                <button class="btn btn-primary" id="confirmPlatformBtn" onclick="confirmPlatformSelection()" disabled>
+                    <i class="fas fa-rocket"></i> 确认铺货
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Toast ===== -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ===== Toast =====
+        function showToast(msg) {
+            var toast = document.getElementById('toast');
+            toast.innerHTML = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+
+        // ===== 页面切换 =====
+        document.querySelectorAll('.sidebar .item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar .item').forEach(function(i) { i.classList.remove('active'); });
+                this.classList.add('active');
+                var pageId = this.dataset.page;
+                document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+                var target = document.getElementById(pageId);
+                if (target) target.classList.add('active');
+                if (pageId !== 'page-channels') {
+                    showToast('📌 其他模块已精简，仅保留「渠道货源」内容');
+                }
+            });
+        });
+
+        // ===== 渠道货源分类筛选 =====
+        var channelCategoryFilters = { level1: 'all', level2: 'all', level3: 'all' };
+
+        function filterChannelCategory(level, cat, el) {
+            var levelKey = 'level' + level;
+            var siblings = el.parentElement.querySelectorAll('.cat-tag');
+            siblings.forEach(function(tag) { tag.classList.remove('active'); });
+            el.classList.add('active');
+            channelCategoryFilters[levelKey] = cat;
+            applyChannelFilters();
+        }
+
+        function filterChannelList() {
+            applyChannelFilters();
+        }
+
+        function applyChannelFilters() {
+            var keyword = document.getElementById('channelSearchInput').value.toLowerCase().trim();
+            var items = document.querySelectorAll('#channelSourceList .product-pick-item');
+            var visibleCount = 0;
+            var firstVisible = null;
+            items.forEach(function(item) {
+                var rowCat = item.dataset.category || '';
+                var rowSubcat = item.dataset.subcat || '';
+                var rowThird = item.dataset.third || '';
+                var itemText = item.textContent.toLowerCase();
+                var match = true;
+                if (channelCategoryFilters.level1 !== 'all' && rowCat !== channelCategoryFilters.level1) match = false;
+                if (channelCategoryFilters.level2 !== 'all' && rowSubcat !== channelCategoryFilters.level2) match = false;
+                if (channelCategoryFilters.level3 !== 'all' && rowThird !== channelCategoryFilters.level3) match = false;
+                if (keyword && !itemText.includes(keyword)) match = false;
+                item.style.display = match ? '' : 'none';
+                if (match) {
+                    visibleCount++;
+                    if (!firstVisible) firstVisible = item;
+                }
+            });
+            var activeItem = document.querySelector('#channelSourceList .product-pick-item.active');
+            if (!activeItem || activeItem.style.display === 'none') {
+                if (firstVisible) {
+                    firstVisible.classList.add('active');
+                    showChannelDetail(firstVisible, Array.from(document.querySelectorAll('#channelSourceList .product-pick-item')).indexOf(firstVisible));
+                } else {
+                    document.getElementById('detailContent').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-box-open"></i>
+                            <p>暂无匹配的货源</p>
+                            <p style="font-size:13px;color:#94a3b8;">请调整筛选条件</p>
+                        </div>
+                    `;
+                    document.getElementById('detailProductName').textContent = '暂无产品';
+                }
+            }
+        }
+
+        // ===== 产品完整图文数据（1:1 复制电商详情页排版） =====
+        var channelProducts = [
+            {
+                id: 1,
+                name: '云山茶叶礼盒 · 2026春茶',
+                subtitle: '特级龙井 · 明前采摘 · 礼盒装 500g×2',
+                price: '¥68.00',
+                originalPrice: '¥128.00',
+                discount: '5折',
+                extraPrice: '支持一件代发',
+                supplier: '云山茶厂 · 金牌供应商',
+                sku: 'YS-2026-001',
+                sales: '8,234件/月',
+                rating: '4.9 (2345评价)',
+                coverIcon: 'fa-leaf',
+                coverBg: 'linear-gradient(135deg, #d4e9d6 0%, #a8c9a8 100%)',
+                coverTag: '春茶 · 特级',
+                tags: ['礼盒装', '明前采摘', '特级龙井', '一件代发', '包邮', '送礼首选'],
+                desc: `<span class="desc-title">🌱 产品详情</span>
+                    <p><strong>2026年明前春茶 · 特级龙井</strong></p>
+                    <p>精选杭州西湖龙井核心产区，一芽一叶明前采摘，手工炒制，香气清高持久，滋味鲜醇甘爽。</p>
+                    <ul>
+                        <li><strong>净含量：</strong>500g × 2 礼盒装</li>
+                        <li><strong>原料：</strong>西湖龙井群体种</li>
+                        <li><strong>采摘时间：</strong>2026年清明前</li>
+                        <li><strong>保质期：</strong>18个月</li>
+                        <li><strong>储存方式：</strong>密封、避光、防潮、防异味</li>
+                    </ul>
+                    <p>🎁 精美礼盒包装，内附茶文化手册，适合送礼、商务、自饮收藏。</p>`,
+                detailImages: ['fa-cup-togo', 'fa-leaf', 'fa-box-open', 'fa-certificate', 'fa-gift', 'fa-hand-holding-heart'],
+                features: ['明前采摘', '手工炒制', '礼盒包装', '一件代发']
+            },
+            {
+                id: 2,
+                name: '手工竹编包 · 复古简约',
+                subtitle: '通勤单肩 · 天然竹编 35×28cm · 手工制作',
+                price: '¥45.00',
+                originalPrice: '¥89.00',
+                discount: '5.1折',
+                extraPrice: '限量款 · 手工制作',
+                supplier: '竹艺工坊 · 实力商家',
+                sku: 'ZB-2026-002',
+                sales: '3,456件/月',
+                rating: '4.8 (1892评价)',
+                coverIcon: 'fa-bag-shopping',
+                coverBg: 'linear-gradient(135deg, #e8dcc8 0%, #c4b5a0 100%)',
+                coverTag: '手工 · 复古',
+                tags: ['手工编织', '天然材质', '复古风格', '轻便耐用', '通勤百搭', '环保'],
+                desc: `<span class="desc-title">🧺 产品详情</span>
+                    <p><strong>手工竹编包 · 复古简约通勤款</strong></p>
+                    <p>采用天然竹子手工编织而成，每一只都独一无二。轻便耐用，适合日常通勤、逛街、度假搭配。</p>
+                    <ul>
+                        <li><strong>尺寸：</strong>35×28cm（手工测量略有误差）</li>
+                        <li><strong>材质：</strong>天然竹材 + 棉麻内衬</li>
+                        <li><strong>重量：</strong>约300g</li>
+                        <li><strong>容量：</strong>可容纳平板、钱包、手机等</li>
+                    </ul>
+                    <p>🌿 环保健康，无化学处理，保留竹子天然纹理与色泽。</p>`,
+                detailImages: ['fa-bag-shopping', 'fa-leaf', 'fa-hand-sparkles', 'fa-tree', 'fa-recycle', 'fa-star'],
+                features: ['手工编织', '天然材质', '复古风格', '轻便耐用']
+            },
+            {
+                id: 3,
+                name: '手写书法折扇 · 文创定制',
+                subtitle: '10寸宣纸扇 · 可定制内容 · 精装锦盒',
+                price: '¥35.00',
+                originalPrice: '¥68.00',
+                discount: '5.1折',
+                extraPrice: '定制款 · 专属内容',
+                supplier: '文房四宝 · 金牌供应商',
+                sku: 'FS-2026-006',
+                sales: '1,234件/月',
+                rating: '4.7 (890评价)',
+                coverIcon: 'fa-scroll',
+                coverBg: 'linear-gradient(135deg, #f5edd6 0%, #e0d4b8 100%)',
+                coverTag: '定制 · 文创',
+                tags: ['定制内容', '宣纸扇面', '竹骨工艺', '礼盒包装', '文化礼品', '书法'],
+                desc: `<span class="desc-title">🖌️ 产品详情</span>
+                    <p><strong>手写书法折扇 · 文创定制</strong></p>
+                    <p>优质宣纸扇面，手工竹骨，可定制书法内容。适合礼品定制、文化活动、个人收藏。</p>
+                    <ul>
+                        <li><strong>尺寸：</strong>10寸（展开约 33cm）</li>
+                        <li><strong>材质：</strong>宣纸扇面 + 天然竹骨</li>
+                        <li><strong>可选内容：</strong>可定制文字、诗句、名字等</li>
+                        <li><strong>包装：</strong>配精美锦盒</li>
+                    </ul>
+                    <p>🎨 支持批量定制，适合企业礼品、文化宣传、活动伴手礼。</p>`,
+                detailImages: ['fa-scroll', 'fa-pen-fancy', 'fa-gift', 'fa-brush', 'fa-palette', 'fa-star'],
+                features: ['定制内容', '宣纸扇面', '竹骨工艺', '礼盒包装']
+            }
+        ];
+
+        // ===== 显示完整图文详情（1:1 复制排版） =====
+        function showChannelDetail(el, index) {
+            document.querySelectorAll('#channelSourceList .product-pick-item').forEach(function(item) {
+                item.classList.remove('active');
+            });
+            el.classList.add('active');
+            var product = channelProducts[index];
+            if (!product) return;
+            document.getElementById('detailProductName').textContent = product.name;
+
+            var html = `
+                <div class="product-detail-1to1">
+                    <!-- 主图区 - 1:1 正方形大图 -->
+                    <div class="detail-cover" style="background:${product.coverBg};">
+                        <i class="fas ${product.coverIcon}"></i>
+                        <span class="cover-badge"><i class="fas fa-store"></i> ${product.supplier}</span>
+                        <span class="cover-tag">${product.coverTag}</span>
+                    </div>
+                    <!-- 标题 -->
+                    <div class="detail-title">${product.name}</div>
+                    <div class="detail-subtitle">${product.subtitle}</div>
+                    <!-- 价格区 -->
+                    <div class="detail-price-row">
+                        <span class="price-current">${product.price}</span>
+                        <span class="price-original">${product.originalPrice}</span>
+                        <span class="price-discount">${product.discount}</span>
+                        <span class="price-extra">${product.extraPrice}</span>
+                    </div>
+                    <!-- 规格参数 -->
+                    <div class="detail-specs">
+                        <div class="spec-item"><span class="label">供应商</span><span class="value">${product.supplier}</span></div>
+                        <div class="spec-item"><span class="label">SKU</span><span class="value">${product.sku}</span></div>
+                        <div class="spec-item"><span class="label">月销量</span><span class="value">${product.sales}</span></div>
+                        <div class="spec-item"><span class="label">评价</span><span class="value">${product.rating}</span></div>
+                    </div>
+                    <!-- 标签区 -->
+                    <div class="detail-tags">
+                        ${product.tags.map(function(tag) {
+                            var highlight = ['特级龙井', '包邮', '定制内容', '手工编织'].includes(tag) ? 'highlight' : '';
+                            var sale = ['送礼首选', '限量款'].includes(tag) ? 'sale' : '';
+                            return '<span class="tag ' + highlight + ' ' + sale + '">' + tag + '</span>';
+                        }).join('')}
+                    </div>
+                    <!-- 详情描述 -->
+                    <div class="detail-desc">
+                        ${product.desc}
+                    </div>
+                    <!-- 详情图区 -->
+                    <div class="detail-images">
+                        ${product.detailImages.map(function(icon) {
+                            return '<div class="img-item"><i class="fas ' + icon + '"></i></div>';
+                        }).join('')}
+                    </div>
+                    <!-- 操作按钮 -->
+                    <div class="detail-actions">
+                        <span class="btn-sm primary" onclick="openPlatformModal('${product.name}')"><i class="fas fa-rocket"></i> 立即铺货</span>
+                        <span class="btn-sm outline" onclick="showToast('📋 已加入铺货清单')"><i class="fas fa-plus"></i> 加入清单</span>
+                        <span class="btn-sm outline" onclick="showToast('📊 查看供应商详情...')"><i class="fas fa-store"></i> 供应商详情</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detailContent').innerHTML = html;
+        }
+
+        // ================================================================
+        // ===== 铺货平台选择弹窗 =====
+        // ================================================================
+
+        var availablePlatforms = [
+            { id: 'taobao_1', name: '云山好物旗舰店', platform: '淘宝', icon: 'fa-shopping-bag', color: '#b55a1a', status: '已授权' },
+            { id: 'douyin_1', name: '云山茶生活馆', platform: '抖音', icon: 'fa-video', color: '#1a5bb5', status: '已授权' },
+            { id: 'pdd_1', name: '云山山货专营店', platform: '拼多多', icon: 'fa-store', color: '#b51a3f', status: '已授权' },
+            { id: 'jd_1', name: '云山官方旗舰店', platform: '京东', icon: 'fa-box', color: '#0d7c4f', status: '已授权' },
+            { id: 'douyin_2', name: '云山手工坊', platform: '抖音', icon: 'fa-video', color: '#1a5bb5', status: '已授权' },
+        ];
+
+        var selectedPlatforms = [];
+        var currentProductName = '';
+
+        function openPlatformModal(productName) {
+            currentProductName = productName || '当前商品';
+            document.getElementById('modalProductInfo').innerHTML = '正在为 <strong>' + currentProductName + '</strong> 选择铺货店铺';
+            selectedPlatforms = [];
+            document.getElementById('platformSearchInput').value = '';
+            document.getElementById('selectAllBtn').classList.remove('active');
+            renderPlatformList();
+            document.getElementById('platformModal').classList.add('show');
+            document.getElementById('confirmPlatformBtn').disabled = true;
+        }
+
+        function closePlatformModal() {
+            document.getElementById('platformModal').classList.remove('show');
+        }
+
+        function renderPlatformList() {
+            var container = document.getElementById('platformList');
+            var html = '';
+            availablePlatforms.forEach(function(plat) {
+                var isSelected = selectedPlatforms.includes(plat.id);
+                var platformIcon = plat.platform === '淘宝' ? 'fa-shopping-bag' :
+                                  plat.platform === '抖音' ? 'fa-video' :
+                                  plat.platform === '拼多多' ? 'fa-store' : 'fa-box';
+                html += `
+                    <div class="platform-option ${isSelected ? 'selected' : ''}" data-id="${plat.id}" data-name="${plat.name.toLowerCase()}" onclick="togglePlatform('${plat.id}')">
+                        <div class="platform-icon" style="background:${plat.color}">
+                            <i class="fas ${platformIcon}"></i>
+                        </div>
+                        <div class="platform-info">
+                            <div class="name">${plat.name}</div>
+                            <div class="desc">${plat.platform} · ${plat.status}</div>
+                        </div>
+                        <div class="platform-check">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            filterPlatformList();
+        }
+
+        function filterPlatformList() {
+            var keyword = document.getElementById('platformSearchInput').value.toLowerCase().trim();
+            var options = document.querySelectorAll('.platform-option');
+            var hasVisible = false;
+            options.forEach(function(opt) {
+                var name = opt.dataset.name || '';
+                if (keyword === '' || name.includes(keyword)) {
+                    opt.classList.remove('hidden');
+                    hasVisible = true;
+                } else {
+                    opt.classList.add('hidden');
+                }
+            });
+            var list = document.getElementById('platformList');
+            var existingTip = list.querySelector('.no-result-tip');
+            if (!hasVisible && keyword !== '') {
+                if (!existingTip) {
+                    var tip = document.createElement('div');
+                    tip.className = 'no-result-tip';
+                    tip.style.cssText = 'text-align:center;color:#94a3b8;padding:20px 0;font-size:14px;';
+                    tip.textContent = '🔍 没有找到匹配的店铺';
+                    list.appendChild(tip);
+                }
+            } else {
+                if (existingTip) existingTip.remove();
+            }
+        }
+
+        function toggleSelectAll() {
+            var btn = document.getElementById('selectAllBtn');
+            var visibleOptions = document.querySelectorAll('.platform-option:not(.hidden)');
+            var allSelected = true;
+            visibleOptions.forEach(function(opt) {
+                var id = opt.dataset.id;
+                if (!selectedPlatforms.includes(id)) {
+                    allSelected = false;
+                }
+            });
+            if (allSelected && visibleOptions.length > 0) {
+                visibleOptions.forEach(function(opt) {
+                    var id = opt.dataset.id;
+                    var idx = selectedPlatforms.indexOf(id);
+                    if (idx > -1) selectedPlatforms.splice(idx, 1);
+                    opt.classList.remove('selected');
+                });
+                btn.classList.remove('active');
+            } else {
+                visibleOptions.forEach(function(opt) {
+                    var id = opt.dataset.id;
+                    if (!selectedPlatforms.includes(id)) {
+                        selectedPlatforms.push(id);
+                    }
+                    opt.classList.add('selected');
+                });
+                btn.classList.add('active');
+            }
+            updateConfirmButton();
+        }
+
+        function togglePlatform(platformId) {
+            var index = selectedPlatforms.indexOf(platformId);
+            if (index > -1) {
+                selectedPlatforms.splice(index, 1);
+            } else {
+                selectedPlatforms.push(platformId);
+            }
+            var options = document.querySelectorAll('.platform-option');
+            var visibleOptions = document.querySelectorAll('.platform-option:not(.hidden)');
+            options.forEach(function(opt) {
+                var id = opt.dataset.id;
+                if (selectedPlatforms.includes(id)) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+            var btn = document.getElementById('selectAllBtn');
+            if (visibleOptions.length > 0) {
+                var allSelected = true;
+                visibleOptions.forEach(function(opt) {
+                    if (!selectedPlatforms.includes(opt.dataset.id)) allSelected = false;
+                });
+                if (allSelected) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            }
+            updateConfirmButton();
+        }
+
+        function updateConfirmButton() {
+            document.getElementById('confirmPlatformBtn').disabled = selectedPlatforms.length === 0;
+        }
+
+        function confirmPlatformSelection() {
+            if (selectedPlatforms.length === 0) {
+                showToast('⚠️ 请至少选择一个店铺');
+                return;
+            }
+            var selectedNames = availablePlatforms
+                .filter(function(p) { return selectedPlatforms.includes(p.id); })
+                .map(function(p) { return p.name; });
+            closePlatformModal();
+            showToast('🚀 已成功将「' + currentProductName + '」铺货到：' + selectedNames.join('、'));
+            console.log('铺货商品:', currentProductName);
+            console.log('目标店铺:', selectedNames);
+        }
+
+        document.getElementById('platformModal').addEventListener('click', function(e) {
+            if (e.target === this) closePlatformModal();
+        });
+
+        // ===== 默认加载第一个产品详情 =====
+        document.addEventListener('DOMContentLoaded', function() {
+            var firstItem = document.querySelector('#channelSourceList .product-pick-item');
+            if (firstItem) {
+                firstItem.classList.add('active');
+                showChannelDetail(firstItem, 0);
+            }
+        });
+    </script>
+</body>
+</html>
