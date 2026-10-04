@@ -2018,6 +2018,98 @@
     };
 
     /* ============================================================
+       ★★★ 关键修复：函数声明提前 ★★★
+       说明：scrollMessagesToBottom 使用了默认参数（force = false），
+             这会阻止函数提升（hoisting），导致前面调用时 "not defined"。
+             解决方法：
+             ① 把它改成不带默认参数的普通函数声明，手动处理默认值
+             ② 并且把它放在调用它的函数之前
+       这里先放置滚动相关函数，确保任何地方调用都不会报错。
+       ============================================================ */
+
+    /**
+     * 智能滚动：仅当用户未主动上翻时滚到底
+     * @param {boolean} force - 是否强制滚动（打开会话、发送消息时使用）
+     */
+    function scrollMessagesToBottom(force) {
+        if (force === undefined) force = false;
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+
+        // 用户已上翻且非强制 → 不滚动，并显示"新消息"小红点
+        if (!force && state.userScrolledUp) {
+            state.hasNewMessageWhileScrolledUp = true;
+            updateScrollBottomBtn();
+            setTimeout(attachImageLoadHandlers, 100);
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            setTimeout(attachImageLoadHandlers, 50);
+        });
+    }
+
+    /**
+     * 强制滚动到底（用于"回到最新"按钮）
+     */
+    function forceScrollToBottom() {
+        state.userScrolledUp = false;
+        state.hasNewMessageWhileScrolledUp = false;
+        updateScrollBottomBtn();
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        chatMessages.scrollTo({
+            top: chatMessages.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    /**
+     * 监听图片加载，加载完成后如果仍在贴底状态则修正位置
+     */
+    function attachImageLoadHandlers() {
+        const imgs = document.querySelectorAll('#messagesList img');
+        imgs.forEach(img => {
+            if (img.complete) return;
+            if (img._scrollHandlerAttached) return;
+            img._scrollHandlerAttached = true;
+            img.addEventListener('load', () => {
+                if (!state.userScrolledUp) {
+                    const chatMessages = document.getElementById('chatMessages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+            });
+            img.addEventListener('error', () => {
+                if (!state.userScrolledUp) {
+                    const chatMessages = document.getElementById('chatMessages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 更新"回到最新"按钮的显示状态
+     */
+    function updateScrollBottomBtn() {
+        const btn = document.getElementById('scrollBottomBtn');
+        const dot = document.getElementById('scrollBottomDot');
+        if (!btn) return;
+        if (state.userScrolledUp) {
+            btn.classList.add('show');
+            if (dot) dot.style.display = state.hasNewMessageWhileScrolledUp ? 'block' : 'none';
+        } else {
+            btn.classList.remove('show');
+            if (dot) dot.style.display = 'none';
+        }
+    }
+
+    /* ============================================================
        模拟数据
        ============================================================ */
     const DEMO_CONVERSATIONS = [
@@ -2103,30 +2195,14 @@
         chatMessages.addEventListener('scroll', function () {
             const distToBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight;
             if (distToBottom > 120) {
-                // 用户上翻超过 120px，标记为"已上翻"
                 state.userScrolledUp = true;
             } else if (distToBottom < 30) {
-                // 距离底部 30px 内，视为"已贴底"
                 state.userScrolledUp = false;
                 state.hasNewMessageWhileScrolledUp = false;
                 updateScrollBottomBtn();
             }
             updateScrollBottomBtn();
         });
-    }
-
-    /* ★ 更新"回到最新"按钮的显示状态 */
-    function updateScrollBottomBtn() {
-        const btn = document.getElementById('scrollBottomBtn');
-        const dot = document.getElementById('scrollBottomDot');
-        if (!btn) return;
-        if (state.userScrolledUp) {
-            btn.classList.add('show');
-            if (dot) dot.style.display = state.hasNewMessageWhileScrolledUp ? 'block' : 'none';
-        } else {
-            btn.classList.remove('show');
-            if (dot) dot.style.display = 'none';
-        }
     }
 
     /* ============================================================
@@ -2201,7 +2277,6 @@
         if (!conv) return;
         state.currentId = id;
         conv.unread = 0;
-        // 切换会话时重置滚动状态
         state.userScrolledUp = false;
         state.hasNewMessageWhileScrolledUp = false;
         renderConvList();
@@ -2221,7 +2296,6 @@
 
         renderChatActions(id);
         renderMessages(id);
-        // 打开会话强制贴底
         requestAnimationFrame(() => {
             forceScrollToBottom();
         });
@@ -2234,7 +2308,6 @@
         const head = document.getElementById('chatHead');
         const takeover = state.takeoverState[convId] || 'ai';
 
-        // 头部整体状态样式
         if (head) {
             if (takeover === 'human') {
                 head.classList.add('state-human');
@@ -3606,77 +3679,6 @@
     }
 
     /* ============================================================
-       ★ 智能滚动到底
-       ============================================================ */
-
-    /**
-     * 智能滚动：仅当用户未主动上翻时滚到底
-     * @param {boolean} force - 是否强制滚动（打开会话、发送消息时使用）
-     */
-    function scrollMessagesToBottom(force = false) {
-        const chatMessages = document.getElementById('chatMessages');
-        if (!chatMessages) return;
-
-        // 用户已上翻且非强制 → 不滚动，并显示"新消息"小红点
-        if (!force && state.userScrolledUp) {
-            state.hasNewMessageWhileScrolledUp = true;
-            updateScrollBottomBtn();
-            // 图片加载后可能改变高度，但仍不滚动
-            setTimeout(attachImageLoadHandlers, 100);
-            return;
-        }
-
-        requestAnimationFrame(() => {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            // 图片加载后修正
-            setTimeout(attachImageLoadHandlers, 50);
-        });
-    }
-
-    /**
-     * 强制滚动到底（用于"回到最新"按钮）
-     */
-    function forceScrollToBottom() {
-        state.userScrolledUp = false;
-        state.hasNewMessageWhileScrolledUp = false;
-        updateScrollBottomBtn();
-        const chatMessages = document.getElementById('chatMessages');
-        if (!chatMessages) return;
-        chatMessages.scrollTo({
-            top: chatMessages.scrollHeight,
-            behavior: 'smooth'
-        });
-    }
-
-    /**
-     * 监听图片加载，加载完成后如果仍在贴底状态则修正位置
-     */
-    function attachImageLoadHandlers() {
-        const imgs = document.querySelectorAll('#messagesList img');
-        imgs.forEach(img => {
-            if (img.complete) return;
-            if (img._scrollHandlerAttached) return;
-            img._scrollHandlerAttached = true;
-            img.addEventListener('load', () => {
-                if (!state.userScrolledUp) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    if (chatMessages) {
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }
-                }
-            });
-            img.addEventListener('error', () => {
-                if (!state.userScrolledUp) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    if (chatMessages) {
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }
-                }
-            });
-        });
-    }
-
-    /* ============================================================
        全局暴露
        ============================================================ */
     window.switchTab = switchTab;
@@ -3698,6 +3700,7 @@
     window.quickSendAsset = quickSendAsset;
     window.closeLightbox = closeLightbox;
     window.forceScrollToBottom = forceScrollToBottom;
+    window.scrollMessagesToBottom = scrollMessagesToBottom;
 
     window.openProductPicker = openProductPicker;
     window.closeProductPicker = closeProductPicker;
@@ -3724,7 +3727,7 @@
 
     window.showClickStats = showClickStats;
 
-    console.log('💬 AI 客服页已加载（鲜明状态切换 + 智能贴底滚动）');
+    console.log('💬 AI 客服页已加载（修复 scrollMessagesToBottom 提升问题）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
