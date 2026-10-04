@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>客资聚合</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <script src="../js/auth.js"></script>
+    <script>requireLogin();</script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #eef2f8;
+            color: #0a1a2b;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== 工具条 ===== */
+        .toolbar {
+            background: #fff;
+            border-bottom: 1px solid #e8edf4;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .toolbar .tb-left {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 13px; color: #5f7d95;
+            min-width: 0;
+        }
+        .toolbar .tb-left .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #0d7c4f;
+            animation: pulse 2s infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .toolbar .tb-left strong { color: #0a1e2f; }
+        .toolbar .tb-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .toolbar .tb-btn {
+            padding: 6px 14px; border-radius: 20px;
+            border: 1px solid #dce5ef; background: #fff;
+            color: #1e3a5f; font-size: 12px; font-weight: 500;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+            transition: 0.12s; font-family: inherit; white-space: nowrap;
+        }
+        .toolbar .tb-btn:hover {
+            border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
+        }
+        .toolbar .tb-btn i { color: #5f7d95; }
+        .toolbar .tb-btn:hover i { color: #4dabf7; }
+        .toolbar .tb-btn.primary {
+            background: #0a1e2f; border-color: #0a1e2f; color: #fff;
+        }
+        .toolbar .tb-btn.primary:hover { background: #1a3a5a; }
+        .toolbar .tb-btn.primary i { color: rgba(255,255,255,0.7); }
+
+        /* ===== 主体 ===== */
+        .app-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px 20px;
+        }
+        .app-body::-webkit-scrollbar { width: 6px; }
+        .app-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+
+        /* ===== 统计卡片 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 16px 18px;
+            border-radius: 14px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+        }
+        .stat-card:hover {
+            box-shadow: 0 6px 20px rgba(10,30,47,0.06);
+            border-color: #c8d8e8;
+        }
+        .stat-card .label {
+            font-size: 12px; font-weight: 500; color: #5f7d95;
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 6px;
+        }
+        .stat-card .label i { color: #4dabf7; }
+        .stat-card .value {
+            font-size: 24px; font-weight: 700; color: #0a1e2f;
+            letter-spacing: -0.02em;
+            display: flex; align-items: baseline; gap: 6px;
+        }
+        .stat-card .value small {
+            font-size: 12px; color: #5f7d95; font-weight: 400;
+        }
+        .stat-card .sub {
+            font-size: 12px; color: #5f7d95;
+            margin-top: 4px;
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .stat-card .trend {
+            font-size: 11px; font-weight: 500;
+            background: #e6f7ec; color: #0d7c4f;
+            padding: 1px 8px; border-radius: 20px;
+        }
+        .stat-card .trend.down { background: #fde8ed; color: #b51a3f; }
+
+        /* ===== 卡片 ===== */
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e8edf4;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .card-header h3 {
+            font-size: 15px; font-weight: 600; color: #0a1e2f;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action {
+            font-size: 12px; color: #4dabf7;
+            font-weight: 500; cursor: pointer;
+        }
+
+        /* ===== 筛选栏 ===== */
+        .filter-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .filter-item label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f7d95;
+            margin-bottom: 4px;
+        }
+        .filter-item input,
+        .filter-item select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dce5ef;
+            border-radius: 8px;
+            font-size: 13px;
+            background: #fafcfe;
+            font-family: inherit;
+            transition: 0.15s;
+            color: #0a1e2f;
+            outline: none;
+        }
+        .filter-item input:focus,
+        .filter-item select:focus {
+            border-color: #4dabf7;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 4px;
+        }
+        .btn-sm {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.1s;
+            font-family: inherit;
+        }
+        .btn-sm.primary { background: #0a1e2f; color: #fff; }
+        .btn-sm.primary:hover { background: #1a3a5a; }
+        .btn-sm.outline {
+            background: transparent;
+            border: 1px solid #dce5ef;
+            color: #1e3a5f;
+        }
+        .btn-sm.outline:hover {
+            border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
+        }
+        .btn-sm.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .btn-sm.blue:hover { background: rgba(77,171,247,0.2); }
+        .btn-sm.success { background: #e6f7ec; color: #0d7c4f; }
+        .btn-sm.success:hover { background: #d3f0de; }
+        .btn-sm.warn { background: #fef0e6; color: #b55a1a; }
+        .btn-sm.warn:hover { background: #fde4cc; }
+        .btn-sm.danger { background: #fde8ed; color: #b51a3f; }
+        .btn-sm.danger:hover { background: #fbd5dd; }
+
+        /* ===== 表格 ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 0 -20px;
+            padding: 0 20px;
+        }
+        .table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 980px;
+        }
+        .table-wrap th {
+            text-align: left;
+            padding: 10px 8px;
+            font-weight: 600;
+            color: #5f7d95;
+            border-bottom: 1px solid #e8edf4;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            background: #fafcfe;
+        }
+        .table-wrap td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #f0f4f9;
+            color: #0a1e2f;
+            vertical-align: middle;
+        }
+        .table-wrap tr:last-child td { border: none; }
+        .table-wrap tr:hover td { background: #fafcfe; }
+
+        /* 客户单元格 */
+        .cust-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 150px;
+        }
+        .cust-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .cust-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .cust-info .cust-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0a1e2f;
+        }
+        .cust-info .cust-id {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        /* 徽章 */
+        .badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .badge.taobao { background: #fef0e6; color: #b55a1a; }
+        .badge.douyin { background: #e9f0ff; color: #1a5bb5; }
+        .badge.pdd { background: #fde8ed; color: #b51a3f; }
+        .badge.jd { background: #e6f7ec; color: #0d7c4f; }
+        .badge.wechat { background: #e6f9ef; color: #07c160; }
+        .badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .badge.warning { background: #fef0e6; color: #b55a1a; }
+        .badge.danger { background: #fde8ed; color: #b51a3f; }
+        .badge.info { background: #e9f0ff; color: #1a5bb5; }
+        .badge.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .badge.purple { background: #f0e9ff; color: #7b4fa0; }
+        .badge.gold { background: #fff5db; color: #a86b00; }
+
+        /* 意向评分 */
+        .score-badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+            min-width: 46px;
+            text-align: center;
+        }
+        .score-badge.high { background: #e6f7ec; color: #0d7c4f; }
+        .score-badge.mid { background: #fff5db; color: #a86b00; }
+        .score-badge.low { background: #f0f4f9; color: #5f7d95; }
+
+        /* 操作按钮组 */
+        .op-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .op-btn {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            color: #5f7d95;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.12s;
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+        .op-btn:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+            background: #f5f9fe;
+        }
+        .op-btn.view:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
+        .op-btn.talk:hover { border-color: #0d7c4f; color: #0d7c4f; background: #f0fff8; }
+        .op-btn.coupon:hover { border-color: #b55a1a; color: #b55a1a; background: #fef7ee; }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #e8edf4;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pagination .pages-info {
+            font-size: 13px;
+            color: #5f7d95;
+        }
+        .pagination .pages {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .page-item {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            color: #1e3a5f;
+            transition: 0.12s;
+            min-width: 32px;
+            text-align: center;
+            user-select: none;
+        }
+        .page-item:hover { border-color: #4dabf7; color: #2a7faa; }
+        .page-item.active {
+            background: #0a1e2f;
+            border-color: #0a1e2f;
+            color: #fff;
+        }
+        .page-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #94a3b8;
+        }
+        .empty-state i {
+            font-size: 56px;
+            color: #dce5ef;
+            margin-bottom: 14px;
+            display: block;
+        }
+        .empty-state h3 {
+            font-size: 16px;
+            color: #0a1e2f;
+            margin-bottom: 6px;
+        }
+        .empty-state p {
+            font-size: 13px;
+        }
+
+        /* ===== 客户详情弹窗 ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10,30,47,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 640px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-box::-webkit-scrollbar { width: 4px; }
+        .modal-box::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid #e8edf4;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 2;
+        }
+        .modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-header h3 i { color: #4dabf7; }
+        .modal-header .close-btn {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f4f9;
+            color: #5f7d95;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.12s;
+        }
+        .modal-header .close-btn:hover {
+            background: #fde8ed;
+            color: #b51a3f;
+        }
+
+        .modal-body { padding: 20px 22px; }
+
+        /* 客户头像+基本信息 */
+        .detail-profile {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .detail-profile .big-avatar {
+            width: 68px; height: 68px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 26px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .detail-profile .big-info .big-name {
+            font-size: 19px;
+            font-weight: 700;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .detail-profile .big-info .big-id {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .detail-profile .big-info .tags-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* 详情区块 */
+        .detail-section {
+            margin-bottom: 18px;
+        }
+        .detail-section h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0a1e2f;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f4f9;
+        }
+        .detail-section h4 i { color: #4dabf7; }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 20px;
+        }
+        .detail-item {
+            padding: 6px 0;
+        }
+        .detail-item .dt-label {
+            font-size: 11px;
+            color: #94a3b8;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .detail-item .dt-value {
+            font-size: 14px;
+            color: #0a1e2f;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        /* 消费统计小卡片 */
+        .mini-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .mini-stat {
+            background: #f8fafc;
+            border: 1px solid #e8edf4;
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .mini-stat .ms-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0a1e2f;
+        }
+        .mini-stat .ms-label {
+            font-size: 11px;
+            color: #5f7d95;
+            margin-top: 2px;
+        }
+
+        /* 客户画像标签 */
+        .profile-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        /* 底部操作 */
+        .modal-footer {
+            display: flex;
+            gap: 8px;
+            padding: 16px 22px;
+            border-top: 1px solid #e8edf4;
+            background: #fafcfe;
+            flex-wrap: wrap;
+            position: sticky;
+            bottom: 0;
+        }
+        .modal-footer .btn {
+            flex: 1;
+            padding: 11px 18px;
+            border-radius: 10px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-width: 120px;
+        }
+        .modal-footer .btn.primary { background: #0a1e2f; color: #fff; }
+        .modal-footer .btn.primary:hover { background: #1a3a5a; }
+        .modal-footer .btn.success { background: #0d7c4f; color: #fff; }
+        .modal-footer .btn.success:hover { filter: brightness(1.1); }
+        .modal-footer .btn.outline {
+            background: #fff;
+            border: 1px solid #dce5ef;
+            color: #1e3a5f;
+            flex: 0 0 auto;
+        }
+        .modal-footer .btn.outline:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+            background: #f5f9fe;
+        }
+
+        /* ===== Toast ===== */
+        .global-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 99999;
+            white-space: nowrap;
+            display: none;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .global-toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .filter-bar { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .app-body { padding: 12px 12px 16px; }
+            .toolbar { padding: 8px 12px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 12px 14px; }
+            .stat-card .value { font-size: 18px; }
+            .filter-bar { grid-template-columns: 1fr; gap: 8px; }
+            .card { padding: 14px 14px; }
+            .table-wrap { margin: 0 -14px; padding: 0 14px; }
+            .detail-grid { grid-template-columns: 1fr; }
+            .mini-stats { grid-template-columns: 1fr 1fr 1fr; }
+            .modal-body { padding: 16px 14px; }
+            .modal-header { padding: 14px 14px 10px; }
+            .modal-footer { padding: 12px 14px; }
+            .modal-footer .btn { padding: 10px 14px; font-size: 12px; }
+            .toolbar .tb-btn span { display: none; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-card .value { font-size: 16px; }
+            .toolbar .tb-btn { padding: 6px 10px; }
+            .detail-profile .big-avatar { width: 56px; height: 56px; font-size: 22px; }
+            .detail-profile .big-info .big-name { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== 工具条 ===== -->
+<div class="toolbar">
+    <div class="tb-left">
+        <span class="status-dot"></span>
+        <span>客资聚合中 · 已合并 <strong>2,156</strong> 位跨平台客户 · AI 置信度 <strong>94%</strong></span>
+    </div>
+    <div class="tb-right">
+        <button class="tb-btn" onclick="refreshData()" title="刷新">
+            <i class="fas fa-sync-alt"></i><span> 刷新</span>
+        </button>
+        <button class="tb-btn" onclick="showToast('📥 正在导出客户数据...')" title="导出">
+            <i class="fas fa-download"></i><span> 导出</span>
+        </button>
+        <button class="tb-btn primary" onclick="showToast('➕ 添加客户（演示）')" title="添加客户">
+            <i class="fas fa-user-plus"></i><span> 添加客户</span>
+        </button>
+    </div>
+</div>
+
+<!-- ===== 主体 ===== -->
+<div class="app-body">
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-user-plus"></i> 总客户数</div>
+            <div class="value" id="statTotal">3,847</div>
+            <div class="sub"><span>今日新增 89</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-object-group"></i> 已合并客户</div>
+            <div class="value" id="statMerged">2,156</div>
+            <div class="sub"><span>跨平台识别率 56%</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-tags"></i> 智能标签</div>
+            <div class="value" id="statTags">1,234</div>
+            <div class="sub"><span>高价值 342</span><span>复购潜力 456</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-robot"></i> AI 置信度</div>
+            <div class="value" id="statConfidence">94%</div>
+            <div class="sub"><span>同人识别准确率</span></div>
+        </div>
+    </div>
+
+    <!-- 筛选 -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-search"></i> 客户搜索与筛选</h3>
+            <span class="action" onclick="resetFilters()">
+                <i class="fas fa-undo"></i> 重置
+            </span>
+        </div>
+        <div class="filter-bar">
+            <div class="filter-item">
+                <label>关键词</label>
+                <input type="text" id="filterKeyword" placeholder="姓名 / 手机号 / ID" oninput="applyFilters()">
+            </div>
+            <div class="filter-item">
+                <label>渠道来源</label>
+                <select id="filterPlatform" onchange="applyFilters()">
+                    <option value="all">全部渠道</option>
+                    <option value="淘宝">淘宝</option>
+                    <option value="抖音">抖音</option>
+                    <option value="拼多多">拼多多</option>
+                    <option value="京东">京东</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>意向评分</label>
+                <select id="filterScore" onchange="applyFilters()">
+                    <option value="all">全部评分</option>
+                    <option value="high">高意向 (80+)</option>
+                    <option value="mid">中意向 (60-79)</option>
+                    <option value="low">低意向 (&lt;60)</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>客户标签</label>
+                <select id="filterTag" onchange="applyFilters()">
+                    <option value="all">全部标签</option>
+                    <option value="高价值">高价值</option>
+                    <option value="复购潜力">复购潜力</option>
+                    <option value="新客">新客</option>
+                    <option value="流失预警">流失预警</option>
+                    <option value="咨询中">咨询中</option>
+                </select>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button class="btn-sm primary" onclick="applyFilters()">
+                <i class="fas fa-search"></i> 搜索
+            </button>
+            <button class="btn-sm outline" onclick="resetFilters()">
+                <i class="fas fa-undo"></i> 重置
+            </button>
+            <span style="font-size:13px;color:#5f7d95;margin-left:auto;">
+                共 <strong id="filterCount">6</strong> 位客户
+            </span>
+        </div>
+    </div>
+
+    <!-- 客户列表 -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-users"></i> 客户列表 · 跨平台合并</h3>
+            <span class="action" onclick="showToast('⚙️ 高级筛选（演示）')">
+                <i class="fas fa-sliders-h"></i> 高级筛选
+            </span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>客户</th>
+                        <th>渠道来源</th>
+                        <th>手机号</th>
+                        <th>消费次数</th>
+                        <th>总金额</th>
+                        <th>意向评分</th>
+                        <th>标签</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="customerTableBody">
+                    <!-- 由 JS 渲染 -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <div class="pages-info">
+                显示 <strong id="pageShowFrom">1-6</strong> 条 / 共 <strong id="pageTotal">6</strong> 条
+            </div>
+            <div class="pages">
+                <span class="page-item disabled">
+                    <i class="fas fa-chevron-left"></i>
+                </span>
+                <span class="page-item active">1</span>
+                <span class="page-item disabled">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== 客户详情弹窗 ===== -->
+<div class="modal-overlay" id="customerModal" onclick="if(event.target===this) closeCustomerModal()">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-circle"></i> 客户详情</h3>
+            <button class="close-btn" onclick="closeCustomerModal()" title="关闭">×</button>
+        </div>
+        <div class="modal-body" id="customerModalBody">
+            <!-- 由 JS 填充 -->
+        </div>
+        <div class="modal-footer" id="customerModalFooter">
+            <!-- 由 JS 填充 -->
+        </div>
+    </div>
+</div>
+
+<div class="global-toast" id="toast"></div>
+
+<!-- ===== 脚本 ===== -->
+<script>
+    /* ============================================================
+       客户数据
+       ============================================================ */
+    const ALL_CUSTOMERS = [
+        {
+            id: 'CUS-10001',
+            name: '王*婷',
+            avatarText: '王',
+            avatarColor: '#b55a1a',
+            platforms: ['抖音', '微信'],
+            phone: '138****2210',
+            orders: 3,
+            amount: 1247,
+            score: 95,
+            tags: ['高价值', '复购潜力'],
+            regDate: '2026-03-15',
+            address: '北京市朝阳区建国路88号',
+            lastContact: '2026-09-05 14:32',
+            msgCount: 2,
+            lastActive: '3天前',
+            lastOrder: '2026-08-20',
+            preferCategory: '茶叶 · 手工艺',
+            channelPath: '抖音直播间 → 抖音小店 → 微信私域'
+        },
+        {
+            id: 'CUS-10002',
+            name: '张*豪',
+            avatarText: '张',
+            avatarColor: '#1a5bb5',
+            platforms: ['淘宝'],
+            phone: '159****4502',
+            orders: 1,
+            amount: 420,
+            score: 88,
+            tags: ['咨询中', '新客'],
+            regDate: '2026-08-20',
+            address: '上海市浦东新区张杨路88号',
+            lastContact: '2026-09-05 14:15',
+            msgCount: 1,
+            lastActive: '1天前',
+            lastOrder: '2026-08-20',
+            preferCategory: '手工艺 · 编织',
+            channelPath: '淘宝搜索 → 店铺浏览 → 下单'
+        },
+        {
+            id: 'CUS-10003',
+            name: '李*萱',
+            avatarText: '李',
+            avatarColor: '#b51a3f',
+            platforms: ['拼多多', '抖音'],
+            phone: '177****8934',
+            orders: 2,
+            amount: 376,
+            score: 82,
+            tags: ['复购潜力'],
+            regDate: '2026-07-10',
+            address: '广州市天河区天河路188号',
+            lastContact: '2026-09-05 13:50',
+            msgCount: 1,
+            lastActive: '5天前',
+            lastOrder: '2026-08-15',
+            preferCategory: '食品 · 坚果',
+            channelPath: '拼多多下单 → 抖音互动 → 复购'
+        },
+        {
+            id: 'CUS-10004',
+            name: '刘*阳',
+            avatarText: '刘',
+            avatarColor: '#0d7c4f',
+            platforms: ['京东'],
+            phone: '136****6721',
+            orders: 0,
+            amount: 0,
+            score: 76,
+            tags: ['新客', '咨询中'],
+            regDate: '2026-09-01',
+            address: '深圳市南山区科技园路68号',
+            lastContact: '2026-09-05 13:20',
+            msgCount: 0,
+            lastActive: '刚刚',
+            lastOrder: '—',
+            preferCategory: '文创 · 手工皂',
+            channelPath: '京东 APP → 首页推荐'
+        },
+        {
+            id: 'CUS-10005',
+            name: '赵*琳',
+            avatarText: '赵',
+            avatarColor: '#7b4fa0',
+            platforms: ['淘宝', '拼多多'],
+            phone: '158****3390',
+            orders: 5,
+            amount: 2856,
+            score: 98,
+            tags: ['高价值', '复购潜力'],
+            regDate: '2026-01-05',
+            address: '杭州市西湖区文三路118号',
+            lastContact: '2026-09-05 12:45',
+            msgCount: 3,
+            lastActive: '2天前',
+            lastOrder: '2026-08-28',
+            preferCategory: '茶叶 · 文创',
+            channelPath: '淘宝老客 → 拼多多比价 → 双平台复购'
+        },
+        {
+            id: 'CUS-10006',
+            name: '陈*瑶',
+            avatarText: '陈',
+            avatarColor: '#2a7faa',
+            platforms: ['抖音'],
+            phone: '135****7788',
+            orders: 1,
+            amount: 89,
+            score: 55,
+            tags: ['流失预警', '新客'],
+            regDate: '2026-06-12',
+            address: '成都市武侯区人民南路 12 号',
+            lastContact: '2026-08-28 16:20',
+            msgCount: 1,
+            lastActive: '8天前',
+            lastOrder: '2026-06-12',
+            preferCategory: '手工艺 · 竹编',
+            channelPath: '抖音短视频 → 直播间 → 下单'
+        }
+    ];
+
+    /* ============================================================
+       状态
+       ============================================================ */
+    const state = {
+        customers: [],
+        filtered: [],
+        currentDetail: null
+    };
+
+    /* ============================================================
+       初始化
+       ============================================================ */
+    document.addEventListener('DOMContentLoaded', function () {
+        state.customers = JSON.parse(JSON.stringify(ALL_CUSTOMERS));
+        state.filtered = state.customers.slice();
+        renderTable();
+        updateCount();
+    });
+
+    /* ============================================================
+       渲染表格
+       ============================================================ */
+    function renderTable() {
+        const tbody = document.getElementById('customerTableBody');
+
+        if (state.filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fas fa-user-slash"></i>
+                            <h3>没有匹配的客户</h3>
+                            <p>试试调整筛选条件，或点击"重置"</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = state.filtered.map(c => {
+            const platBadges = c.platforms.map(p =>
+                `<span class="badge ${platClass(p)}">${p}</span>`
+            ).join(' ');
+
+            const tagBadges = c.tags.map(t =>
+                `<span class="badge ${tagClass(t)}">${t}</span>`
+            ).join(' ');
+
+            const scoreCls = c.score >= 80 ? 'high' : (c.score >= 60 ? 'mid' : 'low');
+
+            return `
+                <tr data-cid="${c.id}">
+                    <td>
+                        <div class="cust-cell">
+                            <div class="cust-avatar" style="background:${c.avatarColor};">
+                                ${c.avatarText}
+                            </div>
+                            <div class="cust-info">
+                                <div class="cust-name">${escapeHtml(c.name)}</div>
+                                <div class="cust-id">${c.id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${platBadges}</td>
+                    <td><span style="font-size:12px;color:#5f7d95;">${c.phone}</span></td>
+                    <td><strong>${c.orders}</strong> 次</td>
+                    <td><span style="font-weight:600;color:#b55a1a;">¥${formatNum(c.amount)}</span></td>
+                    <td><span class="score-badge ${scoreCls}">${c.score}分</span></td>
+                    <td>${tagBadges}</td>
+                    <td>
+                        <div class="op-group">
+                            <button class="op-btn view" onclick="openCustomerDetail('${c.id}')" title="查看详情">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="op-btn talk" onclick="event.stopPropagation(); talkToCustomer('${c.id}')" title="联系客户">
+                                <i class="fas fa-comment-dots"></i>
+                            </button>
+                            <button class="op-btn coupon" onclick="event.stopPropagation(); sendCoupon('${c.id}')" title="发送优惠券">
+                                <i class="fas fa-ticket-alt"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function platClass(p) {
+        return { '淘宝': 'taobao', '抖音': 'douyin', '拼多多': 'pdd', '京东': 'jd', '微信': 'wechat' }[p] || 'info';
+    }
+
+    function tagClass(t) {
+        return {
+            '高价值': 'gold',
+            '复购潜力': 'success',
+            '新客': 'info',
+            '流失预警': 'danger',
+            '咨询中': 'warning'
+        }[t] || 'info';
+    }
+
+    function formatNum(n) {
+        return Number(n).toLocaleString('zh-CN');
+    }
+
+    /* ============================================================
+       筛选
+       ============================================================ */
+    function applyFilters() {
+        const keyword = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
+        const platform = document.getElementById('filterPlatform').value;
+        const scoreRange = document.getElementById('filterScore').value;
+        const tag = document.getElementById('filterTag').value;
+
+        state.filtered = state.customers.filter(c => {
+            // 关键词
+            if (keyword) {
+                const haystack = [
+                    c.name, c.phone, c.id, c.address
+                ].join(' ').toLowerCase();
+                if (!haystack.includes(keyword)) return false;
+            }
+            // 渠道
+            if (platform !== 'all') {
+                if (!c.platforms.includes(platform)) return false;
+            }
+            // 评分
+            if (scoreRange !== 'all') {
+                if (scoreRange === 'high' && c.score < 80) return false;
+                if (scoreRange === 'mid' && (c.score < 60 || c.score >= 80)) return false;
+                if (scoreRange === 'low' && c.score >= 60) return false;
+            }
+            // 标签
+            if (tag !== 'all') {
+                if (!c.tags.includes(tag)) return false;
+            }
+            return true;
+        });
+
+        renderTable();
+        updateCount();
+    }
+
+    function resetFilters() {
+        document.getElementById('filterKeyword').value = '';
+        document.getElementById('filterPlatform').value = 'all';
+        document.getElementById('filterScore').value = 'all';
+        document.getElementById('filterTag').value = 'all';
+        state.filtered = state.customers.slice();
+        renderTable();
+        updateCount();
+        showToast('🔄 已重置筛选条件');
+    }
+
+    function updateCount() {
+        document.getElementById('filterCount').textContent = state.filtered.length;
+        document.getElementById('pageTotal').textContent = state.filtered.length;
+        document.getElementById('pageShowFrom').textContent =
+            state.filtered.length === 0 ? '0' : `1-${state.filtered.length}`;
+    }
+
+    /* ============================================================
+       客户详情
+       ============================================================ */
+    function openCustomerDetail(cid) {
+        const c = state.customers.find(x => x.id === cid);
+        if (!c) return;
+        state.currentDetail = c;
+
+        const platBadges = c.platforms.map(p =>
+            `<span class="badge ${platClass(p)}">${p}</span>`
+        ).join(' ');
+
+        const tagBadges = c.tags.map(t =>
+            `<span class="badge ${tagClass(t)}">${t}</span>`
+        ).join(' ');
+
+        const scoreCls = c.score >= 80 ? 'high' : (c.score >= 60 ? 'mid' : 'low');
+
+        const body = document.getElementById('customerModalBody');
+        body.innerHTML = `
+            <div class="detail-profile">
+                <div class="big-avatar" style="background:${c.avatarColor};">${c.avatarText}</div>
+                <div class="big-info">
+                    <div class="big-name">
+                        ${escapeHtml(c.name)}
+                        ${platBadges}
+                    </div>
+                    <div class="big-id">客户 ID: ${c.id}</div>
+                    <div class="tags-row">${tagBadges}</div>
+                </div>
+            </div>
+
+            <div class="mini-stats">
+                <div class="mini-stat">
+                    <div class="ms-val">${c.orders}</div>
+                    <div class="ms-label">消费次数</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="ms-val">¥${formatNum(c.amount)}</div>
+                    <div class="ms-label">累计金额</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="ms-val">${c.score}分</div>
+                    <div class="ms-label">意向评分</div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4><i class="fas fa-id-card"></i> 基本信息</h4>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="dt-label">手机号</div>
+                        <div class="dt-value">${c.phone}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="dt-label">注册日期</div>
+                        <div class="dt-value">${c.regDate}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="dt-label">收货地址</div>
+                        <div class="dt-value">${escapeHtml(c.address)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="dt-label">偏好类目</div>
+                        <div class="dt-value">${escapeHtml(c.preferCategory)}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4><i class="fas fa-shopping-bag"></i> 消费画像</h4>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="dt-label">最近订单</div>
+                        <div class="dt-value">${c.lastOrder}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="dt-label">客单价</div>
+                        <div class="dt-value">¥${c.orders > 0 ? (c.amount / c.orders).toFixed(2) : '0.00'}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4><i class="fas fa-comments"></i> 互动轨迹</h4>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="dt-label">最近对话</div>
+                        <div class="dt-value">${c.lastContact}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="dt-label">咨询次数</div>
+                        <div class="dt-value">${c.msgCount} 次</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="dt-label">最近活跃</div>
+                        <div class="dt-value">${c.lastActive}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="dt-label">渠道路径</div>
+                        <div class="dt-value">${escapeHtml(c.channelPath)}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4><i class="fas fa-magic"></i> AI 智能标签</h4>
+                <div class="profile-tags">
+                    ${tagBadges}
+                    <span class="badge blue">AI 置信度 94%</span>
+                    <span class="badge purple">跨平台识别 2 个</span>
+                </div>
+            </div>
+        `;
+
+        const footer = document.getElementById('customerModalFooter');
+        footer.innerHTML = `
+            <button class="btn outline" onclick="closeCustomerModal()">
+                <i class="fas fa-times"></i> 关闭
+            </button>
+            <button class="btn success" onclick="sendCoupon('${c.id}')">
+                <i class="fas fa-ticket-alt"></i> 发优惠券
+            </button>
+            <button class="btn primary" onclick="talkToCustomer('${c.id}')">
+                <i class="fas fa-comment-dots"></i> 联系客户
+            </button>
+        `;
+
+        document.getElementById('customerModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCustomerModal() {
+        document.getElementById('customerModal').classList.remove('show');
+        document.body.style.overflow = '';
+        state.currentDetail = null;
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('customerModal');
+            if (modal.classList.contains('show')) closeCustomerModal();
+        }
+    });
+
+    /* ============================================================
+       操作
+       ============================================================ */
+    function talkToCustomer(cid) {
+        const c = state.customers.find(x => x.id === cid);
+        if (!c) return;
+        showToast(`💬 正在打开与「${c.name}」的对话...`);
+        // 可以在这里 postMessage 到父页面切换 AI 客服：
+        // parent.postMessage({ type: 'navigate', page: 'pages/ai_service.html' }, '*');
+    }
+
+    function sendCoupon(cid) {
+        const c = state.customers.find(x => x.id === cid);
+        if (!c) return;
+        showToast(`🎟️ 已向「${c.name}」发送专属优惠券`);
+    }
+
+    function refreshData() {
+        showToast('🔄 客户数据已刷新');
+        // 这里可以调后端 API 重新拉数据
+    }
+
+    /* ============================================================
+       工具
+       ============================================================ */
+    function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    /* 暴露到全局 */
+    window.openCustomerDetail = openCustomerDetail;
+    window.closeCustomerModal = closeCustomerModal;
+    window.talkToCustomer = talkToCustomer;
+    window.sendCoupon = sendCoupon;
+    window.refreshData = refreshData;
+    window.applyFilters = applyFilters;
+    window.resetFilters = resetFilters;
+
+    console.log('👥 客资聚合页已加载');
+</script>
+</body>
+</html>
