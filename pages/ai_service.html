@@ -406,8 +406,10 @@
             30% { transform: translateY(-4px); opacity: 1; }
         }
 
-        /* 快捷回复区域已移除 */
-        /* .quick-replies { ... } 不再使用 */
+        /* 快捷操作区（已移除按钮，保留容器但隐藏） */
+        .quick-replies {
+            display: none !important;
+        }
 
         .chat-input-area {
             background: #fff;
@@ -1718,7 +1720,8 @@
                     </div>
                 </div>
 
-                <!-- 快捷操作区域已完全移除 -->
+                <!-- 快捷操作已移除，容器保留但隐藏 -->
+                <div class="quick-replies" id="quickReplies" style="display:none;"></div>
 
                 <div class="chat-input-area" id="chatInputArea" style="display:none;">
                     <button class="attach-btn" onclick="quickSendAsset()" title="从素材库发送">
@@ -2083,6 +2086,7 @@
         document.getElementById('emptyChat').style.display = 'none';
         document.getElementById('chatHead').style.display = 'flex';
         document.getElementById('chatMessages').style.display = 'flex';
+        document.getElementById('quickReplies').style.display = 'none';
         document.getElementById('chatInputArea').style.display = 'flex';
 
         document.getElementById('chatAvatar').textContent = conv.avatarText;
@@ -2640,18 +2644,16 @@
     }
 
     /* ============================================================
-       商品选择器（修复版 + 发送后关闭弹窗）
+       商品选择器
        ============================================================ */
     function openProductPicker() {
         if (!state.currentId) {
             showToast('⚠️ 请先选择会话');
             return;
         }
-        // 每次打开都重置选中状态
         state.pickedProducts = [];
         document.getElementById('productPickerSearch').value = '';
 
-        // 若商品列表为空，先尝试加载
         if (!state.productsCache || state.productsCache.length === 0) {
             loadProducts().then(() => {
                 renderProductPickerList(state.productsCache);
@@ -2660,11 +2662,8 @@
             renderProductPickerList(state.productsCache);
         }
 
-        // 立即更新按钮状态
         updatePickedCount();
         document.getElementById('productPickerModal').classList.add('show');
-
-        // 延迟 100ms 再刷新一次按钮状态（防止 DOM 没就绪）
         setTimeout(updatePickedCount, 100);
     }
 
@@ -2709,7 +2708,6 @@
         }).join('');
     }
 
-    // 选中/取消逻辑
     function togglePickProduct(productId) {
         const p = state.productsCache.find(x => x.id === productId);
         if (!p) {
@@ -2719,10 +2717,8 @@
 
         const idx = state.pickedProducts.findIndex(x => x.id === productId);
         if (idx >= 0) {
-            // 取消选中
             state.pickedProducts.splice(idx, 1);
         } else {
-            // 加入选中（最多 3 个）
             if (state.pickedProducts.length >= 3) {
                 showToast('⚠️ 一次最多选 3 个商品');
                 return;
@@ -2730,13 +2726,10 @@
             state.pickedProducts.push(p);
         }
 
-        // 重新渲染列表（更新选中样式）
         renderProductPickerList(state.productsCache);
-        // 强制更新按钮状态
         updatePickedCount();
     }
 
-    // 按钮状态更新
     function updatePickedCount() {
         const n = state.pickedProducts.length;
         const countEl = document.getElementById('pickedCount');
@@ -2764,7 +2757,6 @@
         renderProductPickerList(list);
     }
 
-    // ★ 发送商品：发送后关闭弹窗
     async function sendPickedProducts() {
         if (state.pickedProducts.length === 0) {
             showToast('⚠️ 请先选择商品');
@@ -2816,7 +2808,6 @@
         renderConvList();
         scrollMessagesToBottom();
 
-        // 关闭弹窗并重置选中
         closeProductPicker();
         state.pickedProducts = [];
 
@@ -2836,7 +2827,7 @@
     }
 
     /* ============================================================
-       优惠券选择器（发送后关闭弹窗）
+       优惠券选择器
        ============================================================ */
     function openCouponPicker() {
         if (!state.currentId) {
@@ -2885,7 +2876,6 @@
         document.getElementById('sendCouponBtn').disabled = false;
     }
 
-    // ★ 发送优惠券：发送后关闭弹窗
     async function sendPickedCoupon() {
         if (!state.pickedCoupon) return;
         if (!state.currentId) return;
@@ -2912,7 +2902,6 @@
         renderConvList();
         scrollMessagesToBottom();
 
-        // 关闭弹窗并重置选中
         closeCouponPicker();
         state.pickedCoupon = null;
 
@@ -2954,14 +2943,6 @@
             simulateCustomerReply(convId);
             state.isReplying = false;
         }, 1500 + Math.random() * 1500);
-    }
-
-    function sendQuick(text) {
-        const input = document.getElementById('msgInput');
-        input.value = text;
-        autoResize(input);
-        updateSendBtn();
-        sendMsg();
     }
 
     /* ============================================================
@@ -3346,7 +3327,7 @@
     }
 
     /* ============================================================
-       接管 / 转人工
+       接管 / 转人工（功能逻辑保持不变）
        ============================================================ */
     function transferToHuman() {
         if (!state.currentId) return;
@@ -3393,6 +3374,7 @@
         document.getElementById('emptyChat').style.display = 'flex';
         document.getElementById('chatHead').style.display = 'none';
         document.getElementById('chatMessages').style.display = 'none';
+        document.getElementById('quickReplies').style.display = 'none';
         document.getElementById('chatInputArea').style.display = 'none';
         showToast('✅ 会话已结束');
     }
@@ -3489,7 +3471,6 @@
     window.openConv = openConv;
     window.filterConv = filterConv;
     window.sendMsg = sendMsg;
-    window.sendQuick = sendQuick;
     window.transferToHuman = transferToHuman;
     window.takeOver = takeOver;
     window.releaseToAI = releaseToAI;
@@ -3530,7 +3511,7 @@
 
     window.showClickStats = showClickStats;
 
-    console.log('💬 AI 客服页已加载（移除快捷操作版）');
+    console.log('💬 AI 客服页已加载（恢复转人工/AI接管鲜明切换 + 移除快捷操作）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
