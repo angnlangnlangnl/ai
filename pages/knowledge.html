@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>知识库管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <script src="../js/auth.js"></script>
+    <script>requireLogin();</script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #eef2f8;
+            color: #0a1a2b;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== 工具条 ===== */
+        .toolbar {
+            background: #fff;
+            border-bottom: 1px solid #e8edf4;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .toolbar .tb-left {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 13px; color: #5f7d95;
+        }
+        .toolbar .tb-left strong { color: #0a1e2f; }
+        .toolbar .tb-right {
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .toolbar .tb-btn {
+            padding: 6px 14px; border-radius: 20px;
+            border: 1px solid #dce5ef; background: #fff;
+            color: #1e3a5f; font-size: 12px; font-weight: 500;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+            transition: 0.12s; font-family: inherit; white-space: nowrap;
+        }
+        .toolbar .tb-btn:hover {
+            border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
+        }
+        .toolbar .tb-btn i { color: #5f7d95; }
+        .toolbar .tb-btn:hover i { color: #4dabf7; }
+        .toolbar .tb-btn.primary {
+            background: #0a1e2f;
+            border-color: #0a1e2f;
+            color: #fff;
+        }
+        .toolbar .tb-btn.primary:hover { background: #1a3a5a; }
+        .toolbar .tb-btn.primary i { color: rgba(255,255,255,0.7); }
+
+        /* ===== 主体 ===== */
+        .app-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px 20px;
+        }
+        .app-body::-webkit-scrollbar { width: 6px; }
+        .app-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+
+        /* ===== 统计 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 16px 18px;
+            border-radius: 14px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+        }
+        .stat-card:hover {
+            box-shadow: 0 6px 20px rgba(10,30,47,0.06);
+            border-color: #c8d8e8;
+        }
+        .stat-card .label {
+            font-size: 12px; font-weight: 500; color: #5f7d95;
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 6px;
+        }
+        .stat-card .label i { color: #4dabf7; }
+        .stat-card .value {
+            font-size: 24px; font-weight: 700; color: #0a1e2f;
+            letter-spacing: -0.02em;
+        }
+        .stat-card .value small {
+            font-size: 12px; color: #5f7d95; font-weight: 400;
+        }
+        .stat-card .sub {
+            font-size: 12px; color: #5f7d95;
+            margin-top: 4px;
+        }
+
+        /* ===== 卡片 ===== */
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e8edf4;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+        }
+
+        /* ===== 筛选栏 ===== */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .filter-bar input[type="text"],
+        .filter-bar select {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            color: #0a1e2f;
+        }
+        .filter-bar input[type="text"]:focus,
+        .filter-bar select:focus {
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .filter-bar input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+        }
+        .filter-bar .btn-sm {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.12s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .filter-bar .btn-sm.primary {
+            background: #0a1e2f; color: #fff;
+        }
+        .filter-bar .btn-sm.primary:hover { background: #1a3a5a; }
+        .filter-bar .btn-sm.outline {
+            background: #fff; color: #1e3a5f;
+            border: 1px solid #dce5ef;
+        }
+        .filter-bar .btn-sm.outline:hover {
+            border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
+        }
+        .filter-bar .btn-sm.blue {
+            background: rgba(77,171,247,0.12); color: #2a7faa;
+        }
+        .filter-bar .btn-sm.blue:hover { background: rgba(77,171,247,0.2); }
+
+        /* ===== 分类树 ===== */
+        .kb-category-tree {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e8edf4;
+            margin-bottom: 14px;
+        }
+        .kb-cat-chip {
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #fff;
+            color: #5f7d95;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #dce5ef;
+            transition: 0.12s;
+        }
+        .kb-cat-chip:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+        }
+        .kb-cat-chip.active {
+            background: #0a1e2f;
+            color: #fff;
+            border-color: #0a1e2f;
+        }
+        .kb-cat-chip .count {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-left: 4px;
+        }
+        .kb-cat-chip.active .count {
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* ===== 知识卡片 ===== */
+        .kb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
+        }
+        .kb-card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e8edf4;
+            padding: 16px;
+            transition: 0.15s;
+            position: relative;
+        }
+        .kb-card:hover {
+            box-shadow: 0 6px 20px rgba(10,30,47,0.08);
+            border-color: #c8d8e8;
+            transform: translateY(-2px);
+        }
+        .kb-card.disabled {
+            opacity: 0.55;
+            background: #f5f7fa;
+        }
+        .kb-card.pinned {
+            border-color: #f5b342;
+            box-shadow: 0 0 0 1px #f5b342 inset;
+        }
+        .kb-card .kb-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+        .kb-card .kb-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0a1e2f;
+            line-height: 1.4;
+            flex: 1;
+            word-break: break-word;
+        }
+        .kb-card .kb-title .pin-icon {
+            color: #f5b342;
+            margin-right: 4px;
+        }
+        .kb-card .kb-cat {
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: #f0f7fe;
+            color: #2a7faa;
+            flex-shrink: 0;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .kb-card .kb-summary {
+            font-size: 13px;
+            color: #5f7d95;
+            line-height: 1.6;
+            margin: 8px 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        .kb-card .kb-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        .kb-card .kb-tag {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: #f0f4f9;
+            color: #5f7d95;
+        }
+        .kb-card .kb-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #94a3b8;
+            padding-top: 10px;
+            border-top: 1px solid #f0f4f9;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .kb-card .kb-foot .kb-stat {
+            display: flex;
+            gap: 10px;
+        }
+        .kb-card .kb-foot .kb-stat span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .kb-card-actions {
+            display: flex;
+            gap: 6px;
+            padding-top: 10px;
+            margin-top: 10px;
+            border-top: 1px solid #f0f4f9;
+        }
+        .kb-act-btn {
+            flex: 1;
+            padding: 7px;
+            border-radius: 8px;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            color: #5f7d95;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.12s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .kb-act-btn:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+            background: #f5f9fe;
+        }
+        .kb-act-btn.danger:hover {
+            border-color: #b51a3f;
+            color: #b51a3f;
+            background: #fde8ed;
+        }
+
+        /* ===== 空状态 ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+        .empty-state i {
+            font-size: 56px;
+            color: #dce5ef;
+            margin-bottom: 14px;
+            display: block;
+        }
+        .empty-state h3 {
+            font-size: 16px;
+            color: #0a1e2f;
+            margin-bottom: 6px;
+        }
+        .empty-state p { font-size: 13px; }
+
+        /* ===== 上传弹窗 ===== */
+        .upload-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(10,30,47,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .upload-modal.show { display: flex; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .upload-box {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .upload-head {
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid #e8edf4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .upload-head h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-head h3 i { color: #4dabf7; }
+        .upload-head .close {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f4f9;
+            color: #5f7d95;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-head .close:hover { background: #fde8ed; color: #b51a3f; }
+        .upload-body { padding: 18px 22px; }
+        .upload-body .form-group { margin-bottom: 14px; }
+        .upload-body label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f7d95;
+            margin-bottom: 6px;
+        }
+        .upload-body label .req { color: #b51a3f; }
+        .upload-body input[type="text"],
+        .upload-body select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #dce5ef;
+            border-radius: 10px;
+            background: #fafcfe;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            color: #0a1e2f;
+        }
+        .upload-body input[type="text"]:focus,
+        .upload-body select:focus {
+            border-color: #4dabf7;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .upload-body .file-input-wrap {
+            border: 2px dashed #dce5ef;
+            border-radius: 10px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.15s;
+            background: #fafcfe;
+        }
+        .upload-body .file-input-wrap:hover {
+            border-color: #4dabf7;
+            background: #f5f9fe;
+        }
+        .upload-body .file-input-wrap.dragover {
+            border-color: #4dabf7;
+            background: #f0f7fe;
+        }
+        .upload-body .file-input-wrap i {
+            font-size: 32px;
+            color: #4dabf7;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .upload-body .file-input-wrap p {
+            font-size: 13px;
+            color: #5f7d95;
+        }
+        .upload-body .file-input-wrap small {
+            font-size: 11px;
+            color: #94a3b8;
+            display: block;
+            margin-top: 4px;
+        }
+        .upload-body .selected-file {
+            background: #f0f7fe;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #2a7faa;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-body .selected-file.show { display: flex; }
+        .upload-body .selected-file .name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .upload-foot {
+            display: flex;
+            gap: 10px;
+            padding: 14px 22px;
+            border-top: 1px solid #e8edf4;
+            background: #fafcfe;
+        }
+        .upload-foot .btn {
+            flex: 1;
+            padding: 11px 18px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: 0.15s;
+        }
+        .upload-foot .btn.primary {
+            background: #0a1e2f;
+            color: #fff;
+        }
+        .upload-foot .btn.primary:hover { background: #1a3a5a; }
+        .upload-foot .btn.primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .upload-foot .btn.outline {
+            background: #fff;
+            border: 1px solid #dce5ef;
+            color: #1e3a5f;
+            flex: 0 0 auto;
+        }
+        .upload-foot .btn.outline:hover { background: #f5f8fc; }
+
+        /* ===== Toast ===== */
+        .global-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 9999;
+            white-space: nowrap;
+            display: none;
+        }
+        .global-toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .app-body { padding: 12px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 12px 14px; }
+            .stat-card .value { font-size: 18px; }
+            .kb-grid { grid-template-columns: 1fr; }
+            .toolbar { padding: 8px 12px; }
+            .toolbar .tb-btn span { display: none; }
+            .filter-bar input[type="text"] { min-width: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== 工具条 ===== -->
+<div class="toolbar">
+    <div class="tb-left">
+        <i class="fas fa-book" style="color:#4dabf7;"></i>
+        <span>知识库管理 · 共 <strong id="toolbarKbCount">0</strong> 篇</span>
+    </div>
+    <div class="tb-right">
+        <button class="tb-btn primary" onclick="openKbUpload()">
+            <i class="fas fa-cloud-upload-alt"></i><span> 上传知识</span>
+        </button>
+        <button class="tb-btn" onclick="openKbBatchUpload()">
+            <i class="fas fa-file-import"></i><span> 批量导入</span>
+        </button>
+        <button class="tb-btn" onclick="openKbCategoryModal()">
+            <i class="fas fa-folder-plus"></i><span> 分类管理</span>
+        </button>
+        <button class="tb-btn" onclick="openKbAutoGenerate()">
+            <i class="fas fa-magic"></i><span> AI 提炼</span>
+        </button>
+        <button class="tb-btn" onclick="loadKb()">
+            <i class="fas fa-sync-alt"></i><span> 刷新</span>
+        </button>
+    </div>
+</div>
+
+<!-- ===== 主体 ===== -->
+<div class="app-body">
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-book"></i> 知识总数</div>
+            <div class="value" id="statKbTotal">0</div>
+            <div class="sub">覆盖 <span id="statKbCatCount">0</span> 个分类</div>
+        </div>
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 启用中</div>
+            <div class="value" id="statKbEnabled">0</div>
+            <div class="sub">停用 <span id="statKbDisabled">0</span> 篇</div>
+        </div>
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-fire" style="color:#b55a1a;"></i> 总命中次数</div>
+            <div class="value" id="statKbHits">0</div>
+            <div class="sub">被 AI 引用总数</div>
+        </div>
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-thumbs-up" style="color:#2a7faa;"></i> 满意度</div>
+            <div class="value" id="statKbSatisfaction">-</div>
+            <div class="sub">基于 <span id="statKbFeedback">0</span> 次反馈</div>
+        </div>
+    </div>
+
+    <!-- 筛选 + 分类 -->
+    <div class="card" style="padding:14px 20px;">
+        <div class="filter-bar">
+            <input type="text" id="kbSearch" placeholder="搜索知识标题/内容/标签..." oninput="renderKb()">
+            <select id="kbStatusFilter" onchange="renderKb()">
+                <option value="all">全部状态</option>
+                <option value="enabled">仅启用</option>
+                <option value="disabled">仅停用</option>
+                <option value="pinned">仅置顶</option>
+            </select>
+            <select id="kbSortBy" onchange="renderKb()">
+                <option value="time">按时间</option>
+                <option value="hit">按命中次数</option>
+                <option value="title">按标题</option>
+            </select>
+            <span style="font-size:13px;color:#5f7d95;margin-left:auto;">
+                共 <strong id="kbCount">0</strong> 篇
+            </span>
+        </div>
+        <div class="kb-category-tree" id="kbCategoryTree"></div>
+    </div>
+
+    <!-- 知识列表 -->
+    <div class="kb-grid" id="kbGrid"></div>
+    <div class="empty-state" id="kbEmpty" style="display:none;">
+        <i class="fas fa-book-open"></i>
+        <h3>还没有知识内容</h3>
+        <p>点击上方"上传知识"或"批量导入"，支持 txt / md / json / csv / pdf / docx</p>
+    </div>
+
+</div>
+
+<!-- ===== 上传知识弹窗 ===== -->
+<div class="upload-modal" id="kbUploadModal" onclick="if(event.target===this) closeKbUpload()">
+    <div class="upload-box">
+        <div class="upload-head">
+            <h3><i class="fas fa-book"></i> 上传知识</h3>
+            <button class="close" onclick="closeKbUpload()">×</button>
+        </div>
+        <div class="upload-body">
+            <div class="form-group">
+                <label>知识标题 <span class="req">*</span></label>
+                <input type="text" id="kbTitle" placeholder="例如：退货政策说明">
+            </div>
+            <div class="form-group">
+                <label>分类</label>
+                <select id="kbCategory">
+                    <option value="cat_other">📝 其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>标签（逗号分隔）</label>
+                <input type="text" id="kbTags" placeholder="例如：退货,售后,政策">
+            </div>
+            <div class="form-group">
+                <label>文件 <span class="req">*</span></label>
+                <div class="file-input-wrap" id="kbFileWrap" onclick="document.getElementById('kbFileInput').click()">
+                    <i class="fas fa-file-upload"></i>
+                    <p>点击选择文件，或拖拽到此处</p>
+                    <small>支持 .txt / .md / .json / .csv / .pdf / .docx，≤ 20MB</small>
+                </div>
+                <input type="file" id="kbFileInput" accept=".txt,.md,.markdown,.json,.csv,.pdf,.docx" style="display:none;"
+                    onchange="onKbFileSelected(event)">
+                <div class="selected-file" id="kbSelectedFile">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="name" id="kbFileName"></span>
+                    <span style="color:#94a3b8;font-size:11px;" id="kbFileSize"></span>
+                </div>
+            </div>
+        </div>
+        <div class="upload-foot">
+            <button class="btn outline" onclick="closeKbUpload()">取消</button>
+            <button class="btn primary" id="kbSubmitBtn" onclick="submitKbUpload()">
+                <i class="fas fa-upload"></i> 上传
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 编辑知识弹窗 ===== -->
+<div class="upload-modal" id="kbEditModal" onclick="if(event.target===this) closeKbEdit()">
+    <div class="upload-box">
+        <div class="upload-head">
+            <h3><i class="fas fa-edit"></i> 编辑知识</h3>
+            <button class="close" onclick="closeKbEdit()">×</button>
+        </div>
+        <div class="upload-body">
+            <input type="hidden" id="editKbId">
+            <div class="form-group">
+                <label>标题 <span class="req">*</span></label>
+                <input type="text" id="editKbTitle" placeholder="知识标题">
+            </div>
+            <div class="form-group">
+                <label>分类</label>
+                <select id="editKbCategory"></select>
+            </div>
+            <div class="form-group">
+                <label>标签（逗号分隔）</label>
+                <input type="text" id="editKbTags" placeholder="例如：退货,售后">
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <textarea id="editKbContent" rows="10"
+                    style="width:100%;padding:10px 14px;border:1px solid #dce5ef;border-radius:10px;background:#fafcfe;font-size:13px;font-family:inherit;outline:none;color:#0a1e2f;resize:vertical;min-height:150px;"
+                    placeholder="知识内容..."></textarea>
+            </div>
+        </div>
+        <div class="upload-foot">
+            <button class="btn outline" onclick="closeKbEdit()">取消</button>
+            <button class="btn primary" id="kbEditSubmitBtn" onclick="submitKbEdit()">
+                <i class="fas fa-save"></i> 保存
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 分类管理弹窗 ===== -->
+<div class="upload-modal" id="kbCategoryModal" onclick="if(event.target===this) closeKbCategoryModal()">
+    <div class="upload-box">
+        <div class="upload-head">
+            <h3><i class="fas fa-folder-open"></i> 分类管理</h3>
+            <button class="close" onclick="closeKbCategoryModal()">×</button>
+        </div>
+        <div class="upload-body">
+            <div class="form-group">
+                <label>新增分类</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" id="newCatName" placeholder="分类名称" style="flex:1;">
+                    <select id="newCatParent" style="flex:1;">
+                        <option value="">作为一级分类</option>
+                    </select>
+                    <button class="btn-sm primary" style="padding:10px 18px;border-radius:10px;border:none;background:#0a1e2f;color:#fff;cursor:pointer;font-weight:600;" onclick="submitNewCategory()">
+                        <i class="fas fa-plus"></i> 添加
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>现有分类（点击 ✕ 删除）</label>
+                <div id="kbCategoryList" style="max-height:300px;overflow-y:auto;border:1px solid #e8edf4;border-radius:10px;padding:8px;background:#fafcfe;"></div>
+            </div>
+        </div>
+        <div class="upload-foot">
+            <button class="btn outline" onclick="closeKbCategoryModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<div class="global-toast" id="toast"></div>
+
+<script>
+    const BACKEND_URL = 'https://ai-ecommerce-backend-production-0776.up.railway.app';
+
+    const state = {
+        kbItems: [],
+        kbStats: {},
+        kbCategories: [],
+        kbFilterCategory: 'all',
+        kbFile: null
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadKb();
+        bindDragEvents();
+    });
+
+    function bindDragEvents() {
+        const kbWrap = document.getElementById('kbFileWrap');
+        ['dragenter', 'dragover'].forEach(ev => kbWrap.addEventListener(ev, e => {
+            e.preventDefault();
+            kbWrap.classList.add('dragover');
+        }));
+        ['dragleave', 'drop'].forEach(ev => kbWrap.addEventListener(ev, e => {
+            e.preventDefault();
+            kbWrap.classList.remove('dragover');
+        }));
+        kbWrap.addEventListener('drop', e => {
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                document.getElementById('kbFileInput').files = e.dataTransfer.files;
+                onKbFileSelected({ target: { files: [file] } });
+            }
+        });
+    }
+
+    // ===== 加载 =====
+    async function loadKb() {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/list');
+            const data = await res.json();
+            if (data.success) {
+                state.kbItems = data.items || [];
+                state.kbStats = data.stats || {};
+                state.kbCategories = data.categories || [];
+                fillKbCategorySelects();
+                renderKbCategoryTree();
+                renderKb();
+                updateStats();
+            }
+        } catch (e) {
+            console.warn('加载知识库失败', e);
+        }
+    }
+
+    function updateStats() {
+        const items = state.kbItems;
+        const enabled = items.filter(x => x.enabled !== false).length;
+        const disabled = items.length - enabled;
+        let totalHits = 0, totalSat = 0, totalUnsat = 0;
+        items.forEach(x => {
+            const s = state.kbStats[x.id];
+            if (s) {
+                totalHits += s.hit_count || 0;
+                totalSat += s.satisfied || 0;
+                totalUnsat += s.unsatisfied || 0;
+            }
+        });
+        const feedbackTotal = totalSat + totalUnsat;
+        const satRate = feedbackTotal > 0 ? Math.round(totalSat / feedbackTotal * 100) + '%' : '-';
+
+        document.getElementById('statKbTotal').textContent = items.length;
+        document.getElementById('statKbEnabled').textContent = enabled;
+        document.getElementById('statKbDisabled').textContent = disabled;
+        document.getElementById('statKbHits').textContent = totalHits;
+        document.getElementById('statKbSatisfaction').textContent = satRate;
+        document.getElementById('statKbFeedback').textContent = feedbackTotal;
+        document.getElementById('statKbCatCount').textContent = flattenCategories(state.kbCategories, 0).length;
+        document.getElementById('toolbarKbCount').textContent = items.length;
+    }
+
+    function flattenCategories(tree, depth, result) {
+        if (!result) result = [];
+        tree.forEach(n => {
+            result.push({ id: n.id, name: n.name, icon: n.icon || '', depth: depth });
+            if (n.children && n.children.length > 0) {
+                flattenCategories(n.children, depth + 1, result);
+            }
+        });
+        return result;
+    }
+
+    function fillKbCategorySelects() {
+        const flat = flattenCategories(state.kbCategories || [], 0, []);
+        // 上传弹窗
+        const catSel = document.getElementById('kbCategory');
+        if (catSel) {
+            catSel.innerHTML = flat.map(x => `<option value="${x.id}">${'　'.repeat(x.depth)}${x.icon} ${escapeHtml(x.name)}</option>`).join('');
+        }
+        // 编辑弹窗
+        const editSel = document.getElementById('editKbCategory');
+        if (editSel) {
+            editSel.innerHTML = flat.map(x => `<option value="${x.id}">${'　'.repeat(x.depth)}${x.icon} ${escapeHtml(x.name)}</option>`).join('');
+        }
+        // 父分类
+        const parentSel = document.getElementById('newCatParent');
+        if (parentSel) {
+            const cur = parentSel.value;
+            parentSel.innerHTML = '<option value="">作为一级分类</option>' +
+                flat.map(x => `<option value="${x.id}">${'　'.repeat(x.depth)}${x.icon} ${escapeHtml(x.name)}</option>`).join('');
+            parentSel.value = cur;
+        }
+    }
+
+    function renderKbCategoryTree() {
+        const tree = document.getElementById('kbCategoryTree');
+        const flat = flattenCategories(state.kbCategories || [], 0, []);
+        const counts = {};
+        state.kbItems.forEach(item => {
+            counts[item.category] = (counts[item.category] || 0) + 1;
+        });
+        tree.innerHTML = `
+            <span class="kb-cat-chip ${state.kbFilterCategory === 'all' ? 'active' : ''}"
+                  onclick="filterKbByCategory('all')">全部 <span class="count">(${state.kbItems.length})</span></span>
+            ${flat.map(x => `
+                <span class="kb-cat-chip ${state.kbFilterCategory === x.id ? 'active' : ''}"
+                      onclick="filterKbByCategory('${x.id}')">
+                    ${'　'.repeat(x.depth)}${x.icon} ${escapeHtml(x.name)}
+                    <span class="count">(${counts[x.id] || 0})</span>
+                </span>
+            `).join('')}
+        `;
+    }
+
+    function filterKbByCategory(catId) {
+        state.kbFilterCategory = catId;
+        renderKbCategoryTree();
+        renderKb();
+    }
+
+    function renderKb() {
+        const grid = document.getElementById('kbGrid');
+        const empty = document.getElementById('kbEmpty');
+
+        let list = state.kbItems.slice();
+        const keyword = (document.getElementById('kbSearch').value || '').trim().toLowerCase();
+        const statusFilter = document.getElementById('kbStatusFilter').value;
+        const sortBy = document.getElementById('kbSortBy').value;
+
+        if (state.kbFilterCategory !== 'all') {
+            list = list.filter(x => x.category === state.kbFilterCategory);
+        }
+        if (keyword) {
+            list = list.filter(x => {
+                const hay = (x.title + ' ' + (x.content || '') + ' ' + (x.tags || []).join(' ')).toLowerCase();
+                return hay.includes(keyword);
+            });
+        }
+        if (statusFilter === 'enabled') list = list.filter(x => x.enabled !== false);
+        if (statusFilter === 'disabled') list = list.filter(x => x.enabled === false);
+        if (statusFilter === 'pinned') list = list.filter(x => x.pinned);
+
+        if (sortBy === 'hit') {
+            list.sort((a, b) => (state.kbStats[b.id]?.hit_count || 0) - (state.kbStats[a.id]?.hit_count || 0));
+        } else if (sortBy === 'title') {
+            list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        }
+
+        document.getElementById('kbCount').textContent = list.length;
+
+        if (list.length === 0) {
+            grid.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+
+        grid.innerHTML = list.map(item => {
+            const enabled = item.enabled !== false;
+            const pinned = !!item.pinned;
+            const stat = state.kbStats[item.id] || {};
+            const hitCount = stat.hit_count || 0;
+            const satisfied = stat.satisfied || 0;
+            const unsatisfied = stat.unsatisfied || 0;
+            const tagBadges = (item.tags || []).map(t => `<span class="kb-tag">${escapeHtml(t)}</span>`).join('');
+
+            return `
+                <div class="kb-card ${enabled ? '' : 'disabled'} ${pinned ? 'pinned' : ''}">
+                    <div class="kb-head">
+                        <div class="kb-title">
+                            ${pinned ? '<i class="fas fa-thumbtack pin-icon"></i>' : ''}
+                            ${escapeHtml(item.title)}
+                        </div>
+                        <div class="kb-cat">${escapeHtml(item.category_name || item.category || '未分类')}</div>
+                    </div>
+                    <div class="kb-summary">${escapeHtml((item.content || '').slice(0, 180))}${item.content && item.content.length > 180 ? '...' : ''}</div>
+                    ${tagBadges ? `<div class="kb-tags">${tagBadges}</div>` : ''}
+                    <div class="kb-foot">
+                        <span><i class="fas fa-clock"></i> ${item.updated_at || item.uploaded_at || ''}</span>
+                        <div class="kb-stat">
+                            <span title="命中次数"><i class="fas fa-fire"></i> ${hitCount}</span>
+                            <span title="满意"><i class="fas fa-thumbs-up" style="color:#0d7c4f;"></i> ${satisfied}</span>
+                            <span title="不满意"><i class="fas fa-thumbs-down" style="color:#b51a3f;"></i> ${unsatisfied}</span>
+                        </div>
+                    </div>
+                    <div class="kb-card-actions">
+                        <button class="kb-act-btn" onclick="editKb('${item.id}')" title="编辑">
+                            <i class="fas fa-edit"></i> 编辑
+                        </button>
+                        <button class="kb-act-btn" onclick="toggleKb('${item.id}', ${!enabled})" title="${enabled ? '停用' : '启用'}">
+                            <i class="fas fa-${enabled ? 'toggle-on' : 'toggle-off'}"></i> ${enabled ? '停用' : '启用'}
+                        </button>
+                        <button class="kb-act-btn" onclick="pinKb('${item.id}', ${!pinned})" title="${pinned ? '取消置顶' : '置顶'}">
+                            <i class="fas fa-thumbtack"></i> ${pinned ? '取消' : '置顶'}
+                        </button>
+                        <button class="kb-act-btn danger" onclick="deleteKb('${item.id}')" title="删除">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ===== 上传 =====
+    function openKbUpload() {
+        document.getElementById('kbTitle').value = '';
+        document.getElementById('kbTags').value = '';
+        document.getElementById('kbFileInput').value = '';
+        document.getElementById('kbSelectedFile').classList.remove('show');
+        state.kbFile = null;
+        document.getElementById('kbUploadModal').classList.add('show');
+    }
+    function closeKbUpload() {
+        document.getElementById('kbUploadModal').classList.remove('show');
+    }
+    function onKbFileSelected(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        state.kbFile = file;
+        document.getElementById('kbFileName').textContent = file.name;
+        document.getElementById('kbFileSize').textContent = formatSize(file.size);
+        document.getElementById('kbSelectedFile').classList.add('show');
+    }
+    async function submitKbUpload() {
+        const title = document.getElementById('kbTitle').value.trim();
+        if (!title) { showToast('⚠️ 请填写标题'); return; }
+        if (!state.kbFile) { showToast('⚠️ 请选择文件'); return; }
+
+        const btn = document.getElementById('kbSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
+
+        try {
+            const formData = new FormData();
+            formData.append('file', state.kbFile);
+            formData.append('title', title);
+            formData.append('category', document.getElementById('kbCategory').value);
+            formData.append('tags', document.getElementById('kbTags').value);
+
+            const res = await fetch(BACKEND_URL + '/api/kb/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ ' + data.message);
+                closeKbUpload();
+                loadKb();
+            } else {
+                showToast('❌ ' + (data.message || '上传失败'));
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-upload"></i> 上传';
+        }
+    }
+
+    // ===== 批量导入 =====
+    function openKbBatchUpload() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = '.txt,.md,.markdown,.json,.csv,.pdf,.docx';
+        input.onchange = async function () {
+            const files = Array.from(input.files);
+            if (files.length === 0) return;
+            if (files.length > 20) { showToast('⚠️ 单次最多 20 个文件'); return; }
+
+            const category = state.kbFilterCategory !== 'all' ? state.kbFilterCategory : 'cat_other';
+            const formData = new FormData();
+            files.forEach(f => formData.append('files', f));
+            formData.append('category', category);
+            formData.append('tags', '');
+
+            showToast('⏳ 正在上传 ' + files.length + ' 个文件...');
+            try {
+                const res = await fetch(BACKEND_URL + '/api/kb/batch-upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                    loadKb();
+                } else {
+                    showToast('❌ ' + (data.message || '上传失败'));
+                }
+            } catch (e) {
+                showToast('❌ 网络错误');
+            }
+        };
+        input.click();
+    }
+
+    // ===== 编辑 =====
+    function editKb(id) {
+        const item = state.kbItems.find(x => x.id === id);
+        if (!item) return;
+        document.getElementById('editKbId').value = id;
+        document.getElementById('editKbTitle').value = item.title || '';
+        document.getElementById('editKbTags').value = (item.tags || []).join(',');
+        document.getElementById('editKbContent').value = item.content || '';
+        setTimeout(() => {
+            document.getElementById('editKbCategory').value = item.category || 'cat_other';
+        }, 50);
+        document.getElementById('kbEditModal').classList.add('show');
+    }
+    function closeKbEdit() {
+        document.getElementById('kbEditModal').classList.remove('show');
+    }
+    async function submitKbEdit() {
+        const id = document.getElementById('editKbId').value;
+        const title = document.getElementById('editKbTitle').value.trim();
+        if (!title) { showToast('⚠️ 标题不能为空'); return; }
+
+        const btn = document.getElementById('kbEditSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: id,
+                    title: title,
+                    content: document.getElementById('editKbContent').value,
+                    category: document.getElementById('editKbCategory').value,
+                    tags: document.getElementById('editKbTags').value.split(',').map(t => t.trim()).filter(Boolean)
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ 已保存');
+                closeKbEdit();
+                loadKb();
+            } else {
+                showToast('❌ ' + (data.message || '保存失败'));
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> 保存';
+        }
+    }
+
+    // ===== 启用/停用 =====
+    async function toggleKb(id, enabled) {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, enabled })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ ' + data.message);
+                loadKb();
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+
+    // ===== 置顶 =====
+    async function pinKb(id, pinned) {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/pin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, pinned })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ ' + data.message);
+                loadKb();
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+
+    // ===== 删除 =====
+    async function deleteKb(id) {
+        if (!confirm('确定删除该知识？')) return;
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ ' + data.message);
+                loadKb();
+            } else {
+                showToast('❌ ' + (data.message || '删除失败'));
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+
+    // ===== AI 提炼 =====
+    function openKbAutoGenerate() {
+        showToast('⏳ 请到 AI 客服页面使用"AI 提炼"功能');
+    }
+
+    // ===== 分类管理 =====
+    function openKbCategoryModal() {
+        renderCategoryList();
+        document.getElementById('kbCategoryModal').classList.add('show');
+    }
+    function closeKbCategoryModal() {
+        document.getElementById('kbCategoryModal').classList.remove('show');
+    }
+    function renderCategoryList() {
+        const list = document.getElementById('kbCategoryList');
+        const flat = flattenCategories(state.kbCategories || [], 0, []);
+        list.innerHTML = flat.map(x => `
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;hover:background:#f0f7fe;">
+                <span style="flex:1;font-size:13px;color:#0a1e2f;">
+                    ${'　'.repeat(x.depth)}${x.icon} ${escapeHtml(x.name)}
+                </span>
+                <button class="kb-act-btn danger" style="flex:0;padding:4px 10px;font-size:11px;"
+                    onclick="deleteCategory('${x.id}')" title="删除">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+    async function submitNewCategory() {
+        const name = document.getElementById('newCatName').value.trim();
+        const parent_id = document.getElementById('newCatParent').value || null;
+        if (!name) { showToast('⚠️ 请填写分类名'); return; }
+
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/categories/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, parent_id })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ 已添加分类');
+                document.getElementById('newCatName').value = '';
+                await loadKb();
+                fillKbCategorySelects();
+                renderCategoryList();
+            } else {
+                showToast('❌ ' + (data.message || '添加失败'));
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+    async function deleteCategory(id) {
+        if (!confirm('确定删除该分类？')) return;
+        try {
+            const res = await fetch(BACKEND_URL + '/api/kb/categories/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ 已删除分类');
+                await loadKb();
+                fillKbCategorySelects();
+                renderCategoryList();
+            }
+        } catch (e) {
+            showToast('❌ 网络错误');
+        }
+    }
+
+    // ===== 工具 =====
+    function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
+    function formatSize(bytes) {
+        if (!bytes) return '0B';
+        if (bytes < 1024) return bytes + 'B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
+        return (bytes / 1024 / 1024).toFixed(1) + 'MB';
+    }
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    window.openKbUpload = openKbUpload;
+    window.closeKbUpload = closeKbUpload;
+    window.onKbFileSelected = onKbFileSelected;
+    window.submitKbUpload = submitKbUpload;
+    window.openKbBatchUpload = openKbBatchUpload;
+    window.editKb = editKb;
+    window.closeKbEdit = closeKbEdit;
+    window.submitKbEdit = submitKbEdit;
+    window.toggleKb = toggleKb;
+    window.pinKb = pinKb;
+    window.deleteKb = deleteKb;
+    window.filterKbByCategory = filterKbByCategory;
+    window.openKbAutoGenerate = openKbAutoGenerate;
+    window.openKbCategoryModal = openKbCategoryModal;
+    window.closeKbCategoryModal = closeKbCategoryModal;
+    window.submitNewCategory = submitNewCategory;
+    window.deleteCategory = deleteCategory;
+
+    console.log('📚 知识库管理页已加载');
+</script>
+</body>
+</html>
