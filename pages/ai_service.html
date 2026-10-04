@@ -218,6 +218,13 @@
             padding: 12px 18px; border-bottom: 1px solid #e8edf4;
             display: flex; justify-content: space-between;
             align-items: center; flex-shrink: 0; gap: 10px; flex-wrap: wrap;
+            transition: 0.25s;
+        }
+        /* ★ 头部状态高亮：人工态整体换底色，AI 态白色 */
+        .chat-head.state-human {
+            background: linear-gradient(90deg, #f0faf5 0%, #ffffff 60%);
+            border-bottom-color: #b8e6cd;
+            box-shadow: inset 4px 0 0 #0d7c4f;
         }
         .chat-head .user-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
         .chat-head .user-info .avatar {
@@ -225,12 +232,25 @@
             background: linear-gradient(135deg, #4dabf7, #6a5cff);
             color: #fff; font-size: 15px; font-weight: 600;
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            position: relative;
+        }
+        /* ★ 人工态头像外圈绿环 */
+        .chat-head.state-human .user-info .avatar::after {
+            content: ''; position: absolute; inset: -3px;
+            border-radius: 50%; border: 2px solid #0d7c4f;
+            animation: ringPulse 1.8s infinite;
+        }
+        @keyframes ringPulse {
+            0%,100% { opacity: 0.9; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.08); }
         }
         .chat-head .user-info .name {
             font-size: 15px; font-weight: 600; color: #0a1e2f;
             display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
         }
         .chat-head .user-info .sub { font-size: 12px; color: #5f7d95; margin-top: 2px; }
+        .chat-head.state-human .user-info .sub { color: #0d7c4f; font-weight: 500; }
+
         .chat-head .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .chat-head .actions .btn-sm {
@@ -238,20 +258,45 @@
             border: 1px solid #dce5ef; background: #fff;
             font-size: 12px; color: #1e3a5f; cursor: pointer;
             display: inline-flex; align-items: center; gap: 4px;
-            transition: 0.12s; font-family: inherit; white-space: nowrap;
+            transition: 0.15s; font-family: inherit; white-space: nowrap;
         }
         .chat-head .actions .btn-sm:hover:not(:disabled) {
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
+            transform: translateY(-1px);
         }
         .chat-head .actions .btn-sm.primary {
             background: #0a1e2f; border-color: #0a1e2f; color: #fff;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.25);
         }
-        .chat-head .actions .btn-sm.primary:hover:not(:disabled) { background: #1a3a5a; }
+        .chat-head .actions .btn-sm.primary:hover:not(:disabled) {
+            background: #1a3a5a;
+            box-shadow: 0 4px 14px rgba(10,30,47,0.35);
+        }
         .chat-head .actions .btn-sm.primary i { color: rgba(255,255,255,0.7); }
+
+        /* ★ 人工接管中按钮：实心绿 + 呼吸光晕 */
         .chat-head .actions .btn-sm.taken-over {
-            background: #0d7c4f; border-color: #0d7c4f; color: #fff; cursor: default;
+            background: #0d7c4f; border-color: #0d7c4f; color: #fff;
+            cursor: default; font-weight: 600;
+            box-shadow: 0 0 0 0 rgba(13,124,79,0.55);
+            animation: takenoverPulse 2s infinite;
         }
-        .chat-head .actions .btn-sm.taken-over i { color: rgba(255,255,255,0.85); }
+        .chat-head .actions .btn-sm.taken-over i { color: rgba(255,255,255,0.95); }
+        @keyframes takenoverPulse {
+            0% { box-shadow: 0 0 0 0 rgba(13,124,79,0.55); }
+            70% { box-shadow: 0 0 0 8px rgba(13,124,79,0); }
+            100% { box-shadow: 0 0 0 0 rgba(13,124,79,0); }
+        }
+        /* ★ 释放给 AI 按钮：绿边风格，与"转人工"区分 */
+        .chat-head .actions .btn-sm.release {
+            border-color: #0d7c4f; color: #0d7c4f; background: #f0faf5;
+        }
+        .chat-head .actions .btn-sm.release:hover:not(:disabled) {
+            background: #0d7c4f; color: #fff; border-color: #0d7c4f;
+        }
+        .chat-head .actions .btn-sm.release:hover:not(:disabled) i { color: #fff; }
+        .chat-head .actions .btn-sm.release i { color: #0d7c4f; }
+
         .chat-head .actions .btn-sm:disabled {
             opacity: 0.4; cursor: not-allowed;
             background: #f5f7fa; color: #94a3b8; border-color: #e8edf4;
@@ -263,6 +308,7 @@
             background: #f8fafc;
             display: flex; flex-direction: column; gap: 14px;
             min-height: 0;
+            scroll-behavior: smooth;
         }
         .chat-messages::-webkit-scrollbar { width: 5px; }
         .chat-messages::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
@@ -404,6 +450,35 @@
         @keyframes dotPulse {
             0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
             30% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        /* ★ 滚动到底按钮 */
+        .scroll-bottom-btn {
+            position: absolute;
+            right: 24px;
+            bottom: 180px;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            color: #1e3a5f;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(10,30,47,0.15);
+            z-index: 50;
+            transition: 0.15s;
+        }
+        .scroll-bottom-btn:hover {
+            background: #0a1e2f; color: #fff; border-color: #0a1e2f;
+            transform: translateY(-2px);
+        }
+        .scroll-bottom-btn.show { display: flex; }
+        .scroll-bottom-btn .badge-dot {
+            position: absolute; top: 6px; right: 6px;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #b51a3f;
         }
 
         /* 快捷操作区（已移除按钮，保留容器但隐藏） */
@@ -1603,6 +1678,7 @@
             .kb-grid, .asset-grid { gap: 10px; }
             .asset-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
             .product-card, .product-carousel, .coupon-card { width: 280px; }
+            .scroll-bottom-btn { right: 14px; bottom: 150px; width: 36px; height: 36px; }
         }
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -1694,7 +1770,7 @@
         </div>
 
         <div class="panel-container">
-            <div class="panel active" id="panel-chat">
+            <div class="panel active" id="panel-chat" style="position:relative;">
                 <div class="empty-chat" id="emptyChat">
                     <i class="fas fa-headset"></i>
                     <h3>👋 选择左侧会话开始接待</h3>
@@ -1719,6 +1795,12 @@
                         <div class="dots"><span></span><span></span><span></span></div>
                     </div>
                 </div>
+
+                <!-- ★ 滚动到底按钮 -->
+                <button class="scroll-bottom-btn" id="scrollBottomBtn" onclick="forceScrollToBottom()" title="回到最新">
+                    <i class="fas fa-arrow-down"></i>
+                    <span class="badge-dot" id="scrollBottomDot" style="display:none;"></span>
+                </button>
 
                 <!-- 快捷操作已移除，容器保留但隐藏 -->
                 <div class="quick-replies" id="quickReplies" style="display:none;"></div>
@@ -1928,7 +2010,11 @@
             totalShown: 0,
             totalClicked: 0,
             byProduct: {}
-        }
+        },
+
+        // ★ 滚动状态：是否用户主动上翻（不强制贴底）
+        userScrolledUp: false,
+        hasNewMessageWhileScrolledUp: false
     };
 
     /* ============================================================
@@ -1986,6 +2072,7 @@
         loadCoupons();
         bindInputEvents();
         bindGlobalShortcuts();
+        bindScrollListener();
         updateStatsBar();
     });
 
@@ -2007,6 +2094,39 @@
                 if (style && style.classList.contains('show')) closeCardStyleModal();
             }
         });
+    }
+
+    /* ★ 绑定滚动监听：判断用户是否主动上翻 */
+    function bindScrollListener() {
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        chatMessages.addEventListener('scroll', function () {
+            const distToBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight;
+            if (distToBottom > 120) {
+                // 用户上翻超过 120px，标记为"已上翻"
+                state.userScrolledUp = true;
+            } else if (distToBottom < 30) {
+                // 距离底部 30px 内，视为"已贴底"
+                state.userScrolledUp = false;
+                state.hasNewMessageWhileScrolledUp = false;
+                updateScrollBottomBtn();
+            }
+            updateScrollBottomBtn();
+        });
+    }
+
+    /* ★ 更新"回到最新"按钮的显示状态 */
+    function updateScrollBottomBtn() {
+        const btn = document.getElementById('scrollBottomBtn');
+        const dot = document.getElementById('scrollBottomDot');
+        if (!btn) return;
+        if (state.userScrolledUp) {
+            btn.classList.add('show');
+            if (dot) dot.style.display = state.hasNewMessageWhileScrolledUp ? 'block' : 'none';
+        } else {
+            btn.classList.remove('show');
+            if (dot) dot.style.display = 'none';
+        }
     }
 
     /* ============================================================
@@ -2081,6 +2201,9 @@
         if (!conv) return;
         state.currentId = id;
         conv.unread = 0;
+        // 切换会话时重置滚动状态
+        state.userScrolledUp = false;
+        state.hasNewMessageWhileScrolledUp = false;
         renderConvList();
 
         document.getElementById('emptyChat').style.display = 'none';
@@ -2098,19 +2221,34 @@
 
         renderChatActions(id);
         renderMessages(id);
-        scrollMessagesToBottom();
+        // 打开会话强制贴底
+        requestAnimationFrame(() => {
+            forceScrollToBottom();
+        });
         setTimeout(() => document.getElementById('msgInput').focus(), 100);
     }
 
+    /* ★ 渲染聊天头部操作区：状态鲜明 */
     function renderChatActions(convId) {
         const actions = document.getElementById('chatActions');
+        const head = document.getElementById('chatHead');
         const takeover = state.takeoverState[convId] || 'ai';
+
+        // 头部整体状态样式
+        if (head) {
+            if (takeover === 'human') {
+                head.classList.add('state-human');
+            } else {
+                head.classList.remove('state-human');
+            }
+        }
+
         if (takeover === 'human') {
             actions.innerHTML = `
                 <button class="btn-sm taken-over" disabled>
                     <i class="fas fa-user-check"></i> <span>人工接管中</span>
                 </button>
-                <button class="btn-sm" onclick="releaseToAI()">
+                <button class="btn-sm release" onclick="releaseToAI()">
                     <i class="fas fa-robot"></i> <span>释放给 AI</span>
                 </button>
                 <button class="btn-sm" onclick="closeCurrentConv()">
@@ -3370,12 +3508,15 @@
         delete state.messagesMap[convId];
         delete state.takeoverState[convId];
         state.currentId = null;
+        state.userScrolledUp = false;
+        state.hasNewMessageWhileScrolledUp = false;
         renderConvList();
         document.getElementById('emptyChat').style.display = 'flex';
         document.getElementById('chatHead').style.display = 'none';
         document.getElementById('chatMessages').style.display = 'none';
         document.getElementById('quickReplies').style.display = 'none';
         document.getElementById('chatInputArea').style.display = 'none';
+        updateScrollBottomBtn();
         showToast('✅ 会话已结束');
     }
 
@@ -3465,6 +3606,77 @@
     }
 
     /* ============================================================
+       ★ 智能滚动到底
+       ============================================================ */
+
+    /**
+     * 智能滚动：仅当用户未主动上翻时滚到底
+     * @param {boolean} force - 是否强制滚动（打开会话、发送消息时使用）
+     */
+    function scrollMessagesToBottom(force = false) {
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+
+        // 用户已上翻且非强制 → 不滚动，并显示"新消息"小红点
+        if (!force && state.userScrolledUp) {
+            state.hasNewMessageWhileScrolledUp = true;
+            updateScrollBottomBtn();
+            // 图片加载后可能改变高度，但仍不滚动
+            setTimeout(attachImageLoadHandlers, 100);
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            // 图片加载后修正
+            setTimeout(attachImageLoadHandlers, 50);
+        });
+    }
+
+    /**
+     * 强制滚动到底（用于"回到最新"按钮）
+     */
+    function forceScrollToBottom() {
+        state.userScrolledUp = false;
+        state.hasNewMessageWhileScrolledUp = false;
+        updateScrollBottomBtn();
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        chatMessages.scrollTo({
+            top: chatMessages.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    /**
+     * 监听图片加载，加载完成后如果仍在贴底状态则修正位置
+     */
+    function attachImageLoadHandlers() {
+        const imgs = document.querySelectorAll('#messagesList img');
+        imgs.forEach(img => {
+            if (img.complete) return;
+            if (img._scrollHandlerAttached) return;
+            img._scrollHandlerAttached = true;
+            img.addEventListener('load', () => {
+                if (!state.userScrolledUp) {
+                    const chatMessages = document.getElementById('chatMessages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+            });
+            img.addEventListener('error', () => {
+                if (!state.userScrolledUp) {
+                    const chatMessages = document.getElementById('chatMessages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+            });
+        });
+    }
+
+    /* ============================================================
        全局暴露
        ============================================================ */
     window.switchTab = switchTab;
@@ -3485,6 +3697,7 @@
     window.sendAsset = sendAsset;
     window.quickSendAsset = quickSendAsset;
     window.closeLightbox = closeLightbox;
+    window.forceScrollToBottom = forceScrollToBottom;
 
     window.openProductPicker = openProductPicker;
     window.closeProductPicker = closeProductPicker;
@@ -3511,7 +3724,7 @@
 
     window.showClickStats = showClickStats;
 
-    console.log('💬 AI 客服页已加载（恢复转人工/AI接管鲜明切换 + 移除快捷操作）');
+    console.log('💬 AI 客服页已加载（鲜明状态切换 + 智能贴底滚动）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
