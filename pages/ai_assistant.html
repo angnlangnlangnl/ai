@@ -5,16 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AI 助手</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- 框架公共样式 & 脚本 -->
     <link rel="stylesheet" href="../css/common.css">
     <script src="../js/auth.js"></script>
     <script>requireLogin();</script>
 
     <style>
-        /* ============================================================
-           适配 iframe 的根样式
-           注意：不再用 100vh + overflow:hidden，改成 flex 填充
-           ============================================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; }
         body {
@@ -27,10 +22,6 @@
             overscroll-behavior: none;
         }
 
-        /* ============================================================
-           顶部工具栏（取代原来的深色 app-header）
-           现在是一个浅色工具条，视觉上和框架统一
-           ============================================================ */
         .toolbar {
             background: #fff;
             border-bottom: 1px solid #e8edf4;
@@ -42,12 +33,7 @@
             flex-wrap: wrap;
             flex-shrink: 0;
         }
-        .toolbar .tb-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-        }
+        .toolbar .tb-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
         .toolbar .tb-left .status-dot {
             width: 8px; height: 8px; border-radius: 50%;
             background: #0d7c4f;
@@ -56,78 +42,40 @@
         }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         .toolbar .tb-left .tb-text {
-            font-size: 13px;
-            color: #5f7d95;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 13px; color: #5f7d95;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .toolbar .tb-left .tb-text strong { color: #0a1e2f; }
-        .toolbar .tb-right {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .toolbar .tb-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .toolbar .tb-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid #dce5ef;
-            background: #fff;
-            color: #1e3a5f;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.12s;
-            text-decoration: none;
-            white-space: nowrap;
+            padding: 6px 14px; border-radius: 20px;
+            border: 1px solid #dce5ef; background: #fff;
+            color: #1e3a5f; font-size: 12px; font-weight: 500;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+            transition: 0.12s; text-decoration: none; white-space: nowrap;
             font-family: inherit;
         }
-        .toolbar .tb-btn:hover {
-            border-color: #4dabf7;
-            color: #2a7faa;
-            background: #f5f9fe;
-        }
+        .toolbar .tb-btn:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
         .toolbar .tb-btn i { color: #5f7d95; }
         .toolbar .tb-btn:hover i { color: #4dabf7; }
-
-        /* 移动端菜单按钮（用来开对话历史） */
         .toolbar .menu-btn {
-            width: 34px; height: 34px;
-            border-radius: 50%;
-            border: 1px solid #dce5ef;
-            background: #fff;
-            color: #1e3a5f;
-            font-size: 15px;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid #dce5ef; background: #fff;
+            color: #1e3a5f; font-size: 15px; cursor: pointer;
+            display: none; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
         .toolbar .menu-btn:hover { border-color: #4dabf7; color: #2a7faa; }
 
-        /* ============================================================
-           主体：聊天历史 + 主对话区
-           ============================================================ */
         .app-body {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-            position: relative;
-            min-height: 0;
+            flex: 1; display: flex;
+            overflow: hidden; position: relative; min-height: 0;
         }
 
-        /* 对话历史侧栏 */
         .sidebar-chat {
-            width: 260px;
-            background: #fff;
+            width: 260px; background: #fff;
             border-right: 1px solid #e8edf4;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             flex-shrink: 0;
             transition: transform 0.3s ease;
             min-height: 0;
@@ -135,10 +83,8 @@
         .sidebar-chat .sidebar-header {
             padding: 14px 16px;
             border-bottom: 1px solid #e8edf4;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
+            display: flex; justify-content: space-between;
+            align-items: center; flex-shrink: 0;
         }
         .sidebar-chat .sidebar-header h3 {
             font-size: 13px; font-weight: 600; color: #0a1e2f;
@@ -161,26 +107,18 @@
         }
 
         .sidebar-chat .chat-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 10px;
-            -webkit-overflow-scrolling: touch;
-            min-height: 0;
+            flex: 1; overflow-y: auto; padding: 8px 10px;
+            -webkit-overflow-scrolling: touch; min-height: 0;
         }
         .sidebar-chat .chat-list::-webkit-scrollbar { width: 4px; }
-        .sidebar-chat .chat-list::-webkit-scrollbar-thumb {
-            background: #dce5ef; border-radius: 10px;
-        }
+        .sidebar-chat .chat-list::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
         .chat-history-item {
             padding: 10px 12px; border-radius: 10px; margin-bottom: 4px;
             cursor: pointer; transition: 0.12s;
             border: 1px solid transparent; position: relative;
         }
         .chat-history-item:hover { background: #f5f8fc; border-color: #e8edf4; }
-        .chat-history-item.active {
-            background: #f0f7fe;
-            border-color: rgba(77,171,247,0.25);
-        }
+        .chat-history-item.active { background: #f0f7fe; border-color: rgba(77,171,247,0.25); }
         .chat-history-item .title {
             font-size: 13px; font-weight: 500; color: #0a1e2f;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -207,33 +145,24 @@
         .chat-history-item:hover .del-btn { opacity: 1; }
         .chat-history-item .del-btn:hover { background: #fde8ed; color: #b51a3f; }
 
-        /* 移动端遮罩 */
         .sidebar-overlay {
-            display: none;
-            position: absolute; inset: 0;
-            background: rgba(0,0,0,0.45);
-            z-index: 99;
+            display: none; position: absolute; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 99;
         }
         .sidebar-overlay.show { display: block; }
 
-        /* 主对话区 */
         .chat-main {
             flex: 1; display: flex; flex-direction: column;
             background: #f8fafc; min-width: 0; min-height: 0;
         }
         .chat-main-header {
-            padding: 14px 22px;
-            background: #fff;
+            padding: 14px 22px; background: #fff;
             border-bottom: 1px solid #e8edf4;
-            display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0; gap: 10px; flex-wrap: wrap;
+            display: flex; justify-content: space-between;
+            align-items: center; flex-shrink: 0; gap: 10px; flex-wrap: wrap;
         }
-        .chat-main-header .info h4 {
-            font-size: 15px; font-weight: 600; color: #0a1e2f;
-        }
-        .chat-main-header .info p {
-            font-size: 12px; color: #5f7d95; margin-top: 2px;
-        }
+        .chat-main-header .info h4 { font-size: 15px; font-weight: 600; color: #0a1e2f; }
+        .chat-main-header .info p { font-size: 12px; color: #5f7d95; margin-top: 2px; }
         .chat-main-header .actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .chat-main-header .actions .btn-sm {
             padding: 5px 14px; border-radius: 20px;
@@ -246,7 +175,6 @@
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
         }
 
-        /* 消息容器 */
         .messages {
             flex: 1; overflow-y: auto;
             padding: 18px 22px 12px;
@@ -313,7 +241,6 @@
         }
         .message.user .bubble .time { color: rgba(255,255,255,0.4); }
 
-        /* 消息操作按钮 */
         .msg-actions {
             display: flex; gap: 4px; margin-top: 6px;
             opacity: 0; transition: 0.15s;
@@ -330,7 +257,6 @@
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
         }
 
-        /* 卡片：动作确认 */
         .bubble .action-card {
             background: #f8fafc; border-radius: 10px;
             padding: 12px 16px; margin: 8px 0 4px 0;
@@ -361,7 +287,6 @@
         .bubble .action-card.executed { opacity: 0.55; }
         .bubble .action-card.executed .btn-group { display: none; }
 
-        /* 智能匹配卡片 */
         .bubble .smart-match-card {
             background: linear-gradient(135deg, #f0f7fe, #e6f3ff);
             border: 1px solid #b8d8f7; border-radius: 12px;
@@ -417,7 +342,6 @@
             background: transparent; border: 1px solid #dce5ef; color: #1e3a5f;
         }
 
-        /* 无匹配卡片 */
         .bubble .no-match-card {
             background: linear-gradient(135deg, #fff8e6, #ffeccc);
             border: 1px solid #ffd88c; border-radius: 12px;
@@ -437,14 +361,11 @@
             display: inline-flex; align-items: center; gap: 4px;
             transition: 0.1s; font-family: inherit;
         }
-        .bubble .no-match-card .nm-actions .btn-create {
-            background: #0d7c4f; color: white;
-        }
+        .bubble .no-match-card .nm-actions .btn-create { background: #0d7c4f; color: white; }
         .bubble .no-match-card .nm-actions .btn-cancel {
             background: transparent; border: 1px solid #dce5ef; color: #1e3a5f;
         }
 
-        /* 媒体预览 */
         .bubble .media-preview {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -498,7 +419,6 @@
         }
         .bubble .media-preview.ref-preview .badge { background: rgba(13,124,79,0.85); }
 
-        /* 分析卡片 */
         .bubble .analysis-card {
             background: linear-gradient(135deg, #f0f7fe, #e6f3ff);
             border: 1px solid #b8d8f7; border-radius: 10px;
@@ -526,7 +446,6 @@
             background: white; color: #2a7faa; border: 1px solid #b8d8f7;
         }
 
-        /* 市场分析卡片 */
         .bubble .market-card {
             background: linear-gradient(135deg, #fff8e6, #ffeccc);
             border: 1px solid #ffd88c; border-radius: 10px;
@@ -559,7 +478,6 @@
             background: white; color: #b57a00; border: 1px solid #ffd88c;
         }
 
-        /* 进度条 */
         .bubble .inline-progress {
             margin-top: 8px; background: #e8edf4;
             height: 6px; border-radius: 10px; overflow: hidden;
@@ -570,7 +488,6 @@
             width: 0%; transition: width 0.3s;
         }
 
-        /* typing */
         .typing-indicator {
             display: none; align-items: center; gap: 12px; padding: 8px 0;
         }
@@ -587,7 +504,6 @@
             30% { transform: translateY(-6px); opacity: 1; }
         }
 
-        /* 输入区 */
         .input-area-wrap {
             background: #fff;
             border-top: 1px solid #e8edf4;
@@ -710,7 +626,6 @@
             color: #94a3b8; margin-top: 6px; padding: 0 20px;
         }
 
-        /* 附件菜单 */
         .attach-menu {
             position: absolute; bottom: 90px; left: 20px;
             background: white; border: 1px solid #e8edf4;
@@ -742,7 +657,6 @@
             height: 1px; background: #e8edf4; margin: 4px 8px;
         }
 
-        /* 空状态 */
         .empty-state {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -778,7 +692,6 @@
             border-color: #b51a3f; color: #b51a3f; background: #fde8ed;
         }
 
-        /* 灯箱 */
         .lightbox {
             position: fixed; inset: 0;
             background: rgba(0,0,0,0.92); z-index: 10000;
@@ -831,7 +744,6 @@
             font-size: 14px; text-align: center; opacity: 0.85;
         }
 
-        /* 创建商品弹窗 */
         .create-product-modal {
             position: fixed; inset: 0;
             background: rgba(10,30,47,0.6);
@@ -926,7 +838,6 @@
         }
         .create-product-modal .modal-actions .btn-outline:hover { background: #f5f8fc; }
 
-        /* 全局 Toast */
         .global-toast {
             position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%);
@@ -943,9 +854,50 @@
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
-        /* ============================================================
-           响应式
-           ============================================================ */
+        /* ★★★ 引用消息条 */
+        .quote-bar {
+            padding: 8px 20px 0;
+            animation: quoteIn 0.2s ease;
+        }
+        @keyframes quoteIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quote-bar .quote-inner {
+            display: flex; align-items: center; gap: 8px;
+            background: #f0f7fe;
+            border-left: 3px solid #4dabf7;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #2a7faa;
+            position: relative;
+        }
+        .quote-bar .quote-role {
+            font-weight: 600;
+            color: #0a1e2f;
+            flex-shrink: 0;
+        }
+        .quote-bar .quote-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #5f7d95;
+        }
+        .quote-bar .quote-close {
+            width: 20px; height: 20px;
+            border-radius: 50%; border: none;
+            background: rgba(77,171,247,0.15);
+            color: #2a7faa; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; line-height: 1; flex-shrink: 0;
+            transition: 0.12s;
+        }
+        .quote-bar .quote-close:hover {
+            background: #b51a3f; color: #fff;
+        }
+
         @media (max-width: 1024px) {
             .sidebar-chat { width: 240px; }
         }
@@ -955,7 +907,6 @@
             .toolbar .tb-right .tb-btn span { display: none; }
             .toolbar .tb-right .tb-btn { padding: 6px 10px; }
 
-            /* 侧栏改为浮层 */
             .sidebar-chat {
                 position: absolute; top: 0; left: 0; bottom: 0;
                 width: 260px; max-width: 82vw; z-index: 100;
@@ -984,6 +935,7 @@
             .ref-chips { padding: 8px 12px 0; }
             .input-hint { padding: 0 12px; }
             .attach-menu { left: 12px; bottom: 80px; }
+            .quote-bar { padding: 8px 12px 0; }
 
             .empty-state { padding: 24px 16px; }
             .empty-state i { font-size: 40px; }
@@ -1002,9 +954,6 @@
 </head>
 <body>
 
-<!-- ============================================================
-     工具条（取代原来的深色 app-header）
-     ============================================================ -->
 <div class="toolbar">
     <div class="tb-left">
         <button class="menu-btn" onclick="toggleSidebar()" title="对话历史">
@@ -1025,9 +974,6 @@
     </div>
 </div>
 
-<!-- ============================================================
-     主体
-     ============================================================ -->
 <div class="app-body">
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
@@ -1069,7 +1015,7 @@
             <div class="empty-state" id="emptyState">
                 <i class="fas fa-robot"></i>
                 <h3>👋 你好，我是 AI 经营助手</h3>
-                <p>支持 33 种商品操作 + 图片/视频/海报生成 + 视频反解 + <strong>智能商品匹配</strong> + <strong>AI 电商策略分析</strong>。<br>说「生成3张茶叶主图」，我会自动识别商品；说「生成母亲节海报」，我会先分析市场再生成。</p>
+                <p>支持 33 种商品操作 + 图片/视频/海报生成 + 视频反解 + <strong>智能商品匹配</strong> + <strong>AI 电商策略分析</strong> + <strong>多轮对话上下文</strong>。<br>说「生成3张茶叶主图」，我会自动识别商品；说「再来一张」我会继续上一次。</p>
                 <div class="examples">
                     <span class="ex accent" onclick="sendExample('生成3张茶叶主图')">🖼️ 智能匹配生成</span>
                     <span class="ex accent" onclick="sendExample('生成一张母亲节海报')">🎨 AI策略海报</span>
@@ -1096,7 +1042,7 @@
                 <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu(event)" title="添加参考素材">+</button>
                 <div class="input-wrap">
                     <textarea id="chatInput" rows="1"
-                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 给云山茶叶礼盒生成视频"
+                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 给云山茶叶礼盒生成视频 / 再来一张"
                         onkeydown="handleKeyDown(event)"
                         oninput="autoResize(this)"></textarea>
                     <span class="char-count" id="charCount">0/500</span>
@@ -1106,7 +1052,7 @@
                 </button>
             </div>
             <div class="input-hint">
-                回车发送 · Shift+回车换行 · 可拖拽/粘贴图片 · 上传视频自动抽帧反解 · 点击图片可放大
+                回车发送 · Shift+回车换行 · 可拖拽/粘贴图片 · 上传视频自动抽帧反解 · 点消息"引用"可追问
             </div>
 
             <div class="attach-menu" id="attachMenu">
@@ -1130,7 +1076,6 @@
     </main>
 </div>
 
-<!-- 灯箱 -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <div class="lightbox-content" onclick="event.stopPropagation()">
         <div class="lightbox-caption" id="lightboxCaption"></div>
@@ -1140,7 +1085,6 @@
     </div>
 </div>
 
-<!-- 创建新商品弹窗 -->
 <div class="create-product-modal" id="createProductModal">
     <div class="modal-box">
         <div class="modal-header">
@@ -1208,9 +1152,6 @@
 
 <div class="global-toast" id="toast"></div>
 
-<!-- ============================================================
-     业务脚本：完全保留你的原逻辑，只做少量适配
-     ============================================================ -->
 <script src="../js/common.js"></script>
 <script>
     // ================================================================
@@ -1313,6 +1254,92 @@
         remove(key) { try { localStorage.removeItem(key); return true; } catch (e) { return false; } }
     };
 
+    /* ============================================================
+       ★★★ 会话 ID & 会话级持久化
+       ============================================================ */
+    function getOrCreateSessionId() {
+        let sid = safeStorage.get('ai_session_id');
+        if (!sid) {
+            sid = 's_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+            safeStorage.set('ai_session_id', sid);
+        }
+        return sid;
+    }
+    const SESSION_ID = getOrCreateSessionId();
+
+    const REF_KEY = 'ai_ref_snapshot';
+    function saveReferenceToSession() {
+        try {
+            const payload = {
+                images: state.referenceMedia.images.map(x => ({
+                    id: x.id, dataUrl: x.dataUrl, name: x.name
+                })),
+                videoAnalysis: state.referenceMedia.videoAnalysis || null
+            };
+            payload.images = payload.images
+                .filter(x => x.dataUrl && x.dataUrl.length < 1.5 * 1024 * 1024)
+                .slice(0, 2);
+            sessionStorage.setItem(REF_KEY, JSON.stringify(payload));
+        } catch (e) { /* ignore quota */ }
+    }
+    function loadReferenceFromSession() {
+        try {
+            const raw = sessionStorage.getItem(REF_KEY);
+            if (!raw) return;
+            const payload = JSON.parse(raw);
+            if (payload.images && payload.images.length > 0) {
+                state.referenceMedia.images = payload.images.map(x => ({
+                    id: x.id || ('ref_img_' + Math.random().toString(36).slice(2, 8)),
+                    dataUrl: x.dataUrl, file: null, name: x.name || 'restored'
+                }));
+            }
+            if (payload.videoAnalysis) {
+                state.referenceMedia.videoAnalysis = payload.videoAnalysis;
+            }
+            if (state.referenceMedia.images.length > 0) {
+                renderReferenceChips();
+                showToast('🔄 已恢复上次的参考素材');
+            }
+        } catch (e) { /* ignore */ }
+    }
+    function clearReferenceSession() {
+        try { sessionStorage.removeItem(REF_KEY); } catch (e) {}
+    }
+
+    const LAST_GEN_KEY = 'ai_last_generated';
+    function rememberLastGeneration(info) {
+        state.lastGeneratedMedia = info;
+        try { localStorage.setItem(LAST_GEN_KEY, JSON.stringify({
+            ...info, time: Date.now()
+        })); } catch (e) {}
+        fetch(BACKEND_URL + '/api/ai/remember-generation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: SESSION_ID,
+                kind: info.kind || info.type,
+                theme: info.theme || '',
+                product_name: info.product_name || '',
+                urls: info.urls || [],
+                video_url: info.videoUrl || '',
+                poster_url: info.posterUrl || ''
+            })
+        }).catch(() => {});
+    }
+    function loadLastGeneration() {
+        try {
+            const raw = localStorage.getItem(LAST_GEN_KEY);
+            if (!raw) return null;
+            const info = JSON.parse(raw);
+            if (Date.now() - (info.time || 0) > 24 * 3600 * 1000) return null;
+            return info;
+        } catch (e) { return null; }
+    }
+
+    function getAgnesApiKey() {
+        return AGNES_API_KEY_DEFAULT;
+    }
+
     // ================================================================
     // 状态
     // ================================================================
@@ -1326,6 +1353,7 @@
         productsCache: null,
         productsCacheTime: 0,
         pendingApplyContext: null,
+        quotedMessage: null,
         referenceMedia: {
             images: [], videos: [], keyframes: [], keyframeUrls: [], videoAnalysis: null
         }
@@ -1468,6 +1496,8 @@
         state.pendingActions = {};
         state.lastGeneratedMedia = null;
         state.pendingApplyContext = null;
+        state.quotedMessage = null;
+        renderQuoteBar();
         renderHistory();
         document.getElementById('chatTitle').textContent = 'AI 经营助手';
         document.getElementById('chatSubtitle').textContent = '智能商品匹配 · AI 电商策略分析 · 图片/视频/海报生成';
@@ -1754,11 +1784,13 @@
         if (msg.role === 'ai') {
             actionsHtml = `<div class="msg-actions">
                 <button class="act-btn" onclick="copyMessageText(this)"><i class="fas fa-copy"></i> 复制</button>
+                <button class="act-btn" onclick="quoteMessage(this)"><i class="fas fa-quote-left"></i> 引用</button>
                 ${msg.retryable ? `<button class="act-btn" onclick="retryLastMessage()"><i class="fas fa-redo"></i> 重试</button>` : ''}
             </div>`;
         } else {
             actionsHtml = `<div class="msg-actions">
                 <button class="act-btn" onclick="copyMessageText(this)"><i class="fas fa-copy"></i> 复制</button>
+                <button class="act-btn" onclick="quoteMessage(this)"><i class="fas fa-quote-left"></i> 引用</button>
                 <button class="act-btn" onclick="editAndResend(this)"><i class="fas fa-pen"></i> 重发</button>
             </div>`;
         }
@@ -2040,6 +2072,7 @@
         if (images.length === 0 && videos.length === 0) {
             container.style.display = 'none';
             container.innerHTML = '';
+            saveReferenceToSession();
             return;
         }
         container.style.display = 'flex';
@@ -2064,6 +2097,7 @@
             `).join('')}
             <span class="ref-hint">${images.length} 图 · ${videos.length} 视频${kfCount ? ` · ${kfCount} 关键帧` : ''}</span>
         `;
+        saveReferenceToSession();
     }
 
     function removeReference(id) {
@@ -2088,6 +2122,7 @@
             state.referenceMedia.keyframeUrls = [];
             state.referenceMedia.videoAnalysis = null;
             renderReferenceChips();
+            clearReferenceSession();
             document.getElementById('attachMenu').classList.remove('show');
             if (silent !== true) showToast('🧹 已清空参考素材');
         }
@@ -2173,12 +2208,15 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    text, available_products: availableNames,
+                    text,
+                    available_products: availableNames,
                     has_reference: hasRef,
                     ref_types: [
                         ...(refSnapshot.images.length > 0 ? ['image'] : []),
                         ...(refSnapshot.keyframes.length > 0 ? ['video_keyframes'] : [])
-                    ]
+                    ],
+                    session_id: SESSION_ID,
+                    last_generated: loadLastGeneration()
                 })
             });
             return await res.json();
@@ -2615,6 +2653,7 @@
             updateMessageNode(m);
         }
         state.lastGeneratedMedia = { type: 'images', urls, theme };
+        rememberLastGeneration({ kind: 'images', theme, product_name: theme, urls: urls.filter(Boolean) });
     }
 
     async function generateVideoWithSuggestion(intent, originalText, refSnapshot, matches) {
@@ -2683,6 +2722,7 @@
             state.pendingActions[applyId] = m.card.rawAction;
             updateMessageNode(m);
         }
+        rememberLastGeneration({ kind: 'video', theme, product_name: theme, videoUrl });
     }
 
     // ================================================================
@@ -2771,6 +2811,7 @@
             updateMessageNode(m);
         }
         state.lastGeneratedMedia = { type: 'images', urls, theme };
+        rememberLastGeneration({ kind: 'images', theme, product_name: '', urls: urls.filter(Boolean) });
     }
 
     async function generateVideoFree(theme, seconds, refSnapshot, marketEnhance = '') {
@@ -2848,6 +2889,7 @@
             state.pendingActions[applyId] = m.card.rawAction;
             updateMessageNode(m);
         }
+        rememberLastGeneration({ kind: 'video', theme, product_name: '', videoUrl });
     }
 
     async function generatePosterFree(theme, posterType, refImages, marketEnhance = '') {
@@ -2883,6 +2925,7 @@
             state.pendingActions[applyId] = m.card.rawAction;
             updateMessageNode(m);
         }
+        rememberLastGeneration({ kind: 'poster', theme, product_name: '', posterUrl });
     }
 
     // ================================================================
@@ -2980,6 +3023,7 @@
             state.pendingActions[syncId] = m.card.rawAction;
             updateMessageNode(m);
         }
+        rememberLastGeneration({ kind: 'images', theme: productName, product_name: productName, urls: urls.filter(Boolean) });
     }
 
     async function generateVideoWithProduct(productName, seconds, refSnapshot, category) {
@@ -3054,6 +3098,7 @@
             state.pendingActions[syncId] = m.card.rawAction;
             updateMessageNode(m);
         }
+        rememberLastGeneration({ kind: 'video', theme: productName, product_name: productName, videoUrl });
     }
 
     // ================================================================
@@ -3251,7 +3296,13 @@
         if (text.length > 500) { showToast('⚠️ 输入内容不能超过500字'); return; }
         if (state.isProcessing) return;
 
-        state.lastUserText = text;
+        // ★ 如果有引用消息，拼接
+        let finalText = text;
+        if (state.quotedMessage) {
+            finalText = `[引用] ${state.quotedMessage.text.slice(0, 80)}\n${text}`;
+        }
+
+        state.lastUserText = finalText;
 
         const refSnapshot = {
             images: state.referenceMedia.images.map(x => x.dataUrl),
@@ -3273,6 +3324,10 @@
         input.value = '';
         updateCharCount();
         updateSendBtn();
+
+        // ★ 清空引用
+        state.quotedMessage = null;
+        renderQuoteBar();
 
         state.isProcessing = true;
         document.getElementById('sendBtn').disabled = true;
@@ -3303,10 +3358,27 @@
         document.getElementById('messageContainer').scrollTop = document.getElementById('messageContainer').scrollHeight;
 
         try {
+            // ★ 组装上下文
+            const recentHistory = state.currentMessages
+                .slice(-8)
+                .map(m => ({ role: m.role, text: m.text || '' }))
+                .filter(m => m.text);
+
+            const lastGen = loadLastGeneration();
+
             const res = await fetch(BACKEND_URL + '/api/ai/parse', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: text })
+                body: JSON.stringify({
+                    text: finalText,
+                    session_id: SESSION_ID,
+                    history: recentHistory,
+                    last_generated: lastGen,
+                    reference_context: {
+                        images: state.referenceMedia.images.length,
+                        keyframes: state.referenceMedia.keyframes.length
+                    }
+                })
             });
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json();
@@ -3517,6 +3589,54 @@
         showToast('✏️ 已填入输入框');
     }
 
+    /* ============================================================
+       ★★★ 引用消息
+       ============================================================ */
+    function quoteMessage(btn) {
+        const msgDiv = btn.closest('.message');
+        const msgId = msgDiv.dataset.msgId;
+        const msg = state.currentMessages.find(m => m.id === msgId);
+        if (!msg) return;
+        state.quotedMessage = {
+            text: msg.text || (msg.card ? msg.card.title : ''),
+            role: msg.role,
+            msgId: msg.id
+        };
+        renderQuoteBar();
+        document.getElementById('chatInput').focus();
+        showToast('📎 已引用该消息');
+    }
+
+    function cancelQuote() {
+        state.quotedMessage = null;
+        renderQuoteBar();
+    }
+
+    function renderQuoteBar() {
+        let bar = document.getElementById('quoteBar');
+        if (!state.quotedMessage) {
+            if (bar) bar.remove();
+            return;
+        }
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'quoteBar';
+            bar.className = 'quote-bar';
+            const wrap = document.getElementById('inputAreaWrap');
+            const refChips = document.getElementById('refChips');
+            wrap.insertBefore(bar, refChips);
+        }
+        const q = state.quotedMessage;
+        bar.innerHTML = `
+            <div class="quote-inner">
+                <i class="fas fa-quote-left" style="color:#4dabf7;"></i>
+                <span class="quote-role">${q.role === 'user' ? '我' : 'AI'}</span>
+                <span class="quote-text">${escapeHtml(q.text.slice(0, 100))}${q.text.length > 100 ? '...' : ''}</span>
+                <button class="quote-close" onclick="cancelQuote()" title="取消引用">×</button>
+            </div>
+        `;
+    }
+
     function friendlyError(err) {
         const msg = (err && err.message) || '';
         if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) return '🌐 网络连接失败';
@@ -3642,6 +3762,19 @@
                 document.getElementById('chatInput').focus();
             }
         });
+
+        // ★ 恢复参考素材
+        loadReferenceFromSession();
+
+        // ★ 恢复上次生成结果
+        const lastGen = loadLastGeneration();
+        if (lastGen) {
+            state.lastGeneratedMedia = lastGen;
+            console.log('🔄 已恢复上次生成结果:', lastGen);
+        }
+
+        // ★ 渲染引用条
+        renderQuoteBar();
     });
 
     window.addEventListener('resize', function() {
@@ -3675,9 +3808,12 @@
     window.sendMessage = sendMessage;
     window.closeCreateProductModal = closeCreateProductModal;
     window.submitCreateProduct = submitCreateProduct;
+    window.quoteMessage = quoteMessage;
+    window.cancelQuote = cancelQuote;
 
-    console.log('🤖 AI 助手已加载（Agnes 后端代理 + 5级智能匹配 + 创建商品 + 手机兼容）');
+    console.log('🤖 AI 助手已加载（Agnes 后端代理 + 5级智能匹配 + 创建商品 + 多轮上下文 + 引用消息）');
     console.log('💡 后端:', BACKEND_URL);
+    console.log('🆔 Session:', SESSION_ID);
 </script>
 </body>
 </html>
