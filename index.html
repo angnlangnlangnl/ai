@@ -229,7 +229,7 @@
             font-weight: 600;
         }
 
-        /* ===== iframe 容器 ===== */
+        /* ===== iframe ===== */
         .frame-wrap {
             flex: 1;
             position: relative;
@@ -374,16 +374,16 @@
             <i class="fas fa-users"></i><span>客资聚合</span><span class="tag">89</span>
         </div>
 
-        <!-- ========== 4. 资产管理（新增） ========== -->
+        <!-- ========== 4. 资产管理 ========== -->
         <div class="section-label">资产管理</div>
         <div class="item"
-             data-page="pages/ai_service.html#kb"
+             data-page="pages/knowledge.html"
              data-title="知识库管理"
              data-desc="企业知识库 · FAQ / 产品文档 / 售后政策">
             <i class="fas fa-book"></i><span>知识库管理</span>
         </div>
         <div class="item"
-             data-page="pages/ai_service.html#assets"
+             data-page="pages/assets.html"
              data-title="素材库管理"
              data-desc="图片/视频素材 · 客服调用 · AI 推荐">
             <i class="fas fa-images"></i><span>素材库管理</span>
@@ -476,7 +476,6 @@
         </div>
     </div>
 
-    <!-- iframe 容器 -->
     <div class="frame-wrap">
         <div class="frame-loading" id="frameLoading">
             <i class="fas fa-spinner fa-spin"></i> 页面加载中...
@@ -488,42 +487,35 @@
     </div>
 </div>
 
-<!-- Toast -->
 <div id="toast" class="toast"></div>
 
 <script>
-    /* ============================================================
-       index.html 主控脚本
-       ============================================================ */
-
     var frame        = document.getElementById('contentFrame');
     var pageTitle    = document.getElementById('pageTitle');
     var pageDesc     = document.getElementById('pageDesc');
     var frameLoading = document.getElementById('frameLoading');
     var currentPage  = 'pages/dashboard.html';
 
-    /* ===== 1. 显示当前用户 ===== */
+    // ===== 显示当前用户 =====
     (function initUser() {
         var user = getCurrentUser();
         document.getElementById('currentUser').textContent = user;
         document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
     })();
 
-    /* ===== 2. 导航点击切换 ===== */
+    // ===== 导航切换 =====
     document.querySelectorAll('.sidebar .item').forEach(function (item) {
         item.addEventListener('click', function () {
-            // 高亮
             document.querySelectorAll('.sidebar .item').forEach(function (i) {
                 i.classList.remove('active');
             });
             this.classList.add('active');
 
-            // 读取数据
             var page  = this.dataset.page;
             var title = this.dataset.title;
             var desc  = this.dataset.desc;
 
-            // ★ 处理 hash（#kb / #assets）
+            // 处理 hash
             var hash = '';
             if (page.indexOf('#') > -1) {
                 var parts = page.split('#');
@@ -533,29 +525,21 @@
 
             currentPage = page;
 
-            // 更新顶栏
             pageTitle.innerHTML = '<i class="fas fa-circle" style="color:#4dabf7;font-size:8px;"></i> ' + title;
             pageDesc.textContent = desc;
 
-            // 显示加载中
             frameLoading.classList.add('show');
-
-            // 保存 hash 供 iframe 加载完成后使用
             frame.dataset.pendingHash = hash;
 
-            // 切换 iframe
             frame.src = page;
 
-            // 同步 URL hash
             location.hash = '#/' + page + (hash ? '#' + hash : '');
         });
     });
 
-    /* ===== 3. iframe 加载完成 ===== */
+    // ===== iframe 加载完成 =====
     frame.addEventListener('load', function () {
         frameLoading.classList.remove('show');
-
-        // ★ 处理待切换的 Tab
         var pendingHash = frame.dataset.pendingHash;
         if (pendingHash) {
             try {
@@ -569,7 +553,7 @@
         }
     });
 
-    /* ===== 4. 刷新按钮 ===== */
+    // ===== 刷新 =====
     document.getElementById('refreshBtn').addEventListener('click', function () {
         frameLoading.classList.add('show');
         var base = frame.src.split('?')[0].split('#')[0];
@@ -577,22 +561,21 @@
         showToast('🔄 已刷新当前页面');
     });
 
-    /* ===== 5. 新窗口打开 ===== */
+    // ===== 新窗口 =====
     document.getElementById('openNewBtn').addEventListener('click', function () {
         window.open(currentPage, '_blank');
     });
 
-    /* ===== 6. 退出登录 ===== */
+    // ===== 退出 =====
     document.getElementById('logoutBtn').addEventListener('click', function () {
         if (confirm('确定要退出登录吗？')) {
             doLogout();
         }
     });
 
-    /* ===== 7. 监听子页面 postMessage ===== */
+    // ===== postMessage =====
     window.addEventListener('message', function (e) {
         var data = e.data || {};
-
         if (data.type === 'title') {
             pageTitle.innerHTML = '<i class="fas fa-circle" style="color:#4dabf7;font-size:8px;"></i> ' + data.value;
         }
@@ -608,7 +591,7 @@
         }
     });
 
-    /* ===== 8. 全局 Toast ===== */
+    // ===== Toast =====
     function showToast(msg) {
         var toast = document.getElementById('toast');
         toast.innerHTML = msg;
@@ -619,12 +602,11 @@
         }, 2500);
     }
 
-    /* ===== 9. 根据 hash 恢复页面 ===== */
+    // ===== 根据 hash 恢复 =====
     window.addEventListener('DOMContentLoaded', function () {
         var hash = location.hash.replace('#/', '');
         if (hash && hash !== currentPage) {
             var matched = false;
-            // 支持 pages/xxx.html#kb 形式
             var basePath = hash.split('#')[0];
             document.querySelectorAll('.sidebar .item').forEach(function (i) {
                 var itemPage = i.dataset.page.split('#')[0];
@@ -640,7 +622,7 @@
         showToast('👋 欢迎回来，' + getCurrentUser());
     });
 
-    /* ===== 10. Ctrl+R 刷新 iframe ===== */
+    // ===== Ctrl+R =====
     document.addEventListener('keydown', function (e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
             e.preventDefault();
