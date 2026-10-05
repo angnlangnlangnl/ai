@@ -1019,7 +1019,7 @@
             <div class="empty-state" id="emptyState">
                 <i class="fas fa-robot"></i>
                 <h3>👋 你好，我是 AI 经营助手</h3>
-                <p>支持 33 种商品操作 + 图片/视频/海报生成 + 视频反解 + <strong>智能商品匹配</strong> + <strong>AI 电商策略分析</strong> + <strong>多轮对话上下文</strong> + <strong>上传图片自动识别</strong>。<br>上传图片我会自动看图；说"替换到茶叶商品图"我会直接绑定商品。</p>
+                <p>支持 33 种商品操作 + 图片/视频/海报生成 + 视频反解 + <strong>智能商品匹配</strong> + <strong>AI 电商策略分析</strong> + <strong>多轮对话上下文</strong> + <strong>上传图片后发消息触发看图</strong>。<br>上传图片后直接说"这是什么"我会帮你看图；说"替换到茶叶商品图"我会直接绑定商品。</p>
                 <div class="examples">
                     <span class="ex accent" onclick="sendExample('生成3张茶叶主图')">🖼️ 智能匹配生成</span>
                     <span class="ex accent" onclick="sendExample('生成一张母亲节海报')">🎨 AI策略海报</span>
@@ -1046,7 +1046,7 @@
                 <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu(event)" title="添加参考素材">+</button>
                 <div class="input-wrap">
                     <textarea id="chatInput" rows="1"
-                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 将5张图替换到茶叶商品图 / 再来一张"
+                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 将5张图替换到茶叶商品图 / 再来一张 / 这是什么"
                         onkeydown="handleKeyDown(event)"
                         oninput="autoResize(this)"></textarea>
                     <span class="char-count" id="charCount">0/500</span>
@@ -1056,7 +1056,7 @@
                 </button>
             </div>
             <div class="input-hint">
-                回车发送 · Shift+回车换行 · 上传图片后自动识别 · 上传视频自动抽帧反解 · 点消息"引用"可追问
+                回车发送 · Shift+回车换行 · 上传图后发"这是什么"触发看图 · 上传视频自动抽帧 · 点消息"引用"可追问
             </div>
 
             <div class="attach-menu" id="attachMenu">
@@ -1166,7 +1166,6 @@
 <div class="global-toast" id="toast"></div>
 
 <script src="../js/common.js"></script>
-<!-- ⬇⬇⬇ 第 3 段（JavaScript）从这里开始 ⬇⬇⬇ -->
 <script>
     // ================================================================
     // 配置
@@ -2052,8 +2051,7 @@
         if (added > 0) showToast(`📤 已添加 ${added} 张参考图`);
         if (skipped > 0 && added === 0) showToast(`⚠️ 有 ${skipped} 个文件被跳过`);
         renderReferenceChips();
-        // ★ 自动识别（新增）
-        if (added > 0) scheduleAutoAnalyzeImages('upload');
+        // ★ 不自动识别，等用户发消息触发
     }
 
     async function handleReferenceVideoUpload(files) {
@@ -2082,10 +2080,7 @@
             }
         }
         renderReferenceChips();
-        // ★ 自动分析视频（新增）
-        if (state.referenceMedia.keyframes.length > 0) {
-            autoAnalyzeVideo();
-        }
+        // ★ 不自动分析，等用户发消息触发
     }
 
     function renderReferenceChips() {
@@ -2193,31 +2188,19 @@
     });
 
     // ================================================================
-    // ★ 自动识别图片内容（上传后自动触发）
+    // ★ 自动识别图片内容（发消息触发）
     // ================================================================
-    let _autoAnalyzeTimer = null;
     let _autoAnalyzeLock = false;
-
-    function scheduleAutoAnalyzeImages(reason = '') {
-        if (_autoAnalyzeTimer) clearTimeout(_autoAnalyzeTimer);
-        _autoAnalyzeTimer = setTimeout(async () => {
-            await autoAnalyzeImages(reason);
-        }, 800);
-    }
 
     async function autoAnalyzeImages(reason = '') {
         if (_autoAnalyzeLock) return;
         if (state.referenceMedia.images.length === 0) return;
 
-        const sig = state.referenceMedia.images.length + ':' +
-                    (state.referenceMedia.images[state.referenceMedia.images.length - 1]?.id || '');
-        if (state._lastAnalyzedSig === sig) return;
-
         _autoAnalyzeLock = true;
 
         const tipId = appendMessage({
             role: 'ai',
-            text: `🔍 检测到 ${state.referenceMedia.images.length} 张图片，正在识别内容...`,
+            text: `🔍 正在识别 ${state.referenceMedia.images.length} 张图...`,
             time: nowTime(),
             progress: 30
         });
@@ -2254,7 +2237,8 @@
                 }
                 updateMessageNode(m);
             }
-            state._lastAnalyzedSig = sig;
+            state._lastAnalyzedSig = state.referenceMedia.images.length + ':' +
+                (state.referenceMedia.images[state.referenceMedia.images.length - 1]?.id || '');
         } catch (err) {
             const m = state.currentMessages.find(x => x.id === tipId);
             if (m) { m.progress = undefined; m.text = `⚠️ 识别失败：${friendlyError(err)}`; updateMessageNode(m); }
@@ -2264,7 +2248,7 @@
     }
 
     // ================================================================
-    // ★ 自动反解参考视频（抽帧后自动触发）
+    // ★ 自动反解参考视频（发消息触发）
     // ================================================================
     async function autoAnalyzeVideo() {
         const keyframes = state.referenceMedia.keyframes || [];
@@ -2275,7 +2259,7 @@
 
         const tipId = appendMessage({
             role: 'ai',
-            text: `🎬 已抽取 ${keyframes.length} 帧关键帧，正在分析视频内容...`,
+            text: `🎬 正在分析视频内容（${keyframes.length} 帧）...`,
             time: nowTime(),
             progress: 30
         });
@@ -2342,7 +2326,6 @@
         if (state.isProcessing) { showToast('⏳ 正在处理中'); return; }
         state.isProcessing = true;
         updateSendBtn();
-        state._lastAnalyzedSig = null;
         await autoAnalyzeImages('manual');
         state.isProcessing = false;
         updateSendBtn();
@@ -2611,6 +2594,62 @@
             productHint,
             originalText: text
         };
+    }
+
+    // ================================================================
+    // ★ 识别"看图/分析图"意图
+    // ================================================================
+    function parseImageAnalysisIntent(text) {
+        const t = (text || '').trim();
+        if (!t) return null;
+
+        const triggers = [
+            '这是什么', '这图是什么', '这是什么图', '这张图是什么',
+            '分析一下', '分析这张', '分析这些', '识别一下', '识别这张', '识别这些',
+            '看看这图', '看看这张', '看看这些', '看看是什么',
+            '这图里', '图里有', '图里的',
+            '什么商品', '什么产品', '哪些商品', '哪些产品',
+            '猜猜这', '认一下',
+        ];
+        const hasTrigger = triggers.some(w => t.includes(w));
+        if (!hasTrigger) return null;
+
+        const hasRefImages = state.referenceMedia.images.length > 0;
+        const hasRefVideo = state.referenceMedia.keyframes.length > 0;
+        if (!hasRefImages && !hasRefVideo) return null;
+
+        return {
+            action: 'analyze',
+            hasImages: hasRefImages,
+            hasKeyframes: hasRefVideo,
+            originalText: text
+        };
+    }
+
+    // ================================================================
+    // ★ 处理"看图/分析图"意图
+    // ================================================================
+    async function handleImageAnalysisIntent(intent) {
+        if (intent.hasKeyframes && !intent.hasImages) {
+            state._lastAnalyzedVideoSig = null;
+            await autoAnalyzeVideo();
+            return;
+        }
+        if (intent.hasImages) {
+            state._lastAnalyzedSig = null;
+            await autoAnalyzeImages('intent');
+            if (intent.hasKeyframes) {
+                await new Promise(r => setTimeout(r, 500));
+                state._lastAnalyzedVideoSig = null;
+                await autoAnalyzeVideo();
+            }
+            return;
+        }
+        appendMessage({
+            role: 'ai',
+            text: '⚠️ 未检测到参考图或视频。请先点 "+" 上传，然后再问"这是什么"。',
+            time: nowTime()
+        });
     }
 
     // ================================================================
@@ -3971,6 +4010,20 @@
             return;
         }
 
+        // ★★★ 优先判断"看图/分析图"意图
+        const analysisIntent = parseImageAnalysisIntent(text);
+        if (analysisIntent) {
+            document.getElementById('typingIndicator').classList.remove('show');
+            try {
+                await handleImageAnalysisIntent(analysisIntent);
+            } catch (err) {
+                appendMessage({ role: 'ai', text: friendlyError(err), time: nowTime(), retryable: true });
+            }
+            state.isProcessing = false;
+            updateSendBtn();
+            return;
+        }
+
         const genIntent = parseGenerationIntent(text);
         const isGenerationIntent = genIntent || (hasRef && /生成|做|制作|出|来|弄|设计|同款/.test(text));
 
@@ -4543,9 +4596,9 @@
     window.analyzeImageContent = analyzeImageContent;
     window.autoReplaceFromImages = autoReplaceFromImages;
 
-    console.log('🤖 AI 助手已加载（含自动识别图片 + 一键识别替换 + 素材同步卡片）');
+    console.log('🤖 AI 助手已加载（发消息触发看图，不自动识别）');
     console.log('💡 后端:', BACKEND_URL);
     console.log('🆔 Session:', SESSION_ID);
 </script>
 </body>
-</html>    
+</html>
