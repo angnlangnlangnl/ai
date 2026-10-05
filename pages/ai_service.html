@@ -466,6 +466,9 @@
         .chat-input-area .attach-btn.product:hover { border-color: #ff5000; background: #fff5f0; }
         .chat-input-area .attach-btn.coupon { color: #ff5000; }
         .chat-input-area .attach-btn.coupon:hover { border-color: #ff5000; background: #fff5f0; }
+        .chat-input-area .attach-btn.upload { color: #4dabf7; }
+        .chat-input-area .attach-btn.upload:hover { border-color: #4dabf7; background: #f0f7fe; }
+        .chat-input-area .attach-btn.upload.has-file { color: #0d7c4f; border-color: #0d7c4f; background: #f0faf5; }
         .chat-input-area .input-wrap {
             flex: 1; background: #f8fafc;
             border: 1px solid #e8edf4; border-radius: 12px;
@@ -495,6 +498,44 @@
         }
         .chat-input-area .send-btn:disabled {
             opacity: 0.4; cursor: not-allowed; transform: none;
+        }
+        /* ★ 上传预览区 */
+        .upload-preview-bar {
+            display: none;
+            gap: 8px;
+            padding: 8px 18px 0;
+            flex-wrap: wrap;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .upload-preview-bar.show { display: flex; }
+        .upload-preview-bar .up-chip {
+            position: relative;
+            width: 54px; height: 54px;
+            border-radius: 10px;
+            border: 2px solid #e8edf4;
+            overflow: visible;
+            flex-shrink: 0;
+        }
+        .upload-preview-bar .up-chip img,
+        .upload-preview-bar .up-chip video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+        }
+        .upload-preview-bar .up-chip .up-remove {
+            position: absolute; top: -6px; right: -6px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #b51a3f; color: #fff;
+            border: 2px solid #fff;
+            font-size: 11px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0; font-family: inherit;
+        }
+        .upload-preview-bar .up-hint {
+            font-size: 11px; color: #94a3b8;
+            padding-left: 4px;
         }
         .empty-chat {
             flex: 1; display: flex; flex-direction: column;
@@ -1646,9 +1687,15 @@
                 <!-- 快捷操作已移除，容器保留但隐藏 -->
                 <div class="quick-replies" id="quickReplies" style="display:none;"></div>
 
+                <!-- ★ 新增：上传预览条 -->
+                <div class="upload-preview-bar" id="uploadPreviewBar"></div>
+
                 <div class="chat-input-area" id="chatInputArea" style="display:none;">
-                    <button class="attach-btn" onclick="quickSendAsset()" title="从素材库发送">
+                    <button class="attach-btn upload" id="uploadBtn" onclick="triggerChatUpload()" title="上传图片给客户看">
                         <i class="fas fa-image"></i>
+                    </button>
+                    <button class="attach-btn" onclick="quickSendAsset()" title="从素材库发送">
+                        <i class="fas fa-photo-film"></i>
                     </button>
                     <button class="attach-btn product" onclick="openProductPicker()" title="发商品卡片">
                         <i class="fas fa-shopping-bag"></i>
@@ -1804,6 +1851,9 @@
     </div>
 </div>
 
+<input type="file" id="chatImageInput" accept="image/*" multiple style="display:none;">
+<input type="file" id="chatVideoInput" accept="video/*" style="display:none;">
+
 <div class="global-toast" id="toast"></div>
 
 <script>
@@ -1855,7 +1905,13 @@
 
         // 滚动状态
         userScrolledUp: false,
-        hasNewMessageWhileScrolledUp: false
+        hasNewMessageWhileScrolledUp: false,
+
+        // ★ 当前上传的图片（给客户看 / 发给 AI 识别）
+        chatUploads: [],
+
+        // ★ 沉默跟进定时器
+        silenceTimers: {}
     };
 
     /* ============================================================
@@ -1985,6 +2041,7 @@
         bindInputEvents();
         bindGlobalShortcuts();
         bindScrollListener();
+        bindChatUpload();
         updateStatsBar();
 
         // ★ 从 products.html 跳过来：自动打开会话 + 发送"我想咨询【商品名】"
@@ -1997,7 +2054,6 @@
         const fromProductId = params.get('from_product');
         if (!fromProductId) return;
 
-        // 等商品加载完（最多等 3 秒）
         let tries = 0;
         while (!state.productsCache || state.productsCache.length === 0) {
             await new Promise(r => setTimeout(r, 200));
@@ -2008,12 +2064,10 @@
         const p = state.productsCache.find(x => String(x.id) === String(fromProductId));
         if (!p) return;
 
-        // 打开第一个会话（或新建）
         if (state.conversations.length === 0) return;
         const conv = state.conversations[0];
         openConv(conv.id);
 
-        // 延迟一下，等界面就绪再发消息
         setTimeout(() => {
             const input = document.getElementById('msgInput');
             if (!input) return;
@@ -2058,6 +2112,102 @@
             }
             updateScrollBottomBtn();
         });
+    }
+
+    /* ============================================================
+       ★ 上传图片（客服给客户发图 / 也用于 AI 识别）
+       ============================================================ */
+    function bindChatUpload() {
+        const imgInput = document.getElementById('chatImageInput');
+        const vidInput = document.getElementById('chatVideoInput');
+        if (imgInput) {
+            imgInput.addEventListener('change', async (e) => {
+                const files = Array.from(e.target.files || []);
+                await handleChatUpload(files, 'image');
+                e.target.value = '';
+            });
+        }
+        if (vidInput) {
+            vidInput.addEventListener('change', async (e) => {
+                const files = Array.from(e.target.files || []);
+                await handleChatUpload(files, 'video');
+                e.target.value = '';
+            });
+        }
+    }
+
+    function triggerChatUpload() {
+        const input = document.getElementById('chatImageInput');
+        if (input) input.click();
+    }
+
+    function fileToDataUrl(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function handleChatUpload(files, kind) {
+        if (!files || files.length === 0) return;
+        for (const f of files) {
+            try {
+                const dataUrl = await fileToDataUrl(f);
+                state.chatUploads.push({
+                    id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                    kind: kind,
+                    name: f.name,
+                    dataUrl: dataUrl
+                });
+            } catch (e) {
+                console.warn('读取文件失败:', e);
+            }
+        }
+        renderUploadPreview();
+        updateUploadBtnState();
+        showToast(`📤 已添加 ${files.length} 个${kind === 'image' ? '图片' : '视频'}`);
+    }
+
+    function renderUploadPreview() {
+        const bar = document.getElementById('uploadPreviewBar');
+        if (!bar) return;
+        if (state.chatUploads.length === 0) {
+            bar.classList.remove('show');
+            bar.innerHTML = '';
+            return;
+        }
+        bar.classList.add('show');
+        bar.innerHTML = state.chatUploads.map(f => {
+            const isImg = f.kind === 'image';
+            return `
+                <div class="up-chip" title="${escapeHtml(f.name || '')}">
+                    ${isImg
+                        ? `<img src="${f.dataUrl}" alt="${escapeHtml(f.name || '')}">`
+                        : `<video src="${f.dataUrl}" muted preload="metadata" playsinline></video>`}
+                    <button class="up-remove" onclick="removeChatUpload('${f.id}')" title="移除">×</button>
+                </div>
+            `;
+        }).join('') + `<span class="up-hint">发送时会一起传给 AI 识别</span>`;
+    }
+
+    function removeChatUpload(id) {
+        state.chatUploads = state.chatUploads.filter(f => f.id !== id);
+        renderUploadPreview();
+        updateUploadBtnState();
+    }
+
+    function updateUploadBtnState() {
+        const btn = document.getElementById('uploadBtn');
+        if (!btn) return;
+        if (state.chatUploads.length > 0) {
+            btn.classList.add('has-file');
+            btn.title = `已上传 ${state.chatUploads.length} 个文件`;
+        } else {
+            btn.classList.remove('has-file');
+            btn.title = '上传图片给客户看';
+        }
     }
 
     /* ============================================================
@@ -2130,6 +2280,13 @@
     function openConv(id) {
         const conv = state.conversations.find(c => c.id === id);
         if (!conv) return;
+
+        // ★ 切换会话前，清掉上一个会话的沉默定时器
+        if (state.currentId && state.silenceTimers[state.currentId]) {
+            clearTimeout(state.silenceTimers[state.currentId]);
+            delete state.silenceTimers[state.currentId];
+        }
+
         state.currentId = id;
         conv.unread = 0;
         state.userScrolledUp = false;
@@ -2152,7 +2309,6 @@
         renderChatActions(id);
         renderMessages(id);
 
-        // ★ 恢复输入框状态
         const inputArea = document.getElementById('chatInputArea');
         if (inputArea) {
             inputArea.style.opacity = '1';
@@ -2168,9 +2324,12 @@
             forceScrollToBottom();
         });
         setTimeout(() => document.getElementById('msgInput').focus(), 100);
+
+        // ★ 启动本会话的沉默跟进定时器
+        resetSilenceTimer(id);
     }
 
-    /* ★ 渲染聊天头部操作区：状态鲜明 */
+    /* ★ 渲染聊天头部操作区 */
     function renderChatActions(convId) {
         const actions = document.getElementById('chatActions');
         const head = document.getElementById('chatHead');
@@ -2269,6 +2428,7 @@
                 couponHtml = renderCouponCard(m.coupon_card, m.id);
             }
 
+            // ★ 支持图片/视频（客服发的 & 客户发的）
             let mediaHtml = '';
             if (m.assets && m.assets.length > 0) {
                 mediaHtml += '<div class="msg-media">';
@@ -2281,6 +2441,16 @@
                     } else if (a.type === 'video') {
                         mediaHtml += `<video src="${a.url}" controls preload="metadata" playsinline></video>`;
                     }
+                });
+                mediaHtml += '</div>';
+            }
+            if (m.chat_images && m.chat_images.length > 0) {
+                mediaHtml += '<div class="msg-media">';
+                m.chat_images.forEach(url => {
+                    mediaHtml += `<div class="media-item" onclick="window.open('${url}', '_blank')">
+                        <img src="${url}" alt="图片" loading="lazy">
+                        <span class="media-tag">图</span>
+                    </div>`;
                 });
                 mediaHtml += '</div>';
             }
@@ -2505,7 +2675,6 @@
         state.clickStats.byProduct[productId].clicked++;
         updateStatsBar();
         reportClick(productId, name, 'view');
-        // ★ 优先跳自己的商品详情页
         if (productId) {
             window.open('products.html?id=' + productId, '_blank');
             return;
@@ -2517,6 +2686,7 @@
         }
     }
 
+    /* ★ 用户点击"立即购买"/"加入购物车" → 上报 + 下单后触发感谢词 */
     function onCardAction(productId, msgId, action, url, name) {
         state.clickStats.totalClicked++;
         if (!state.clickStats.byProduct[productId]) {
@@ -2525,6 +2695,7 @@
         state.clickStats.byProduct[productId].clicked++;
         updateStatsBar();
         reportClick(productId, name, action);
+
         if (action === 'cart') {
             showToast(`🛒 已加入购物车：${name}`);
         } else if (action === 'buy') {
@@ -2532,6 +2703,50 @@
             if (url && url !== '#') {
                 window.open(url, '_blank');
             }
+            // ★ 用户点击"立即购买" → 3 秒后触发感谢词
+            const convId = state.currentId;
+            if (convId) {
+                setTimeout(() => {
+                    triggerOrderPlaced(convId, productId, name);
+                }, 3000);
+            }
+        }
+    }
+
+    /* ★ 调用后端 /api/sales/order-placed 触发感谢词 */
+    async function triggerOrderPlaced(convId, productId, productName) {
+        try {
+            const res = await fetch(BACKEND_URL + '/api/sales/order-placed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: 'conv_' + convId,
+                    product_id: productId,
+                    product_name: productName
+                })
+            });
+            const data = await res.json();
+            if (data.ok && data.thank_you) {
+                if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
+                state.messagesMap[convId].push({
+                    id: 'm_' + Date.now() + '_thank',
+                    from: 'ai',
+                    text: data.thank_you,
+                    time: nowTime()
+                });
+                if (state.currentId === convId) {
+                    renderMessages(convId);
+                    scrollMessagesToBottom();
+                }
+                const conv = state.conversations.find(c => c.id === convId);
+                if (conv) {
+                    conv.lastMsg = data.thank_you.slice(0, 30);
+                    conv.lastTime = nowTime();
+                }
+                renderConvList();
+            }
+        } catch (e) {
+            console.warn('感谢词触发失败:', e);
         }
     }
 
@@ -2998,22 +3213,39 @@
     function sendMsg() {
         const input = document.getElementById('msgInput');
         const text = input.value.trim();
-        if (!text || state.isReplying) return;
+        const hasUploads = state.chatUploads.length > 0;
+
+        // ★ 允许"只有图片没文字"发送
+        if ((!text && !hasUploads) || state.isReplying) return;
         if (!state.currentId) { showToast('⚠️ 请先选择会话'); return; }
 
         const convId = state.currentId;
         const time = nowTime();
 
+        // 把上传的图片/视频拼到消息里（作为客服发送的素材）
+        const assetsToSend = state.chatUploads.map(f => ({
+            type: f.kind === 'image' ? 'image' : 'video',
+            url: f.dataUrl,
+            name: f.name || ''
+        }));
+
         if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
-        state.messagesMap[convId].push({
+        const msgData = {
             id: 'm_' + Date.now(),
             from: 'agent',
             text: text,
             time: time
-        });
+        };
+        if (assetsToSend.length > 0) {
+            msgData.assets = assetsToSend;
+        }
+        state.messagesMap[convId].push(msgData);
 
         const conv = state.conversations.find(c => c.id === convId);
-        if (conv) { conv.lastMsg = text; conv.lastTime = time; }
+        if (conv) {
+            conv.lastMsg = text || `[${assetsToSend.length} 个素材]`;
+            conv.lastTime = time;
+        }
 
         input.value = '';
         autoResize(input);
@@ -3021,6 +3253,14 @@
         renderMessages(convId);
         renderConvList();
         scrollMessagesToBottom();
+
+        // 清空上传区
+        state.chatUploads = [];
+        renderUploadPreview();
+        updateUploadBtnState();
+
+        // ★ 重置沉默定时器（客服刚互动了）
+        resetSilenceTimer(convId);
 
         state.isReplying = true;
         setTimeout(() => {
@@ -3074,7 +3314,7 @@
         }
     }
 
-    /* ★ 对接销售型 AI 客服 */
+    /* ★ 对接销售型 AI 客服：带上图片/视频 + is_repeat */
     async function autoAIReply(convId, userText) {
         if (state.takeoverState[convId] !== 'ai') return;
 
@@ -3084,6 +3324,11 @@
             scrollMessagesToBottom();
         }
 
+        // ★ 判断是否老客
+        const isRepeat = (() => {
+            try { return localStorage.getItem('user_is_repeat') === '1'; } catch (e) { return false; }
+        })();
+
         let replyData = null;
         try {
             const res = await fetch(BACKEND_URL + '/api/sales/chat', {
@@ -3092,7 +3337,11 @@
                 body: JSON.stringify({
                     session_id: 'conv_' + convId,
                     text: userText,
-                    conv_id: convId
+                    conv_id: convId,
+                    // ★ 新增：把上传的图片/视频一起传给销售 AI
+                    image_urls: state.chatUploads.filter(f => f.kind === 'image').map(f => f.dataUrl),
+                    keyframe_urls: state.chatUploads.filter(f => f.kind === 'video').map(f => f.dataUrl),
+                    is_repeat: isRepeat
                 })
             });
             if (res.ok) replyData = await res.json();
@@ -3105,6 +3354,7 @@
                 type: 'chat',
                 text: generateLocalReply(userText) || '好的，我帮您看看~',
                 stage: 'exploring',
+                scene: 'general',
                 products: [],
                 kb_hits: [],
                 farewell: false
@@ -3125,7 +3375,6 @@
 
             if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
 
-            // 推送 AI 文本
             state.messagesMap[convId].push({
                 id: 'm_' + Date.now(),
                 from: 'ai',
@@ -3134,7 +3383,6 @@
                 kb_hits: kbHits
             });
 
-            // 推送商品卡片
             if (products && products.length > 0) {
                 const cards = products.map(p => ({
                     id: p.id, name: p.name, price: p.price,
@@ -3161,7 +3409,6 @@
                 }
             }
 
-            // 会话结束标记
             if (farewell) {
                 state.messagesMap[convId].push({
                     id: 'm_' + Date.now() + '_end',
@@ -3195,6 +3442,9 @@
                 scrollMessagesToBottom();
             }
             renderConvList();
+
+            // ★ 重置沉默定时器
+            resetSilenceTimer(convId);
         }, 600);
     }
 
@@ -3206,6 +3456,70 @@
         if (t.includes('下单') || t.includes('买')) return '好的，感谢您的支持！我们会尽快为您安排发货~';
         if (t.includes('谢谢') || t.includes('感谢')) return '不客气，祝您购物愉快！有需要随时联系我~';
         return null;
+    }
+
+    /* ============================================================
+       ★ 沉默跟进：45 秒无回复 → 调 /api/sales/nudge
+       ============================================================ */
+    const SILENCE_MS = 45000;
+    const SILENCE_MAX = 2;          // 后端最多跟进 2 次
+    const silenceCount = {};        // convId -> 已跟进次数
+
+    function resetSilenceTimer(convId) {
+        if (!convId) return;
+        if (state.silenceTimers[convId]) {
+            clearTimeout(state.silenceTimers[convId]);
+            delete state.silenceTimers[convId];
+        }
+        // 只有 AI 接管中、且未超过上限才启动
+        const takeover = state.takeoverState[convId] || 'ai';
+        if (takeover !== 'ai') return;
+        if ((silenceCount[convId] || 0) >= SILENCE_MAX) return;
+
+        state.silenceTimers[convId] = setTimeout(async () => {
+            // 用户可能在这期间已经回复了 → 检查
+            const lastUserTime = (() => {
+                const msgs = state.messagesMap[convId] || [];
+                for (let i = msgs.length - 1; i >= 0; i--) {
+                    if (msgs[i].from === 'user') {
+                        return new Date('1970/01/01 ' + msgs[i].time).getTime();
+                    }
+                }
+                return 0;
+            })();
+
+            // 调后端 nudge
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/sales/nudge?session_id=conv_${convId}`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (!data.skip && data.text) {
+                    if (!state.messagesMap[convId]) state.messagesMap[convId] = [];
+                    state.messagesMap[convId].push({
+                        id: 'm_' + Date.now() + '_nudge',
+                        from: 'ai',
+                        text: data.text,
+                        time: nowTime()
+                    });
+                    silenceCount[convId] = (silenceCount[convId] || 0) + 1;
+                    if (state.currentId === convId) {
+                        renderMessages(convId);
+                        scrollMessagesToBottom();
+                    }
+                    const conv = state.conversations.find(c => c.id === convId);
+                    if (conv) {
+                        conv.lastMsg = data.text.slice(0, 30);
+                        conv.lastTime = nowTime();
+                    }
+                    renderConvList();
+                    // 再来一轮
+                    resetSilenceTimer(convId);
+                }
+            } catch (e) {
+                console.warn('沉默跟进失败:', e);
+            }
+        }, SILENCE_MS);
     }
 
     /* ============================================================
@@ -3366,6 +3680,7 @@
         if (!state.currentId) return;
         const convId = state.currentId;
         if (state.aiTimers[convId]) { clearTimeout(state.aiTimers[convId]); delete state.aiTimers[convId]; }
+        if (state.silenceTimers[convId]) { clearTimeout(state.silenceTimers[convId]); delete state.silenceTimers[convId]; }
         state.takeoverState[convId] = 'human';
         document.getElementById('typingIndicator').classList.remove('show');
         sendSystemMessage(convId, '【系统】会话已转人工客服');
@@ -3382,6 +3697,7 @@
         renderChatActions(convId);
         renderConvList();
         showToast('🤖 AI 已接管');
+        resetSilenceTimer(convId);
     }
 
     function releaseToAI() {
@@ -3392,6 +3708,7 @@
         renderChatActions(convId);
         renderConvList();
         showToast('🤖 已释放给 AI');
+        resetSilenceTimer(convId);
     }
 
     function closeCurrentConv() {
@@ -3399,6 +3716,8 @@
         if (!confirm('确定结束当前会话？')) return;
         const convId = state.currentId;
         if (state.aiTimers[convId]) { clearTimeout(state.aiTimers[convId]); delete state.aiTimers[convId]; }
+        if (state.silenceTimers[convId]) { clearTimeout(state.silenceTimers[convId]); delete state.silenceTimers[convId]; }
+        delete silenceCount[convId];
         state.conversations = state.conversations.filter(c => c.id !== convId);
         delete state.messagesMap[convId];
         delete state.takeoverState[convId];
@@ -3478,7 +3797,9 @@
     function updateSendBtn() {
         const input = document.getElementById('msgInput');
         const btn = document.getElementById('sendBtn');
-        btn.disabled = !input.value.trim() || state.isReplying;
+        const hasText = input.value.trim().length > 0;
+        const hasUploads = state.chatUploads.length > 0;
+        btn.disabled = (!hasText && !hasUploads) || state.isReplying;
     }
 
     function handleMsgKey(e) {
@@ -3549,7 +3870,11 @@
 
     window.showClickStats = showClickStats;
 
-    console.log('💬 AI 客服页已加载（对接销售型 AI 客服）');
+    // ★ 上传相关
+    window.triggerChatUpload = triggerChatUpload;
+    window.removeChatUpload = removeChatUpload;
+
+    console.log('💬 AI 客服页已加载（对接销售型 AI 客服 · 支持图片/视频识别 · 沉默跟进 · 下单感谢）');
     console.log('💡 后端:', BACKEND_URL);
     console.log('💡 销售接口: POST /api/sales/chat');
 </script>
