@@ -1046,7 +1046,7 @@
                 <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu(event)" title="添加参考素材">+</button>
                 <div class="input-wrap">
                     <textarea id="chatInput" rows="1"
-                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 将5张图替换到茶叶商品图 / 再来一张 / 这是什么"
+                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 将图片替换到茶叶商品主图 / 分析图片并替换 / 再来一张 / 这是什么"
                         onkeydown="handleKeyDown(event)"
                         oninput="autoResize(this)"></textarea>
                     <span class="char-count" id="charCount">0/500</span>
@@ -1208,7 +1208,10 @@
         '一个', '一张', '一款', '这款', '这个', '那个',
         '商品', '产品', '作品', '卡片',
         '上传的', '我的', '这', '那',
-        '文字', '图', '内容'
+        '文字', '图', '内容',
+        '分析', '识别', '看看', '查查', '检测', '判断',
+        '帮我', '帮忙', '请', '把', '将', '给', '为',
+        '的', '了', '吧', '吗', '呢', '啊'
     ]);
 
     const IMAGE_PROMPT_TEMPLATES = [
@@ -2051,7 +2054,6 @@
         if (added > 0) showToast(`📤 已添加 ${added} 张参考图`);
         if (skipped > 0 && added === 0) showToast(`⚠️ 有 ${skipped} 个文件被跳过`);
         renderReferenceChips();
-        // ★ 不自动识别，等用户发消息触发
     }
 
     async function handleReferenceVideoUpload(files) {
@@ -2080,7 +2082,6 @@
             }
         }
         renderReferenceChips();
-        // ★ 不自动分析，等用户发消息触发
     }
 
     function renderReferenceChips() {
@@ -2192,25 +2193,30 @@
     // ================================================================
     let _autoAnalyzeLock = false;
 
-    async function autoAnalyzeImages(reason = '') {
-        if (_autoAnalyzeLock) return;
-        if (state.referenceMedia.images.length === 0) return;
+    async function autoAnalyzeImages(reason = '', silent = false) {
+        if (_autoAnalyzeLock) return null;
+        if (state.referenceMedia.images.length === 0) return null;
 
         _autoAnalyzeLock = true;
 
-        const tipId = appendMessage({
-            role: 'ai',
-            text: `🔍 正在识别 ${state.referenceMedia.images.length} 张图...`,
-            time: nowTime(),
-            progress: 30
-        });
+        let tipId = null;
+        if (!silent) {
+            tipId = appendMessage({
+                role: 'ai',
+                text: `🔍 正在识别 ${state.referenceMedia.images.length} 张图...`,
+                time: nowTime(),
+                progress: 30
+            });
+        }
 
         try {
             const urls = await uploadRefImagesToTemp();
             if (urls.length === 0) throw new Error('图片上传失败');
 
-            let m = state.currentMessages.find(x => x.id === tipId);
-            if (m) { m.progress = 60; m.text = '🧠 AI 正在看图...'; updateMessageNode(m); }
+            if (!silent) {
+                let m = state.currentMessages.find(x => x.id === tipId);
+                if (m) { m.progress = 60; m.text = '🧠 AI 正在看图...'; updateMessageNode(m); }
+            }
 
             const res = await fetch(BACKEND_URL + '/api/ai/analyze-image', {
                 method: 'POST',
@@ -2223,7 +2229,12 @@
             });
             const data = await res.json();
 
-            m = state.currentMessages.find(x => x.id === tipId);
+            if (silent) {
+                _autoAnalyzeLock = false;
+                return data;
+            }
+
+            const m = state.currentMessages.find(x => x.id === tipId);
             if (m) {
                 m.progress = undefined;
                 if (data.success) {
@@ -2239,30 +2250,36 @@
             }
             state._lastAnalyzedSig = state.referenceMedia.images.length + ':' +
                 (state.referenceMedia.images[state.referenceMedia.images.length - 1]?.id || '');
+            _autoAnalyzeLock = false;
+            return data;
         } catch (err) {
+            if (silent) { _autoAnalyzeLock = false; return null; }
             const m = state.currentMessages.find(x => x.id === tipId);
             if (m) { m.progress = undefined; m.text = `⚠️ 识别失败：${friendlyError(err)}`; updateMessageNode(m); }
-        } finally {
             _autoAnalyzeLock = false;
+            return null;
         }
     }
 
     // ================================================================
     // ★ 自动反解参考视频（发消息触发）
     // ================================================================
-    async function autoAnalyzeVideo() {
+    async function autoAnalyzeVideo(silent = false) {
         const keyframes = state.referenceMedia.keyframes || [];
-        if (keyframes.length === 0) return;
+        if (keyframes.length === 0) return null;
 
         const sig = 'video:' + keyframes.length + ':' + keyframes[0].slice(0, 32);
-        if (state._lastAnalyzedVideoSig === sig) return;
+        if (state._lastAnalyzedVideoSig === sig && silent) return null;
 
-        const tipId = appendMessage({
-            role: 'ai',
-            text: `🎬 正在分析视频内容（${keyframes.length} 帧）...`,
-            time: nowTime(),
-            progress: 30
-        });
+        let tipId = null;
+        if (!silent) {
+            tipId = appendMessage({
+                role: 'ai',
+                text: `🎬 正在分析视频内容（${keyframes.length} 帧）...`,
+                time: nowTime(),
+                progress: 30
+            });
+        }
 
         try {
             let kfUrls = state.referenceMedia.keyframeUrls;
@@ -2271,13 +2288,17 @@
                 state.referenceMedia.keyframeUrls = kfUrls;
             }
 
-            let m = state.currentMessages.find(x => x.id === tipId);
-            if (m) { m.progress = 60; m.text = '🧠 AI 正在分析画面...'; updateMessageNode(m); }
+            if (!silent) {
+                let m = state.currentMessages.find(x => x.id === tipId);
+                if (m) { m.progress = 60; m.text = '🧠 AI 正在分析画面...'; updateMessageNode(m); }
+            }
 
             const analysis = await decomposeVideoReference(kfUrls, '');
             state.referenceMedia.videoAnalysis = analysis;
 
-            m = state.currentMessages.find(x => x.id === tipId);
+            if (silent) return analysis;
+
+            const m = state.currentMessages.find(x => x.id === tipId);
             if (m) {
                 m.progress = undefined;
                 m.analysis = analysis;
@@ -2285,9 +2306,12 @@
                 updateMessageNode(m);
             }
             state._lastAnalyzedVideoSig = sig;
+            return analysis;
         } catch (err) {
+            if (silent) return null;
             const m = state.currentMessages.find(x => x.id === tipId);
             if (m) { m.progress = undefined; m.text = `⚠️ 视频分析失败：${friendlyError(err)}`; updateMessageNode(m); }
+            return null;
         }
     }
 
@@ -2543,14 +2567,14 @@
     }
 
     // ================================================================
-    // ★ 素材同步/替换意图识别
+    // ★ 素材同步/替换意图识别（重点改动）
     // ================================================================
     function parseMediaSyncIntent(text) {
         const t = (text || '').trim();
         if (!t) return null;
 
         const actionWords = ['替换', '覆盖', '同步', '更新', '应用到', '改成', '设置', '上传到',
-                             '贴到', '传到', '挂到', '换到', '换掉', '替换掉'];
+                             '贴到', '传到', '挂到', '换到', '换掉', '替换掉', '绑定到'];
         const hasAction = actionWords.some(w => t.includes(w));
         if (!hasAction) return null;
 
@@ -2577,13 +2601,25 @@
         const m = t.match(/(\d+)\s*[张个条]/);
         if (m) count = parseInt(m[1], 10);
 
-        let productHint = t
-            .replace(/将|把|的|替换|覆盖|同步|更新|应用到|改成|设置|上传到|贴到|传到|挂到|换到|换掉|替换掉|这|那|些|请|帮我|帮忙/g, ' ')
+        // ★ 更精细地提取商品名：先剔除所有动作词/槽位词/占位词，再看剩下的是不是商品名
+        const NOISE_WORDS = [
+            '将', '把', '的', '这', '那', '些', '请', '帮我', '帮忙', '用',
+            '分析', '识别', '看看', '查查', '检测', '判断', '看图', '看下',
+            '替换', '覆盖', '同步', '更新', '应用到', '改成', '设置',
+            '上传到', '贴到', '传到', '挂到', '换到', '换掉', '替换掉', '绑定到',
+            '商品图', '商品视频', '详情图', '详情页', '主图', '副图', '轮播图',
+            '视频', '图片', '素材图', '素材视频', '商品', '产品'
+        ];
+        let productHint = t;
+        for (const w of NOISE_WORDS) {
+            productHint = productHint.split(w).join(' ');
+        }
+        productHint = productHint
             .replace(/\d+\s*[张个条]/g, ' ')
-            .replace(/商品图|商品视频|详情图|详情页|主图|副图|轮播图|视频|图片|素材图|素材视频/g, ' ')
-            .replace(/[，,。、\s]+/g, ' ')
+            .replace(/[，,。、！!？?\s]+/g, ' ')
             .trim();
-        const tokens = productHint.split(/\s+/).filter(x => x.length >= 2);
+        // 只保留长度 >=2 的片段，取第一个
+        const tokens = productHint.split(/\s+/).filter(x => x.length >= 2 && !PRODUCT_BLACKLIST.has(x));
         productHint = tokens[0] || '';
 
         return {
@@ -2605,7 +2641,8 @@
 
         const triggers = [
             '这是什么', '这图是什么', '这是什么图', '这张图是什么',
-            '分析一下', '分析这张', '分析这些', '识别一下', '识别这张', '识别这些',
+            '分析一下', '分析这张', '分析这些', '分析图片', '分析下图',
+            '识别一下', '识别这张', '识别这些', '识别图片',
             '看看这图', '看看这张', '看看这些', '看看是什么',
             '这图里', '图里有', '图里的',
             '什么商品', '什么产品', '哪些商品', '哪些产品',
@@ -2653,7 +2690,7 @@
     }
 
     // ================================================================
-    // ★ 处理"素材同步"意图
+    // ★ 处理"素材同步"意图（重点改动：没有商品名时先看图识别再匹配）
     // ================================================================
     async function handleMediaSyncIntent(intent) {
         const { targetType, targetLabel, productHint } = intent;
@@ -2691,20 +2728,77 @@
         if (imageUrls.length > 0) materialSummary.push(`${imageUrls.length} 张图`);
         if (videoUrl) materialSummary.push(`1 个视频`);
 
-        appendMessage({
-            role: 'ai',
-            text: `📦 检测到素材：${materialSummary.join(' + ')}\n🎯 目标槽位：${targetLabel}\n🔍 正在查找商品「${productHint || '（未指定）'}」...`,
-            time: nowTime()
-        });
-
+        // ★ 关键改动：如果没识别到具体商品名，先用 AI 看图识别 → 再用识别结果智能匹配
         if (!productHint) {
             appendMessage({
                 role: 'ai',
-                text: `❌ 未识别到目标商品名。\n\n请重试，例如：**将图片替换到云山茶叶礼盒的主图**`,
+                text: `📦 检测到素材：${materialSummary.join(' + ')}\n🎯 目标槽位：${targetLabel}\n🔍 未指定商品名，正在用 AI 识别图片内容...`,
                 time: nowTime()
             });
+
+            // 调 AI 识别图片内容
+            let recognized = null;
+            try {
+                recognized = await autoAnalyzeImages('sync-need-hint', true); // silent=true 不渲染中间卡片
+            } catch (e) {
+                console.warn('识别图片失败:', e);
+            }
+
+            // 从识别结果里提取商品名（关键词）
+            let recognizedKeyword = '';
+            if (recognized && recognized.success && recognized.text) {
+                recognizedKeyword = extractKeywordFromRecognition(recognized.text);
+            }
+
+            if (!recognizedKeyword) {
+                appendMessage({
+                    role: 'ai',
+                    text: `❌ 未能从图片中识别出明确的商品名。\n\n请直接用文字告诉我商品名，例如：**将图片替换到云山茶叶礼盒的主图**`,
+                    time: nowTime()
+                });
+                return;
+            }
+
+            appendMessage({
+                role: 'ai',
+                text: `🔍 AI 识别到图片内容：**${recognizedKeyword}**\n🔎 正在商品库中匹配...`,
+                time: nowTime()
+            });
+
+            const check = await checkProductExists(recognizedKeyword);
+            if (check.ok) {
+                showSyncConfirmCard(check.product, intent, imageUrls, videoUrl, posterUrl, 'AI 识别匹配');
+                return;
+            }
+
+            const matchResult = await smartMatchProducts(recognizedKeyword);
+            if (matchResult.has_match && matchResult.matched.length > 0) {
+                showSyncMatchCard(recognizedKeyword, matchResult.matched, intent, imageUrls, videoUrl, posterUrl);
+            } else {
+                appendMessage({
+                    role: 'ai',
+                    text: `❌ 商品库中没有找到与「${recognizedKeyword}」匹配的商品。`,
+                    time: nowTime(),
+                    noMatch: { keyword: recognizedKeyword }
+                });
+                state.pendingApplyContext = {
+                    theme: recognizedKeyword,
+                    mediaType: targetType === 'video' ? 'video' : 'image',
+                    urls: imageUrls,
+                    videoUrl,
+                    posterUrl,
+                    targetType
+                };
+            }
             return;
         }
+
+        // 有明确商品名，走原逻辑
+        appendMessage({
+            role: 'ai',
+            text: `📦 检测到素材：${materialSummary.join(' + ')}\n🎯 目标槽位：${targetLabel}\n🔍 正在查找商品「${productHint}」...`,
+            time: nowTime()
+        });
 
         const check = await checkProductExists(productHint);
         if (check.ok) {
@@ -2731,6 +2825,28 @@
                 targetType
             };
         }
+    }
+
+    // ================================================================
+    // ★ 从 AI 识别文本中提取商品关键词
+    // ================================================================
+    function extractKeywordFromRecognition(text) {
+        if (!text) return '';
+        let s = String(text).trim();
+
+        // 去掉常见前缀
+        s = s.replace(/^(这是|这是一[个张款]?|这[个张]?图[片是]?|图片[中是]|图中是|图里是|画面[中是]|这应该是|看起来[是像]?)[：:，,\s]*/g, '');
+
+        // 取第一句
+        const firstSentence = s.split(/[。！!？?\n，,；;]/)[0].trim();
+        if (firstSentence.length >= 2 && firstSentence.length <= 20) {
+            // 再清洗一下括号内容
+            return firstSentence.replace(/[（）()【】\[\]]/g, '').trim();
+        }
+
+        // 兜底：取第一段
+        const firstPart = s.split(/[。！!？?\n]/)[0].trim();
+        return firstPart.slice(0, 20);
     }
 
     // ================================================================
@@ -4596,7 +4712,7 @@
     window.analyzeImageContent = analyzeImageContent;
     window.autoReplaceFromImages = autoReplaceFromImages;
 
-    console.log('🤖 AI 助手已加载（发消息触发看图，不自动识别）');
+    console.log('🤖 AI 助手已加载（发消息触发看图，无商品名时自动识别匹配）');
     console.log('💡 后端:', BACKEND_URL);
     console.log('🆔 Session:', SESSION_ID);
 </script>
