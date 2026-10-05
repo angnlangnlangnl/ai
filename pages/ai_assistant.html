@@ -631,7 +631,7 @@
             background: white; border: 1px solid #e8edf4;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(10,30,47,0.12);
-            padding: 6px; display: none; z-index: 100; min-width: 240px;
+            padding: 6px; display: none; z-index: 100; min-width: 260px;
         }
         .attach-menu.show { display: block; animation: fadeUpSmall 0.2s ease; }
         @keyframes fadeUpSmall {
@@ -653,6 +653,11 @@
         .attach-menu .menu-item .meta {
             margin-left: auto; font-size: 11px; color: #94a3b8;
         }
+        .attach-menu .menu-item.magic {
+            color: #0d7c4f; font-weight: 500;
+        }
+        .attach-menu .menu-item.magic i { color: #0d7c4f; }
+        .attach-menu .menu-item.magic:hover { background: #f0fff8; }
         .attach-menu .menu-divider {
             height: 1px; background: #e8edf4; margin: 4px 8px;
         }
@@ -1014,7 +1019,7 @@
             <div class="empty-state" id="emptyState">
                 <i class="fas fa-robot"></i>
                 <h3>👋 你好，我是 AI 经营助手</h3>
-                <p>支持 33 种商品操作 + 图片/视频/海报生成 + 视频反解 + <strong>智能商品匹配</strong> + <strong>AI 电商策略分析</strong> + <strong>多轮对话上下文</strong>。<br>说「生成3张茶叶主图」，我会自动识别商品；说「再来一张」我会继续上一次。</p>
+                <p>支持 33 种商品操作 + 图片/视频/海报生成 + 视频反解 + <strong>智能商品匹配</strong> + <strong>AI 电商策略分析</strong> + <strong>多轮对话上下文</strong> + <strong>上传图片自动识别</strong>。<br>上传图片我会自动看图；说"替换到茶叶商品图"我会直接绑定商品。</p>
                 <div class="examples">
                     <span class="ex accent" onclick="sendExample('生成3张茶叶主图')">🖼️ 智能匹配生成</span>
                     <span class="ex accent" onclick="sendExample('生成一张母亲节海报')">🎨 AI策略海报</span>
@@ -1041,7 +1046,7 @@
                 <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu(event)" title="添加参考素材">+</button>
                 <div class="input-wrap">
                     <textarea id="chatInput" rows="1"
-                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 给云山茶叶礼盒生成视频 / 再来一张"
+                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 将5张图替换到茶叶商品图 / 再来一张"
                         onkeydown="handleKeyDown(event)"
                         oninput="autoResize(this)"></textarea>
                     <span class="char-count" id="charCount">0/500</span>
@@ -1051,7 +1056,7 @@
                 </button>
             </div>
             <div class="input-hint">
-                回车发送 · Shift+回车换行 · 可拖拽/粘贴图片 · 上传视频自动抽帧反解 · 点消息"引用"可追问
+                回车发送 · Shift+回车换行 · 上传图片后自动识别 · 上传视频自动抽帧反解 · 点消息"引用"可追问
             </div>
 
             <div class="attach-menu" id="attachMenu">
@@ -1064,6 +1069,15 @@
                     <i class="fas fa-video"></i>
                     <span>上传参考视频</span>
                     <span class="meta" id="refVidCount">0/1</span>
+                </button>
+                <div class="menu-divider"></div>
+                <button class="menu-item" onclick="analyzeImageContent()">
+                    <i class="fas fa-search"></i>
+                    <span>🔍 AI 识别图片内容</span>
+                </button>
+                <button class="menu-item magic" onclick="autoReplaceFromImages()">
+                    <i class="fas fa-magic"></i>
+                    <span>⚡ 一键识别并替换到商品</span>
                 </button>
                 <div class="menu-divider"></div>
                 <button class="menu-item" onclick="clearReferenceMedia(true)">
@@ -1152,6 +1166,7 @@
 <div class="global-toast" id="toast"></div>
 
 <script src="../js/common.js"></script>
+<!-- ⬇⬇⬇ 第 3 段（JavaScript）从这里开始 ⬇⬇⬇ -->
 <script>
     // ================================================================
     // 配置
@@ -1355,7 +1370,9 @@
         quotedMessage: null,
         referenceMedia: {
             images: [], videos: [], keyframes: [], keyframeUrls: [], videoAnalysis: null
-        }
+        },
+        _lastAnalyzedSig: null,
+        _lastAnalyzedVideoSig: null
     };
 
     let historyData = [];
@@ -1669,8 +1686,9 @@
 
         if (msg.smartMatch) {
             const sm = msg.smartMatch;
+            const isSyncMode = sm.isSyncMode ? '【素材替换模式】' : '';
             bubbleContent += `<div class="smart-match-card">
-                <div class="sm-title"><i class="fas fa-magic"></i> 找到 ${sm.matched.length} 个匹配「${escapeHtml(sm.keyword)}」的商品</div>`;
+                <div class="sm-title"><i class="fas fa-magic"></i> ${isSyncMode}找到 ${sm.matched.length} 个匹配「${escapeHtml(sm.keyword)}」的商品</div>`;
             sm.matched.forEach((m, idx) => {
                 const isTop = idx === 0;
                 const scoreCls = m.score >= 80 ? '' : (m.score >= 60 ? 'mid' : 'low');
@@ -2034,6 +2052,8 @@
         if (added > 0) showToast(`📤 已添加 ${added} 张参考图`);
         if (skipped > 0 && added === 0) showToast(`⚠️ 有 ${skipped} 个文件被跳过`);
         renderReferenceChips();
+        // ★ 自动识别（新增）
+        if (added > 0) scheduleAutoAnalyzeImages('upload');
     }
 
     async function handleReferenceVideoUpload(files) {
@@ -2062,6 +2082,10 @@
             }
         }
         renderReferenceChips();
+        // ★ 自动分析视频（新增）
+        if (state.referenceMedia.keyframes.length > 0) {
+            autoAnalyzeVideo();
+        }
     }
 
     function renderReferenceChips() {
@@ -2120,6 +2144,8 @@
             state.referenceMedia.keyframes = [];
             state.referenceMedia.keyframeUrls = [];
             state.referenceMedia.videoAnalysis = null;
+            state._lastAnalyzedSig = null;
+            state._lastAnalyzedVideoSig = null;
             renderReferenceChips();
             clearReferenceSession();
             document.getElementById('attachMenu').classList.remove('show');
@@ -2165,6 +2191,258 @@
 
         renderReferenceChips();
     });
+
+    // ================================================================
+    // ★ 自动识别图片内容（上传后自动触发）
+    // ================================================================
+    let _autoAnalyzeTimer = null;
+    let _autoAnalyzeLock = false;
+
+    function scheduleAutoAnalyzeImages(reason = '') {
+        if (_autoAnalyzeTimer) clearTimeout(_autoAnalyzeTimer);
+        _autoAnalyzeTimer = setTimeout(async () => {
+            await autoAnalyzeImages(reason);
+        }, 800);
+    }
+
+    async function autoAnalyzeImages(reason = '') {
+        if (_autoAnalyzeLock) return;
+        if (state.referenceMedia.images.length === 0) return;
+
+        const sig = state.referenceMedia.images.length + ':' +
+                    (state.referenceMedia.images[state.referenceMedia.images.length - 1]?.id || '');
+        if (state._lastAnalyzedSig === sig) return;
+
+        _autoAnalyzeLock = true;
+
+        const tipId = appendMessage({
+            role: 'ai',
+            text: `🔍 检测到 ${state.referenceMedia.images.length} 张图片，正在识别内容...`,
+            time: nowTime(),
+            progress: 30
+        });
+
+        try {
+            const urls = await uploadRefImagesToTemp();
+            if (urls.length === 0) throw new Error('图片上传失败');
+
+            let m = state.currentMessages.find(x => x.id === tipId);
+            if (m) { m.progress = 60; m.text = '🧠 AI 正在看图...'; updateMessageNode(m); }
+
+            const res = await fetch(BACKEND_URL + '/api/ai/analyze-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image_urls: urls,
+                    question: '请描述这些图片：是什么商品？颜色/材质/风格？适合作为商品图的哪个位置（主图/副图/详情图）？',
+                    session_id: SESSION_ID
+                })
+            });
+            const data = await res.json();
+
+            m = state.currentMessages.find(x => x.id === tipId);
+            if (m) {
+                m.progress = undefined;
+                if (data.success) {
+                    m.text = `🔍 **AI 识别结果**（${data.model}）：\n\n${data.text}\n\n💡 你可以直接说："替换到XXX商品的主图"或"帮我匹配商品并替换"`;
+                    m.media = {
+                        type: 'references',
+                        images: state.referenceMedia.images.map(x => x.dataUrl)
+                    };
+                } else {
+                    m.text = `⚠️ 识别失败：${data.message || '未知错误'}\n（你可以继续输入指令，AI 会在下一次对话时重新识别）`;
+                }
+                updateMessageNode(m);
+            }
+            state._lastAnalyzedSig = sig;
+        } catch (err) {
+            const m = state.currentMessages.find(x => x.id === tipId);
+            if (m) { m.progress = undefined; m.text = `⚠️ 识别失败：${friendlyError(err)}`; updateMessageNode(m); }
+        } finally {
+            _autoAnalyzeLock = false;
+        }
+    }
+
+    // ================================================================
+    // ★ 自动反解参考视频（抽帧后自动触发）
+    // ================================================================
+    async function autoAnalyzeVideo() {
+        const keyframes = state.referenceMedia.keyframes || [];
+        if (keyframes.length === 0) return;
+
+        const sig = 'video:' + keyframes.length + ':' + keyframes[0].slice(0, 32);
+        if (state._lastAnalyzedVideoSig === sig) return;
+
+        const tipId = appendMessage({
+            role: 'ai',
+            text: `🎬 已抽取 ${keyframes.length} 帧关键帧，正在分析视频内容...`,
+            time: nowTime(),
+            progress: 30
+        });
+
+        try {
+            let kfUrls = state.referenceMedia.keyframeUrls;
+            if (!kfUrls || kfUrls.length === 0) {
+                kfUrls = await uploadKeyframesToTemp(keyframes);
+                state.referenceMedia.keyframeUrls = kfUrls;
+            }
+
+            let m = state.currentMessages.find(x => x.id === tipId);
+            if (m) { m.progress = 60; m.text = '🧠 AI 正在分析画面...'; updateMessageNode(m); }
+
+            const analysis = await decomposeVideoReference(kfUrls, '');
+            state.referenceMedia.videoAnalysis = analysis;
+
+            m = state.currentMessages.find(x => x.id === tipId);
+            if (m) {
+                m.progress = undefined;
+                m.analysis = analysis;
+                m.text = `🎬 **视频分析完成**：\n\n可基于此风格生成同款视频，或替换到商品。`;
+                updateMessageNode(m);
+            }
+            state._lastAnalyzedVideoSig = sig;
+        } catch (err) {
+            const m = state.currentMessages.find(x => x.id === tipId);
+            if (m) { m.progress = undefined; m.text = `⚠️ 视频分析失败：${friendlyError(err)}`; updateMessageNode(m); }
+        }
+    }
+
+    // ================================================================
+    // ★ 上传参考图到临时图床
+    // ================================================================
+    async function uploadRefImagesToTemp() {
+        if (state.referenceMedia.images.length === 0) return [];
+        const formData = new FormData();
+        state.referenceMedia.images.forEach((img, i) => {
+            try {
+                const blob = dataUrlToBlob(img.dataUrl);
+                const file = new File([blob], `ref_${i + 1}.jpg`, { type: 'image/jpeg' });
+                formData.append('files', file);
+            } catch (e) {
+                console.warn('第 ' + (i + 1) + ' 张转 blob 失败:', e);
+            }
+        });
+        formData.append('purpose', 'analyze');
+        const res = await fetch(BACKEND_URL + '/api/upload/temp/batch', {
+            method: 'POST', body: formData
+        });
+        const data = await res.json();
+        return (data.results || []).filter(r => r.success).map(r => sanitizeImageUrl(r.url));
+    }
+
+    // ================================================================
+    // ★ 手动触发：AI 识别图片内容
+    // ================================================================
+    async function analyzeImageContent() {
+        document.getElementById('attachMenu').classList.remove('show');
+        if (state.referenceMedia.images.length === 0) {
+            showToast('⚠️ 请先上传参考图');
+            return;
+        }
+        if (state.isProcessing) { showToast('⏳ 正在处理中'); return; }
+        state.isProcessing = true;
+        updateSendBtn();
+        state._lastAnalyzedSig = null;
+        await autoAnalyzeImages('manual');
+        state.isProcessing = false;
+        updateSendBtn();
+    }
+
+    // ================================================================
+    // ★ 一键识别 + 自动匹配商品 + 替换（全链路）
+    // ================================================================
+    async function autoReplaceFromImages() {
+        document.getElementById('attachMenu').classList.remove('show');
+        if (state.referenceMedia.images.length === 0) {
+            showToast('⚠️ 请先上传参考图');
+            return;
+        }
+        if (state.isProcessing) { showToast('⏳ 正在处理中'); return; }
+
+        let hint = '';
+        const lastUser = [...state.currentMessages].reverse().find(x => x.role === 'user');
+        if (lastUser && lastUser.text) {
+            const syncIntent = parseMediaSyncIntent(lastUser.text);
+            if (syncIntent && syncIntent.productHint) hint = syncIntent.productHint;
+        }
+
+        state.isProcessing = true;
+        updateSendBtn();
+
+        const tipId = appendMessage({
+            role: 'ai',
+            text: `⚡ 正在自动识别图片并匹配商品...`,
+            time: nowTime(),
+            progress: 10
+        });
+
+        try {
+            const urls = await uploadRefImagesToTemp();
+            if (urls.length === 0) throw new Error('图片上传失败');
+
+            let m = state.currentMessages.find(x => x.id === tipId);
+            if (m) { m.progress = 40; m.text = `🧠 AI 正在识别图片内容...`; updateMessageNode(m); }
+
+            const res = await fetch(BACKEND_URL + '/api/ai/auto-replace-from-images', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_urls: urls, hint })
+            });
+            const data = await res.json();
+
+            m = state.currentMessages.find(x => x.id === tipId);
+
+            if (!data.success) {
+                if (m) {
+                    m.progress = undefined;
+                    m.text = `❌ 自动识别失败：${data.message}\n\n${data.recognized ? `（AI 识别结果：${JSON.stringify(data.recognized)}）` : ''}`;
+                    m.retryable = true;
+                    updateMessageNode(m);
+                }
+                showToast('❌ ' + (data.message || '失败'));
+                state.isProcessing = false;
+                updateSendBtn();
+                return;
+            }
+
+            const { recognized, matched_product, slot, sync_payload } = data;
+            const slotLabel = { main_image: '主图', sub_images: '副图', detail_html: '详情图' }[slot] || '主图';
+
+            if (m) {
+                m.progress = undefined;
+                m.text = `✨ 识别完成！\n\n📸 图片内容：${recognized.description || '—'}\n📦 匹配商品：**${matched_product.name}**\n📍 建议位置：**${slotLabel}**\n🎯 匹配度：${Math.round((recognized.confidence || 0) * 100)}%`;
+                m.media = {
+                    type: 'references',
+                    images: state.referenceMedia.images.map(x => x.dataUrl)
+                };
+                const actionId = 'auto_' + Date.now();
+                m.card = {
+                    title: '⚡ 一键替换确认',
+                    desc: `将 ${urls.length} 张图替换到「${matched_product.name}」的${slotLabel}，是否执行？`,
+                    actionId,
+                    rawAction: {
+                        type: 'auto_replace_execute',
+                        args: { sync_payload, product_name: matched_product.name, slot }
+                    },
+                    actions: [
+                        { label: '✅ 立即替换', type: 'confirm', onclick: `confirmAction('${actionId}')` },
+                        { label: '✖ 取消', type: 'cancel', onclick: `cancelAction('${actionId}')` }
+                    ]
+                };
+                state.pendingActions[actionId] = m.card.rawAction;
+                updateMessageNode(m);
+            }
+
+            showToast('✨ 已识别，请确认替换');
+        } catch (err) {
+            const m = state.currentMessages.find(x => x.id === tipId);
+            if (m) { m.progress = undefined; m.text = `❌ 失败：${friendlyError(err)}`; m.retryable = true; updateMessageNode(m); }
+            showToast('❌ ' + friendlyError(err));
+        } finally {
+            state.isProcessing = false;
+            updateSendBtn();
+        }
+    }
 
     // ================================================================
     // 临时图床
@@ -2279,6 +2557,279 @@
             candidates.add(cleaned);
         }
         return Array.from(candidates);
+    }
+
+    // ================================================================
+    // ★ 素材同步/替换意图识别
+    // ================================================================
+    function parseMediaSyncIntent(text) {
+        const t = (text || '').trim();
+        if (!t) return null;
+
+        const actionWords = ['替换', '覆盖', '同步', '更新', '应用到', '改成', '设置', '上传到',
+                             '贴到', '传到', '挂到', '换到', '换掉', '替换掉'];
+        const hasAction = actionWords.some(w => t.includes(w));
+        if (!hasAction) return null;
+
+        const slotWords = ['商品图', '商品视频', '详情图', '详情页', '主图', '副图', '轮播图',
+                           '视频', '图片', '素材图', '素材视频'];
+        const hasSlot = slotWords.some(w => t.includes(w));
+        if (!hasSlot) return null;
+
+        let targetType = 'main_image';
+        let targetLabel = '商品主图';
+        if (t.includes('详情图') || t.includes('详情页')) {
+            targetType = 'detail_html'; targetLabel = '图文详情';
+        } else if (t.includes('视频') || t.includes('商品视频')) {
+            targetType = 'video'; targetLabel = '商品视频';
+        } else if (t.includes('副图') || t.includes('轮播图')) {
+            targetType = 'sub_images'; targetLabel = '商品副图';
+        } else if (t.includes('主图')) {
+            targetType = 'main_image'; targetLabel = '商品主图';
+        } else if (t.includes('商品图') || t.includes('图片')) {
+            targetType = 'main_and_sub'; targetLabel = '主图 + 副图';
+        }
+
+        let count = null;
+        const m = t.match(/(\d+)\s*[张个条]/);
+        if (m) count = parseInt(m[1], 10);
+
+        let productHint = t
+            .replace(/将|把|的|替换|覆盖|同步|更新|应用到|改成|设置|上传到|贴到|传到|挂到|换到|换掉|替换掉|这|那|些|请|帮我|帮忙/g, ' ')
+            .replace(/\d+\s*[张个条]/g, ' ')
+            .replace(/商品图|商品视频|详情图|详情页|主图|副图|轮播图|视频|图片|素材图|素材视频/g, ' ')
+            .replace(/[，,。、\s]+/g, ' ')
+            .trim();
+        const tokens = productHint.split(/\s+/).filter(x => x.length >= 2);
+        productHint = tokens[0] || '';
+
+        return {
+            action: 'media_sync',
+            targetType,
+            targetLabel,
+            count,
+            productHint,
+            originalText: text
+        };
+    }
+
+    // ================================================================
+    // ★ 处理"素材同步"意图
+    // ================================================================
+    async function handleMediaSyncIntent(intent) {
+        const { targetType, targetLabel, productHint } = intent;
+
+        let imageUrls = state.referenceMedia.images.map(x => x.dataUrl).filter(Boolean);
+        let videoUrl = state.referenceMedia.videos.length > 0
+            ? state.referenceMedia.videos[0].previewUrl : '';
+        let posterUrl = '';
+
+        if (imageUrls.length === 0 && !videoUrl && state.lastGeneratedMedia) {
+            const lg = state.lastGeneratedMedia;
+            if (lg.type === 'images' && lg.urls) imageUrls = lg.urls.filter(Boolean);
+            if (lg.type === 'video' && lg.videoUrl) videoUrl = lg.videoUrl;
+            if (lg.type === 'poster' && lg.posterUrl) posterUrl = lg.posterUrl;
+        }
+
+        if (targetType === 'video' && !videoUrl) {
+            appendMessage({
+                role: 'ai',
+                text: `❌ 未找到可同步的**视频**素材。\n\n请先上传参考视频，或先生成一段视频。`,
+                time: nowTime()
+            });
+            return;
+        }
+        if (targetType !== 'video' && imageUrls.length === 0) {
+            appendMessage({
+                role: 'ai',
+                text: `❌ 未找到可同步的**图片**素材。\n\n请先上传参考图，或先生成主图。`,
+                time: nowTime()
+            });
+            return;
+        }
+
+        const materialSummary = [];
+        if (imageUrls.length > 0) materialSummary.push(`${imageUrls.length} 张图`);
+        if (videoUrl) materialSummary.push(`1 个视频`);
+
+        appendMessage({
+            role: 'ai',
+            text: `📦 检测到素材：${materialSummary.join(' + ')}\n🎯 目标槽位：${targetLabel}\n🔍 正在查找商品「${productHint || '（未指定）'}」...`,
+            time: nowTime()
+        });
+
+        if (!productHint) {
+            appendMessage({
+                role: 'ai',
+                text: `❌ 未识别到目标商品名。\n\n请重试，例如：**将图片替换到云山茶叶礼盒的主图**`,
+                time: nowTime()
+            });
+            return;
+        }
+
+        const check = await checkProductExists(productHint);
+        if (check.ok) {
+            showSyncConfirmCard(check.product, intent, imageUrls, videoUrl, posterUrl, '精确匹配');
+            return;
+        }
+
+        const matchResult = await smartMatchProducts(productHint);
+        if (matchResult.has_match && matchResult.matched.length > 0) {
+            showSyncMatchCard(productHint, matchResult.matched, intent, imageUrls, videoUrl, posterUrl);
+        } else {
+            appendMessage({
+                role: 'ai',
+                text: `❌ 商品库中没有找到「${productHint}」。`,
+                time: nowTime(),
+                noMatch: { keyword: productHint }
+            });
+            state.pendingApplyContext = {
+                theme: productHint,
+                mediaType: targetType === 'video' ? 'video' : 'image',
+                urls: imageUrls,
+                videoUrl,
+                posterUrl,
+                targetType
+            };
+        }
+    }
+
+    // ================================================================
+    // ★ 同步确认卡片
+    // ================================================================
+    function showSyncConfirmCard(product, intent, imageUrls, videoUrl, posterUrl, matchDesc) {
+        const { targetType, targetLabel } = intent;
+        const actionId = 'sync_card_' + Date.now();
+        const countText = imageUrls.length > 0 ? `${imageUrls.length} 张图`
+                         : videoUrl ? '1 个视频' : '';
+
+        const card = {
+            title: `📌 替换确认（${matchDesc}）`,
+            desc: `商品：**${product.name}**\n素材：${countText}\n位置：**${targetLabel}**\n\n⚠️ 覆盖后原素材将被删除`,
+            actionId,
+            rawAction: {
+                type: 'media_sync_execute',
+                args: {
+                    product_name: product.name,
+                    targetType,
+                    imageUrls,
+                    videoUrl,
+                    posterUrl
+                }
+            },
+            actions: [
+                { label: '✅ 确认替换', type: 'confirm', onclick: `confirmAction('${actionId}')` },
+                { label: '✖ 取消', type: 'cancel', onclick: `cancelAction('${actionId}')` }
+            ]
+        };
+
+        state.pendingActions[actionId] = card.rawAction;
+
+        appendMessage({
+            role: 'ai',
+            text: `已匹配到商品，请确认替换操作：`,
+            time: nowTime(),
+            card: card
+        });
+    }
+
+    // ================================================================
+    // ★ 候选商品选择卡片
+    // ================================================================
+    function showSyncMatchCard(keyword, matched, intent, imageUrls, videoUrl, posterUrl) {
+        state.pendingApplyContext = {
+            theme: keyword,
+            mediaType: intent.targetType === 'video' ? 'video' : 'image',
+            urls: imageUrls,
+            videoUrl,
+            posterUrl,
+            targetType: intent.targetType,
+            isSyncMode: true
+        };
+
+        appendMessage({
+            role: 'ai',
+            text: `为你找到 ${matched.length} 个匹配「${keyword}」的商品，请选择要同步的目标：`,
+            time: nowTime(),
+            smartMatch: {
+                keyword,
+                matched,
+                isSyncMode: true
+            }
+        });
+    }
+
+    // ================================================================
+    // ★ 执行素材同步
+    // ================================================================
+    async function executeMediaSync(productName, targetType, imageUrls, videoUrl, posterUrl) {
+        const payload = { product_names: [productName], mode: 'replace' };
+        let syncDesc = '';
+
+        if (targetType === 'main_image') {
+            payload.main_image = imageUrls[0];
+            if (imageUrls.length > 1) payload.sub_images = imageUrls.slice(1, 6);
+            syncDesc = `主图（1 张）${imageUrls.length > 1 ? ` + 副图（${Math.min(imageUrls.length - 1, 5)} 张）` : ''}`;
+        } else if (targetType === 'sub_images') {
+            payload.sub_images = imageUrls.slice(0, 5);
+            syncDesc = `副图（${Math.min(imageUrls.length, 5)} 张）`;
+        } else if (targetType === 'main_and_sub') {
+            payload.main_image = imageUrls[0];
+            payload.sub_images = imageUrls.slice(1, 6);
+            syncDesc = `主图 + 副图`;
+        } else if (targetType === 'video') {
+            payload.video = videoUrl;
+            syncDesc = `视频`;
+        } else if (targetType === 'detail_html') {
+            const parts = imageUrls.slice(0, 10).map(url =>
+                `<img src="${url}" style="width:100%;display:block;margin:0;padding:0;" />`
+            );
+            payload.detail_html = `<div style="max-width:100%;overflow:hidden;">${parts.join('')}</div>`;
+            syncDesc = `图文详情（${imageUrls.length} 张图）`;
+        } else if (posterUrl) {
+            payload.main_image = posterUrl;
+            syncDesc = `主图（海报）`;
+        }
+
+        const tipId = appendMessage({
+            role: 'ai',
+            text: `⏳ 正在把 ${syncDesc} 同步到「${productName}」...`,
+            time: nowTime(),
+            progress: 50
+        });
+
+        try {
+            const res = await fetch(BACKEND_URL + '/api/materials/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            const m = state.currentMessages.find(x => x.id === tipId);
+            if (m) {
+                m.progress = undefined;
+                if (data.success || data.all_ok) {
+                    m.text = `✅ 已成功替换到「${productName}」\n📌 ${syncDesc}`;
+                } else {
+                    m.text = `❌ 替换失败：${data.message || '未知错误'}`;
+                }
+                updateMessageNode(m);
+            }
+            state.productsCache = null;
+            state.referenceMedia.images = [];
+            state.referenceMedia.videos.forEach(v => { try { URL.revokeObjectURL(v.previewUrl); } catch (e) {} });
+            state.referenceMedia.videos = [];
+            state.referenceMedia.keyframes = [];
+            state.referenceMedia.keyframeUrls = [];
+            state.referenceMedia.videoAnalysis = null;
+            state._lastAnalyzedSig = null;
+            state._lastAnalyzedVideoSig = null;
+            renderReferenceChips();
+            clearReferenceSession();
+        } catch (err) {
+            const m = state.currentMessages.find(x => x.id === tipId);
+            if (m) { m.progress = undefined; m.text = `❌ 替换失败：${friendlyError(err)}`; updateMessageNode(m); }
+        }
     }
 
     // ================================================================
@@ -2463,7 +3014,6 @@
     function parseGenerationIntent(text) {
         const t = text.trim();
 
-        // ★★★ 延续型短语：无名词但有指代
         const CONTINUE_PATTERNS = [
             /^再来\s*[一二三四五六七八九十\d]*\s*[张个条]/,
             /^再\s*[一二三四五六七八九十\d]*\s*[张个条]/,
@@ -3207,7 +3757,22 @@
 
     window.applyToProductFromSmart = async function(productName) {
         const context = state.pendingApplyContext;
-        if (!context) { showToast('⚠️ 素材上下文已丢失，请重新生成'); return; }
+        if (!context) { showToast('⚠️ 素材上下文已丢失，请重新操作'); return; }
+
+        const isSyncMode = context.targetType && (context.urls?.length > 0 || context.videoUrl || context.posterUrl);
+
+        if (isSyncMode) {
+            await executeMediaSync(
+                productName,
+                context.targetType,
+                context.urls || [],
+                context.videoUrl || '',
+                context.posterUrl || ''
+            );
+            state.pendingApplyContext = null;
+            return;
+        }
+
         showToast(`⏳ 正在应用到「${productName}」...`);
         try {
             const payload = { product_names: [productName], mode: 'replace' };
@@ -3252,7 +3817,7 @@
     // ================================================================
     function openCreateProductModal() {
         const context = state.pendingApplyContext;
-        if (!context) { showToast('⚠️ 素材上下文已丢失，请重新生成'); return; }
+        if (!context) { showToast('⚠️ 素材上下文已丢失，请重新操作'); return; }
         const keyword = (context.theme || '').trim() || '新商品';
         document.getElementById('newProductName').value = keyword;
         document.getElementById('newProductPrice').value = '';
@@ -3392,13 +3957,26 @@
         state.isProcessing = true;
         document.getElementById('sendBtn').disabled = true;
 
+        // ★★★ 优先判断"素材同步/替换"意图
+        const syncIntent = parseMediaSyncIntent(text);
+        if (syncIntent) {
+            document.getElementById('typingIndicator').classList.remove('show');
+            try {
+                await handleMediaSyncIntent(syncIntent);
+            } catch (err) {
+                appendMessage({ role: 'ai', text: friendlyError(err), time: nowTime(), retryable: true });
+            }
+            state.isProcessing = false;
+            updateSendBtn();
+            return;
+        }
+
         const genIntent = parseGenerationIntent(text);
         const isGenerationIntent = genIntent || (hasRef && /生成|做|制作|出|来|弄|设计|同款/.test(text));
 
         if (isGenerationIntent) {
             document.getElementById('typingIndicator').classList.remove('show');
             try {
-                // ★★★ 延续型：直接用上次参数重新生成
                 if (genIntent && genIntent.isContinue) {
                     const last = genIntent.lastGenerated;
                     const kindName = genIntent.kind === 'video' ? '视频'
@@ -3455,7 +4033,6 @@
                     return;
                 }
 
-                // 非延续分支
                 const intentType = detectIntentType(text);
                 if (intentType.type === 'bound') {
                     await handleGenerationIntent(genIntent, text, refSnapshot);
@@ -3540,6 +4117,49 @@
         delete state.pendingActions[actionId];
         markCardExecuted(actionId);
 
+        if (action.type === 'media_sync_execute') {
+            const { product_name, targetType, imageUrls, videoUrl, posterUrl } = action.args;
+            await executeMediaSync(product_name, targetType, imageUrls, videoUrl, posterUrl);
+            return;
+        }
+        if (action.type === 'auto_replace_execute') {
+            const { sync_payload, product_name, slot } = action.args;
+            showToast('⏳ 正在替换...');
+            const tipId = appendMessage({
+                role: 'ai',
+                text: `⏳ 正在把素材同步到「${product_name}」...`,
+                time: nowTime(),
+                progress: 50
+            });
+            try {
+                const res = await fetch(BACKEND_URL + '/api/materials/sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sync_payload)
+                });
+                const data = await res.json();
+                const m = state.currentMessages.find(x => x.id === tipId);
+                if (m) {
+                    m.progress = undefined;
+                    if (data.success || data.all_ok) {
+                        const slotLabel = { main_image: '主图', sub_images: '副图', detail_html: '详情图' }[slot] || '素材';
+                        m.text = `✅ 已成功替换到「${product_name}」的${slotLabel}！`;
+                    } else {
+                        m.text = `❌ 替换失败：${data.message || '未知错误'}`;
+                    }
+                    updateMessageNode(m);
+                }
+                state.productsCache = null;
+                state.referenceMedia.images = [];
+                renderReferenceChips();
+                showToast('✅ 替换成功');
+            } catch (err) {
+                const m = state.currentMessages.find(x => x.id === tipId);
+                if (m) { m.progress = undefined; m.text = `❌ 替换失败：${friendlyError(err)}`; updateMessageNode(m); }
+                showToast('❌ ' + friendlyError(err));
+            }
+            return;
+        }
         if (action.type === 'apply_media_smart') {
             await startSmartApply(action.args);
             return;
@@ -3920,10 +4540,12 @@
     window.submitCreateProduct = submitCreateProduct;
     window.quoteMessage = quoteMessage;
     window.cancelQuote = cancelQuote;
+    window.analyzeImageContent = analyzeImageContent;
+    window.autoReplaceFromImages = autoReplaceFromImages;
 
-    console.log('🤖 AI 助手已加载（Agnes 后端代理 + 5级智能匹配 + 创建商品 + 多轮上下文 + 引用消息 + 延续生成）');
+    console.log('🤖 AI 助手已加载（含自动识别图片 + 一键识别替换 + 素材同步卡片）');
     console.log('💡 后端:', BACKEND_URL);
     console.log('🆔 Session:', SESSION_ID);
 </script>
 </body>
-</html>
+</html>    
