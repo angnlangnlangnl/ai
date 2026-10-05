@@ -565,6 +565,11 @@
             font-size: 9px; padding: 1px 5px; border-radius: 6px;
             background: #0d7c4f; color: white; font-weight: 600;
         }
+        .ref-chip .chip-remote-badge {
+            position: absolute; top: -6px; right: 16px;
+            font-size: 9px; padding: 1px 5px; border-radius: 6px;
+            background: #2a7faa; color: white; font-weight: 600;
+        }
         .ref-hint {
             font-size: 11px; color: #94a3b8;
             padding-left: 4px; align-self: center;
@@ -1019,7 +1024,7 @@
             <div class="empty-state" id="emptyState">
                 <i class="fas fa-robot"></i>
                 <h3>👋 你好，我是 AI 经营助手</h3>
-                <p>支持 33 种商品操作 + 图片/视频/海报生成 + 视频反解 + <strong>智能商品匹配</strong> + <strong>AI 电商策略分析</strong> + <strong>多轮对话上下文</strong> + <strong>上传图片后发消息触发看图</strong>。<br>上传图片后直接说"这是什么"我会帮你看图；说"替换到茶叶商品图"我会直接绑定商品。</p>
+                <p>支持 33 种商品操作 + 图片/视频/海报生成 + 视频反解 + <strong>智能商品匹配</strong> + <strong>AI 电商策略分析</strong> + <strong>多轮对话上下文</strong> + <strong>上传图片/视频后发消息触发识别</strong>。<br>上传图片后说"这是什么"我会帮你看图；上传视频后说"替换到商品视频"我会自动反解匹配。</p>
                 <div class="examples">
                     <span class="ex accent" onclick="sendExample('生成3张茶叶主图')">🖼️ 智能匹配生成</span>
                     <span class="ex accent" onclick="sendExample('生成一张母亲节海报')">🎨 AI策略海报</span>
@@ -1046,7 +1051,7 @@
                 <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu(event)" title="添加参考素材">+</button>
                 <div class="input-wrap">
                     <textarea id="chatInput" rows="1"
-                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 将图片替换到茶叶商品主图 / 分析图片并替换 / 再来一张 / 这是什么"
+                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 将图片替换到茶叶商品主图 / 分析图片并替换 / 替换到商品视频 / 再来一张 / 这是什么"
                         onkeydown="handleKeyDown(event)"
                         oninput="autoResize(this)"></textarea>
                     <span class="char-count" id="charCount">0/500</span>
@@ -1056,7 +1061,7 @@
                 </button>
             </div>
             <div class="input-hint">
-                回车发送 · Shift+回车换行 · 上传图后发"这是什么"触发看图 · 上传视频自动抽帧 · 点消息"引用"可追问
+                回车发送 · Shift+回车换行 · 上传图后发"这是什么"触发看图 · 上传视频后发"替换到商品视频"自动反解匹配 · 点消息"引用"可追问
             </div>
 
             <div class="attach-menu" id="attachMenu">
@@ -2054,6 +2059,7 @@
         if (added > 0) showToast(`📤 已添加 ${added} 张参考图`);
         if (skipped > 0 && added === 0) showToast(`⚠️ 有 ${skipped} 个文件被跳过`);
         renderReferenceChips();
+        // ★ 不自动识别，等用户发消息触发
     }
 
     async function handleReferenceVideoUpload(files) {
@@ -2064,10 +2070,12 @@
             if (!file.type.startsWith('video/')) { showToast(`⚠️ ${file.name} 不是视频`); continue; }
             if (file.size > REF_VIDEO_MAX_SIZE) { showToast(`⚠️ ${file.name} 超过 20MB`); continue; }
             const previewUrl = URL.createObjectURL(file);
-            state.referenceMedia.videos.push({
+            const videoEntry = {
                 id: 'ref_vid_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                file, name: file.name, previewUrl
-            });
+                file, name: file.name, previewUrl,
+                remoteUrl: ''   // ★ 新增：上传到服务器后的公网 URL
+            };
+            state.referenceMedia.videos.push(videoEntry);
             showToast('🎬 正在从视频抽帧...');
             try {
                 const keyframes = await extractVideoKeyframes(file, KEYFRAME_COUNT);
@@ -2080,8 +2088,30 @@
                 state.referenceMedia.keyframes = [];
                 showToast(`⚠️ 抽帧失败：${err.message}`);
             }
+
+            // ★ 同步把视频上传到临时图床，拿公网 URL（用于后续替换商品视频）
+            try {
+                showToast('📤 正在上传视频到服务器...');
+                const formData = new FormData();
+                formData.append('files', file);
+                formData.append('purpose', 'video_reference');
+                const res = await fetch(BACKEND_URL + '/api/upload/temp/batch', {
+                    method: 'POST', body: formData
+                });
+                const data = await res.json();
+                if (data.success && data.results && data.results[0] && data.results[0].success) {
+                    videoEntry.remoteUrl = sanitizeImageUrl(data.results[0].url);
+                    showToast('✅ 视频已上传服务器');
+                } else {
+                    showToast('⚠️ 视频上传失败，后续无法替换到商品视频');
+                }
+            } catch (e) {
+                console.warn('视频上传失败:', e);
+                showToast('⚠️ 视频上传失败');
+            }
         }
         renderReferenceChips();
+        // ★ 不自动分析，等用户发消息触发
     }
 
     function renderReferenceChips() {
@@ -2112,6 +2142,7 @@
                     <button class="chip-remove" onclick="removeReference('${m.id}')" title="移除">×</button>
                     <span class="chip-badge">视频 · ${kfCount}帧</span>
                     ${kfCount > 0 ? `<span class="chip-kf-badge">已抽帧</span>` : ''}
+                    ${m.remoteUrl ? `<span class="chip-remote-badge">已上传</span>` : ''}
                 </div>
             `).join('')}
             <span class="ref-hint">${images.length} 图 · ${videos.length} 视频${kfCount ? ` · ${kfCount} 关键帧` : ''}</span>
@@ -2269,7 +2300,7 @@
         if (keyframes.length === 0) return null;
 
         const sig = 'video:' + keyframes.length + ':' + keyframes[0].slice(0, 32);
-        if (state._lastAnalyzedVideoSig === sig && silent) return null;
+        if (state._lastAnalyzedVideoSig === sig && silent) return state.referenceMedia.videoAnalysis || null;
 
         let tipId = null;
         if (!silent) {
@@ -2311,6 +2342,38 @@
             if (silent) return null;
             const m = state.currentMessages.find(x => x.id === tipId);
             if (m) { m.progress = undefined; m.text = `⚠️ 视频分析失败：${friendlyError(err)}`; updateMessageNode(m); }
+            return null;
+        }
+    }
+
+    // ================================================================
+    // ★ 视频反解 + 自动匹配商品（一步到位，调后端新端点）
+    // ================================================================
+    async function decomposeAndMatchVideo() {
+        const keyframes = state.referenceMedia.keyframes || [];
+        if (keyframes.length === 0) return null;
+
+        try {
+            let kfUrls = state.referenceMedia.keyframeUrls;
+            if (!kfUrls || kfUrls.length === 0) {
+                kfUrls = await uploadKeyframesToTemp(keyframes);
+                state.referenceMedia.keyframeUrls = kfUrls;
+            }
+            const res = await fetch(BACKEND_URL + '/api/video/decompose-and-match', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    keyframe_urls: kfUrls,
+                    hint: ''
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                state.referenceMedia.videoAnalysis = data.analysis || null;
+            }
+            return data;
+        } catch (e) {
+            console.warn('decompose-and-match 失败:', e);
             return null;
         }
     }
@@ -2567,7 +2630,7 @@
     }
 
     // ================================================================
-    // ★ 素材同步/替换意图识别（重点改动）
+    // ★ 素材同步/替换意图识别
     // ================================================================
     function parseMediaSyncIntent(text) {
         const t = (text || '').trim();
@@ -2601,7 +2664,6 @@
         const m = t.match(/(\d+)\s*[张个条]/);
         if (m) count = parseInt(m[1], 10);
 
-        // ★ 更精细地提取商品名：先剔除所有动作词/槽位词/占位词，再看剩下的是不是商品名
         const NOISE_WORDS = [
             '将', '把', '的', '这', '那', '些', '请', '帮我', '帮忙', '用',
             '分析', '识别', '看看', '查查', '检测', '判断', '看图', '看下',
@@ -2618,7 +2680,6 @@
             .replace(/\d+\s*[张个条]/g, ' ')
             .replace(/[，,。、！!？?\s]+/g, ' ')
             .trim();
-        // 只保留长度 >=2 的片段，取第一个
         const tokens = productHint.split(/\s+/).filter(x => x.length >= 2 && !PRODUCT_BLACKLIST.has(x));
         productHint = tokens[0] || '';
 
@@ -2690,20 +2751,31 @@
     }
 
     // ================================================================
-    // ★ 处理"素材同步"意图（重点改动：没有商品名时先看图识别再匹配）
+    // ★ 处理"素材同步"意图
+    // ★ 无商品名时：优先图片识别 → 其次调 /api/video/decompose-and-match 反解视频
     // ================================================================
     async function handleMediaSyncIntent(intent) {
         const { targetType, targetLabel, productHint } = intent;
 
         let imageUrls = state.referenceMedia.images.map(x => x.dataUrl).filter(Boolean);
-        let videoUrl = state.referenceMedia.videos.length > 0
-            ? state.referenceMedia.videos[0].previewUrl : '';
+        // ★ 视频优先用 remoteUrl（公网 URL），没有再退到本地 previewUrl
+        let videoUrl = '';
+        let videoIsRemote = false;
+        if (state.referenceMedia.videos.length > 0) {
+            const v = state.referenceMedia.videos[0];
+            if (v.remoteUrl) {
+                videoUrl = v.remoteUrl;
+                videoIsRemote = true;
+            } else {
+                videoUrl = v.previewUrl;
+            }
+        }
         let posterUrl = '';
 
         if (imageUrls.length === 0 && !videoUrl && state.lastGeneratedMedia) {
             const lg = state.lastGeneratedMedia;
             if (lg.type === 'images' && lg.urls) imageUrls = lg.urls.filter(Boolean);
-            if (lg.type === 'video' && lg.videoUrl) videoUrl = lg.videoUrl;
+            if (lg.type === 'video' && lg.videoUrl) { videoUrl = lg.videoUrl; videoIsRemote = true; }
             if (lg.type === 'poster' && lg.posterUrl) posterUrl = lg.posterUrl;
         }
 
@@ -2711,6 +2783,14 @@
             appendMessage({
                 role: 'ai',
                 text: `❌ 未找到可同步的**视频**素材。\n\n请先上传参考视频，或先生成一段视频。`,
+                time: nowTime()
+            });
+            return;
+        }
+        if (targetType === 'video' && videoUrl && !videoIsRemote) {
+            appendMessage({
+                role: 'ai',
+                text: `⚠️ 视频还在本地（blob），未上传服务器，无法替换到商品。\n\n请重新上传视频（上传时会自动同步到服务器）。`,
                 time: nowTime()
             });
             return;
@@ -2728,32 +2808,63 @@
         if (imageUrls.length > 0) materialSummary.push(`${imageUrls.length} 张图`);
         if (videoUrl) materialSummary.push(`1 个视频`);
 
-        // ★ 关键改动：如果没识别到具体商品名，先用 AI 看图识别 → 再用识别结果智能匹配
+        // ★ 无商品名分支：优先图片识别，其次视频反解匹配
         if (!productHint) {
             appendMessage({
                 role: 'ai',
-                text: `📦 检测到素材：${materialSummary.join(' + ')}\n🎯 目标槽位：${targetLabel}\n🔍 未指定商品名，正在用 AI 识别图片内容...`,
+                text: `📦 检测到素材：${materialSummary.join(' + ')}\n🎯 目标槽位：${targetLabel}\n🔍 未指定商品名，正在用 AI 识别素材内容...`,
                 time: nowTime()
             });
 
-            // 调 AI 识别图片内容
-            let recognized = null;
-            try {
-                recognized = await autoAnalyzeImages('sync-need-hint', true); // silent=true 不渲染中间卡片
-            } catch (e) {
-                console.warn('识别图片失败:', e);
+            let recognizedKeyword = '';
+
+            // ① 优先用图片识别
+            if (imageUrls.length > 0) {
+                let recognized = null;
+                try {
+                    recognized = await autoAnalyzeImages('sync-need-hint', true);
+                } catch (e) {
+                    console.warn('识别图片失败:', e);
+                }
+                if (recognized && recognized.success && recognized.text) {
+                    recognizedKeyword = extractKeywordFromRecognition(recognized.text);
+                }
             }
 
-            // 从识别结果里提取商品名（关键词）
-            let recognizedKeyword = '';
-            if (recognized && recognized.success && recognized.text) {
-                recognizedKeyword = extractKeywordFromRecognition(recognized.text);
+            // ② 图片识别不出来 → 用视频反解并匹配（调后端一步到位端点）
+            if (!recognizedKeyword && state.referenceMedia.keyframes.length > 0) {
+                let dmResult = null;
+                try {
+                    dmResult = await decomposeAndMatchVideo();
+                } catch (e) {
+                    console.warn('视频反解匹配失败:', e);
+                }
+                if (dmResult && dmResult.success) {
+                    // 后端直接返回了匹配好的商品
+                    if (dmResult.has_match && dmResult.matched && dmResult.matched.length > 0) {
+                        showSyncMatchCard(
+                            dmResult.keyword || '视频内容',
+                            dmResult.matched,
+                            intent,
+                            imageUrls,
+                            videoUrl,
+                            posterUrl
+                        );
+                        return;
+                    } else {
+                        recognizedKeyword = dmResult.keyword || '';
+                    }
+                } else if (dmResult && dmResult.analysis) {
+                    // 反解成功但没匹配上
+                    const content = (dmResult.analysis.content || dmResult.analysis.prompt || '');
+                    recognizedKeyword = extractKeywordFromRecognition(content);
+                }
             }
 
             if (!recognizedKeyword) {
                 appendMessage({
                     role: 'ai',
-                    text: `❌ 未能从图片中识别出明确的商品名。\n\n请直接用文字告诉我商品名，例如：**将图片替换到云山茶叶礼盒的主图**`,
+                    text: `❌ 未能从素材中识别出明确的商品名。\n\n请直接用文字告诉我商品名，例如：**将视频替换到云山茶叶礼盒的商品视频**`,
                     time: nowTime()
                 });
                 return;
@@ -2761,7 +2872,7 @@
 
             appendMessage({
                 role: 'ai',
-                text: `🔍 AI 识别到图片内容：**${recognizedKeyword}**\n🔎 正在商品库中匹配...`,
+                text: `🔍 AI 识别到素材内容：**${recognizedKeyword}**\n🔎 正在商品库中匹配...`,
                 time: nowTime()
             });
 
@@ -2834,17 +2945,14 @@
         if (!text) return '';
         let s = String(text).trim();
 
-        // 去掉常见前缀
         s = s.replace(/^(这是|这是一[个张款]?|这[个张]?图[片是]?|图片[中是]|图中是|图里是|画面[中是]|这应该是|看起来[是像]?)[：:，,\s]*/g, '');
+        s = s.replace(/^(视频[中里]?[画面展示]*|画面[中里]?[展示]*|镜头[中里]?|短片[中里]?|开场[是]?|特写[是]?)[：:，,\s]*/g, '');
+        s = s.replace(/^(展示|呈现|出现|看到|拍摄|捕捉)[了]?[：:，,\s]*/g, '');
 
-        // 取第一句
         const firstSentence = s.split(/[。！!？?\n，,；;]/)[0].trim();
         if (firstSentence.length >= 2 && firstSentence.length <= 20) {
-            // 再清洗一下括号内容
             return firstSentence.replace(/[（）()【】\[\]]/g, '').trim();
         }
-
-        // 兜底：取第一段
         const firstPart = s.split(/[。！!？?\n]/)[0].trim();
         return firstPart.slice(0, 20);
     }
@@ -2918,6 +3026,22 @@
     // ★ 执行素材同步
     // ================================================================
     async function executeMediaSync(productName, targetType, imageUrls, videoUrl, posterUrl) {
+        // ★ 视频优先使用 remoteUrl
+        if (targetType === 'video') {
+            const videoEntry = state.referenceMedia.videos[0];
+            if (videoEntry && videoEntry.remoteUrl) {
+                videoUrl = videoEntry.remoteUrl;
+            }
+            if (!videoUrl || videoUrl.startsWith('blob:')) {
+                appendMessage({
+                    role: 'ai',
+                    text: `❌ 视频没有上传服务器（还是本地 blob），无法替换。请重新上传视频。`,
+                    time: nowTime()
+                });
+                return;
+            }
+        }
+
         const payload = { product_names: [productName], mode: 'replace' };
         let syncDesc = '';
 
@@ -4712,7 +4836,7 @@
     window.analyzeImageContent = analyzeImageContent;
     window.autoReplaceFromImages = autoReplaceFromImages;
 
-    console.log('🤖 AI 助手已加载（发消息触发看图，无商品名时自动识别匹配）');
+    console.log('🤖 AI 助手已加载（发消息触发看图/视频反解 + 视频先上传服务器再替换）');
     console.log('💡 后端:', BACKEND_URL);
     console.log('🆔 Session:', SESSION_ID);
 </script>
