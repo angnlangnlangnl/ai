@@ -18,13 +18,19 @@
             color: #0a1a2b;
             display: flex; flex-direction: column; overflow: hidden;
         }
+
+        /* ============================================================
+           ★ Toolbar（含统计数字，高度 ~56px）
+           ============================================================ */
         .toolbar {
             background: #fff; border-bottom: 1px solid #e8edf4;
-            padding: 10px 20px; display: flex; justify-content: space-between;
-            align-items: center; gap: 12px; flex-wrap: wrap; flex-shrink: 0;
+            padding: 10px 20px;
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 16px; flex-wrap: wrap; flex-shrink: 0;
+            min-height: 56px;
         }
         .toolbar .tb-left {
-            display: flex; align-items: center; gap: 12px;
+            display: flex; align-items: center; gap: 10px;
             font-size: 13px; color: #5f7d95; min-width: 0;
         }
         .toolbar .tb-left .status-dot {
@@ -32,8 +38,40 @@
             background: #0d7c4f; animation: pulse 2s infinite; flex-shrink: 0;
         }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-        .toolbar .tb-left strong { color: #0a1e2f; }
-        .toolbar .tb-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .toolbar .tb-left strong { color: #0a1e2f; font-weight: 600; }
+
+        /* ★ 内嵌统计数字 */
+        .toolbar .tb-stats {
+            display: flex; align-items: center; gap: 14px;
+            margin-left: 4px; padding-left: 14px;
+            border-left: 1px solid #e8edf4;
+            flex-wrap: wrap;
+        }
+        .toolbar .tb-stat {
+            display: flex; align-items: baseline; gap: 4px;
+            font-size: 12px; color: #5f7d95;
+            white-space: nowrap;
+        }
+        .toolbar .tb-stat i {
+            font-size: 11px; margin-right: 2px;
+            align-self: center;
+        }
+        .toolbar .tb-stat .num {
+            font-size: 14px; font-weight: 700; color: #0a1e2f;
+            letter-spacing: -0.01em;
+        }
+        .toolbar .tb-stat.cards i { color: #ff5000; }
+        .toolbar .tb-stat.clicks i { color: #ff5000; }
+        .toolbar .tb-stat.clicks .num { color: #ff5000; }
+        .toolbar .tb-stat small {
+            font-size: 10px; color: #94a3b8; font-weight: 400;
+            margin-left: 2px;
+        }
+
+        .toolbar .tb-right {
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+            flex-shrink: 0;
+        }
         .toolbar .tb-btn {
             padding: 6px 14px; border-radius: 20px;
             border: 1px solid #dce5ef; background: #fff;
@@ -44,26 +82,26 @@
         .toolbar .tb-btn:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
         .toolbar .tb-btn i { color: #5f7d95; }
         .toolbar .tb-btn:hover i { color: #4dabf7; }
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 14px; padding: 16px 20px 8px; flex-shrink: 0;
+
+        /* ★ 移动端客户信息切换按钮 */
+        .cs-mobile-toggle {
+            display: none;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            color: #1e3a5f;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
         }
-        .stat-card {
-            background: #fff; padding: 14px 18px; border-radius: 14px;
-            border: 1px solid #e8edf4; box-shadow: 0 2px 8px rgba(10,30,47,0.02);
-            transition: 0.15s;
-        }
-        .stat-card:hover { box-shadow: 0 6px 20px rgba(10,30,47,0.06); border-color: #c8d8e8; }
-        .stat-card .label {
-            font-size: 12px; font-weight: 500; color: #5f7d95;
-            display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
-        }
-        .stat-card .label i { color: #4dabf7; }
-        .stat-card .value {
-            font-size: 22px; font-weight: 700; color: #0a1e2f;
-            letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 6px;
-        }
-        .stat-card .value small { font-size: 12px; color: #5f7d95; font-weight: 400; }
+        .cs-mobile-toggle:hover { border-color: #4dabf7; color: #2a7faa; }
+
+        /* ============================================================
+           主区域
+           ============================================================ */
         .app-body {
             flex: 1; display: flex; overflow: hidden;
             padding: 8px 20px 20px; gap: 14px; min-height: 0;
@@ -159,6 +197,7 @@
         .plat-tag.douyin { background: #e9f0ff; color: #1a5bb5; }
         .plat-tag.pdd { background: #fde8ed; color: #b51a3f; }
         .plat-tag.jd { background: #e6f7ec; color: #0d7c4f; }
+
         .chat-panel {
             flex: 1; background: #fff; border-radius: 14px;
             border: 1px solid #e8edf4;
@@ -275,6 +314,7 @@
             background: #f5f7fa; color: #94a3b8; border-color: #e8edf4;
         }
         .chat-head .actions .btn-sm:disabled i { color: #94a3b8; }
+
         .chat-messages {
             flex: 1; overflow-y: auto; padding: 18px 22px;
             background: #f8fafc;
@@ -1534,10 +1574,10 @@
         }
 
         /* ============================================================
-           ★ 右侧客户信息面板（新增）
+           ★ 右侧客户信息面板
            ============================================================ */
         .customer-side {
-            width: 320px;
+            width: 360px;
             background: #fff;
             border-radius: 14px;
             border: 1px solid #e8edf4;
@@ -1925,15 +1965,32 @@
             color: #2a7faa;
         }
 
-        /* 响应式 */
-        @media (max-width: 1400px) {
-            .customer-side { width: 280px; }
+        /* ============================================================
+           响应式
+           ============================================================ */
+        @media (max-width: 1500px) {
+            .customer-side { width: 340px; }
+        }
+        @media (max-width: 1300px) {
+            .toolbar .tb-stats { gap: 10px; }
+            .toolbar .tb-stat { font-size: 11px; }
+            .toolbar .tb-stat .num { font-size: 13px; }
+            .customer-side { width: 320px; }
         }
         @media (max-width: 1200px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .customer-side { display: none; }
-            .customer-side.show-mobile { display: flex; position: fixed; right: 12px; top: 100px; bottom: 20px; z-index: 90; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
-            .cs-mobile-toggle { display: flex !important; }
+            .toolbar .tb-stats { display: none; }
+            .customer-side {
+                display: none;
+            }
+            .customer-side.show-mobile {
+                display: flex;
+                position: fixed;
+                right: 12px; top: 80px; bottom: 20px;
+                z-index: 90;
+                width: 340px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            }
+            .cs-mobile-toggle { display: flex; }
         }
         @media (max-width: 900px) {
             .app-body { flex-direction: column; padding: 8px 12px 12px; gap: 10px; }
@@ -1941,10 +1998,10 @@
             .chat-panel { flex: 1; min-height: 0; }
         }
         @media (max-width: 768px) {
-            .stats-grid { padding: 12px 12px 4px; gap: 10px; }
-            .stat-card { padding: 10px 14px; }
-            .stat-card .value { font-size: 18px; }
-            .toolbar { padding: 8px 12px; }
+            .toolbar { padding: 8px 12px; gap: 8px; }
+            .toolbar .tb-left { font-size: 12px; }
+            .toolbar .tb-right .tb-btn span { display: none; }
+            .toolbar .tb-right .tb-btn { padding: 6px 10px; }
             .chat-tabs { padding: 6px 8px 0; }
             .chat-tab { padding: 8px 12px; font-size: 12px; }
             .chat-tab span.tab-text { display: none; }
@@ -1960,41 +2017,53 @@
             .asset-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
             .product-card, .product-carousel, .coupon-card { width: 280px; }
             .scroll-bottom-btn { right: 14px; bottom: 150px; width: 36px; height: 36px; }
+            .customer-side.show-mobile { width: 300px; right: 8px; }
         }
         @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; }
             .conv-side { max-height: 180px; }
-            .toolbar .tb-btn span { display: none; }
+            .toolbar .tb-left .status-dot { display: none; }
+            .toolbar .tb-left { font-size: 11px; }
             .chat-head .actions .btn-sm span { display: none; }
             .msg-row { max-width: 92%; }
             .kb-grid { grid-template-columns: 1fr; }
             .product-card, .product-carousel, .coupon-card { width: 100%; }
+            .customer-side.show-mobile { width: calc(100vw - 24px); right: 12px; }
         }
-
-        /* 移动端客户信息面板切换按钮（默认隐藏） */
-        .cs-mobile-toggle {
-            display: none;
-            width: 34px; height: 34px;
-            border-radius: 50%;
-            border: 1px solid #dce5ef;
-            background: #fff;
-            color: #1e3a5f;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-        .cs-mobile-toggle:hover { border-color: #4dabf7; color: #2a7faa; }
     </style>
 </head>
 <body>
 
-<!-- ===== 工具条 ===== -->
+<!-- ===== 工具条（含统计数字） ===== -->
 <div class="toolbar">
     <div class="tb-left">
         <span class="status-dot"></span>
-        <span>AI 客服在线 · 已接入 <strong>DeepSeek</strong> · 知识库 <strong id="toolbarKbCount">0</strong> 篇 · 素材 <strong id="toolbarAssetCount">0</strong> 个</span>
+        <span>AI 客服在线</span>
+
+        <!-- ★ 内嵌的 4 个统计数字 -->
+        <div class="tb-stats">
+            <div class="tb-stat">
+                <i class="fas fa-comments" style="color:#4dabf7;"></i>
+                <span class="num" id="statTotal">1,284</span>
+                <span>会话</span>
+            </div>
+            <div class="tb-stat">
+                <i class="fas fa-robot" style="color:#4dabf7;"></i>
+                <span class="num" id="statAI">1,023</span>
+                <small>79.6%</small>
+            </div>
+            <div class="tb-stat cards">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="num" id="statCards">0</span>
+                <span>卡片</span>
+            </div>
+            <div class="tb-stat clicks">
+                <i class="fas fa-mouse-pointer"></i>
+                <span class="num" id="statClicks">0</span>
+                <span>点击</span>
+            </div>
+        </div>
     </div>
+
     <div class="tb-right">
         <button class="cs-mobile-toggle" id="csMobileToggle" onclick="toggleCustomerSide()" title="客户信息">
             <i class="fas fa-user-circle"></i>
@@ -2011,26 +2080,6 @@
         <button class="tb-btn" onclick="openCardStyleModal()" title="卡片样式设置">
             <i class="fas fa-palette"></i><span> 卡片样式</span>
         </button>
-    </div>
-</div>
-
-<!-- ===== 统计卡片 ===== -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="label"><i class="fas fa-comments"></i> 今日会话</div>
-        <div class="value" id="statTotal">1,284</div>
-    </div>
-    <div class="stat-card">
-        <div class="label"><i class="fas fa-robot"></i> AI 处理</div>
-        <div class="value" id="statAI">1,023 <small>79.6%</small></div>
-    </div>
-    <div class="stat-card">
-        <div class="label"><i class="fas fa-shopping-bag" style="color:#ff5000;"></i> 发卡片</div>
-        <div class="value" id="statCards">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="label"><i class="fas fa-mouse-pointer" style="color:#ff5000;"></i> 卡片点击</div>
-        <div class="value" id="statClicks">0</div>
     </div>
 </div>
 
@@ -2337,7 +2386,6 @@
 
         silenceTimers: {},
 
-        // ★ 新增：客户画像 & 备注 & 快捷话术
         customerProfile: null,
         customerNote: { note: '', tags: [], updated_at: '' },
         quickReplyGroups: [],
@@ -2541,7 +2589,7 @@
     }
 
     /* ============================================================
-       上传图片（客服给客户发图 / 也用于 AI 识别）
+       上传图片
        ============================================================ */
     function bindChatUpload() {
         const imgInput = document.getElementById('chatImageInput');
@@ -2752,7 +2800,6 @@
 
         resetSilenceTimer(id);
 
-        // ★ 加载客户画像 & 备注
         loadCustomerProfile(id);
     }
 
@@ -3122,14 +3169,12 @@
 
         if (action === 'cart') {
             showToast(`🛒 已加入购物车：${name}`);
-            // ★ 记录加购行为
             trackCustomerBehavior('cart', { product_id: productId, product_name: name });
         } else if (action === 'buy') {
             showToast(`⚡ 正在跳转到购买页：${name}`);
             if (url && url !== '#') {
                 window.open(url, '_blank');
             }
-            // ★ 记录下单行为 + 触发感谢词
             const convId = state.currentId;
             if (convId) {
                 trackCustomerBehavior('order', { product_id: productId, product_name: name, amount: 0 });
@@ -3152,7 +3197,6 @@
                     data: data
                 })
             });
-            // 刷新客户画像
             setTimeout(() => loadCustomerProfile(state.currentId), 500);
         } catch (e) { /* ignore */ }
     }
@@ -3386,7 +3430,7 @@
     }
 
     /* ============================================================
-       ★ 客户画像（右侧面板）
+       客户画像
        ============================================================ */
     async function loadCustomerProfile(convId) {
         if (!convId) {
@@ -3394,7 +3438,6 @@
             return;
         }
         try {
-            // 并行拉：画像 + 备注
             const [profileRes, noteRes] = await Promise.all([
                 fetch(`${BACKEND_URL}/api/customers/${encodeURIComponent(convId)}`).then(r => r.json()).catch(() => null),
                 fetch(`${BACKEND_URL}/api/sales/note/${encodeURIComponent(convId)}`).then(r => r.json()).catch(() => null)
@@ -3403,7 +3446,6 @@
             if (profileRes && profileRes.success) {
                 state.customerProfile = profileRes.profile;
             } else {
-                // 后端无此客户 → 用会话数据兜底
                 const conv = state.conversations.find(c => c.id === convId);
                 state.customerProfile = conv ? {
                     customer_id: convId,
@@ -3471,11 +3513,7 @@
         ).join('');
 
         const profileListHtml = (() => {
-            // 从会话消息里提取 AI 画像（如果 sales_agent 的 user_profile 里有）
-            const conv = state.conversations.find(c => c.id === profile.customer_id);
             const msgs = state.messagesMap[profile.customer_id] || [];
-            // 从最后一次 AI 返回的 session 中提取（如果有）
-            // 这里用一个简单的兜底：从消息里找关键词
             const budget = extractBudgetFromMessages(msgs);
             const preferences = extractPreferencesFromMessages(msgs);
             const painPoints = extractPainPointsFromMessages(msgs);
@@ -3493,7 +3531,6 @@
             `).join('');
         })();
 
-        // 最近浏览
         const recentViewsHtml = (profile.recent_views || []).length > 0
             ? profile.recent_views.slice(0, 5).map(v => `
                 <div class="cs-product-item">
@@ -3504,7 +3541,6 @@
             `).join('')
             : '<div class="cs-empty-mini">暂无浏览记录</div>';
 
-        // 最近搜索
         const recentSearchesHtml = (profile.recent_searches || []).length > 0
             ? profile.recent_searches.slice(0, 5).map(s => `
                 <div class="cs-product-item">
@@ -3514,7 +3550,6 @@
             `).join('')
             : '<div class="cs-empty-mini">暂无搜索记录</div>';
 
-        // 加购
         const cartItemsHtml = (profile.cart_items || []).length > 0
             ? profile.cart_items.slice(0, 5).map(v => `
                 <div class="cs-product-item">
@@ -3534,7 +3569,6 @@
             `<span class="cs-note-tag">${escapeHtml(t)}<span class="cs-note-tag-x" onclick="removeCustomerNoteTag('${escapeHtml(t)}')">×</span></span>`
         ).join('');
 
-        // 快捷话术
         const qrGroupsHtml = (state.quickReplyGroups || []).map(g => `
             <div class="cs-qr-group">
                 <div class="cs-qr-group-name">${g.icon || ''} ${escapeHtml(g.name)}</div>
@@ -3549,7 +3583,6 @@
         `).join('');
 
         body.innerHTML = `
-            <!-- 身份卡 -->
             <div class="cs-section">
                 <div class="cs-sec-body">
                     <div class="cs-identity">
@@ -3572,7 +3605,6 @@
                 </div>
             </div>
 
-            <!-- 当前会话状态 -->
             <div class="cs-section">
                 <div class="cs-sec-title">
                     <i class="fas fa-bullseye"></i>
@@ -3595,7 +3627,6 @@
                 </div>
             </div>
 
-            <!-- AI 画像 -->
             <div class="cs-section">
                 <div class="cs-sec-title">
                     <i class="fas fa-lightbulb"></i>
@@ -3607,7 +3638,6 @@
                 </div>
             </div>
 
-            <!-- 客户价值 -->
             <div class="cs-section">
                 <div class="cs-sec-title">
                     <i class="fas fa-chart-line"></i>
@@ -3630,7 +3660,6 @@
                 </div>
             </div>
 
-            <!-- 最近行为 -->
             <div class="cs-section">
                 <div class="cs-sec-title">
                     <i class="fas fa-history"></i>
@@ -3653,7 +3682,6 @@
                 </div>
             </div>
 
-            <!-- 客服备注 -->
             <div class="cs-section">
                 <div class="cs-sec-title">
                     <i class="fas fa-pen"></i>
@@ -3680,7 +3708,6 @@
                 </div>
             </div>
 
-            <!-- 快捷话术 -->
             <div class="cs-section">
                 <div class="cs-sec-title">
                     <i class="fas fa-bolt"></i>
@@ -3695,7 +3722,6 @@
             </div>
         `;
 
-        // 折叠交互
         body.querySelectorAll('.cs-sec-title').forEach(title => {
             title.addEventListener('click', () => {
                 title.parentElement.classList.toggle('collapsed');
@@ -3703,7 +3729,6 @@
         });
     }
 
-    /* ★ 从消息中提取 AI 画像（兜底方案） */
     function extractBudgetFromMessages(msgs) {
         for (let i = msgs.length - 1; i >= 0; i--) {
             const t = msgs[i].text || '';
@@ -3821,7 +3846,6 @@
         }
     }
 
-    /* 移动端切换客户信息面板 */
     function toggleCustomerSide() {
         const side = document.getElementById('customerSide');
         if (!side) return;
@@ -4245,7 +4269,6 @@
         const products = replyData.products || [];
         const farewell = !!replyData.farewell;
 
-        // ★ 保存场景，供右侧面板显示
         if (replyData.scene) state.sessionScene = replyData.scene;
         if (replyData.stage) state.sessionStage = replyData.stage;
 
@@ -4323,7 +4346,6 @@
             if (state.currentId === convId) {
                 renderMessages(convId);
                 scrollMessagesToBottom();
-                // ★ 刷新右侧面板（场景可能有更新）
                 loadCustomerProfile(convId);
             }
             renderConvList();
@@ -4539,8 +4561,6 @@
     function updateBadges() {
         document.getElementById('kbBadge').textContent = state.kbItems.length;
         document.getElementById('assetsBadge').textContent = state.assetItems.length;
-        document.getElementById('toolbarKbCount').textContent = state.kbItems.length;
-        document.getElementById('toolbarAssetCount').textContent = state.assetItems.length;
     }
 
     /* ============================================================
@@ -4753,7 +4773,6 @@
     window.triggerChatUpload = triggerChatUpload;
     window.removeChatUpload = removeChatUpload;
 
-    // ★ 客户信息面板
     window.loadCustomerProfile = loadCustomerProfile;
     window.saveCustomerNote = saveCustomerNote;
     window.addCustomerNoteTag = addCustomerNoteTag;
@@ -4761,7 +4780,7 @@
     window.useQuickReply = useQuickReply;
     window.toggleCustomerSide = toggleCustomerSide;
 
-    console.log('💬 AI 客服页已加载（右侧客户信息面板 + 快捷话术 + 备注）');
+    console.log('💬 AI 客服页已加载（Toolbar 内嵌统计 + 右侧面板加宽 + 移除知识库/素材/DeepSeek 显示）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
