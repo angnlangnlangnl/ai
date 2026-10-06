@@ -121,74 +121,86 @@
         }
         .conv-side .conv-head .refresh-btn:hover { background: #f0f7fe; color: #2a7faa; }
 
-        /* ★ 新增：状态筛选 Tab（全部/咨询中/待人工/已结束） */
+        /* ★ 4.1 布局：4 个状态 Tab 横向等分，上小标签 + 下大数字 */
         .conv-status-tabs {
-            display: flex; gap: 2px; padding: 8px 10px 0;
-            border-bottom: 1px solid #e8edf4; flex-shrink: 0;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-        .conv-status-tabs::-webkit-scrollbar { display: none; }
-        .conv-status-tab {
+            display: flex;
+            padding: 0;
+            border-bottom: 1px solid #e8edf4;
             flex-shrink: 0;
-            padding: 8px 12px;
+            background: #fff;
+        }
+        .conv-status-tab {
+            flex: 1;
+            padding: 8px 4px 9px;
             border: none;
             background: transparent;
-            font-size: 12px;
-            font-weight: 500;
-            color: #5f7d95;
             cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.12s;
             font-family: inherit;
+            border-right: 1px solid #f0f4f9;
+            transition: 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
             position: relative;
+            min-width: 0;
+        }
+        .conv-status-tab:last-child { border-right: none; }
+        .conv-status-tab:hover { background: #fafcfe; }
+        .conv-status-tab .tab-label {
+            font-size: 11px;
+            color: #5f7d95;
+            font-weight: 500;
+            line-height: 1.2;
             white-space: nowrap;
-        }
-        .conv-status-tab:hover { color: #2a7faa; background: #f5f9fe; }
-        .conv-status-tab.active {
-            color: #0a1e2f; font-weight: 600;
-        }
-        .conv-status-tab.active::after {
-            content: ''; position: absolute; left: 8px; right: 8px; bottom: -1px;
-            height: 2px; background: #4dabf7; border-radius: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            transition: 0.15s;
         }
         .conv-status-tab .tab-count {
-            font-size: 10px;
-            padding: 0 6px;
-            border-radius: 10px;
-            background: #f0f4f9;
-            color: #5f7d95;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0a1e2f;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            transition: 0.15s;
+        }
+        .conv-status-tab.active {
+            background: #f0f7fe;
+        }
+        .conv-status-tab.active::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: #4dabf7;
+        }
+        .conv-status-tab.active .tab-label {
+            color: #2a7faa;
             font-weight: 600;
-            min-width: 18px;
-            text-align: center;
-            line-height: 16px;
         }
         .conv-status-tab.active .tab-count {
-            background: #0a1e2f;
-            color: #fff;
-        }
-        .conv-status-tab.pending .tab-count {
-            background: #fff5e6;
-            color: #b57a00;
-        }
-        .conv-status-tab.pending.active .tab-count {
-            background: #b57a00;
-            color: #fff;
-        }
-        .conv-status-tab.closed .tab-count {
-            background: #f0f4f9;
-            color: #94a3b8;
-        }
-        .conv-status-tab.closed.active .tab-count {
-            background: #5f7d95;
-            color: #fff;
+            color: #0a1e2f;
         }
 
-        /* 平台筛选 */
+        /* 咨询中 · 数字蓝色 */
+        .conv-status-tab[data-status="active"] .tab-count { color: #2a7faa; }
+        .conv-status-tab[data-status="active"].active .tab-count { color: #2a7faa; }
+
+        /* 待人工 · 数字橙色 + 有工单时脉冲 */
+        .conv-status-tab[data-status="pending"] .tab-count { color: #b55a1a; }
+        .conv-status-tab[data-status="pending"].has-pending .tab-count {
+            animation: pendingPulse 2s infinite;
+        }
+        @keyframes pendingPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* 已结束 · 数字灰色 */
+        .conv-status-tab[data-status="closed"] .tab-count { color: #94a3b8; }
+
         .conv-filters {
             padding: 8px 12px; border-bottom: 1px solid #e8edf4;
             display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0;
@@ -262,7 +274,6 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 平台标签颜色 */
         .plat-tag.taobao { background: #fef0e6; color: #b55a1a; }
         .plat-tag.douyin { background: #e9f0ff; color: #1a5bb5; }
         .plat-tag.pdd { background: #fde8ed; color: #b51a3f; }
@@ -1711,27 +1722,6 @@
             margin-bottom: 12px;
         }
 
-        /* 会话切换时的骨架动画 */
-        .cs-loading {
-            padding: 20px 4px;
-        }
-        .cs-loading-row {
-            height: 12px;
-            background: linear-gradient(90deg, #f0f4f9 25%, #e8edf4 50%, #f0f4f9 75%);
-            background-size: 200% 100%;
-            animation: csShimmer 1.2s infinite;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-        .cs-loading-row:nth-child(2) { width: 80%; }
-        .cs-loading-row:nth-child(3) { width: 60%; }
-        .cs-loading-row:nth-child(4) { width: 70%; }
-        .cs-loading-row:nth-child(5) { width: 50%; }
-        @keyframes csShimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
         .cs-section {
             margin-bottom: 14px;
             border-radius: 10px;
@@ -2115,9 +2105,10 @@
             .product-card, .product-carousel, .coupon-card { width: 280px; }
             .scroll-bottom-btn { right: 14px; bottom: 150px; width: 36px; height: 36px; }
             .customer-side.show-mobile { width: 300px; right: 8px; }
+            .conv-status-tab .tab-count { font-size: 18px; }
         }
         @media (max-width: 480px) {
-            .conv-side { max-height: 180px; }
+            .conv-side { max-height: 200px; }
             .toolbar .tb-left .status-dot { display: none; }
             .toolbar .tb-left { font-size: 11px; }
             .chat-head .actions .btn-sm span { display: none; }
@@ -2125,6 +2116,8 @@
             .kb-grid { grid-template-columns: 1fr; }
             .product-card, .product-carousel, .coupon-card { width: 100%; }
             .customer-side.show-mobile { width: calc(100vw - 24px); right: 12px; }
+            .conv-status-tab .tab-count { font-size: 16px; }
+            .conv-status-tab .tab-label { font-size: 10px; }
         }
     </style>
 </head>
@@ -2187,31 +2180,26 @@
             </button>
         </div>
 
-        <!-- ★ 新增：状态筛选 Tab -->
+        <!-- ★ 4.1 布局：状态 Tab 4 等分 -->
         <div class="conv-status-tabs" id="convStatusTabs">
             <button class="conv-status-tab active" data-status="all" onclick="filterConvStatus('all', this)">
-                <i class="fas fa-list"></i>
-                <span>全部</span>
+                <span class="tab-label">全部</span>
                 <span class="tab-count" id="statusCountAll">0</span>
             </button>
             <button class="conv-status-tab" data-status="active" onclick="filterConvStatus('active', this)">
-                <i class="fas fa-comments"></i>
-                <span>咨询中</span>
+                <span class="tab-label">咨询中</span>
                 <span class="tab-count" id="statusCountActive">0</span>
             </button>
-            <button class="conv-status-tab pending" data-status="pending" onclick="filterConvStatus('pending', this)">
-                <i class="fas fa-user-headset"></i>
-                <span>待人工</span>
+            <button class="conv-status-tab" data-status="pending" onclick="filterConvStatus('pending', this)">
+                <span class="tab-label">待人工</span>
                 <span class="tab-count" id="statusCountPending">0</span>
             </button>
-            <button class="conv-status-tab closed" data-status="closed" onclick="filterConvStatus('closed', this)">
-                <i class="fas fa-check-circle"></i>
-                <span>已结束</span>
+            <button class="conv-status-tab" data-status="closed" onclick="filterConvStatus('closed', this)">
+                <span class="tab-label">已结束</span>
                 <span class="tab-count" id="statusCountClosed">0</span>
             </button>
         </div>
 
-        <!-- ★ 平台筛选（扩到 13 个） -->
         <div class="conv-filters" id="convFilters">
             <button class="conv-filter active" data-plat="all" onclick="filterConv('all', this)">全部</button>
             <button class="conv-filter" data-plat="1688" onclick="filterConv('1688', this)">1688</button>
@@ -2474,16 +2462,11 @@
         conversations: [],
         currentId: null,
         filterPlatform: 'all',
-        filterStatus: 'all',         // ★ 新增：会话状态筛选
+        filterStatus: 'all',
         messagesMap: {},
         isReplying: false,
         aiAutoReplyOn: true,
         takeoverState: {},
-        // ★ 会话生命周期状态：'active' | 'pending' | 'closed'
-        // 说明：
-        //   - active  = 咨询中（AI 正在服务）
-        //   - pending = 待人工（用户主动请求人工 / AI 判断需人工接管）
-        //   - closed  = 已结束（客服点结束会话）
         convStatus: {},
         aiTimers: {},
         kbItems: [],
@@ -2525,8 +2508,9 @@
         sessionScene: 'general',
         sessionStage: 'greeting',
 
-        // ★ 防止异步竞态：记录最近一次请求的会话 ID
-        _profileLoadingFor: null
+        // ★ 防竞态：记录最近一次请求的会话 ID
+        _profileLoadingFor: null,
+        _profileAbortController: null
     };
 
     /* ============================================================
@@ -2597,7 +2581,7 @@
     }
 
     /* ============================================================
-       模拟数据（平台已扩到 13 个）
+       模拟数据
        ============================================================ */
     const DEMO_CONVERSATIONS = [
         { id: 'c1', name: '王*婷', avatarText: '王', avatarColor: '#b55a1a', platform: '抖音', online: true, lastTime: '14:32', unread: 2, lastMsg: '这款茶叶礼盒可以定制包装吗？', status: 'active' },
@@ -2661,7 +2645,6 @@
         state.messagesMap = JSON.parse(JSON.stringify(DEMO_MESSAGES));
         state.conversations.forEach(c => {
             state.takeoverState[c.id] = 'ai';
-            // 初始化会话状态（从数据里取，取不到默认 active）
             state.convStatus[c.id] = c.status || 'active';
         });
         renderConvList();
@@ -2856,7 +2839,7 @@
     }
 
     /* ============================================================
-       ★ 会话状态筛选 Tab
+       会话状态筛选 Tab
        ============================================================ */
     function filterConvStatus(status, el) {
         state.filterStatus = status;
@@ -2875,6 +2858,13 @@
         set('statusCountActive', active);
         set('statusCountPending', pending);
         set('statusCountClosed', closed);
+
+        // 待人工 Tab 有工单时脉冲
+        const pendingTab = document.querySelector('.conv-status-tab[data-status="pending"]');
+        if (pendingTab) {
+            if (pending > 0) pendingTab.classList.add('has-pending');
+            else pendingTab.classList.remove('has-pending');
+        }
     }
 
     /* ============================================================
@@ -2883,12 +2873,10 @@
     function renderConvList() {
         const container = document.getElementById('convList');
 
-        // 先按平台筛
         let list = state.conversations;
         if (state.filterPlatform !== 'all') {
             list = list.filter(c => c.platform === state.filterPlatform);
         }
-        // 再按状态筛
         if (state.filterStatus !== 'all') {
             list = list.filter(c => (state.convStatus[c.id] || 'active') === state.filterStatus);
         }
@@ -2953,7 +2941,9 @@
 
     /* ============================================================
        ★ 打开会话
-       - 关键：切换会话时，客户信息面板立即清空 + 骨架 + 异步刷新
+       - 切换会话时，先立即同步渲染客户信息（用会话数据兜底）
+       - 再异步拉后端真实数据覆盖
+       - 加了竞态保护，防止旧请求覆盖新数据
        ============================================================ */
     function openConv(id) {
         const conv = state.conversations.find(c => c.id === id);
@@ -3004,11 +2994,40 @@
 
         resetSilenceTimer(id);
 
-        // ★ 关键改动：切换会话时清空 + 加载新客户画像
-        state.customerProfile = null;
+        // ★ 关键：立刻渲染客户信息（用会话数据 + 空值兜底），不让面板闪"未命名客户"
+        state.customerProfile = buildFallbackProfile(conv);
         state.customerNote = { note: '', tags: [], updated_at: '' };
-        showCustomerSkeleton();          // 立即显示骨架屏
-        loadCustomerProfile(id);          // 异步拉取
+        renderCustomerProfile(state.customerProfile);
+
+        // 再异步拉后端真实数据（会覆盖上面）
+        loadCustomerProfile(id);
+    }
+
+    // ★ 从会话数据构建一个完整的兜底 profile（避免显示"未命名客户/普通会员/ID: c1"）
+    function buildFallbackProfile(conv) {
+        return {
+            customer_id: conv.id,
+            name: conv.name || '客户',
+            avatar_text: conv.avatarText || (conv.name || '客').slice(0, 1),
+            avatar_color: conv.avatarColor || '#4dabf7',
+            platform: conv.platform || '',
+            online: conv.online !== false,
+            level: 'normal',
+            level_name: '普通会员',
+            level_color: '#94a3b8',
+            customer_type: 'new',
+            is_repeat: false,
+            order_count: 0,
+            total_spent: 0,
+            last_order_days: null,
+            last_order_time: '',
+            register_days: null,
+            value_tags: [{ id: 'normal', name: '🆕 新客', color: '#2a7faa' }],
+            recent_views: [],
+            recent_searches: [],
+            cart_items: [],
+            last_active: ''
+        };
     }
 
     function renderChatActions(convId) {
@@ -3405,7 +3424,11 @@
                     data: data
                 })
             });
-            setTimeout(() => loadCustomerProfile(state.currentId), 500);
+            // 记录行为的会话跟当前会话一致才刷新
+            const refreshFor = state.currentId;
+            setTimeout(() => {
+                if (state.currentId === refreshFor) loadCustomerProfile(refreshFor);
+            }, 500);
         } catch (e) { /* ignore */ }
     }
 
@@ -3638,22 +3661,8 @@
     }
 
     /* ============================================================
-       ★ 客户画像（同步+异步）
+       ★ 客户画像（异步加载，带竞态保护）
        ============================================================ */
-    function showCustomerSkeleton() {
-        const body = document.getElementById('customerSideBody');
-        if (!body) return;
-        body.innerHTML = `
-            <div class="cs-loading">
-                <div class="cs-loading-row"></div>
-                <div class="cs-loading-row"></div>
-                <div class="cs-loading-row"></div>
-                <div class="cs-loading-row"></div>
-                <div class="cs-loading-row"></div>
-            </div>
-        `;
-    }
-
     async function loadCustomerProfile(convId) {
         if (!convId) {
             state.customerProfile = null;
@@ -3661,50 +3670,49 @@
             return;
         }
 
-        // ★ 竞态保护：记录本次请求的会话 ID
+        // 记录本次请求对应的会话 ID
         state._profileLoadingFor = convId;
 
-        // 先用会话数据立即渲染（保证"同步"）
-        const conv = state.conversations.find(c => c.id === convId);
-        if (conv) {
-            state.customerProfile = {
-                customer_id: convId,
-                name: conv.name,
-                avatar_text: conv.avatarText,
-                avatar_color: conv.avatarColor,
-                platform: conv.platform,
-                online: conv.online,
-                level: 'normal', level_name: '普通会员', level_color: '#94a3b8',
-                customer_type: 'new', is_repeat: false,
-                order_count: 0, total_spent: 0, last_order_days: null,
-                value_tags: [{ id: 'normal', name: '🆕 新客', color: '#2a7faa' }],
-                recent_views: [], recent_searches: [], cart_items: [],
-                last_active: ''
-            };
-            renderCustomerProfile(state.customerProfile);
+        // 中断上一次未完成的请求
+        if (state._profileAbortController) {
+            try { state._profileAbortController.abort(); } catch (e) {}
         }
+        state._profileAbortController = new AbortController();
+        const signal = state._profileAbortController.signal;
 
         try {
             const [profileRes, noteRes] = await Promise.all([
-                fetch(`${BACKEND_URL}/api/customers/${encodeURIComponent(convId)}`).then(r => r.json()).catch(() => null),
-                fetch(`${BACKEND_URL}/api/sales/note/${encodeURIComponent(convId)}`).then(r => r.json()).catch(() => null)
+                fetch(`${BACKEND_URL}/api/customers/${encodeURIComponent(convId)}`, { signal })
+                    .then(r => r.json()).catch(() => null),
+                fetch(`${BACKEND_URL}/api/sales/note/${encodeURIComponent(convId)}`, { signal })
+                    .then(r => r.json()).catch(() => null)
             ]);
 
-            // ★ 竞态保护：如果用户在等待期间切换了会话，则丢弃本次结果
+            // ★ 竞态保护：如果用户已经切换到别的会话，直接丢弃本次结果
             if (state._profileLoadingFor !== convId) return;
+            if (state.currentId !== convId) return;
 
-            if (profileRes && profileRes.success) {
-                state.customerProfile = profileRes.profile;
+            const conv = state.conversations.find(c => c.id === convId);
+
+            if (profileRes && profileRes.success && profileRes.profile) {
+                // 后端返回的 profile 可能是空数据（比如查不到客户），需要合并会话信息
+                const merged = { ...buildFallbackProfile(conv || {}), ...profileRes.profile };
+                if (!merged.name && conv) merged.name = conv.name;
+                if (!merged.avatar_text && conv) merged.avatar_text = conv.avatarText;
+                if (!merged.avatar_color && conv) merged.avatar_color = conv.avatarColor;
+                if (!merged.platform && conv) merged.platform = conv.platform;
+                state.customerProfile = merged;
+            } else if (conv) {
+                state.customerProfile = buildFallbackProfile(conv);
             }
 
             if (noteRes && noteRes.success) {
                 state.customerNote = noteRes.note;
-            } else {
-                state.customerNote = { note: '', tags: [], updated_at: '' };
             }
 
             renderCustomerProfile(state.customerProfile);
         } catch (e) {
+            if (e && e.name === 'AbortError') return;
             console.warn('加载客户画像失败:', e);
         }
     }
@@ -3825,7 +3833,7 @@
                             <span class="${profile.online ? 'online-dot' : 'offline-dot'}"></span>
                         </div>
                         <div class="cs-id-info">
-                            <div class="cs-id-name">${escapeHtml(profile.name || '未命名客户')}</div>
+                            <div class="cs-id-name">${escapeHtml(profile.name || '客户')}</div>
                             <div class="cs-id-meta">
                                 ${profile.platform ? `<span class="plat-tag ${platClass(profile.platform)}">${escapeHtml(profile.platform)}</span>` : ''}
                                 <span class="cs-level" style="background:${levelBg};color:${levelColor};">${escapeHtml(profile.level_name || '普通会员')}</span>
@@ -4569,7 +4577,6 @@
                         msgInput.placeholder = '会话已结束';
                     }
                 }
-                // ★ 会话结束时，同步更新左侧列表状态
                 setConvStatus(convId, 'closed');
             }
 
@@ -4602,7 +4609,7 @@
     }
 
     /* ============================================================
-       ★ 会话状态工具
+       会话状态工具
        ============================================================ */
     function setConvStatus(convId, status) {
         if (!convId || !status) return;
@@ -4821,7 +4828,6 @@
         if (state.aiTimers[convId]) { clearTimeout(state.aiTimers[convId]); delete state.aiTimers[convId]; }
         if (state.silenceTimers[convId]) { clearTimeout(state.silenceTimers[convId]); delete state.silenceTimers[convId]; }
         state.takeoverState[convId] = 'human';
-        // ★ 转人工 → 状态变为 pending
         setConvStatus(convId, 'pending');
         document.getElementById('typingIndicator').classList.remove('show');
         sendSystemMessage(convId, '【系统】会话已转人工客服');
@@ -4835,7 +4841,6 @@
         if (!state.currentId) return;
         const convId = state.currentId;
         state.takeoverState[convId] = 'ai';
-        // ★ AI 接管 → 状态变为 active
         setConvStatus(convId, 'active');
         sendSystemMessage(convId, '【系统】AI 已接管本会话');
         renderChatActions(convId);
@@ -4866,7 +4871,6 @@
         if (state.silenceTimers[convId]) { clearTimeout(state.silenceTimers[convId]); delete state.silenceTimers[convId]; }
         delete silenceCount[convId];
 
-        // ★ 结束会话 → 状态变为 closed（不删除会话，只标记）
         setConvStatus(convId, 'closed');
         sendSystemMessage(convId, '【系统】会话已结束');
 
@@ -5038,7 +5042,7 @@
     window.useQuickReply = useQuickReply;
     window.toggleCustomerSide = toggleCustomerSide;
 
-    console.log('💬 AI 客服页已加载（客户信息同步 + 状态筛选 Tab + 13 个平台）');
+    console.log('💬 AI 客服页已加载（4.1 布局状态Tab + 客户信息同步修复）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
