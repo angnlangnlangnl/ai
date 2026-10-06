@@ -19,9 +19,6 @@
             display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* ============================================================
-           ★ Toolbar（含统计数字，高度 ~56px）
-           ============================================================ */
         .toolbar {
             background: #fff; border-bottom: 1px solid #e8edf4;
             padding: 10px 20px;
@@ -40,7 +37,6 @@
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         .toolbar .tb-left strong { color: #0a1e2f; font-weight: 600; }
 
-        /* ★ 内嵌统计数字 */
         .toolbar .tb-stats {
             display: flex; align-items: center; gap: 14px;
             margin-left: 4px; padding-left: 14px;
@@ -83,7 +79,6 @@
         .toolbar .tb-btn i { color: #5f7d95; }
         .toolbar .tb-btn:hover i { color: #4dabf7; }
 
-        /* ★ 移动端客户信息切换按钮 */
         .cs-mobile-toggle {
             display: none;
             width: 34px; height: 34px;
@@ -99,9 +94,6 @@
         }
         .cs-mobile-toggle:hover { border-color: #4dabf7; color: #2a7faa; }
 
-        /* ============================================================
-           主区域
-           ============================================================ */
         .app-body {
             flex: 1; display: flex; overflow: hidden;
             padding: 8px 20px 20px; gap: 14px; min-height: 0;
@@ -128,18 +120,93 @@
             display: flex; align-items: center; justify-content: center; transition: 0.12s;
         }
         .conv-side .conv-head .refresh-btn:hover { background: #f0f7fe; color: #2a7faa; }
+
+        /* ★ 新增：状态筛选 Tab（全部/咨询中/待人工/已结束） */
+        .conv-status-tabs {
+            display: flex; gap: 2px; padding: 8px 10px 0;
+            border-bottom: 1px solid #e8edf4; flex-shrink: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .conv-status-tabs::-webkit-scrollbar { display: none; }
+        .conv-status-tab {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f7d95;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.12s;
+            font-family: inherit;
+            position: relative;
+            white-space: nowrap;
+        }
+        .conv-status-tab:hover { color: #2a7faa; background: #f5f9fe; }
+        .conv-status-tab.active {
+            color: #0a1e2f; font-weight: 600;
+        }
+        .conv-status-tab.active::after {
+            content: ''; position: absolute; left: 8px; right: 8px; bottom: -1px;
+            height: 2px; background: #4dabf7; border-radius: 2px;
+        }
+        .conv-status-tab .tab-count {
+            font-size: 10px;
+            padding: 0 6px;
+            border-radius: 10px;
+            background: #f0f4f9;
+            color: #5f7d95;
+            font-weight: 600;
+            min-width: 18px;
+            text-align: center;
+            line-height: 16px;
+        }
+        .conv-status-tab.active .tab-count {
+            background: #0a1e2f;
+            color: #fff;
+        }
+        .conv-status-tab.pending .tab-count {
+            background: #fff5e6;
+            color: #b57a00;
+        }
+        .conv-status-tab.pending.active .tab-count {
+            background: #b57a00;
+            color: #fff;
+        }
+        .conv-status-tab.closed .tab-count {
+            background: #f0f4f9;
+            color: #94a3b8;
+        }
+        .conv-status-tab.closed.active .tab-count {
+            background: #5f7d95;
+            color: #fff;
+        }
+
+        /* 平台筛选 */
         .conv-filters {
             padding: 8px 12px; border-bottom: 1px solid #e8edf4;
             display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0;
+            max-height: 88px;
+            overflow-y: auto;
         }
+        .conv-filters::-webkit-scrollbar { width: 3px; }
+        .conv-filters::-webkit-scrollbar-thumb { background: #dce5ef; border-radius: 10px; }
         .conv-filter {
             padding: 3px 10px; border-radius: 20px;
             border: 1px solid #dce5ef; background: #fff;
             font-size: 11px; color: #5f7d95; cursor: pointer;
             transition: 0.12s; font-family: inherit;
+            white-space: nowrap;
         }
         .conv-filter:hover { border-color: #4dabf7; color: #2a7faa; }
         .conv-filter.active { background: #0a1e2f; border-color: #0a1e2f; color: #fff; }
+
         .conv-list {
             flex: 1; overflow-y: auto; padding: 8px 10px; min-height: 0;
         }
@@ -152,6 +219,7 @@
         }
         .conv-item:hover { background: #f5f8fc; border-color: #e8edf4; }
         .conv-item.active { background: #f0f7fe; border-color: rgba(77,171,247,0.3); }
+        .conv-item.closed { opacity: 0.65; }
         .conv-avatar {
             width: 38px; height: 38px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -193,10 +261,21 @@
             font-size: 10px; font-weight: 600;
             display: flex; align-items: center; justify-content: center;
         }
+
+        /* 平台标签颜色 */
         .plat-tag.taobao { background: #fef0e6; color: #b55a1a; }
         .plat-tag.douyin { background: #e9f0ff; color: #1a5bb5; }
         .plat-tag.pdd { background: #fde8ed; color: #b51a3f; }
         .plat-tag.jd { background: #e6f7ec; color: #0d7c4f; }
+        .plat-tag.alibaba1688 { background: #fff5e6; color: #b57a00; }
+        .plat-tag.amazon { background: #fff8e6; color: #8a5a00; }
+        .plat-tag.aliexpress { background: #fff0e6; color: #e1251b; }
+        .plat-tag.alibabaintl { background: #fff0e6; color: #b55a1a; }
+        .plat-tag.mercadolibre { background: #fff8e6; color: #b57a00; }
+        .plat-tag.shein { background: #f5f0ff; color: #6a5cff; }
+        .plat-tag.shopify { background: #e6f7ec; color: #0d7c4f; }
+        .plat-tag.shopee { background: #fff0e6; color: #e1251b; }
+        .plat-tag.temu { background: #fef0e6; color: #ff5000; }
 
         .chat-panel {
             flex: 1; background: #fff; border-radius: 14px;
@@ -1632,6 +1711,27 @@
             margin-bottom: 12px;
         }
 
+        /* 会话切换时的骨架动画 */
+        .cs-loading {
+            padding: 20px 4px;
+        }
+        .cs-loading-row {
+            height: 12px;
+            background: linear-gradient(90deg, #f0f4f9 25%, #e8edf4 50%, #f0f4f9 75%);
+            background-size: 200% 100%;
+            animation: csShimmer 1.2s infinite;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .cs-loading-row:nth-child(2) { width: 80%; }
+        .cs-loading-row:nth-child(3) { width: 60%; }
+        .cs-loading-row:nth-child(4) { width: 70%; }
+        .cs-loading-row:nth-child(5) { width: 50%; }
+        @keyframes csShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         .cs-section {
             margin-bottom: 14px;
             border-radius: 10px;
@@ -1965,9 +2065,6 @@
             color: #2a7faa;
         }
 
-        /* ============================================================
-           响应式
-           ============================================================ */
         @media (max-width: 1500px) {
             .customer-side { width: 340px; }
         }
@@ -2033,13 +2130,11 @@
 </head>
 <body>
 
-<!-- ===== 工具条（含统计数字） ===== -->
 <div class="toolbar">
     <div class="tb-left">
         <span class="status-dot"></span>
         <span>AI 客服在线</span>
 
-        <!-- ★ 内嵌的 4 个统计数字 -->
         <div class="tb-stats">
             <div class="tb-stat">
                 <i class="fas fa-comments" style="color:#4dabf7;"></i>
@@ -2083,7 +2178,6 @@
     </div>
 </div>
 
-<!-- ===== 主体 ===== -->
 <div class="app-body">
     <aside class="conv-side">
         <div class="conv-head">
@@ -2092,13 +2186,49 @@
                 <i class="fas fa-sync-alt"></i>
             </button>
         </div>
-        <div class="conv-filters">
+
+        <!-- ★ 新增：状态筛选 Tab -->
+        <div class="conv-status-tabs" id="convStatusTabs">
+            <button class="conv-status-tab active" data-status="all" onclick="filterConvStatus('all', this)">
+                <i class="fas fa-list"></i>
+                <span>全部</span>
+                <span class="tab-count" id="statusCountAll">0</span>
+            </button>
+            <button class="conv-status-tab" data-status="active" onclick="filterConvStatus('active', this)">
+                <i class="fas fa-comments"></i>
+                <span>咨询中</span>
+                <span class="tab-count" id="statusCountActive">0</span>
+            </button>
+            <button class="conv-status-tab pending" data-status="pending" onclick="filterConvStatus('pending', this)">
+                <i class="fas fa-user-headset"></i>
+                <span>待人工</span>
+                <span class="tab-count" id="statusCountPending">0</span>
+            </button>
+            <button class="conv-status-tab closed" data-status="closed" onclick="filterConvStatus('closed', this)">
+                <i class="fas fa-check-circle"></i>
+                <span>已结束</span>
+                <span class="tab-count" id="statusCountClosed">0</span>
+            </button>
+        </div>
+
+        <!-- ★ 平台筛选（扩到 13 个） -->
+        <div class="conv-filters" id="convFilters">
             <button class="conv-filter active" data-plat="all" onclick="filterConv('all', this)">全部</button>
+            <button class="conv-filter" data-plat="1688" onclick="filterConv('1688', this)">1688</button>
             <button class="conv-filter" data-plat="淘宝" onclick="filterConv('淘宝', this)">淘宝</button>
             <button class="conv-filter" data-plat="抖音" onclick="filterConv('抖音', this)">抖音</button>
             <button class="conv-filter" data-plat="拼多多" onclick="filterConv('拼多多', this)">拼多多</button>
             <button class="conv-filter" data-plat="京东" onclick="filterConv('京东', this)">京东</button>
+            <button class="conv-filter" data-plat="亚马逊" onclick="filterConv('亚马逊', this)">亚马逊</button>
+            <button class="conv-filter" data-plat="速卖通" onclick="filterConv('速卖通', this)">速卖通</button>
+            <button class="conv-filter" data-plat="阿里国际站" onclick="filterConv('阿里国际站', this)">阿里国际站</button>
+            <button class="conv-filter" data-plat="美客多" onclick="filterConv('美客多', this)">美客多</button>
+            <button class="conv-filter" data-plat="希英" onclick="filterConv('希英', this)">希英</button>
+            <button class="conv-filter" data-plat="Shopify" onclick="filterConv('Shopify', this)">Shopify</button>
+            <button class="conv-filter" data-plat="Shopee" onclick="filterConv('Shopee', this)">Shopee</button>
+            <button class="conv-filter" data-plat="temu" onclick="filterConv('temu', this)">temu</button>
         </div>
+
         <div class="conv-list" id="convList"></div>
     </aside>
 
@@ -2223,7 +2353,6 @@
         </div>
     </main>
 
-    <!-- ★ 右侧客户信息面板 -->
     <aside class="customer-side" id="customerSide">
         <div class="cs-header">
             <h3><i class="fas fa-id-card"></i> 客户信息</h3>
@@ -2240,7 +2369,6 @@
     </aside>
 </div>
 
-<!-- ===== 商品选择弹窗 ===== -->
 <div class="product-picker-modal" id="productPickerModal" onclick="if(event.target===this) closeProductPicker()">
     <div class="product-picker-box">
         <div class="product-picker-head">
@@ -2266,7 +2394,6 @@
     </div>
 </div>
 
-<!-- ===== 优惠券选择弹窗 ===== -->
 <div class="coupon-picker-modal" id="couponPickerModal" onclick="if(event.target===this) closeCouponPicker()">
     <div class="coupon-picker-box">
         <div class="product-picker-head">
@@ -2286,7 +2413,6 @@
     </div>
 </div>
 
-<!-- ===== 卡片样式设置弹窗 ===== -->
 <div class="card-style-modal" id="cardStyleModal" onclick="if(event.target===this) closeCardStyleModal()">
     <div class="card-style-box">
         <div class="product-picker-head">
@@ -2348,10 +2474,17 @@
         conversations: [],
         currentId: null,
         filterPlatform: 'all',
+        filterStatus: 'all',         // ★ 新增：会话状态筛选
         messagesMap: {},
         isReplying: false,
         aiAutoReplyOn: true,
         takeoverState: {},
+        // ★ 会话生命周期状态：'active' | 'pending' | 'closed'
+        // 说明：
+        //   - active  = 咨询中（AI 正在服务）
+        //   - pending = 待人工（用户主动请求人工 / AI 判断需人工接管）
+        //   - closed  = 已结束（客服点结束会话）
+        convStatus: {},
         aiTimers: {},
         kbItems: [],
         kbStats: {},
@@ -2390,7 +2523,10 @@
         customerNote: { note: '', tags: [], updated_at: '' },
         quickReplyGroups: [],
         sessionScene: 'general',
-        sessionStage: 'greeting'
+        sessionStage: 'greeting',
+
+        // ★ 防止异步竞态：记录最近一次请求的会话 ID
+        _profileLoadingFor: null
     };
 
     /* ============================================================
@@ -2461,15 +2597,19 @@
     }
 
     /* ============================================================
-       模拟数据
+       模拟数据（平台已扩到 13 个）
        ============================================================ */
     const DEMO_CONVERSATIONS = [
-        { id: 'c1', name: '王*婷', avatarText: '王', avatarColor: '#b55a1a', platform: '抖音', online: true, lastTime: '14:32', unread: 2, lastMsg: '这款茶叶礼盒可以定制包装吗？' },
-        { id: 'c2', name: '张*豪', avatarText: '张', avatarColor: '#1a5bb5', platform: '淘宝', online: true, lastTime: '14:15', unread: 5, lastMsg: '竹编包能发顺丰吗？' },
-        { id: 'c3', name: '李*萱', avatarText: '李', avatarColor: '#b51a3f', platform: '拼多多', online: false, lastTime: '14:05', unread: 0, lastMsg: '山核桃仁的保质期多久？' },
-        { id: 'c4', name: '刘*阳', avatarText: '刘', avatarColor: '#0d7c4f', platform: '京东', online: true, lastTime: '13:48', unread: 1, lastMsg: '手工皂套装含哪些香味？' },
-        { id: 'c5', name: '陈*瑶', avatarText: '陈', avatarColor: '#7b4fa0', platform: '抖音', online: true, lastTime: '13:20', unread: 0, lastMsg: '竹编包有现货吗？' },
-        { id: 'c6', name: '赵*琳', avatarText: '赵', avatarColor: '#2a7faa', platform: '淘宝', online: false, lastTime: '12:50', unread: 0, lastMsg: '茶叶礼盒的保质期？' }
+        { id: 'c1', name: '王*婷', avatarText: '王', avatarColor: '#b55a1a', platform: '抖音', online: true, lastTime: '14:32', unread: 2, lastMsg: '这款茶叶礼盒可以定制包装吗？', status: 'active' },
+        { id: 'c2', name: '张*豪', avatarText: '张', avatarColor: '#1a5bb5', platform: '淘宝', online: true, lastTime: '14:15', unread: 5, lastMsg: '竹编包能发顺丰吗？', status: 'pending' },
+        { id: 'c3', name: '李*萱', avatarText: '李', avatarColor: '#b51a3f', platform: '拼多多', online: false, lastTime: '14:05', unread: 0, lastMsg: '山核桃仁的保质期多久？', status: 'active' },
+        { id: 'c4', name: '刘*阳', avatarText: '刘', avatarColor: '#0d7c4f', platform: '京东', online: true, lastTime: '13:48', unread: 1, lastMsg: '手工皂套装含哪些香味？', status: 'active' },
+        { id: 'c5', name: '陈*瑶', avatarText: '陈', avatarColor: '#7b4fa0', platform: '1688', online: true, lastTime: '13:20', unread: 0, lastMsg: '竹编包有现货吗？', status: 'closed' },
+        { id: 'c6', name: '赵*琳', avatarText: '赵', avatarColor: '#2a7faa', platform: '亚马逊', online: false, lastTime: '12:50', unread: 0, lastMsg: '茶叶礼盒的保质期？', status: 'active' },
+        { id: 'c7', name: '孙*洋', avatarText: '孙', avatarColor: '#6a5cff', platform: 'Shopee', online: true, lastTime: '12:30', unread: 3, lastMsg: '丝巾有没有其他颜色？', status: 'pending' },
+        { id: 'c8', name: '周*涵', avatarText: '周', avatarColor: '#e1251b', platform: 'temu', online: true, lastTime: '12:15', unread: 0, lastMsg: '可以批发吗？', status: 'active' },
+        { id: 'c9', name: '吴*婷', avatarText: '吴', avatarColor: '#0d7c4f', platform: '速卖通', online: false, lastTime: '11:50', unread: 0, lastMsg: '发货到美国要多久？', status: 'closed' },
+        { id: 'c10', name: '郑*雅', avatarText: '郑', avatarColor: '#b57a00', platform: '阿里国际站', online: true, lastTime: '11:30', unread: 1, lastMsg: 'MOQ 是多少？', status: 'active' }
     ];
 
     const DEMO_MESSAGES = {
@@ -2497,6 +2637,18 @@
         c6: [
             { id: 'm1', from: 'user', text: '茶叶礼盒的保质期？', time: '12:50' },
             { id: 'm2', from: 'ai', text: '保质期18个月。', time: '12:50' }
+        ],
+        c7: [
+            { id: 'm1', from: 'user', text: '丝巾有没有其他颜色？', time: '12:30' }
+        ],
+        c8: [
+            { id: 'm1', from: 'user', text: '可以批发吗？', time: '12:15' }
+        ],
+        c9: [
+            { id: 'm1', from: 'user', text: '发货到美国要多久？', time: '11:50' }
+        ],
+        c10: [
+            { id: 'm1', from: 'user', text: 'MOQ 是多少？', time: '11:30' }
         ]
     };
 
@@ -2507,8 +2659,13 @@
         loadCardStyle();
         state.conversations = JSON.parse(JSON.stringify(DEMO_CONVERSATIONS));
         state.messagesMap = JSON.parse(JSON.stringify(DEMO_MESSAGES));
-        state.conversations.forEach(c => state.takeoverState[c.id] = 'ai');
+        state.conversations.forEach(c => {
+            state.takeoverState[c.id] = 'ai';
+            // 初始化会话状态（从数据里取，取不到默认 active）
+            state.convStatus[c.id] = c.status || 'active';
+        });
         renderConvList();
+        updateStatusTabCounts();
         loadKb();
         loadAssets();
         loadProducts();
@@ -2699,14 +2856,43 @@
     }
 
     /* ============================================================
+       ★ 会话状态筛选 Tab
+       ============================================================ */
+    function filterConvStatus(status, el) {
+        state.filterStatus = status;
+        document.querySelectorAll('.conv-status-tab').forEach(t => t.classList.remove('active'));
+        if (el) el.classList.add('active');
+        renderConvList();
+    }
+
+    function updateStatusTabCounts() {
+        const all = state.conversations.length;
+        const active = state.conversations.filter(c => (state.convStatus[c.id] || 'active') === 'active').length;
+        const pending = state.conversations.filter(c => state.convStatus[c.id] === 'pending').length;
+        const closed = state.conversations.filter(c => state.convStatus[c.id] === 'closed').length;
+        const set = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+        set('statusCountAll', all);
+        set('statusCountActive', active);
+        set('statusCountPending', pending);
+        set('statusCountClosed', closed);
+    }
+
+    /* ============================================================
        会话列表
        ============================================================ */
     function renderConvList() {
         const container = document.getElementById('convList');
+
+        // 先按平台筛
         let list = state.conversations;
         if (state.filterPlatform !== 'all') {
             list = list.filter(c => c.platform === state.filterPlatform);
         }
+        // 再按状态筛
+        if (state.filterStatus !== 'all') {
+            list = list.filter(c => (state.convStatus[c.id] || 'active') === state.filterStatus);
+        }
+
         if (list.length === 0) {
             container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:13px;">暂无会话</div>';
             return;
@@ -2716,8 +2902,10 @@
             const takenoverBadge = takeover === 'human'
                 ? `<span class="takenover-badge" title="人工接管中"><i class="fas fa-user"></i></span>`
                 : '';
+            const st = state.convStatus[c.id] || 'active';
+            const closedCls = st === 'closed' ? 'closed' : '';
             return `
-                <div class="conv-item ${c.id === state.currentId ? 'active' : ''}" onclick="openConv('${c.id}')">
+                <div class="conv-item ${c.id === state.currentId ? 'active' : ''} ${closedCls}" onclick="openConv('${c.id}')">
                     <div class="conv-avatar" style="background:${c.avatarColor};">
                         ${c.avatarText}
                         <span class="${c.online ? 'online-dot' : 'offline-dot'}"></span>
@@ -2745,11 +2933,27 @@
     }
 
     function platClass(p) {
-        return { '淘宝': 'taobao', '抖音': 'douyin', '拼多多': 'pdd', '京东': 'jd' }[p] || '';
+        const map = {
+            '1688': 'alibaba1688',
+            '淘宝': 'taobao',
+            '抖音': 'douyin',
+            '拼多多': 'pdd',
+            '京东': 'jd',
+            '亚马逊': 'amazon',
+            '速卖通': 'aliexpress',
+            '阿里国际站': 'alibabaintl',
+            '美客多': 'mercadolibre',
+            '希英': 'shein',
+            'Shopify': 'shopify',
+            'Shopee': 'shopee',
+            'temu': 'temu'
+        };
+        return map[p] || '';
     }
 
     /* ============================================================
-       打开会话
+       ★ 打开会话
+       - 关键：切换会话时，客户信息面板立即清空 + 骨架 + 异步刷新
        ============================================================ */
     function openConv(id) {
         const conv = state.conversations.find(c => c.id === id);
@@ -2800,7 +3004,11 @@
 
         resetSilenceTimer(id);
 
-        loadCustomerProfile(id);
+        // ★ 关键改动：切换会话时清空 + 加载新客户画像
+        state.customerProfile = null;
+        state.customerNote = { note: '', tags: [], updated_at: '' };
+        showCustomerSkeleton();          // 立即显示骨架屏
+        loadCustomerProfile(id);          // 异步拉取
     }
 
     function renderChatActions(convId) {
@@ -3430,37 +3638,63 @@
     }
 
     /* ============================================================
-       客户画像
+       ★ 客户画像（同步+异步）
        ============================================================ */
+    function showCustomerSkeleton() {
+        const body = document.getElementById('customerSideBody');
+        if (!body) return;
+        body.innerHTML = `
+            <div class="cs-loading">
+                <div class="cs-loading-row"></div>
+                <div class="cs-loading-row"></div>
+                <div class="cs-loading-row"></div>
+                <div class="cs-loading-row"></div>
+                <div class="cs-loading-row"></div>
+            </div>
+        `;
+    }
+
     async function loadCustomerProfile(convId) {
         if (!convId) {
+            state.customerProfile = null;
             renderCustomerProfile(null);
             return;
         }
+
+        // ★ 竞态保护：记录本次请求的会话 ID
+        state._profileLoadingFor = convId;
+
+        // 先用会话数据立即渲染（保证"同步"）
+        const conv = state.conversations.find(c => c.id === convId);
+        if (conv) {
+            state.customerProfile = {
+                customer_id: convId,
+                name: conv.name,
+                avatar_text: conv.avatarText,
+                avatar_color: conv.avatarColor,
+                platform: conv.platform,
+                online: conv.online,
+                level: 'normal', level_name: '普通会员', level_color: '#94a3b8',
+                customer_type: 'new', is_repeat: false,
+                order_count: 0, total_spent: 0, last_order_days: null,
+                value_tags: [{ id: 'normal', name: '🆕 新客', color: '#2a7faa' }],
+                recent_views: [], recent_searches: [], cart_items: [],
+                last_active: ''
+            };
+            renderCustomerProfile(state.customerProfile);
+        }
+
         try {
             const [profileRes, noteRes] = await Promise.all([
                 fetch(`${BACKEND_URL}/api/customers/${encodeURIComponent(convId)}`).then(r => r.json()).catch(() => null),
                 fetch(`${BACKEND_URL}/api/sales/note/${encodeURIComponent(convId)}`).then(r => r.json()).catch(() => null)
             ]);
 
+            // ★ 竞态保护：如果用户在等待期间切换了会话，则丢弃本次结果
+            if (state._profileLoadingFor !== convId) return;
+
             if (profileRes && profileRes.success) {
                 state.customerProfile = profileRes.profile;
-            } else {
-                const conv = state.conversations.find(c => c.id === convId);
-                state.customerProfile = conv ? {
-                    customer_id: convId,
-                    name: conv.name,
-                    avatar_text: conv.avatarText,
-                    avatar_color: conv.avatarColor,
-                    platform: conv.platform,
-                    online: conv.online,
-                    level: 'normal', level_name: '普通会员', level_color: '#94a3b8',
-                    customer_type: 'new', is_repeat: false,
-                    order_count: 0, total_spent: 0, last_order_days: null,
-                    value_tags: [{ id: 'normal', name: '🆕 新客', color: '#2a7faa' }],
-                    recent_views: [], recent_searches: [], cart_items: [],
-                    last_active: ''
-                } : null;
             }
 
             if (noteRes && noteRes.success) {
@@ -4335,6 +4569,8 @@
                         msgInput.placeholder = '会话已结束';
                     }
                 }
+                // ★ 会话结束时，同步更新左侧列表状态
+                setConvStatus(convId, 'closed');
             }
 
             const conv = state.conversations.find(c => c.id === convId);
@@ -4349,6 +4585,7 @@
                 loadCustomerProfile(convId);
             }
             renderConvList();
+            updateStatusTabCounts();
 
             resetSilenceTimer(convId);
         }, 600);
@@ -4362,6 +4599,18 @@
         if (t.includes('下单') || t.includes('买')) return '好的，感谢您的支持！我们会尽快为您安排发货~';
         if (t.includes('谢谢') || t.includes('感谢')) return '不客气，祝您购物愉快！有需要随时联系我~';
         return null;
+    }
+
+    /* ============================================================
+       ★ 会话状态工具
+       ============================================================ */
+    function setConvStatus(convId, status) {
+        if (!convId || !status) return;
+        state.convStatus[convId] = status;
+        const conv = state.conversations.find(c => c.id === convId);
+        if (conv) conv.status = status;
+        renderConvList();
+        updateStatusTabCounts();
     }
 
     /* ============================================================
@@ -4564,7 +4813,7 @@
     }
 
     /* ============================================================
-       接管 / 转人工
+       接管 / 转人工 / 结束
        ============================================================ */
     function transferToHuman() {
         if (!state.currentId) return;
@@ -4572,6 +4821,8 @@
         if (state.aiTimers[convId]) { clearTimeout(state.aiTimers[convId]); delete state.aiTimers[convId]; }
         if (state.silenceTimers[convId]) { clearTimeout(state.silenceTimers[convId]); delete state.silenceTimers[convId]; }
         state.takeoverState[convId] = 'human';
+        // ★ 转人工 → 状态变为 pending
+        setConvStatus(convId, 'pending');
         document.getElementById('typingIndicator').classList.remove('show');
         sendSystemMessage(convId, '【系统】会话已转人工客服');
         renderChatActions(convId);
@@ -4584,6 +4835,8 @@
         if (!state.currentId) return;
         const convId = state.currentId;
         state.takeoverState[convId] = 'ai';
+        // ★ AI 接管 → 状态变为 active
+        setConvStatus(convId, 'active');
         sendSystemMessage(convId, '【系统】AI 已接管本会话');
         renderChatActions(convId);
         renderConvList();
@@ -4596,6 +4849,7 @@
         if (!state.currentId) return;
         const convId = state.currentId;
         state.takeoverState[convId] = 'ai';
+        setConvStatus(convId, 'active');
         sendSystemMessage(convId, '【系统】已释放给 AI 接管');
         renderChatActions(convId);
         renderConvList();
@@ -4611,9 +4865,11 @@
         if (state.aiTimers[convId]) { clearTimeout(state.aiTimers[convId]); delete state.aiTimers[convId]; }
         if (state.silenceTimers[convId]) { clearTimeout(state.silenceTimers[convId]); delete state.silenceTimers[convId]; }
         delete silenceCount[convId];
-        state.conversations = state.conversations.filter(c => c.id !== convId);
-        delete state.messagesMap[convId];
-        delete state.takeoverState[convId];
+
+        // ★ 结束会话 → 状态变为 closed（不删除会话，只标记）
+        setConvStatus(convId, 'closed');
+        sendSystemMessage(convId, '【系统】会话已结束');
+
         state.currentId = null;
         state.customerProfile = null;
         state.customerNote = { note: '', tags: [], updated_at: '' };
@@ -4647,6 +4903,7 @@
        ============================================================ */
     function refreshAll() {
         renderConvList();
+        updateStatusTabCounts();
         loadKb();
         loadAssets();
         loadProducts();
@@ -4727,6 +4984,7 @@
     window.switchTab = switchTab;
     window.openConv = openConv;
     window.filterConv = filterConv;
+    window.filterConvStatus = filterConvStatus;
     window.sendMsg = sendMsg;
     window.transferToHuman = transferToHuman;
     window.takeOver = takeOver;
@@ -4780,7 +5038,7 @@
     window.useQuickReply = useQuickReply;
     window.toggleCustomerSide = toggleCustomerSide;
 
-    console.log('💬 AI 客服页已加载（Toolbar 内嵌统计 + 右侧面板加宽 + 移除知识库/素材/DeepSeek 显示）');
+    console.log('💬 AI 客服页已加载（客户信息同步 + 状态筛选 Tab + 13 个平台）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
