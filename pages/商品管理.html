@@ -846,7 +846,7 @@
                     <th>销量</th>
                     <th>评价</th>
                     <th>状态</th>
-                    <th style="width:140px;">操作</th>
+                    <th style="width:150px;">操作</th>
                 </tr>
             </thead>
             <tbody id="productTableBody">
@@ -1695,7 +1695,7 @@
                     <td>${(p.sales || 0).toLocaleString()}</td>
                     <td><span class="badge ${p.rating && p.rating.includes('4.5') ? 'warning' : 'success'}">${p.rating || '—'}</span></td>
                     <td><span class="badge ${statusCls}">${p.status}</span></td>
-                    <td>
+                    <td style="white-space:nowrap;">
                         <span class="btn-sm outline" onclick="openEditModal(${p.id})"><i class="fas fa-edit"></i> 编辑</span>
                         <span class="btn-sm blue" style="margin-left:4px;" onclick="showToast('🔄 同步商品：${p.name}')"><i class="fas fa-sync-alt"></i> 同步</span>
                     </td>
