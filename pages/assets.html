@@ -37,6 +37,18 @@
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         .toolbar .tb-left strong { color: #0a1e2f; font-weight: 600; }
 
+        /* ★ 返回仪表盘按钮 */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 12px; border-radius: 8px;
+            border: 1px solid #dce5ef; background: #fff;
+            color: #1e3a5f; font-size: 12px; font-weight: 500;
+            cursor: pointer; transition: 0.12s; font-family: inherit;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .back-btn:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
+        .back-btn i { font-size: 11px; }
+
         .toolbar .tb-stats {
             display: flex; align-items: center; gap: 14px;
             margin-left: 4px; padding-left: 14px;
@@ -201,7 +213,7 @@
         /* 已结束 · 数字灰色 */
         .conv-status-tab[data-status="closed"] .tab-count { color: #94a3b8; }
 
-        /* ★ 店铺选择器（替代原平台筛选） */
+        /* ★ 店铺选择器（工作台顶部） */
         .store-picker {
             position: relative;
             display: flex;
@@ -349,19 +361,27 @@
             display: flex; align-items: center; justify-content: center;
         }
 
+        /* ============================================================
+           ★ 平台标签 13 色（含 TikTok Shop / 天猫 / 快手 / 小红书 / Lazada）
+           ============================================================ */
+        .plat-tag.alibaba1688 { background: #fff5e6; color: #b57a00; }
         .plat-tag.taobao { background: #fef0e6; color: #b55a1a; }
+        .plat-tag.tmall { background: #fde8ed; color: #b51a3f; }
         .plat-tag.douyin { background: #e9f0ff; color: #1a5bb5; }
+        .plat-tag.kuaishou { background: #ffe8e0; color: #ff6a00; }
         .plat-tag.pdd { background: #fde8ed; color: #b51a3f; }
         .plat-tag.jd { background: #e6f7ec; color: #0d7c4f; }
-        .plat-tag.alibaba1688 { background: #fff5e6; color: #b57a00; }
+        .plat-tag.xiaohongshu { background: #fde8ed; color: #e1251b; }
         .plat-tag.amazon { background: #fff8e6; color: #8a5a00; }
         .plat-tag.aliexpress { background: #fff0e6; color: #e1251b; }
         .plat-tag.alibabaintl { background: #fff0e6; color: #b55a1a; }
-        .plat-tag.mercadolibre { background: #fff8e6; color: #b57a00; }
-        .plat-tag.shein { background: #f5f0ff; color: #6a5cff; }
-        .plat-tag.shopify { background: #e6f7ec; color: #0d7c4f; }
+        .plat-tag.tiktokshop { background: #f0f0f0; color: #0a0a0a; }
+        .plat-tag.lazada { background: #e6f0ff; color: #0f4cff; }
         .plat-tag.shopee { background: #fff0e6; color: #e1251b; }
         .plat-tag.temu { background: #fef0e6; color: #ff5000; }
+        .plat-tag.shein { background: #f5f0ff; color: #6a5cff; }
+        .plat-tag.mercadolibre { background: #fff8e6; color: #b57a00; }
+        .plat-tag.shopify { background: #e6f7ec; color: #0d7c4f; }
 
         .chat-panel {
             flex: 1; background: #fff; border-radius: 14px;
@@ -2130,6 +2150,219 @@
             color: #2a7faa;
         }
 
+        /* ============================================================
+           ★ 仪表盘视图（店铺首页）
+           ============================================================ */
+        .view { display: none; }
+        .view.active { display: block; }
+        #viewWorkspace.active { display: flex; flex-direction: column; height: 100%; }
+
+        .dashboard-wrap {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: #f4f7fa;
+            min-height: 0;
+        }
+        .dashboard-wrap::-webkit-scrollbar { width: 6px; }
+        .dashboard-wrap::-webkit-scrollbar-thumb { background: #d0d8e4; border-radius: 10px; }
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .dashboard-container .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .dashboard-container .page-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0a1e2f;
+        }
+        .dashboard-container .page-title p {
+            color: #666;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+        .dashboard-container .time-select {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            font-family: inherit;
+            font-size: 13px;
+            color: #0a1e2f;
+            cursor: pointer;
+            outline: none;
+        }
+        .dashboard-container .time-select:focus {
+            border-color: #1677ff;
+            box-shadow: 0 0 0 3px rgba(22,119,255,0.08);
+        }
+
+        .metric-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1677ff;
+        }
+        .metric-desc {
+            font-size: 12px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        .tab-wrap {
+            background: #fff;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .tab-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .tab-item {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            border: 1px solid transparent;
+            transition: 0.15s;
+            user-select: none;
+            color: #0a1e2f;
+        }
+        .tab-item.active {
+            background: #1677ff;
+            color: #fff;
+        }
+        .tab-item:not(.active):hover {
+            background: #f0f7ff;
+        }
+
+        .shop-grid-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #0a1e2f;
+        }
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+        .shop-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .shop-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(22,119,255,0.12);
+            border-color: rgba(22,119,255,0.5);
+        }
+        .shop-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .shop-platform-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .shop-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a1e2f;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .shop-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .shop-stat-item {
+            font-size: 13px;
+        }
+        .shop-stat-label {
+            color: #777;
+        }
+        .shop-stat-value {
+            font-weight: 600;
+            margin-top: 2px;
+            color: #0a1e2f;
+        }
+        .shop-card-footer {
+            margin-top: 16px;
+            border-top: 1px solid #f2f2f2;
+            padding-top: 12px;
+            text-align: right;
+        }
+        .enter-btn {
+            color: #1677ff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 平台色（仪表盘卡片图标） */
+        .tkshop { background: #000000; }
+        .temu-color { background: #e64398; }
+        .shein-color { background: #ff6700; }
+        .douyin-color { background: #000000; }
+        .taobao-color { background: #ff4400; }
+
+        @media (max-width: 1400px) {
+            .shop-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 1100px) {
+            .metric-row { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .shop-grid { grid-template-columns: repeat(2, 1fr); }
+            .metric-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .shop-grid { grid-template-columns: 1fr; }
+            .metric-row { grid-template-columns: 1fr; }
+            .dashboard-wrap { padding: 14px; }
+        }
+
         @media (max-width: 1500px) {
             .customer-side { width: 340px; }
         }
@@ -2198,8 +2431,77 @@
 </head>
 <body>
 
+<div id="viewDashboard" class="view active">
+    <div class="dashboard-wrap">
+        <div class="dashboard-container">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>多店铺AI客服仪表盘</h1>
+                    <p>客服接待数据汇总 | 点击店铺卡片进入对应客服工作台</p>
+                </div>
+                <select class="time-select">
+                    <option>今日</option>
+                    <option>近7天</option>
+                    <option selected>近30天</option>
+                    <option>自然月</option>
+                </select>
+            </div>
+
+            <!-- 顶部核心指标 -->
+            <div class="metric-row">
+                <div class="metric-card">
+                    <div class="metric-label">总接待会话量</div>
+                    <div class="metric-value">12,684</div>
+                    <div class="metric-desc">环比 +12.4%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">平均首次响应时长</div>
+                    <div class="metric-value">14.2s</div>
+                    <div class="metric-desc">目标：小于20秒</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">AI自动解决率</div>
+                    <div class="metric-value">86.7%</div>
+                    <div class="metric-desc">环比 +2.1%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">人工介入率</div>
+                    <div class="metric-value">13.3%</div>
+                    <div class="metric-desc">环比 -2.1%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">客户满意度</div>
+                    <div class="metric-value">4.86</div>
+                    <div class="metric-desc">满分5分</div>
+                </div>
+            </div>
+
+            <!-- 平台 Tab 切换 -->
+            <div class="tab-wrap">
+                <div class="tab-list" id="dashboardTabList">
+                    <div class="tab-item active" data-platform="all" onclick="filterDashboard('all', this)">全部平台</div>
+                    <div class="tab-item" data-platform="TikTok Shop" onclick="filterDashboard('TikTok Shop', this)">TikTok Shop</div>
+                    <div class="tab-item" data-platform="Temu" onclick="filterDashboard('Temu', this)">Temu</div>
+                    <div class="tab-item" data-platform="Shein" onclick="filterDashboard('Shein', this)">Shein</div>
+                    <div class="tab-item" data-platform="抖音" onclick="filterDashboard('抖音', this)">抖音电商</div>
+                    <div class="tab-item" data-platform="淘宝" onclick="filterDashboard('淘宝', this)">淘宝</div>
+                </div>
+            </div>
+
+            <!-- 店铺卡片区域 -->
+            <div class="shop-grid-title">店铺列表（点击进入客服工作台）</div>
+            <div class="shop-grid" id="dashboardShopGrid"></div>
+        </div>
+    </div>
+</div>
+
+<div id="viewWorkspace" class="view">
 <div class="toolbar">
     <div class="tb-left">
+        <button class="back-btn" onclick="backToDashboard()" title="返回仪表盘">
+            <i class="fas fa-arrow-left"></i> 返回
+        </button>
         <div class="store-picker" id="storePicker" onclick="toggleStoreDropdown(event)">
             <div class="store-logo" id="storeCurrentLogo" style="background:#ff5000;">淘</div>
             <div class="store-info">
@@ -2221,13 +2523,13 @@
         <div class="tb-stats">
             <div class="tb-stat">
                 <i class="fas fa-comments" style="color:#4dabf7;"></i>
-                <span class="num" id="statTotal">1,284</span>
+                <span class="num" id="statTotal">0</span>
                 <span>会话</span>
             </div>
             <div class="tb-stat">
                 <i class="fas fa-robot" style="color:#4dabf7;"></i>
-                <span class="num" id="statAI">1,023</span>
-                <small>79.6%</small>
+                <span class="num" id="statAI">0</span>
+                <small>AI</small>
             </div>
             <div class="tb-stat cards">
                 <i class="fas fa-shopping-bag"></i>
@@ -2429,6 +2731,7 @@
         </div>
     </aside>
 </div>
+</div>
 
 <div class="product-picker-modal" id="productPickerModal" onclick="if(event.target===this) closeProductPicker()">
     <div class="product-picker-box">
@@ -2584,7 +2887,10 @@
 
         // ★ 防竞态：记录最近一次请求的会话 ID
         _profileLoadingFor: null,
-        _profileAbortController: null
+        _profileAbortController: null,
+
+        // ★ 仪表盘过滤
+        dashboardFilter: 'all'
     };
 
     /* ============================================================
@@ -2655,69 +2961,119 @@
     }
 
     /* ============================================================
-       ★ 店铺列表（替代原平台筛选）
+       ★ 店铺列表（6 个店铺，对应仪表盘卡片）
        ============================================================ */
     const DEMO_STORES = [
-        { id: 'shop_taobao', name: '云山优选旗舰店',   platform: '淘宝',   logoText: '淘', logoColor: '#ff5000', status: 'online',  statusText: '在线' },
-        { id: 'shop_douyin', name: '云山茶叶官方店',   platform: '抖音',   logoText: '抖', logoColor: '#1a1a1a', status: 'online',  statusText: '在线' },
-        { id: 'shop_pdd',    name: '云山食品专营店',   platform: '拼多多', logoText: '拼', logoColor: '#e02e24', status: 'busy',    statusText: '繁忙' },
-        { id: 'shop_jd',     name: '云山手工艺专营店', platform: '京东',   logoText: '京', logoColor: '#e1251b', status: 'online',  statusText: '在线' },
-        { id: 'shop_1688',   name: '云山优选批发店',   platform: '1688',   logoText: '阿', logoColor: '#ff6a00', status: 'offline', statusText: '离线' }
+        {
+            id: 'shop_tk_fashion', name: 'Fashion Global Store', platform: 'TikTok Shop',
+            logoText: 'TK', logoColor: '#000000', status: 'online', statusText: '在线',
+            stats: { pending: 28, aiRate: '84.2%', respTime: '16.3s', satisfaction: '4.82' },
+            cardClass: 'tkshop'
+        },
+        {
+            id: 'shop_temu_home', name: 'Home Goods Supply', platform: 'Temu',
+            logoText: 'TM', logoColor: '#e64398', status: 'online', statusText: '在线',
+            stats: { pending: 12, aiRate: '89.1%', respTime: '12.1s', satisfaction: '4.91' },
+            cardClass: 'temu-color'
+        },
+        {
+            id: 'shop_shein_a', name: 'Shein服饰供应商A', platform: 'Shein',
+            logoText: 'SH', logoColor: '#ff6700', status: 'online', statusText: '在线',
+            stats: { pending: 5, aiRate: '91.3%', respTime: '10.5s', satisfaction: '4.93' },
+            cardClass: 'shein-color'
+        },
+        {
+            id: 'shop_douyin_fresh', name: '生鲜源头直营店', platform: '抖音',
+            logoText: 'DY', logoColor: '#000000', status: 'online', statusText: '在线',
+            stats: { pending: 16, aiRate: '85.4%', respTime: '15.7s', satisfaction: '4.84' },
+            cardClass: 'douyin-color'
+        },
+        {
+            id: 'shop_taobao_supply', name: '跨藏优选供应链', platform: '淘宝',
+            logoText: 'TB', logoColor: '#ff4400', status: 'online', statusText: '在线',
+            stats: { pending: 9, aiRate: '87.6%', respTime: '13.4s', satisfaction: '4.87' },
+            cardClass: 'taobao-color'
+        },
+        {
+            id: 'shop_tk_gadget', name: 'Home Gadget Shop', platform: 'TikTok Shop',
+            logoText: 'TK', logoColor: '#000000', status: 'busy', statusText: '繁忙',
+            stats: { pending: 21, aiRate: '83.5%', respTime: '17.1s', satisfaction: '4.79' },
+            cardClass: 'tkshop'
+        }
     ];
 
     /* ============================================================
-       模拟数据
+       会话数据（每个店铺 2 条，共 12 条）
+       注意：加了 storeId 字段用于按店铺过滤
        ============================================================ */
     const DEMO_CONVERSATIONS = [
-        { id: 'c1',  name: '王*婷', avatarText: '王', avatarColor: '#b55a1a', platform: '淘宝', online: true,  lastTime: '14:32', unread: 2, lastMsg: '这款茶叶礼盒可以定制包装吗？', status: 'active' },
-        { id: 'c2',  name: '张*豪', avatarText: '张', avatarColor: '#1a5bb5', platform: '淘宝', online: true,  lastTime: '14:15', unread: 5, lastMsg: '竹编包能发顺丰吗？', status: 'pending' },
-        { id: 'c3',  name: '李*萱', avatarText: '李', avatarColor: '#b51a3f', platform: '抖音', online: false, lastTime: '14:05', unread: 0, lastMsg: '山核桃仁的保质期多久？', status: 'active' },
-        { id: 'c4',  name: '刘*阳', avatarText: '刘', avatarColor: '#0d7c4f', platform: '抖音', online: true,  lastTime: '13:48', unread: 1, lastMsg: '手工皂套装含哪些香味？', status: 'active' },
-        { id: 'c5',  name: '陈*瑶', avatarText: '陈', avatarColor: '#7b4fa0', platform: '拼多多', online: true,  lastTime: '13:20', unread: 0, lastMsg: '竹编包有现货吗？', status: 'closed' },
-        { id: 'c6',  name: '赵*琳', avatarText: '赵', avatarColor: '#2a7faa', platform: '拼多多', online: false, lastTime: '12:50', unread: 0, lastMsg: '茶叶礼盒的保质期？', status: 'active' },
-        { id: 'c7',  name: '孙*洋', avatarText: '孙', avatarColor: '#6a5cff', platform: '京东', online: true,  lastTime: '12:30', unread: 3, lastMsg: '丝巾有没有其他颜色？', status: 'pending' },
-        { id: 'c8',  name: '周*涵', avatarText: '周', avatarColor: '#e1251b', platform: '京东', online: true,  lastTime: '12:15', unread: 0, lastMsg: '可以批发吗？', status: 'active' },
-        { id: 'c9',  name: '吴*婷', avatarText: '吴', avatarColor: '#0d7c4f', platform: '1688', online: false, lastTime: '11:50', unread: 0, lastMsg: '发货到美国要多久？', status: 'closed' },
-        { id: 'c10', name: '郑*雅', avatarText: '郑', avatarColor: '#b57a00', platform: '1688', online: true,  lastTime: '11:30', unread: 1, lastMsg: 'MOQ 是多少？', status: 'active' }
+        // shop_tk_fashion
+        { id: 'tk1', storeId: 'shop_tk_fashion', name: 'Emily*', avatarText: 'E', avatarColor: '#1a1a1a', platform: 'TikTok Shop', online: true,  lastTime: '14:32', unread: 2, lastMsg: 'Do you ship to the UK?', status: 'active' },
+        { id: 'tk2', storeId: 'shop_tk_fashion', name: 'Jason*', avatarText: 'J', avatarColor: '#2a7faa', platform: 'TikTok Shop', online: true,  lastTime: '14:10', unread: 5, lastMsg: 'What sizes do you have?', status: 'pending' },
+        // shop_temu_home
+        { id: 'tm1', storeId: 'shop_temu_home', name: 'Sophia*', avatarText: 'S', avatarColor: '#e64398', platform: 'Temu', online: true,  lastTime: '13:58', unread: 0, lastMsg: 'When will it arrive?', status: 'active' },
+        { id: 'tm2', storeId: 'shop_temu_home', name: 'Mike*', avatarText: 'M', avatarColor: '#0d7c4f', platform: 'Temu', online: false, lastTime: '13:40', unread: 1, lastMsg: 'Any discount for bulk?', status: 'active' },
+        // shop_shein_a
+        { id: 'sh1', storeId: 'shop_shein_a', name: 'Lily*', avatarText: 'L', avatarColor: '#ff6700', platform: 'Shein', online: true,  lastTime: '13:20', unread: 0, lastMsg: 'Can I return if not fit?', status: 'closed' },
+        { id: 'sh2', storeId: 'shop_shein_a', name: 'Anna*', avatarText: 'A', avatarColor: '#b51a3f', platform: 'Shein', online: true,  lastTime: '13:05', unread: 2, lastMsg: 'Is this in stock?', status: 'active' },
+        // shop_douyin_fresh
+        { id: 'dy1', storeId: 'shop_douyin_fresh', name: '王*婷', avatarText: '王', avatarColor: '#b55a1a', platform: '抖音', online: true,  lastTime: '12:50', unread: 3, lastMsg: '这个生鲜能发顺丰吗？', status: 'active' },
+        { id: 'dy2', storeId: 'shop_douyin_fresh', name: '张*豪', avatarText: '张', avatarColor: '#1a5bb5', platform: '抖音', online: false, lastTime: '12:30', unread: 0, lastMsg: '多久能到货？', status: 'pending' },
+        // shop_taobao_supply
+        { id: 'tb1', storeId: 'shop_taobao_supply', name: '李*萱', avatarText: '李', avatarColor: '#b51a3f', platform: '淘宝', online: true,  lastTime: '12:10', unread: 1, lastMsg: '可以定制包装吗？', status: 'active' },
+        { id: 'tb2', storeId: 'shop_taobao_supply', name: '刘*阳', avatarText: '刘', avatarColor: '#0d7c4f', platform: '淘宝', online: true,  lastTime: '11:50', unread: 0, lastMsg: '有现货吗？', status: 'closed' },
+        // shop_tk_gadget
+        { id: 'tg1', storeId: 'shop_tk_gadget', name: 'David*', avatarText: 'D', avatarColor: '#6a5cff', platform: 'TikTok Shop', online: true,  lastTime: '11:30', unread: 2, lastMsg: 'Does it support 220V?', status: 'active' },
+        { id: 'tg2', storeId: 'shop_tk_gadget', name: 'Sarah*', avatarText: 'S', avatarColor: '#e1251b', platform: 'TikTok Shop', online: true,  lastTime: '11:15', unread: 0, lastMsg: 'Warranty period?', status: 'active' }
     ];
 
     const DEMO_MESSAGES = {
-        c1: [
-            { id: 'm1', from: 'user', text: '您好，请问这款茶叶礼盒还有货吗？', time: '14:30' },
-            { id: 'm2', from: 'ai', text: '您好！云山茶叶礼盒目前库存充足，下单后24小时内发货哦。', time: '14:30' },
-            { id: 'm3', from: 'user', text: '这款茶叶礼盒可以定制包装吗？', time: '14:32' }
+        tk1: [
+            { id: 'm1', from: 'user', text: 'Hi, do you ship to the UK?', time: '14:30' },
+            { id: 'm2', from: 'ai', text: 'Yes! We ship worldwide, including the UK. Delivery takes 7-12 business days.', time: '14:30' },
+            { id: 'm3', from: 'user', text: 'Do you ship to the UK?', time: '14:32' }
         ],
-        c2: [
-            { id: 'm1', from: 'user', text: '竹编包能发顺丰吗？', time: '14:15' },
-            { id: 'm2', from: 'ai', text: '您好，竹编包默认发中通/圆通，如需顺丰可补差价¥10，下单时备注即可。', time: '14:15' }
+        tk2: [
+            { id: 'm1', from: 'user', text: 'What sizes do you have?', time: '14:10' },
+            { id: 'm2', from: 'ai', text: 'We have S, M, L, XL available. Which size would you like?', time: '14:10' }
         ],
-        c3: [
-            { id: 'm1', from: 'user', text: '山核桃仁的保质期多久？', time: '14:05' },
-            { id: 'm2', from: 'ai', text: '山核桃仁保质期为6个月。', time: '14:05' }
+        tm1: [
+            { id: 'm1', from: 'user', text: 'When will it arrive?', time: '13:58' },
+            { id: 'm2', from: 'ai', text: 'Usually 5-9 business days after shipping. You will get a tracking number.', time: '13:58' }
         ],
-        c4: [
-            { id: 'm1', from: 'user', text: '手工皂套装含哪些香味？', time: '13:48' },
-            { id: 'm2', from: 'ai', text: '包含薰衣草、玫瑰、茶树精油三款。', time: '13:48' }
+        tm2: [
+            { id: 'm1', from: 'user', text: 'Any discount for bulk?', time: '13:40' }
         ],
-        c5: [
-            { id: 'm1', from: 'user', text: '竹编包有现货吗？', time: '13:20' },
-            { id: 'm2', from: 'ai', text: '竹编包库存充足。', time: '13:20' }
+        sh1: [
+            { id: 'm1', from: 'user', text: 'Can I return if not fit?', time: '13:20' },
+            { id: 'm2', from: 'ai', text: 'Yes, we offer 30-day free returns. Just keep the tags on.', time: '13:20' }
         ],
-        c6: [
-            { id: 'm1', from: 'user', text: '茶叶礼盒的保质期？', time: '12:50' },
-            { id: 'm2', from: 'ai', text: '保质期18个月。', time: '12:50' }
+        sh2: [
+            { id: 'm1', from: 'user', text: 'Is this in stock?', time: '13:05' },
+            { id: 'm2', from: 'ai', text: 'Yes, in stock. Ready to ship within 24 hours.', time: '13:05' }
         ],
-        c7: [
-            { id: 'm1', from: 'user', text: '丝巾有没有其他颜色？', time: '12:30' }
+        dy1: [
+            { id: 'm1', from: 'user', text: '这个生鲜能发顺丰吗？', time: '12:50' },
+            { id: 'm2', from: 'ai', text: '可以的！生鲜默认顺丰冷链，确保新鲜。', time: '12:50' }
         ],
-        c8: [
-            { id: 'm1', from: 'user', text: '可以批发吗？', time: '12:15' }
+        dy2: [
+            { id: 'm1', from: 'user', text: '多久能到货？', time: '12:30' }
         ],
-        c9: [
-            { id: 'm1', from: 'user', text: '发货到美国要多久？', time: '11:50' }
+        tb1: [
+            { id: 'm1', from: 'user', text: '可以定制包装吗？', time: '12:10' },
+            { id: 'm2', from: 'ai', text: '可以的，定制包装需加收¥10，下单时备注即可。', time: '12:10' }
         ],
-        c10: [
-            { id: 'm1', from: 'user', text: 'MOQ 是多少？', time: '11:30' }
+        tb2: [
+            { id: 'm1', from: 'user', text: '有现货吗？', time: '11:50' },
+            { id: 'm2', from: 'ai', text: '有货，下单后24小时内发货。', time: '11:50' }
+        ],
+        tg1: [
+            { id: 'm1', from: 'user', text: 'Does it support 220V?', time: '11:30' },
+            { id: 'm2', from: 'ai', text: 'Yes, it supports 110-240V, works worldwide.', time: '11:30' }
+        ],
+        tg2: [
+            { id: 'm1', from: 'user', text: 'Warranty period?', time: '11:15' },
+            { id: 'm2', from: 'ai', text: '12 months warranty. Any issue, just contact us.', time: '11:15' }
         ]
     };
 
@@ -2728,14 +3084,17 @@
         loadCardStyle();
         state.stores = JSON.parse(JSON.stringify(DEMO_STORES));
         state.currentStore = state.stores[0];
-        renderStorePicker();
-        document.addEventListener('click', closeStoreDropdownOnClickOutside);
         state.conversations = JSON.parse(JSON.stringify(DEMO_CONVERSATIONS));
         state.messagesMap = JSON.parse(JSON.stringify(DEMO_MESSAGES));
         state.conversations.forEach(c => {
             state.takeoverState[c.id] = 'ai';
             state.convStatus[c.id] = c.status || 'active';
         });
+
+        renderDashboard();
+        renderStorePicker();
+        document.addEventListener('click', closeStoreDropdownOnClickOutside);
+
         renderConvList();
         updateStatusTabCounts();
         loadKb();
@@ -2769,16 +3128,8 @@
 
         if (state.conversations.length === 0) return;
         const conv = state.conversations[0];
-        openConv(conv.id);
-
-        setTimeout(() => {
-            const input = document.getElementById('msgInput');
-            if (!input) return;
-            input.value = `我想咨询【${p.name}】`;
-            autoResize(input);
-            updateSendBtn();
-            sendMsg();
-        }, 600);
+        enterWorkspace(conv.storeId);
+        setTimeout(() => openConv(conv.id), 200);
     }
 
     function bindInputEvents() {
@@ -2818,6 +3169,96 @@
         });
     }
 
+    /* ============================================================
+       ★ 仪表盘渲染 + 视图切换
+       ============================================================ */
+    function renderDashboard() {
+        const grid = document.getElementById('dashboardShopGrid');
+        if (!grid) return;
+        let list = state.stores;
+        if (state.dashboardFilter && state.dashboardFilter !== 'all') {
+            list = list.filter(s => s.platform === state.dashboardFilter);
+        }
+        if (list.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">该平台暂无店铺</div>';
+            return;
+        }
+        grid.innerHTML = list.map(s => {
+            const st = s.stats || {};
+            return `
+                <div class="shop-card" onclick="enterWorkspace('${s.id}')">
+                    <div class="shop-card-header">
+                        <div class="shop-platform-icon ${s.cardClass || ''}" style="${s.cardClass ? '' : 'background:' + s.logoColor + ';'}">${escapeHtml(s.logoText)}</div>
+                        <div class="shop-name">${escapeHtml(s.name)}</div>
+                    </div>
+                    <div class="shop-stats">
+                        <div class="shop-stat-item">
+                            <div class="shop-stat-label">待接待会话</div>
+                            <div class="shop-stat-value">${st.pending || 0}</div>
+                        </div>
+                        <div class="shop-stat-item">
+                            <div class="shop-stat-label">AI解决率</div>
+                            <div class="shop-stat-value">${st.aiRate || '-'}</div>
+                        </div>
+                        <div class="shop-stat-item">
+                            <div class="shop-stat-label">响应时长</div>
+                            <div class="shop-stat-value">${st.respTime || '-'}</div>
+                        </div>
+                        <div class="shop-stat-item">
+                            <div class="shop-stat-label">满意度</div>
+                            <div class="shop-stat-value">${st.satisfaction || '-'}</div>
+                        </div>
+                    </div>
+                    <div class="shop-card-footer">
+                        <span class="enter-btn">进入客服工作台 →</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function filterDashboard(platform, el) {
+        state.dashboardFilter = platform;
+        document.querySelectorAll('#dashboardTabList .tab-item').forEach(t => t.classList.remove('active'));
+        if (el) el.classList.add('active');
+        renderDashboard();
+    }
+
+    function enterWorkspace(storeId) {
+        const st = state.stores.find(s => s.id === storeId);
+        if (!st) return;
+        state.currentStore = st;
+
+        document.getElementById('viewDashboard').classList.remove('active');
+        document.getElementById('viewWorkspace').classList.add('active');
+
+        renderStorePicker();
+        renderConvList();
+        updateStatusTabCounts();
+
+        // 退出当前会话（切换店铺时清空）
+        state.currentId = null;
+        state.customerProfile = null;
+        state.customerNote = { note: '', tags: [], updated_at: '' };
+        renderCustomerProfile(null);
+        document.getElementById('emptyChat').style.display = 'flex';
+        document.getElementById('chatHead').style.display = 'none';
+        document.getElementById('chatMessages').style.display = 'none';
+        document.getElementById('chatInputArea').style.display = 'none';
+
+        updateStatsBar();
+    }
+
+    function backToDashboard() {
+        // 关闭定时器
+        if (state.currentId && state.silenceTimers[state.currentId]) {
+            clearTimeout(state.silenceTimers[state.currentId]);
+            delete state.silenceTimers[state.currentId];
+        }
+        document.getElementById('viewWorkspace').classList.remove('active');
+        document.getElementById('viewDashboard').classList.add('active');
+        renderDashboard();
+    }
     /* ============================================================
        上传图片
        ============================================================ */
@@ -2939,11 +3380,7 @@
     }
 
     function updateStatusTabCounts() {
-        let list = state.conversations;
-        const platFilter = getStorePlatformFilter();
-        if (platFilter && platFilter !== 'all') {
-            list = list.filter(c => c.platform === platFilter);
-        }
+        let list = getStoreConversations();
         const all = list.length;
         const active = list.filter(c => (state.convStatus[c.id] || 'active') === 'active').length;
         const pending = list.filter(c => state.convStatus[c.id] === 'pending').length;
@@ -2960,6 +3397,12 @@
             if (pending > 0) pendingTab.classList.add('has-pending');
             else pendingTab.classList.remove('has-pending');
         }
+
+        // 顶部统计数字
+        const setNum = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+        setNum('statTotal', all);
+        const aiCount = active; // 简化为咨询中数量
+        setNum('statAI', aiCount);
     }
 
     /* ============================================================
@@ -3025,35 +3468,42 @@
         const st = state.stores.find(x => x.id === storeId);
         if (!st) return;
         state.currentStore = st;
+        state.currentId = null;
         closeStoreDropdown();
         renderStorePicker();
         renderConvList();
         updateStatusTabCounts();
+
+        // 清空会话面板
+        state.customerProfile = null;
+        state.customerNote = { note: '', tags: [], updated_at: '' };
+        renderCustomerProfile(null);
+        document.getElementById('emptyChat').style.display = 'flex';
+        document.getElementById('chatHead').style.display = 'none';
+        document.getElementById('chatMessages').style.display = 'none';
+        document.getElementById('chatInputArea').style.display = 'none';
+
         showToast(`🏪 已切换到「${st.name}」`);
     }
 
-    function getStorePlatformFilter() {
-        if (!state.currentStore) return 'all';
-        return state.currentStore.platform;
+    function getStoreConversations() {
+        if (!state.currentStore) return [];
+        return state.conversations.filter(c => c.storeId === state.currentStore.id);
     }
 
     /* ============================================================
-       会话列表
+       会话列表（按 storeId 过滤）
        ============================================================ */
     function renderConvList() {
         const container = document.getElementById('convList');
 
-        let list = state.conversations;
-        const platFilter = getStorePlatformFilter();
-        if (platFilter && platFilter !== 'all') {
-            list = list.filter(c => c.platform === platFilter);
-        }
+        let list = getStoreConversations();
         if (state.filterStatus !== 'all') {
             list = list.filter(c => (state.convStatus[c.id] || 'active') === state.filterStatus);
         }
 
         if (list.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:13px;">暂无会话</div>';
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:13px;">该店铺暂无会话</div>';
             return;
         }
         container.innerHTML = list.map(c => {
@@ -3073,7 +3523,7 @@
                     <div class="conv-info">
                         <div class="conv-name">
                             ${escapeHtml(c.name)}
-                            <span class="plat-tag ${platClass(c.platform)}">${c.platform}</span>
+                            <span class="plat-tag ${platClass(c.platform)}">${escapeHtml(c.platform)}</span>
                         </div>
                         <div class="conv-preview">${escapeHtml(c.lastMsg)}</div>
                         <div class="conv-time">${c.lastTime}</div>
@@ -3084,29 +3534,37 @@
         }).join('');
     }
 
+    /* ============================================================
+       ★ 平台标签映射（13 个平台）
+       ============================================================ */
     function platClass(p) {
         const map = {
             '1688': 'alibaba1688',
             '淘宝': 'taobao',
+            '天猫': 'tmall',
             '抖音': 'douyin',
+            '快手': 'kuaishou',
             '拼多多': 'pdd',
             '京东': 'jd',
+            '小红书': 'xiaohongshu',
             '亚马逊': 'amazon',
             '速卖通': 'aliexpress',
             '阿里国际站': 'alibabaintl',
-            '美客多': 'mercadolibre',
-            '希英': 'shein',
-            'Shopify': 'shopify',
+            'TikTok Shop': 'tiktokshop',
+            'Lazada': 'lazada',
             'Shopee': 'shopee',
-            'temu': 'temu'
+            'temu': 'temu',
+            'Temu': 'temu',
+            '希英': 'shein',
+            'Shein': 'shein',
+            '美客多': 'mercadolibre',
+            'Shopify': 'shopify'
         };
         return map[p] || '';
     }
+
     /* ============================================================
        ★ 打开会话
-       - 切换会话时，先立即同步渲染客户信息（用会话数据兜底）
-       - 再异步拉后端真实数据覆盖
-       - 加了竞态保护，防止旧请求覆盖新数据
        ============================================================ */
     function openConv(id) {
         const conv = state.conversations.find(c => c.id === id);
@@ -3132,7 +3590,7 @@
         document.getElementById('chatAvatar').textContent = conv.avatarText;
         document.getElementById('chatAvatar').style.background = conv.avatarColor;
         document.getElementById('chatName').innerHTML =
-            `${escapeHtml(conv.name)} <span class="plat-tag ${platClass(conv.platform)}">${conv.platform}</span>`;
+            `${escapeHtml(conv.name)} <span class="plat-tag ${platClass(conv.platform)}">${escapeHtml(conv.platform)}</span>`;
         document.getElementById('chatSub').textContent =
             `客户 ID: ${conv.id.toUpperCase()} · ${conv.online ? '在线' : '离线'}`;
 
@@ -3157,16 +3615,15 @@
 
         resetSilenceTimer(id);
 
-        // ★ 关键：立刻渲染客户信息（用会话数据 + 空值兜底），不让面板闪"未命名客户"
+        // ★ 立刻渲染客户信息兜底
         state.customerProfile = buildFallbackProfile(conv);
         state.customerNote = { note: '', tags: [], updated_at: '' };
         renderCustomerProfile(state.customerProfile);
 
-        // 再异步拉后端真实数据（会覆盖上面）
+        // 异步拉后端真实数据
         loadCustomerProfile(id);
     }
 
-    // ★ 从会话数据构建一个完整的兜底 profile（避免显示"未命名客户/普通会员/ID: c1"）
     function buildFallbackProfile(conv) {
         return {
             customer_id: conv.id,
@@ -3517,7 +3974,6 @@
         state.clickStats.totalClicked++;
         updateStatsBar();
     }
-
     /* ============================================================
        点击追踪
        ============================================================ */
@@ -3587,7 +4043,6 @@
                     data: data
                 })
             });
-            // 记录行为的会话跟当前会话一致才刷新
             const refreshFor = state.currentId;
             setTimeout(() => {
                 if (state.currentId === refreshFor) loadCustomerProfile(refreshFor);
@@ -3648,8 +4103,9 @@
     }
 
     function updateStatsBar() {
-        document.getElementById('statCards').textContent = state.clickStats.totalShown;
-        document.getElementById('statClicks').textContent = state.clickStats.totalClicked;
+        const setNum = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+        setNum('statCards', state.clickStats.totalShown);
+        setNum('statClicks', state.clickStats.totalClicked);
     }
 
     /* ============================================================
@@ -3833,10 +4289,8 @@
             return;
         }
 
-        // 记录本次请求对应的会话 ID
         state._profileLoadingFor = convId;
 
-        // 中断上一次未完成的请求
         if (state._profileAbortController) {
             try { state._profileAbortController.abort(); } catch (e) {}
         }
@@ -3851,14 +4305,12 @@
                     .then(r => r.json()).catch(() => null)
             ]);
 
-            // ★ 竞态保护：如果用户已经切换到别的会话，直接丢弃本次结果
             if (state._profileLoadingFor !== convId) return;
             if (state.currentId !== convId) return;
 
             const conv = state.conversations.find(c => c.id === convId);
 
             if (profileRes && profileRes.success && profileRes.profile) {
-                // 后端返回的 profile 可能是空数据（比如查不到客户），需要合并会话信息
                 const merged = { ...buildFallbackProfile(conv || {}), ...profileRes.profile };
                 if (!merged.name && conv) merged.name = conv.name;
                 if (!merged.avatar_text && conv) merged.avatar_text = conv.avatarText;
@@ -4439,7 +4891,6 @@
         else if (platform.includes('京东')) return `https://search.jd.com/Search?keyword=${name}`;
         return '#';
     }
-
     /* ============================================================
        优惠券选择器
        ============================================================ */
@@ -4579,6 +5030,7 @@
             state.isReplying = false;
         }, 1500 + Math.random() * 1500);
     }
+
     /* ============================================================
        客户回复 + AI 自动回复
        ============================================================ */
@@ -5068,6 +5520,7 @@
        工具
        ============================================================ */
     function refreshAll() {
+        renderDashboard();
         renderConvList();
         updateStatusTabCounts();
         loadKb();
@@ -5143,7 +5596,6 @@
     function closeLightbox() {
         document.getElementById('lightbox').classList.remove('show');
     }
-
     /* ============================================================
        全局暴露
        ============================================================ */
@@ -5170,6 +5622,11 @@
 
     window.toggleStoreDropdown = toggleStoreDropdown;
     window.selectStore = selectStore;
+
+    // ★ 仪表盘
+    window.filterDashboard = filterDashboard;
+    window.enterWorkspace = enterWorkspace;
+    window.backToDashboard = backToDashboard;
 
     window.openProductPicker = openProductPicker;
     window.closeProductPicker = closeProductPicker;
@@ -5206,7 +5663,7 @@
     window.useQuickReply = useQuickReply;
     window.toggleCustomerSide = toggleCustomerSide;
 
-    console.log('💬 AI 客服页已加载（多店铺选择 + 4.1 布局状态Tab + 客户信息同步修复）');
+    console.log('💬 AI 客服页已加载（多店铺仪表盘 + 双视图 + 13 平台标签 + 客户信息同步修复）');
     console.log('💡 后端:', BACKEND_URL);
 </script>
 </body>
