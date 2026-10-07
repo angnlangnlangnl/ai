@@ -17,7 +17,7 @@
             color: #0a1a2b;
         }
 
-        /* 统计卡片 */
+        /* ===== 统计卡片 ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -31,10 +31,16 @@
             border: 1px solid #e8edf4;
             box-shadow: 0 2px 8px rgba(10,30,47,0.02);
             transition: 0.15s;
+            cursor: pointer;
         }
         .stat-card:hover {
             box-shadow: 0 6px 20px rgba(10,30,47,0.06);
             border-color: #c8d8e8;
+            transform: translateY(-1px);
+        }
+        .stat-card.active {
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.1);
         }
         .stat-card .label {
             font-size: 13px;
@@ -57,7 +63,7 @@
             margin-top: 4px;
         }
 
-        /* 卡片 */
+        /* ===== 卡片 ===== */
         .card {
             background: #fff;
             border-radius: 16px;
@@ -88,7 +94,7 @@
             cursor: pointer;
         }
 
-        /* 表单 */
+        /* ===== 表单 ===== */
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -110,6 +116,7 @@
             font-size: 14px;
             background: #fafcfe;
             font-family: inherit;
+            transition: 0.15s;
         }
         .form-group input:focus,
         .form-group select:focus {
@@ -118,7 +125,64 @@
             box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
         }
 
-        /* 表格 */
+        /* ===== 三级分类筛选 ===== */
+        .category-filter-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 6px 0 2px;
+            width: 100%;
+        }
+        .category-level {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+        .category-level .level-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f7d95;
+            margin-right: 4px;
+            min-width: 36px;
+        }
+        .category-level .cat-tag {
+            padding: 3px 14px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #5f7d95;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+        .category-level .cat-tag:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+            background: #f5f9fe;
+        }
+        .category-level .cat-tag.active {
+            background: #0a1e2f;
+            border-color: #0a1e2f;
+            color: #fff;
+        }
+        .category-level .cat-tag .count {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-left: 3px;
+        }
+        .category-level .cat-tag.active .count {
+            color: rgba(255,255,255,0.5);
+        }
+        .category-divider {
+            width: 100%;
+            height: 1px;
+            background: #e8edf4;
+            margin: 4px 0;
+        }
+
+        /* ===== 表格 ===== */
         .table-wrap { overflow-x: auto; }
         .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .table-wrap th {
@@ -138,8 +202,14 @@
         }
         .table-wrap tr:last-child td { border: none; }
         .table-wrap tr:hover td { background: #fafcfe; }
+        .table-wrap input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            accent-color: #4dabf7;
+            cursor: pointer;
+        }
 
-        /* 徽章 */
+        /* ===== 徽章 ===== */
         .badge {
             padding: 3px 12px;
             border-radius: 30px;
@@ -156,8 +226,9 @@
         .badge.warning { background: #fef0e6; color: #b55a1a; }
         .badge.danger { background: #fde8ed; color: #b51a3f; }
         .badge.info { background: #e9f0ff; color: #1a5bb5; }
+        .badge.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
 
-        /* 按钮 */
+        /* ===== 按钮 ===== */
         .btn-sm {
             padding: 5px 14px;
             border-radius: 20px;
@@ -171,11 +242,16 @@
             transition: 0.1s;
         }
         .btn-sm.primary { background: #0a1e2f; color: #fff; }
+        .btn-sm.primary:hover { background: #1a3a5a; }
         .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm.outline:hover { background: #f5f8fc; }
+        .btn-sm.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
         .btn-sm.danger  { background: #fde8ed; color: #b51a3f; }
+        .btn-sm.success { background: #e6f7ec; color: #0d7c4f; }
         .btn-sm:active  { transform: scale(0.95); }
+        .btn-sm:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* 分页 */
+        /* ===== 分页 ===== */
         .pagination {
             display: flex;
             justify-content: space-between;
@@ -190,6 +266,7 @@
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
+            align-items: center;
         }
         .page-item {
             padding: 5px 12px;
@@ -200,10 +277,160 @@
             background: #fff;
             color: #1e3a5f;
             transition: 0.1s;
+            user-select: none;
         }
-        .page-item:hover { border-color: #4dabf7; color: #2a7faa; }
+        .page-item:hover:not(.disabled):not(.active) {
+            border-color: #4dabf7;
+            color: #2a7faa;
+        }
         .page-item.active { background: #0a1e2f; border-color: #0a1e2f; color: #fff; }
+        .page-item.disabled { opacity: 0.4; cursor: not-allowed; }
 
+        /* ===== 空状态 ===== */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: #94a3b8;
+        }
+        .empty-state i { font-size: 40px; margin-bottom: 12px; display: block; opacity: 0.5; }
+        .empty-state p { font-size: 14px; }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+        .toast.show { display: block; animation: fadeUp 0.3s ease; }
+        .toast.success { background: #0d7c4f; }
+        .toast.error { background: #b51a3f; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ===== 弹窗 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 640px;
+            width: 95%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+            animation: dialogIn 0.25s ease;
+        }
+        @keyframes dialogIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid #e8edf4;
+            flex-shrink: 0;
+        }
+        .modal-header h3 {
+            font-size: 17px;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-header h3 i { color: #4dabf7; }
+        .modal-header .close {
+            font-size: 26px;
+            color: #94a3b8;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0 8px;
+            line-height: 1;
+        }
+        .modal-header .close:hover { color: #0a1e2f; }
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 28px;
+        }
+        .modal-body::-webkit-scrollbar { width: 4px; }
+        .modal-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 16px 28px 20px;
+            border-top: 1px solid #e8edf4;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e8edf4;
+            font-size: 13px;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .k { color: #5f7d95; }
+        .info-row .v { color: #0a1e2f; font-weight: 500; }
+
+        .timeline { padding-left: 6px; margin-top: 8px; }
+        .timeline-item {
+            position: relative;
+            padding-left: 20px;
+            padding-bottom: 14px;
+            font-size: 13px;
+            color: #0a1e2f;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4dabf7;
+        }
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            left: 3.5px;
+            top: 15px;
+            bottom: 0;
+            width: 1px;
+            background: #e8edf4;
+        }
+        .timeline-item:last-child:after { display: none; }
+        .timeline-item .time { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+        /* ===== 响应式 ===== */
         @media (max-width: 1200px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .form-row { grid-template-columns: 1fr 1fr; }
@@ -212,233 +439,760 @@
             body { padding: 14px; }
             .stats-grid { grid-template-columns: 1fr; }
             .form-row { grid-template-columns: 1fr; }
+            .modal-box { max-width: 100%; width: 100%; max-height: 100vh; border-radius: 0; }
+            .modal-header { padding: 16px 18px 12px; }
+            .modal-body { padding: 16px 18px; }
+            .modal-footer { padding: 12px 18px 16px; }
         }
     </style>
 </head>
 <body>
 
-<!-- 统计卡片 -->
+<!-- ===== 统计卡片（可点击筛选） ===== -->
 <div class="stats-grid">
-    <div class="stat-card">
+    <div class="stat-card active" data-stat="all" onclick="quickFilter('all', this)">
         <div class="label"><i class="fas fa-shopping-cart" style="color:#4dabf7;"></i> 总订单</div>
-        <div class="value">347</div>
-        <div class="sub">今日 +56</div>
+        <div class="value" id="statTotal">0</div>
+        <div class="sub" id="statToday">今日 +0</div>
     </div>
-    <div class="stat-card">
-        <div class="label"><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 待发货</div>
-        <div class="value">89</div>
+    <div class="stat-card" data-stat="待发货" onclick="quickFilter('待发货', this)">
+        <div class="label"><i class="fas fa-box" style="color:#b55a1a;"></i> 待发货</div>
+        <div class="value" id="statPending">0</div>
         <div class="sub">需处理</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" data-stat="已发货" onclick="quickFilter('已发货', this)">
         <div class="label"><i class="fas fa-truck" style="color:#4dabf7;"></i> 运输中</div>
-        <div class="value">156</div>
+        <div class="value" id="statShipping">0</div>
         <div class="sub">正常</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" data-stat="退款中" onclick="quickFilter('退款中', this)">
         <div class="label"><i class="fas fa-times-circle" style="color:#b51a3f;"></i> 退款/售后</div>
-        <div class="value">12</div>
-        <div class="sub">需关注 5</div>
+        <div class="value" id="statRefund">0</div>
+        <div class="sub" id="statRefundSub">需关注 0</div>
     </div>
 </div>
 
-<!-- 筛选 -->
+<!-- ===== 订单筛选 ===== -->
 <div class="card">
     <div class="card-header">
         <h3><i class="fas fa-filter"></i> 订单筛选</h3>
-        <span class="action" onclick="showToast('🔄 已重置筛选条件')">
+        <span class="action" onclick="resetFilters()">
             <i class="fas fa-undo"></i> 重置
         </span>
     </div>
     <div class="form-row">
         <div class="form-group">
             <label>渠道</label>
-            <select>
-                <option>全部</option>
-                <option>淘宝</option>
-                <option>抖音</option>
-                <option>拼多多</option>
-                <option>京东</option>
+            <select id="filterChannel">
+                <option value="all">全部</option>
+                <option value="淘宝">淘宝</option>
+                <option value="抖音">抖音</option>
+                <option value="拼多多">拼多多</option>
+                <option value="京东">京东</option>
             </select>
         </div>
         <div class="form-group">
             <label>状态</label>
-            <select>
-                <option>全部</option>
-                <option>待支付</option>
-                <option>已支付</option>
-                <option>待发货</option>
-                <option>已发货</option>
-                <option>已完成</option>
-                <option>退款中</option>
+            <select id="filterStatus">
+                <option value="all">全部</option>
+                <option value="待支付">待支付</option>
+                <option value="已支付">已支付</option>
+                <option value="待发货">待发货</option>
+                <option value="已发货">已发货</option>
+                <option value="已完成">已完成</option>
+                <option value="退款中">退款中</option>
             </select>
         </div>
         <div class="form-group">
             <label>日期</label>
-            <input type="text" placeholder="2026-09-01 ~ 2026-09-05">
+            <input type="text" id="filterDate" placeholder="2026-09-01 ~ 2026-09-05">
         </div>
         <div class="form-group">
             <label>买家</label>
-            <input type="text" placeholder="昵称 / 手机号">
+            <input type="text" id="filterBuyer" placeholder="昵称 / 手机号">
         </div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
-        <span class="btn-sm primary" onclick="showToast('🔍 正在搜索订单...')">
-            <i class="fas fa-search"></i> 搜索
-        </span>
-        <span class="btn-sm outline" onclick="showToast('📤 正在导出订单...')">
-            <i class="fas fa-file-export"></i> 导出
-        </span>
-        <span style="margin-left:auto;font-size:13px;color:#5f7d95;align-self:center;">
-            共 347 条订单
-        </span>
+    <div class="form-row" style="margin-top:14px;grid-template-columns:1fr 1fr 1fr 1fr;">
+        <div class="form-group">
+            <label>订单号</label>
+            <input type="text" id="filterOrderNo" placeholder="ORD-...">
+        </div>
+        <div class="form-group">
+            <label>金额区间</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+                <input type="number" id="filterMinAmount" placeholder="最低" min="0" style="flex:1;">
+                <span style="color:#94a3b8;">~</span>
+                <input type="number" id="filterMaxAmount" placeholder="最高" min="0" style="flex:1;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>排序</label>
+            <select id="filterSort">
+                <option value="time_desc">时间：最新优先</option>
+                <option value="time_asc">时间：最早优先</option>
+                <option value="amount_desc">金额：高到低</option>
+                <option value="amount_asc">金额：低到高</option>
+            </select>
+        </div>
+        <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
+            <span class="btn-sm primary" onclick="applyFilters()" style="flex:1;justify-content:center;">
+                <i class="fas fa-search"></i> 搜索
+            </span>
+            <span class="btn-sm outline" onclick="exportOrders()" style="flex:1;justify-content:center;">
+                <i class="fas fa-file-export"></i> 导出
+            </span>
+        </div>
     </div>
 </div>
 
-<!-- 订单列表 -->
+<!-- ===== 三级分类筛选 ===== -->
+<div class="card" style="padding:12px 20px;">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+        <span style="font-weight:600;color:#0a1e2f;font-size:13px;">
+            <i class="fas fa-tags" style="color:#4dabf7;"></i> 商品分类
+        </span>
+        <span style="font-size:12px;color:#94a3b8;">三级分类 · 点击切换</span>
+        <span style="margin-left:auto;font-size:13px;color:#5f7d95;">
+            筛选结果 <strong id="filteredCount">0</strong> 条
+        </span>
+    </div>
+    <div class="category-filter-container">
+        <div class="category-level">
+            <span class="level-label">一级</span>
+            <span class="cat-tag active" data-level="1" data-cat="all" onclick="filterOrderCategory(1,'all',this)">全部 <span class="count">(0)</span></span>
+            <span class="cat-tag" data-level="1" data-cat="食品" onclick="filterOrderCategory(1,'食品',this)">🍜 食品 <span class="count">(0)</span></span>
+            <span class="cat-tag" data-level="1" data-cat="手工艺" onclick="filterOrderCategory(1,'手工艺',this)">🎨 手工艺 <span class="count">(0)</span></span>
+            <span class="cat-tag" data-level="1" data-cat="文创" onclick="filterOrderCategory(1,'文创',this)">📚 文创 <span class="count">(0)</span></span>
+        </div>
+        <div class="category-divider"></div>
+        <div class="category-level" id="level2Row">
+            <span class="level-label">二级</span>
+            <span class="cat-tag active" data-level="2" data-cat="all" onclick="filterOrderCategory(2,'all',this)">全部 <span class="count">(0)</span></span>
+        </div>
+        <div class="category-divider"></div>
+        <div class="category-level" id="level3Row">
+            <span class="level-label">三级</span>
+            <span class="cat-tag active" data-level="3" data-cat="all" onclick="filterOrderCategory(3,'all',this)">全部 <span class="count">(0)</span></span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 订单列表 ===== -->
 <div class="card">
     <div class="card-header">
         <h3><i class="fas fa-list"></i> 订单列表</h3>
-        <span class="action"><i class="fas fa-clock"></i> 实时更新</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <span style="font-size:12px;color:#94a3b8;" id="selectedCount">未选择</span>
+            <span class="btn-sm blue" onclick="batchShip()"><i class="fas fa-truck"></i> 批量发货</span>
+            <span class="btn-sm outline" onclick="batchExport()"><i class="fas fa-file-export"></i> 批量导出</span>
+            <span class="action" onclick="loadOrders()" style="margin-left:4px;"><i class="fas fa-sync-alt"></i> 刷新</span>
+        </div>
     </div>
     <div class="table-wrap">
         <table>
             <thead>
                 <tr>
+                    <th style="width:36px;">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)">
+                    </th>
                     <th>订单号</th>
                     <th>买家</th>
                     <th>商品</th>
+                    <th>分类</th>
                     <th>渠道</th>
                     <th>金额</th>
                     <th>状态</th>
                     <th>时间</th>
-                    <th>操作</th>
+                    <th style="width:170px;">操作</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td><strong>ORD-0905-001</strong></td>
-                    <td>王*婷</td>
-                    <td>云山茶叶礼盒</td>
-                    <td><span class="badge douyin">抖音</span></td>
-                    <td style="font-weight:600;color:#b55a1a;">¥128</td>
-                    <td><span class="badge success">已支付</span></td>
-                    <td>14:32</td>
-                    <td>
-                        <span class="btn-sm outline" onclick="showToast('📦 正在处理发货...')">发货</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>ORD-0905-002</strong></td>
-                    <td>张*豪</td>
-                    <td>手工竹编包</td>
-                    <td><span class="badge taobao">淘宝</span></td>
-                    <td style="font-weight:600;color:#b55a1a;">¥89</td>
-                    <td><span class="badge warning">待发货</span></td>
-                    <td>14:15</td>
-                    <td>
-                        <span class="btn-sm primary" onclick="showToast('✏️ 正在处理订单...')">处理</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>ORD-0905-003</strong></td>
-                    <td>李*萱</td>
-                    <td>山核桃仁 250g</td>
-                    <td><span class="badge pdd">拼多多</span></td>
-                    <td style="font-weight:600;color:#b55a1a;">¥45</td>
-                    <td><span class="badge info">已发货</span></td>
-                    <td>13:50</td>
-                    <td>
-                        <span class="btn-sm outline" onclick="showToast('📍 正在追踪物流...')">追踪</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>ORD-0905-004</strong></td>
-                    <td>赵*琳</td>
-                    <td>云山手工皂套装</td>
-                    <td><span class="badge jd">京东</span></td>
-                    <td style="font-weight:600;color:#b55a1a;">¥79</td>
-                    <td><span class="badge danger">退款中</span></td>
-                    <td>13:20</td>
-                    <td>
-                        <span class="btn-sm danger" onclick="showToast('🚨 正在处理退款...')">处理</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>ORD-0905-005</strong></td>
-                    <td>刘*阳</td>
-                    <td>云山陶瓷杯</td>
-                    <td><span class="badge taobao">淘宝</span></td>
-                    <td style="font-weight:600;color:#b55a1a;">¥58</td>
-                    <td><span class="badge success">已支付</span></td>
-                    <td>12:45</td>
-                    <td>
-                        <span class="btn-sm outline" onclick="showToast('📦 正在处理发货...')">发货</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>ORD-0905-006</strong></td>
-                    <td>陈*瑶</td>
-                    <td>手工竹编包</td>
-                    <td><span class="badge douyin">抖音</span></td>
-                    <td style="font-weight:600;color:#b55a1a;">¥89</td>
-                    <td><span class="badge warning">待发货</span></td>
-                    <td>12:30</td>
-                    <td>
-                        <span class="btn-sm primary" onclick="showToast('✏️ 正在处理订单...')">处理</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>ORD-0905-007</strong></td>
-                    <td>周*明</td>
-                    <td>手写书法折扇</td>
-                    <td><span class="badge pdd">拼多多</span></td>
-                    <td style="font-weight:600;color:#b55a1a;">¥35</td>
-                    <td><span class="badge info">已发货</span></td>
-                    <td>12:10</td>
-                    <td>
-                        <span class="btn-sm outline" onclick="showToast('📍 正在追踪物流...')">追踪</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>ORD-0905-008</strong></td>
-                    <td>吴*雅</td>
-                    <td>云山国风丝巾</td>
-                    <td><span class="badge jd">京东</span></td>
-                    <td style="font-weight:600;color:#b55a1a;">¥68</td>
-                    <td><span class="badge success">已完成</span></td>
-                    <td>11:45</td>
-                    <td>
-                        <span class="btn-sm outline" onclick="showToast('📋 查看订单详情...')">详情</span>
-                    </td>
-                </tr>
+            <tbody id="orderTableBody">
+                <tr><td colspan="10" style="text-align:center; padding:30px; color:#94a3b8;">
+                    <i class="fas fa-spinner fa-spin"></i> 加载中...
+                </td></tr>
             </tbody>
         </table>
     </div>
 
-    <!-- 分页 -->
     <div class="pagination">
-        <span style="font-size:13px;color:#5f7d95;">
-            显示 1-8 条 / 共 347 条
+        <span style="font-size:13px;color:#5f7d95;" id="pageInfo">
+            显示 0-0 条 / 共 0 条
         </span>
-        <div class="pages">
-            <span class="page-item" onclick="showToast('📄 上一页')">
-                <i class="fas fa-chevron-left"></i>
-            </span>
-            <span class="page-item active">1</span>
-            <span class="page-item" onclick="showToast('📄 第2页')">2</span>
-            <span class="page-item" onclick="showToast('📄 第3页')">3</span>
-            <span class="page-item">...</span>
-            <span class="page-item" onclick="showToast('📄 第44页')">44</span>
-            <span class="page-item" onclick="showToast('📄 下一页')">
-                <i class="fas fa-chevron-right"></i>
+        <div class="pages" id="paginationPages"></div>
+    </div>
+</div>
+
+<!-- ===== 订单详情弹窗 ===== -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this) closeDetailModal()">
+    <div class="modal-box" style="max-width:720px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-receipt"></i> 订单详情 · <span id="detailOrderNo">—</span></h3>
+            <button class="close" onclick="closeDetailModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="detailBody"></div>
+        <div class="modal-footer">
+            <span class="btn-sm outline" onclick="closeDetailModal()">关闭</span>
+            <span class="btn-sm primary" onclick="showToast('📋 已复制订单信息', 'success')">
+                <i class="fas fa-copy"></i> 复制信息
             </span>
         </div>
     </div>
 </div>
 
+<!-- ===== 发货弹窗 ===== -->
+<div class="modal-overlay" id="shipModal" onclick="if(event.target===this) closeShipModal()">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-truck"></i> 订单发货 · <span id="shipOrderNo">—</span></h3>
+            <button class="close" onclick="closeShipModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>物流公司 <span style="color:#b51a3f;">*</span></label>
+                <select id="shipCompany">
+                    <option value="顺丰">顺丰速运</option>
+                    <option value="中通" selected>中通快递</option>
+                    <option value="圆通">圆通速递</option>
+                    <option value="韵达">韵达快递</option>
+                    <option value="德邦">德邦物流</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>物流单号 <span style="color:#b51a3f;">*</span></label>
+                <input type="text" id="shipTrackingNo" placeholder="请输入或扫描物流单号">
+            </div>
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>发货备注</label>
+                <input type="text" id="shipRemark" placeholder="选填，如：易碎品请注意">
+            </div>
+            <div style="background:#f0f7fe; border-radius:10px; padding:12px 16px; font-size:13px; color:#475569;">
+                <i class="fas fa-info-circle" style="color:#4dabf7;"></i>
+                发货后物流信息将同步到各平台，买家会收到发货通知。
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span class="btn-sm outline" onclick="closeShipModal()">取消</span>
+            <span class="btn-sm primary" onclick="confirmShip()"><i class="fas fa-check"></i> 确认发货</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 退款处理弹窗 ===== -->
+<div class="modal-overlay" id="refundModal" onclick="if(event.target===this) closeRefundModal()">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-undo-alt"></i> 退款处理 · <span id="refundOrderNo">—</span></h3>
+            <button class="close" onclick="closeRefundModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="info-row"><span class="k">退款金额</span><span class="v" id="refundAmount">¥0</span></div>
+            <div class="info-row"><span class="k">退款原因</span><span class="v" id="refundReason">—</span></div>
+            <div class="info-row"><span class="k">买家留言</span><span class="v" id="refundMessage">—</span></div>
+            <div class="form-group" style="margin-top:14px;">
+                <label>处理方式</label>
+                <select id="refundAction">
+                    <option value="approve">同意退款</option>
+                    <option value="reject">拒绝退款</option>
+                    <option value="return">要求退货退款</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-top:14px;">
+                <label>处理备注</label>
+                <textarea id="refundRemark" placeholder="选填，将同步给买家" style="min-height:70px;"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span class="btn-sm outline" onclick="closeRefundModal()">取消</span>
+            <span class="btn-sm danger" onclick="confirmRefund()"><i class="fas fa-paper-plane"></i> 提交处理</span>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
 <script src="../js/common.js"></script>
 <script>
+/* ============================================================
+   订单管理脚本
+   ============================================================ */
+
+/* ---------- 兼容：确保 showToast 可用（common.js 若无则用本地实现） ---------- */
+if (typeof window.showToast !== 'function') {
+    window.showToast = function(msg, type) {
+        var t = document.getElementById('toast');
+        t.className = 'toast ' + (type || '');
+        t.innerHTML = msg;
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2500);
+    };
+}
+
+/* ---------- 演示数据（真实项目可换成 fetch） ---------- */
+const MOCK_ORDERS = [
+    { id: 1,  orderNo: 'ORD-0905-001', buyer: '王*婷', product: '云山茶叶礼盒',   cat1: '食品',   cat2: '茶饮',   cat3: '礼盒装', channel: '抖音',   amount: 128, status: '已支付', time: '2026-09-05 14:32', phone: '138****2233' },
+    { id: 2,  orderNo: 'ORD-0905-002', buyer: '张*豪', product: '手工竹编包',     cat1: '手工艺', cat2: '编织',   cat3: '手工',   channel: '淘宝',   amount: 89,  status: '待发货', time: '2026-09-05 14:15', phone: '139****8877' },
+    { id: 3,  orderNo: 'ORD-0905-003', buyer: '李*萱', product: '山核桃仁 250g',  cat1: '食品',   cat2: '坚果',   cat3: '散装',   channel: '拼多多', amount: 45,  status: '已发货', time: '2026-09-05 13:50', phone: '137****5566' },
+    { id: 4,  orderNo: 'ORD-0905-004', buyer: '赵*琳', product: '云山手工皂套装', cat1: '文创',   cat2: '纸艺',   cat3: '定制',   channel: '京东',   amount: 79,  status: '退款中', time: '2026-09-05 13:20', phone: '136****1122' },
+    { id: 5,  orderNo: 'ORD-0905-005', buyer: '刘*阳', product: '云山陶瓷杯',     cat1: '手工艺', cat2: '陶瓷',   cat3: '手工',   channel: '淘宝',   amount: 58,  status: '已支付', time: '2026-09-05 12:45', phone: '135****3344' },
+    { id: 6,  orderNo: 'ORD-0905-006', buyer: '陈*瑶', product: '手工竹编包',     cat1: '手工艺', cat2: '编织',   cat3: '手工',   channel: '抖音',   amount: 89,  status: '待发货', time: '2026-09-05 12:30', phone: '134****7788' },
+    { id: 7,  orderNo: 'ORD-0905-007', buyer: '周*明', product: '手写书法折扇',   cat1: '文创',   cat2: '纸艺',   cat3: '定制',   channel: '拼多多', amount: 35,  status: '已发货', time: '2026-09-05 12:10', phone: '133****9900' },
+    { id: 8,  orderNo: 'ORD-0905-008', buyer: '吴*雅', product: '云山国风丝巾',   cat1: '文创',   cat2: '纸艺',   cat3: '定制',   channel: '京东',   amount: 68,  status: '已完成', time: '2026-09-05 11:45', phone: '132****1234' },
+    { id: 9,  orderNo: 'ORD-0905-009', buyer: '孙*倩', product: '云山茶叶礼盒',   cat1: '食品',   cat2: '茶饮',   cat3: '礼盒装', channel: '淘宝',   amount: 128, status: '待发货', time: '2026-09-05 11:20', phone: '131****5678' },
+    { id: 10, orderNo: 'ORD-0905-010', buyer: '郑*浩', product: '山核桃仁 250g',  cat1: '食品',   cat2: '坚果',   cat3: '散装',   channel: '抖音',   amount: 45,  status: '已支付', time: '2026-09-05 10:55', phone: '130****2468' },
+    { id: 11, orderNo: 'ORD-0905-011', buyer: '黄*丽', product: '云山陶瓷杯',     cat1: '手工艺', cat2: '陶瓷',   cat3: '手工',   channel: '京东',   amount: 58,  status: '已完成', time: '2026-09-05 10:30', phone: '159****1357' },
+    { id: 12, orderNo: 'ORD-0905-012', buyer: '林*峰', product: '手写书法折扇',   cat1: '文创',   cat2: '纸艺',   cat3: '定制',   channel: '淘宝',   amount: 35,  status: '退款中', time: '2026-09-05 10:05', phone: '158****8642' }
+];
+
+/* ---------- 全局状态 ---------- */
+let orders = [];
+let filteredOrders = [];
+let currentPage = 1;
+const PAGE_SIZE = 8;
+let categoryFilters = { level1: 'all', level2: 'all', level3: 'all' };
+let quickStatusFilter = 'all';
+let selectedIds = new Set();
+
+const CAT_MAP = {
+    '食品':   ['茶饮', '坚果'],
+    '手工艺': ['编织', '陶瓷'],
+    '文创':   ['纸艺']
+};
+const CAT3_MAP = {
+    '茶饮': ['礼盒装'],
+    '坚果': ['散装'],
+    '编织': ['手工'],
+    '陶瓷': ['手工'],
+    '纸艺': ['定制']
+};
+
+/* ---------- 工具 ---------- */
+function fmtMoney(n) {
+    return '¥' + Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+function badgeClass(channel) {
+    return ({ '淘宝': 'taobao', '抖音': 'douyin', '拼多多': 'pdd', '京东': 'jd' })[channel] || 'blue';
+}
+function statusClass(status) {
+    return ({
+        '待支付': 'warning', '已支付': 'success', '待发货': 'warning',
+        '已发货': 'info', '已完成': 'success', '退款中': 'danger'
+    })[status] || 'info';
+}
+
+/* ---------- 初始化 ---------- */
+function loadOrders() {
+    // 演示：直接使用 MOCK；真实项目改为 fetch(BACKEND_URL + '/api/orders')
+    orders = MOCK_ORDERS.slice();
+    applyFilters();
+    updateStats();
+    renderCategoryCounts();
+}
+
+/* ---------- 统计卡片 ---------- */
+function updateStats() {
+    var today = '2026-09-05';
+    var total = orders.length;
+    var todayCount = orders.filter(o => o.time.startsWith(today)).length;
+    var pending = orders.filter(o => o.status === '待发货').length;
+    var shipping = orders.filter(o => o.status === '已发货').length;
+    var refund = orders.filter(o => o.status === '退款中').length;
+
+    document.getElementById('statTotal').textContent   = total;
+    document.getElementById('statToday').textContent   = '今日 +' + todayCount;
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statShipping').textContent = shipping;
+    document.getElementById('statRefund').textContent  = refund;
+    document.getElementById('statRefundSub').textContent = '需关注 ' + refund;
+}
+
+/* ---------- 类目筛选 ---------- */
+function renderCategoryCounts() {
+    var l1Row = document.querySelector('.category-level[data-row="l1"]') ||
+                document.querySelectorAll('.category-level')[0];
+    // 一级统计
+    l1Row.querySelectorAll('.cat-tag').forEach(function(tag) {
+        var cat = tag.dataset.cat;
+        var n = cat === 'all' ? orders.length : orders.filter(o => o.cat1 === cat).length;
+        var cntEl = tag.querySelector('.count');
+        if (cntEl) cntEl.textContent = '(' + n + ')';
+    });
+    // 二级
+    var l2Row = document.getElementById('level2Row');
+    if (categoryFilters.level1 !== 'all') {
+        var subs = CAT_MAP[categoryFilters.level1] || [];
+        var html = '<span class="level-label">二级</span>' +
+                   '<span class="cat-tag ' + (categoryFilters.level2 === 'all' ? 'active' : '') + '" data-level="2" data-cat="all" onclick="filterOrderCategory(2,\'all\',this)">全部 <span class="count">(' +
+                   orders.filter(o => o.cat1 === categoryFilters.level1).length + ')</span></span>';
+        subs.forEach(function(s) {
+            var n = orders.filter(o => o.cat1 === categoryFilters.level1 && o.cat2 === s).length;
+            html += '<span class="cat-tag ' + (categoryFilters.level2 === s ? 'active' : '') +
+                    '" data-level="2" data-cat="' + s + '" onclick="filterOrderCategory(2,\'' + s + '\',this)">' + s +
+                    ' <span class="count">(' + n + ')</span></span>';
+        });
+        l2Row.innerHTML = html;
+    } else {
+        l2Row.innerHTML = '<span class="level-label">二级</span>' +
+            '<span class="cat-tag active" data-level="2" data-cat="all" onclick="filterOrderCategory(2,\'all\',this)">全部 <span class="count">(' + orders.length + ')</span></span>';
+    }
+    // 三级
+    var l3Row = document.getElementById('level3Row');
+    if (categoryFilters.level1 !== 'all' && categoryFilters.level2 !== 'all') {
+        var subs3 = CAT3_MAP[categoryFilters.level2] || [];
+        var baseN = orders.filter(o => o.cat1 === categoryFilters.level1 && o.cat2 === categoryFilters.level2).length;
+        var html3 = '<span class="level-label">三级</span>' +
+                    '<span class="cat-tag ' + (categoryFilters.level3 === 'all' ? 'active' : '') + '" data-level="3" data-cat="all" onclick="filterOrderCategory(3,\'all\',this)">全部 <span class="count">(' + baseN + ')</span></span>';
+        subs3.forEach(function(s) {
+            var n = orders.filter(o => o.cat1 === categoryFilters.level1 && o.cat2 === categoryFilters.level2 && o.cat3 === s).length;
+            html3 += '<span class="cat-tag ' + (categoryFilters.level3 === s ? 'active' : '') +
+                     '" data-level="3" data-cat="' + s + '" onclick="filterOrderCategory(3,\'' + s + '\',this)">' + s +
+                     ' <span class="count">(' + n + ')</span></span>';
+        });
+        l3Row.innerHTML = html3;
+    } else {
+        l3Row.innerHTML = '<span class="level-label">三级</span>' +
+            '<span class="cat-tag active" data-level="3" data-cat="all" onclick="filterOrderCategory(3,\'all\',this)">全部 <span class="count">(' + orders.length + ')</span></span>';
+    }
+}
+
+function filterOrderCategory(level, cat, el) {
+    var key = 'level' + level;
+    var siblings = el.parentElement.querySelectorAll('.cat-tag');
+    siblings.forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    categoryFilters[key] = cat;
+    if (level === 1) { categoryFilters.level2 = 'all'; categoryFilters.level3 = 'all'; }
+    if (level === 2) { categoryFilters.level3 = 'all'; }
+    renderCategoryCounts();
+    applyFilters();
+}
+
+/* ---------- 快捷状态筛选 ---------- */
+function quickFilter(status, el) {
+    document.querySelectorAll('.stat-card').forEach(function(c) { c.classList.remove('active'); });
+    if (el) el.classList.add('active');
+    quickStatusFilter = status;
+    if (status === 'all') {
+        document.getElementById('filterStatus').value = 'all';
+    } else {
+        document.getElementById('filterStatus').value = status;
+    }
+    applyFilters();
+}
+
+/* ---------- 筛选 ---------- */
+function applyFilters() {
+    var channel = document.getElementById('filterChannel').value;
+    var status  = document.getElementById('filterStatus').value;
+    var dateRange = document.getElementById('filterDate').value.trim();
+    var buyer   = document.getElementById('filterBuyer').value.trim().toLowerCase();
+    var orderNo = document.getElementById('filterOrderNo').value.trim().toLowerCase();
+    var minAmt  = parseFloat(document.getElementById('filterMinAmount').value);
+    var maxAmt  = parseFloat(document.getElementById('filterMaxAmount').value);
+    var sort    = document.getElementById('filterSort').value;
+
+    filteredOrders = orders.filter(function(o) {
+        if (channel !== 'all' && o.channel !== channel) return false;
+        if (status !== 'all' && o.status !== status) return false;
+        if (buyer && !(o.buyer.toLowerCase().includes(buyer) || (o.phone || '').includes(buyer))) return false;
+        if (orderNo && !o.orderNo.toLowerCase().includes(orderNo)) return false;
+        if (!isNaN(minAmt) && o.amount < minAmt) return false;
+        if (!isNaN(maxAmt) && o.amount > maxAmt) return false;
+        if (categoryFilters.level1 !== 'all' && o.cat1 !== categoryFilters.level1) return false;
+        if (categoryFilters.level2 !== 'all' && o.cat2 !== categoryFilters.level2) return false;
+        if (categoryFilters.level3 !== 'all' && o.cat3 !== categoryFilters.level3) return false;
+        // 日期区间（简单按字符串比较，假设格式一致）
+        if (dateRange) {
+            var parts = dateRange.split('~').map(s => s.trim());
+            if (parts.length === 2) {
+                var d = o.time.slice(0, 10);
+                if (d < parts[0] || d > parts[1]) return false;
+            }
+        }
+        return true;
+    });
+
+    // 排序
+    filteredOrders.sort(function(a, b) {
+        if (sort === 'time_desc') return b.time.localeCompare(a.time);
+        if (sort === 'time_asc')  return a.time.localeCompare(b.time);
+        if (sort === 'amount_desc') return b.amount - a.amount;
+        if (sort === 'amount_asc')  return a.amount - b.amount;
+        return 0;
+    });
+
+    currentPage = 1;
+    document.getElementById('filteredCount').textContent = filteredOrders.length;
+    renderTable();
+    renderPagination();
+}
+
+function resetFilters() {
+    document.getElementById('filterChannel').value = 'all';
+    document.getElementById('filterStatus').value = 'all';
+    document.getElementById('filterDate').value = '';
+    document.getElementById('filterBuyer').value = '';
+    document.getElementById('filterOrderNo').value = '';
+    document.getElementById('filterMinAmount').value = '';
+    document.getElementById('filterMaxAmount').value = '';
+    document.getElementById('filterSort').value = 'time_desc';
+    categoryFilters = { level1: 'all', level2: 'all', level3: 'all' };
+    quickStatusFilter = 'all';
+    document.querySelectorAll('.stat-card').forEach(function(c) { c.classList.remove('active'); });
+    document.querySelector('.stat-card[data-stat="all"]').classList.add('active');
+    selectedIds.clear();
+    renderCategoryCounts();
+    applyFilters();
+    showToast('🔄 已重置筛选条件', 'success');
+}
+
+/* ---------- 渲染表格 ---------- */
+function renderTable() {
+    var tbody = document.getElementById('orderTableBody');
+    if (filteredOrders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state">' +
+            '<i class="fas fa-inbox"></i><p>没有符合条件的订单</p></div></td></tr>';
+        updateSelectedCount();
+        return;
+    }
+
+    var start = (currentPage - 1) * PAGE_SIZE;
+    var pageData = filteredOrders.slice(start, start + PAGE_SIZE);
+
+    tbody.innerHTML = pageData.map(function(o) {
+        var checked = selectedIds.has(o.id) ? 'checked' : '';
+        var actions = '';
+        if (o.status === '已支付' || o.status === '待发货') {
+            actions = '<span class="btn-sm outline" onclick="openShipModal(' + o.id + ')"><i class="fas fa-truck"></i> 发货</span>' +
+                      '<span class="btn-sm primary" style="margin-left:4px;" onclick="openDetailModal(' + o.id + ')"><i class="fas fa-eye"></i> 详情</span>';
+        } else if (o.status === '退款中') {
+            actions = '<span class="btn-sm danger" onclick="openRefundModal(' + o.id + ')"><i class="fas fa-undo-alt"></i> 处理</span>' +
+                      '<span class="btn-sm outline" style="margin-left:4px;" onclick="openDetailModal(' + o.id + ')"><i class="fas fa-eye"></i> 详情</span>';
+        } else if (o.status === '已发货') {
+            actions = '<span class="btn-sm outline" onclick="showToast(\'📍 正在追踪物流...\')"><i class="fas fa-map-marker-alt"></i> 追踪</span>' +
+                      '<span class="btn-sm outline" style="margin-left:4px;" onclick="openDetailModal(' + o.id + ')"><i class="fas fa-eye"></i> 详情</span>';
+        } else {
+            actions = '<span class="btn-sm outline" onclick="openDetailModal(' + o.id + ')"><i class="fas fa-eye"></i> 详情</span>';
+        }
+
+        return '<tr>' +
+            '<td><input type="checkbox" ' + checked + ' onchange="toggleSelect(' + o.id + ', this)"></td>' +
+            '<td><strong>' + o.orderNo + '</strong></td>' +
+            '<td>' + o.buyer + '</td>' +
+            '<td>' + o.product + '</td>' +
+            '<td><span class="badge blue">' + o.cat1 + '</span></td>' +
+            '<td><span class="badge ' + badgeClass(o.channel) + '">' + o.channel + '</span></td>' +
+            '<td style="font-weight:600;color:#b55a1a;">' + fmtMoney(o.amount) + '</td>' +
+            '<td><span class="badge ' + statusClass(o.status) + '">' + o.status + '</span></td>' +
+            '<td style="font-size:12px;color:#5f7d95;">' + o.time.slice(5) + '</td>' +
+            '<td>' + actions + '</td>' +
+            '</tr>';
+    }).join('');
+
+    // 同步全选框
+    var allOnPage = pageData.every(function(o) { return selectedIds.has(o.id); });
+    document.getElementById('selectAll').checked = allOnPage && pageData.length > 0;
+    updateSelectedCount();
+}
+
+function renderPagination() {
+    var total = filteredOrders.length;
+    var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    var start = total === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+    var end = Math.min(currentPage * PAGE_SIZE, total);
+    document.getElementById('pageInfo').textContent = '显示 ' + start + '-' + end + ' 条 / 共 ' + total + ' 条';
+
+    var container = document.getElementById('paginationPages');
+    var html = '';
+    html += '<span class="page-item ' + (currentPage === 1 ? 'disabled' : '') + '" onclick="gotoPage(' + (currentPage - 1) + ')"><i class="fas fa-chevron-left"></i></span>';
+
+    var pages = [];
+    if (totalPages <= 7) {
+        for (var i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        pages.push(1);
+        if (currentPage > 3) pages.push('...');
+        for (var i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+        if (currentPage < totalPages - 2) pages.push('...');
+        pages.push(totalPages);
+    }
+    pages.forEach(function(p) {
+        if (p === '...') {
+            html += '<span class="page-item disabled">...</span>';
+        } else {
+            html += '<span class="page-item ' + (p === currentPage ? 'active' : '') + '" onclick="gotoPage(' + p + ')">' + p + '</span>';
+        }
+    });
+
+    html += '<span class="page-item ' + (currentPage === totalPages ? 'disabled' : '') + '" onclick="gotoPage(' + (currentPage + 1) + ')"><i class="fas fa-chevron-right"></i></span>';
+    container.innerHTML = html;
+}
+
+function gotoPage(p) {
+    var totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+    if (p < 1 || p > totalPages) return;
+    currentPage = p;
+    renderTable();
+    renderPagination();
+}
+
+/* ---------- 选择 ---------- */
+function toggleSelect(id, el) {
+    if (el.checked) selectedIds.add(id);
+    else selectedIds.delete(id);
+    updateSelectedCount();
+}
+function toggleSelectAll(el) {
+    var start = (currentPage - 1) * PAGE_SIZE;
+    var pageData = filteredOrders.slice(start, start + PAGE_SIZE);
+    pageData.forEach(function(o) {
+        if (el.checked) selectedIds.add(o.id);
+        else selectedIds.delete(o.id);
+    });
+    renderTable();
+}
+function updateSelectedCount() {
+    var n = selectedIds.size;
+    document.getElementById('selectedCount').textContent = n > 0 ? ('已选 ' + n + ' 项') : '未选择';
+}
+
+/* ---------- 批量 ---------- */
+function batchShip() {
+    if (selectedIds.size === 0) { showToast('⚠️ 请先选择订单', 'error'); return; }
+    var shippable = filteredOrders.filter(o => selectedIds.has(o.id) && (o.status === '已支付' || o.status === '待发货'));
+    if (shippable.length === 0) { showToast('⚠️ 所选订单均不可发货', 'error'); return; }
+    if (!confirm('确定要批量发货 ' + shippable.length + ' 个订单吗？')) return;
+    shippable.forEach(function(o) { o.status = '已发货'; });
+    selectedIds.clear();
+    applyFilters();
+    updateStats();
+    showToast('✅ 已批量发货 ' + shippable.length + ' 单', 'success');
+}
+function batchExport() {
+    if (selectedIds.size === 0) { showToast('⚠️ 请先选择订单', 'error'); return; }
+    showToast('📤 正在导出 ' + selectedIds.size + ' 条订单...', 'success');
+}
+function exportOrders() {
+    showToast('📤 正在导出 ' + filteredOrders.length + ' 条订单...', 'success');
+}
+
+/* ---------- 详情弹窗 ---------- */
+function openDetailModal(id) {
+    var o = orders.find(x => x.id === id);
+    if (!o) return;
+    document.getElementById('detailOrderNo').textContent = o.orderNo;
+    var timeline = '';
+    if (o.status === '待支付') {
+        timeline = '<div class="timeline-item">订单创建<div class="time">' + o.time + '</div></div>';
+    } else if (o.status === '已支付' || o.status === '待发货') {
+        timeline = '<div class="timeline-item">买家已支付<div class="time">' + o.time + '</div></div>' +
+                   '<div class="timeline-item">等待商家发货</div>';
+    } else if (o.status === '已发货') {
+        timeline = '<div class="timeline-item">买家已支付<div class="time">' + o.time + '</div></div>' +
+                   '<div class="timeline-item">商家已发货 · 中通快递</div>';
+    } else if (o.status === '已完成') {
+        timeline = '<div class="timeline-item">买家已支付<div class="time">' + o.time + '</div></div>' +
+                   '<div class="timeline-item">商家已发货</div>' +
+                   '<div class="timeline-item">交易已完成</div>';
+    } else if (o.status === '退款中') {
+        timeline = '<div class="timeline-item">买家已支付<div class="time">' + o.time + '</div></div>' +
+                   '<div class="timeline-item">买家申请退款</div>';
+    }
+
+    document.getElementById('detailBody').innerHTML =
+        '<div class="info-row"><span class="k">订单号</span><span class="v">' + o.orderNo + '</span></div>' +
+        '<div class="info-row"><span class="k">买家</span><span class="v">' + o.buyer + ' · ' + o.phone + '</span></div>' +
+        '<div class="info-row"><span class="k">商品</span><span class="v">' + o.product + '</span></div>' +
+        '<div class="info-row"><span class="k">分类</span><span class="v">' + o.cat1 + ' > ' + o.cat2 + ' > ' + o.cat3 + '</span></div>' +
+        '<div class="info-row"><span class="k">渠道</span><span class="v"><span class="badge ' + badgeClass(o.channel) + '">' + o.channel + '</span></span></div>' +
+        '<div class="info-row"><span class="k">金额</span><span class="v" style="color:#b55a1a;">' + fmtMoney(o.amount) + '</span></div>' +
+        '<div class="info-row"><span class="k">状态</span><span class="v"><span class="badge ' + statusClass(o.status) + '">' + o.status + '</span></span></div>' +
+        '<div class="info-row"><span class="k">下单时间</span><span class="v">' + o.time + '</span></div>' +
+        '<div style="margin-top:16px;font-size:13px;font-weight:600;color:#0a1e2f;">订单进度</div>' +
+        '<div class="timeline">' + timeline + '</div>';
+    document.getElementById('detailModal').classList.add('show');
+}
+function closeDetailModal() {
+    document.getElementById('detailModal').classList.remove('show');
+}
+
+/* ---------- 发货弹窗 ---------- */
+let shippingOrderId = null;
+function openShipModal(id) {
+    var o = orders.find(x => x.id === id);
+    if (!o) return;
+    shippingOrderId = id;
+    document.getElementById('shipOrderNo').textContent = o.orderNo;
+    document.getElementById('shipTrackingNo').value = '';
+    document.getElementById('shipRemark').value = '';
+    document.getElementById('shipModal').classList.add('show');
+}
+function closeShipModal() {
+    document.getElementById('shipModal').classList.remove('show');
+    shippingOrderId = null;
+}
+function confirmShip() {
+    var tracking = document.getElementById('shipTrackingNo').value.trim();
+    if (!tracking) { showToast('⚠️ 请输入物流单号', 'error'); return; }
+    var o = orders.find(x => x.id === shippingOrderId);
+    if (o) o.status = '已发货';
+    closeShipModal();
+    applyFilters();
+    updateStats();
+    showToast('✅ 订单已发货 · ' + tracking, 'success');
+}
+
+/* ---------- 退款弹窗 ---------- */
+let refundOrderId = null;
+function openRefundModal(id) {
+    var o = orders.find(x => x.id === id);
+    if (!o) return;
+    refundOrderId = id;
+    document.getElementById('refundOrderNo').textContent = o.orderNo;
+    document.getElementById('refundAmount').textContent = fmtMoney(o.amount);
+    document.getElementById('refundReason').textContent = '拍错 / 不想要';
+    document.getElementById('refundMessage').textContent = '买错了，麻烦帮忙退款';
+    document.getElementById('refundRemark').value = '';
+    document.getElementById('refundAction').value = 'approve';
+    document.getElementById('refundModal').classList.add('show');
+}
+function closeRefundModal() {
+    document.getElementById('refundModal').classList.remove('show');
+    refundOrderId = null;
+}
+function confirmRefund() {
+    var action = document.getElementById('refundAction').value;
+    var o = orders.find(x => x.id === refundOrderId);
+    if (o) o.status = action === 'reject' ? '已完成' : '已完成';
+    closeRefundModal();
+    applyFilters();
+    updateStats();
+    var msgMap = { approve: '✅ 已同意退款', reject: '❌ 已拒绝退款', return: '📦 已要求退货退款' };
+    showToast(msgMap[action] || '✅ 处理完成', 'success');
+}
+
+/* ---------- 绑定筛选事件（输入即筛选） ---------- */
+document.addEventListener('DOMContentLoaded', function() {
+    ['filterChannel', 'filterStatus', 'filterSort'].forEach(function(id) {
+        document.getElementById(id).addEventListener('change', function() {
+            if (id === 'filterStatus') {
+                quickStatusFilter = this.value;
+                document.querySelectorAll('.stat-card').forEach(function(c) {
+                    c.classList.toggle('active', c.dataset.stat === (this.value === 'all' ? 'all' : this.value));
+                }.bind(this));
+            }
+            applyFilters();
+        });
+    });
+    ['filterBuyer', 'filterOrderNo', 'filterMinAmount', 'filterMaxAmount', 'filterDate'].forEach(function(id) {
+        document.getElementById(id).addEventListener('input', applyFilters);
+    });
+
+    loadOrders();
     console.log('订单管理页已加载');
+});
 </script>
 </body>
 </html>
