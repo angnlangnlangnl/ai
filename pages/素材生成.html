@@ -22,17 +22,16 @@
             --text-2: #5f7d95;
             --text-3: #94a3b8;
         }
-        /* ★ iframe 子页面布局：不使用 flex + 侧边栏 */
         html, body { min-height: 100%; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: var(--bg);
             color: var(--text);
-            padding: 20px 28px 100px;   /* ★ 底部留出操作条空间 */
+            padding: 20px 28px 100px;
             position: relative;
         }
 
-        /* ★ 顶部细工具条（替代原大 topbar） */
+        /* 顶部工具条 */
         .toolbar {
             background: #fff;
             border: 1px solid var(--border);
@@ -70,7 +69,6 @@
         .toolbar .tb-btn i { color: var(--text-2); }
         .toolbar .tb-btn:hover i { color: var(--accent); }
 
-        /* Stepper */
         .stepper { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: center; min-width: 0; }
         .stepper .step { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--text-3); cursor: pointer; transition: 0.15s; white-space: nowrap; }
         .stepper .step .num { width: 20px; height: 20px; border-radius: 50%; background: var(--border); color: var(--text-2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
@@ -82,7 +80,6 @@
         .stepper .step.done .num::before { font-size: 11px; }
         .stepper .arrow { color: var(--border); font-size: 12px; }
 
-        /* 内容区：外层 body 已有 padding，这里不再重复 */
         .content { padding: 0 0 100px; }
         .step-panel { display: none; }
         .step-panel.active { display: block; animation: fadeIn 0.25s ease; }
@@ -108,6 +105,37 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
         .hero-input { font-size: 16px !important; padding: 14px 16px !important; font-weight: 500; }
+
+        /* ★ 商品名称 + 搜索按钮 */
+        .name-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .name-input-row input {
+            flex: 1;
+        }
+        .name-input-row .pick-btn {
+            padding: 0 18px;
+            border-radius: 10px;
+            border: 1px solid var(--accent);
+            background: var(--accent-soft);
+            color: #2a7faa;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.15s;
+            font-family: inherit;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .name-input-row .pick-btn:hover {
+            background: rgba(77,171,247,0.2);
+            border-color: #2a7faa;
+        }
 
         .type-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 8px; }
         .type-pill {
@@ -370,7 +398,6 @@
             border: 1px solid #b8d8f7;
         }
 
-        /* ★ 同步记录卡片 */
         .sync-record-list {
             display: flex;
             flex-direction: column;
@@ -437,7 +464,6 @@
             flex-shrink: 0;
         }
 
-        /* ★ 底部操作条：iframe 内全宽，不再偏移 220px */
         .action-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: white; border-top: 1px solid var(--border);
@@ -661,6 +687,175 @@
         .history-item .meta { font-size: 11px; color: var(--text-3); margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
         .history-item .badge { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); }
 
+        /* ★ 商品选择弹窗 */
+        .product-picker-modal {
+            position: fixed; inset: 0;
+            background: rgba(10,30,47,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .product-picker-modal.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        .product-picker-box {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .product-picker-header {
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .product-picker-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .product-picker-header h3 i { color: var(--accent); }
+        .product-picker-header .close-btn {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f4f9;
+            color: var(--text-2);
+            cursor: pointer;
+            font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.15s;
+        }
+        .product-picker-header .close-btn:hover {
+            background: #fde8ed; color: var(--danger);
+        }
+        .product-picker-search {
+            padding: 12px 22px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .product-picker-search input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fafcfe;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .product-picker-search input:focus {
+            outline: none; border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            background: white;
+        }
+        .product-picker-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 12px;
+        }
+        .product-picker-body::-webkit-scrollbar { width: 4px; }
+        .product-picker-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        .pp-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.12s;
+            border: 1px solid transparent;
+        }
+        .pp-item:hover {
+            background: #f5f9fe;
+            border-color: var(--accent);
+        }
+        .pp-item .pp-img {
+            width: 44px; height: 44px;
+            border-radius: 8px;
+            background: #e8edf4;
+            display: flex; align-items: center; justify-content: center;
+            color: #7e9cb0; font-size: 18px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .pp-item .pp-img img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .pp-item .pp-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .pp-item .pp-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+        .pp-item .pp-meta {
+            font-size: 12px;
+            color: var(--text-2);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .pp-item .pp-meta .badge {
+            font-size: 10px;
+            padding: 1px 7px;
+            border-radius: 10px;
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+        .pp-item .pp-price {
+            font-size: 13px;
+            font-weight: 700;
+            color: #b55a1a;
+            flex-shrink: 0;
+        }
+        .product-picker-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-3);
+        }
+        .product-picker-empty i {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block;
+            opacity: 0.4;
+        }
+        .product-picker-footer {
+            padding: 12px 22px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-3);
+            flex-shrink: 0;
+        }
+
         @media (max-width: 1200px) {
             .image-grid { grid-template-columns: repeat(3, 1fr); }
             .carousel-prompts { grid-template-columns: repeat(3, 1fr); }
@@ -680,6 +875,9 @@
             .action-bar { padding: 12px 14px; }
             .btn-lg { padding: 11px 20px; font-size: 13px; }
             .drawer { width: 100%; max-width: 100%; }
+            .name-input-row .pick-btn span { display: none; }
+            .name-input-row .pick-btn { padding: 0 14px; }
+            .product-picker-box { max-width: 100%; }
         }
         @media (max-width: 480px) {
             .type-pills { grid-template-columns: repeat(2, 1fr); }
@@ -690,7 +888,6 @@
 </head>
 <body>
 
-    <!-- ===== 顶部工具条（含 Stepper） ===== -->
     <div class="toolbar">
         <div class="tb-left">
             <span class="status-dot"></span>
@@ -717,7 +914,13 @@
             <div class="card">
                 <div class="form-group">
                     <label><i class="fas fa-tag"></i> 商品名称 <span class="req">*</span></label>
-                    <input type="text" id="productName" class="hero-input" placeholder="例如：云山茶叶礼盒" value="云山茶叶礼盒" onkeydown="if(event.key==='Enter') startGenerate()">
+                    <!-- ★ 修改2：商品名称 + 搜索按钮 -->
+                    <div class="name-input-row">
+                        <input type="text" id="productName" class="hero-input" placeholder="例如：云山茶叶礼盒" value="云山茶叶礼盒" onkeydown="if(event.key==='Enter') startGenerate()">
+                        <button class="pick-btn" onclick="openProductPicker()" title="从商品库选择">
+                            <i class="fas fa-search"></i><span> 从商品库选择</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-list"></i> 商品类别</label>
@@ -771,7 +974,7 @@
                 <div class="label">
                     <i class="fas fa-cog"></i>
                     <span>高级设置</span>
-                    <span style="font-size:11px; color:var(--text-3);">（参考图、参考视频、卖点、风格、提示词、API Key）</span>
+                    <span style="font-size:11px; color:var(--text-3);">（参考图、参考视频、卖点、风格、提示词）</span>
                 </div>
                 <i class="fas fa-chevron-down arrow"></i>
             </div>
@@ -855,21 +1058,7 @@
                     </div>
                 </div>
 
-                <div class="card" id="apiKeyCard">
-                    <div class="card-header">
-                        <h3><i class="fas fa-key"></i> Agnes AI API Key</h3>
-                        <span class="action" onclick="toggleApiKeyCard()" id="apiKeyToggleBtn">隐藏</span>
-                    </div>
-                    <div id="apiKeyBody">
-                        <div style="display:flex; gap:8px; align-items:center;">
-                            <input type="password" id="agnesApiKey" placeholder="sk-..." value="sk-XmLjN9e3Mhh8wf" style="flex:1; padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-size:13px; font-family:monospace; background:#fafcfe;">
-                            <span class="btn-sm blue" onclick="toggleApiKeyVisibility()" id="apiKeyEyeBtn"><i class="fas fa-eye"></i></span>
-                        </div>
-                        <div style="font-size:11px; color:var(--text-3); margin-top:6px;">
-                            <i class="fas fa-info-circle"></i> 密钥仅存本地浏览器，不会上传
-                        </div>
-                    </div>
-                </div>
+                <!-- ★ 修改1：已删除 Agnes AI API Key 卡片 -->
 
             </div>
         </div>
@@ -1105,6 +1294,29 @@
     <div class="drawer-body" id="historyList"></div>
 </div>
 
+<!-- ★ 商品选择弹窗 -->
+<div class="product-picker-modal" id="productPickerModal" onclick="if(event.target===this) closeProductPicker()">
+    <div class="product-picker-box">
+        <div class="product-picker-header">
+            <h3><i class="fas fa-box"></i> 选择商品</h3>
+            <button class="close-btn" onclick="closeProductPicker()" title="关闭">×</button>
+        </div>
+        <div class="product-picker-search">
+            <input type="text" id="ppSearchInput" placeholder="🔍 输入商品名称 / SKU 搜索..." oninput="filterPickerProducts()" autocomplete="off">
+        </div>
+        <div class="product-picker-body" id="ppProductList">
+            <div class="product-picker-empty">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>加载商品中...</p>
+            </div>
+        </div>
+        <div class="product-picker-footer">
+            <span id="ppCountInfo">共 0 个商品</span>
+            <span style="font-size:11px;color:var(--text-3);">点击商品即可填充</span>
+        </div>
+    </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -1115,6 +1327,9 @@
     const AGNES_IMAGE_MODEL = 'agnes-image-2.5-flash';
     const AGNES_VIDEO_MODEL = 'agnes-video-2.5-flash';
     const BACKEND_URL = 'https://ai-ecommerce-backend-production-0776.up.railway.app';
+
+    // ★ 修改1：API Key 硬编码（对齐 AI 助手页）
+    const AGNES_API_KEY_DEFAULT = 'sk-XmLjN9e3Mhh8wf';
 
     const REF_VIDEO_MAX = 1;
     const REF_VIDEO_MAX_SIZE = 20 * 1024 * 1024;
@@ -1151,14 +1366,9 @@
         'Temu':       { imageRatio: '1:1',  videoRatio: '9:16' }
     };
 
+    // ★ 修改1：直接返回硬编码密钥，不再从 input 或 storage 读取
     function getAgnesApiKey() {
-        const fromInput = document.getElementById('agnesApiKey')?.value.trim();
-        if (fromInput) return fromInput;
-        return safeStorage.get('agnes_api_key') || 'sk-XmLjN9e3Mhh8wf';
-    }
-    function saveAgnesApiKey() {
-        const key = document.getElementById('agnesApiKey')?.value.trim();
-        if (key) safeStorage.set('agnes_api_key', key);
+        return AGNES_API_KEY_DEFAULT;
     }
 
     // ================================================================
@@ -1209,6 +1419,14 @@
         maxRecords: 50
     };
 
+    // ★ 商品选择器状态
+    const pickerState = {
+        allProducts: [],
+        filteredProducts: [],
+        loaded: false,
+        loading: false
+    };
+
     // ================================================================
     // 工具函数
     // ================================================================
@@ -1234,6 +1452,11 @@
         const array = new Uint8Array(binary.length);
         for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
         return new Blob([array], { type: mime });
+    }
+    function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
     }
 
     // ================================================================
@@ -1295,24 +1518,116 @@
     }
 
     // ================================================================
-    // 高级折叠 / API Key
+    // 高级折叠
     // ================================================================
     function toggleAdvanced() {
         document.getElementById('advancedToggle').classList.toggle('open');
         document.getElementById('advancedBody').classList.toggle('open');
     }
-    function toggleApiKeyVisibility() {
-        const input = document.getElementById('agnesApiKey');
-        const btn = document.getElementById('apiKeyEyeBtn');
-        if (input.type === 'password') { input.type = 'text'; btn.innerHTML = '<i class="fas fa-eye-slash"></i>'; }
-        else { input.type = 'password'; btn.innerHTML = '<i class="fas fa-eye"></i>'; }
+
+    // ================================================================
+    // ★ 商品选择器
+    // ================================================================
+    function openProductPicker() {
+        document.getElementById('productPickerModal').classList.add('show');
+        document.getElementById('ppSearchInput').value = '';
+        document.body.style.overflow = 'hidden';
+
+        // 如果已加载，直接渲染
+        if (pickerState.loaded) {
+            pickerState.filteredProducts = pickerState.allProducts.slice();
+            renderPickerProducts();
+        } else if (!pickerState.loading) {
+            loadPickerProducts();
+        }
+        setTimeout(() => { document.getElementById('ppSearchInput').focus(); }, 200);
     }
-    function toggleApiKeyCard() {
-        const body = document.getElementById('apiKeyBody');
-        const btn = document.getElementById('apiKeyToggleBtn');
-        const isHidden = body.style.display === 'none';
-        body.style.display = isHidden ? 'block' : 'none';
-        btn.textContent = isHidden ? '隐藏' : '显示';
+
+    function closeProductPicker() {
+        document.getElementById('productPickerModal').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    async function loadPickerProducts() {
+        pickerState.loading = true;
+        const box = document.getElementById('ppProductList');
+        box.innerHTML = '<div class="product-picker-empty"><i class="fas fa-spinner fa-spin"></i><p>加载商品中...</p></div>';
+        try {
+            const res = await fetch(BACKEND_URL + '/api/products');
+            const data = await res.json();
+            pickerState.allProducts = data.products || [];
+            pickerState.filteredProducts = pickerState.allProducts.slice();
+            pickerState.loaded = true;
+            renderPickerProducts();
+        } catch (err) {
+            box.innerHTML = `<div class="product-picker-empty"><i class="fas fa-exclamation-triangle"></i><p>加载失败：${escapeHtml(err.message)}</p></div>`;
+        } finally {
+            pickerState.loading = false;
+        }
+    }
+
+    function filterPickerProducts() {
+        const kw = document.getElementById('ppSearchInput').value.trim().toLowerCase();
+        if (!kw) {
+            pickerState.filteredProducts = pickerState.allProducts.slice();
+        } else {
+            pickerState.filteredProducts = pickerState.allProducts.filter(p => {
+                const name = (p.name || '').toLowerCase();
+                const sku = (p.sku || '').toLowerCase();
+                const cat = (p.category || '').toLowerCase();
+                return name.includes(kw) || sku.includes(kw) || cat.includes(kw);
+            });
+        }
+        renderPickerProducts();
+    }
+
+    function renderPickerProducts() {
+        const box = document.getElementById('ppProductList');
+        const list = pickerState.filteredProducts;
+        document.getElementById('ppCountInfo').textContent = `共 ${list.length} 个商品`;
+
+        if (list.length === 0) {
+            box.innerHTML = `<div class="product-picker-empty">
+                <i class="fas fa-box-open"></i>
+                <p>${pickerState.allProducts.length === 0 ? '暂无商品' : '没有匹配的商品'}</p>
+            </div>`;
+            return;
+        }
+
+        box.innerHTML = list.map(p => {
+            const imgHTML = p.main_image
+                ? `<img src="${escapeHtml(p.main_image)}" alt="" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-box\\'></i>';">`
+                : `<i class="fas fa-box"></i>`;
+            const catBadge = p.category ? `<span class="badge">${escapeHtml(p.category)}</span>` : '';
+            const statusBadge = p.status ? `<span style="color:var(--text-3);">${escapeHtml(p.status)}</span>` : '';
+            return `
+                <div class="pp-item" onclick="pickProduct('${escapeHtml(p.name).replace(/'/g, "\\'")}')">
+                    <div class="pp-img">${imgHTML}</div>
+                    <div class="pp-info">
+                        <div class="pp-name">${escapeHtml(p.name)}</div>
+                        <div class="pp-meta">
+                            ${catBadge}
+                            ${statusBadge}
+                            <span>库存 ${p.stock || 0}</span>
+                        </div>
+                    </div>
+                    <div class="pp-price">¥${p.price || 0}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function pickProduct(name) {
+        document.getElementById('productName').value = name;
+        // 如果商品带分类，自动同步分类下拉
+        const product = pickerState.allProducts.find(p => p.name === name);
+        if (product && product.category) {
+            const catSelect = document.getElementById('productCategory');
+            const opt = Array.from(catSelect.options).find(o => o.value === product.category);
+            if (opt) catSelect.value = product.category;
+        }
+        closeProductPicker();
+        showToast('✅ 已选择：' + name);
     }
 
     // ================================================================
@@ -1607,12 +1922,6 @@
         showToast('🧹 已清空参考视频');
     }
 
-    function escapeHtml(s) {
-        return String(s || '').replace(/[&<>"']/g, c => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-        })[c]);
-    }
-
     // ================================================================
     // 临时图床 + 反解
     // ================================================================
@@ -1701,7 +2010,7 @@
         container.innerHTML = state.detailPrompts.map((d, i) => `
             <div class="detail-prompt-item">
                 <div class="step">${d.step}</div>
-                <input type="text" value="${d.prompt}" placeholder="输入第 ${i + 1} 张详情图内容..." oninput="updateDetailPrompt(${i}, this.value)">
+                <input type="text" value="${escapeHtml(d.prompt)}" placeholder="输入第 ${i + 1} 张详情图内容..." oninput="updateDetailPrompt(${i}, this.value)">
                 <div style="display:flex; gap:4px;">
                     <button class="del" onclick="aiFillDetailPrompt(${i})" title="AI" style="background:var(--accent-soft); color:var(--accent);"><i class="fas fa-magic"></i></button>
                     <button class="del" onclick="removeDetailItem(${i})" title="删除"><i class="fas fa-trash"></i></button>
@@ -1810,8 +2119,7 @@
     // ================================================================
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const apiKey = getAgnesApiKey();
-        if (!apiKey) throw new Error('请先填写 Agnes AI API Key');
-        saveAgnesApiKey();
+        if (!apiKey) throw new Error('Agnes AI API Key 未配置');
 
         const body = {
             model: AGNES_IMAGE_MODEL,
@@ -1880,8 +2188,7 @@
 
     async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', onProgress) {
         const apiKey = getAgnesApiKey();
-        if (!apiKey) throw new Error('请先填写 Agnes AI API Key');
-        saveAgnesApiKey();
+        if (!apiKey) throw new Error('Agnes AI API Key 未配置');
 
         const hasRefs = referenceImages && referenceImages.length > 0;
 
@@ -1956,9 +2263,7 @@
         if (!name) { showToast('⚠️ 请输入商品名称'); document.getElementById('productName').focus(); return; }
         if (state.selectedTypes.length === 0) { showToast('⚠️ 请至少选择一种生成类型'); return; }
 
-        const apiKey = document.getElementById('agnesApiKey').value.trim();
-        if (!apiKey) { showToast('⚠️ 请填写 Agnes AI API Key'); return; }
-        saveAgnesApiKey();
+        // ★ 修改1：删除 API Key 前端校验，密钥已硬编码
 
         const category = document.getElementById('productCategory').value;
         const features = document.getElementById('productFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
@@ -2094,15 +2399,15 @@
             { name: '🏆 专业推荐版', conversion: '3.5%', content: `🏆 专家推荐 · ${name}\n"${features.join(' · ')}"` }
         ];
         const detailHTML = `
-            <div style="font-weight:600;font-size:16px;border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:12px;">🌟 ${name}</div>
+            <div style="font-weight:600;font-size:16px;border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:12px;">🌟 ${escapeHtml(name)}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:12px;">
-                <div><span style="color:var(--text-3);">类别：</span>${category}</div>
-                <div><span style="color:var(--text-3);">风格：</span>${style}</div>
+                <div><span style="color:var(--text-3);">类别：</span>${escapeHtml(category)}</div>
+                <div><span style="color:var(--text-3);">风格：</span>${escapeHtml(style)}</div>
             </div>
             <div style="margin-bottom:10px;">
                 <span style="font-weight:600;">✨ 核心卖点</span>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
-                    ${features.map(f => `<span style="background:var(--accent-soft);color:var(--accent);padding:2px 10px;border-radius:20px;font-size:12px;">✅ ${f}</span>`).join('')}
+                    ${features.map(f => `<span style="background:var(--accent-soft);color:var(--accent);padding:2px 10px;border-radius:20px;font-size:12px;">✅ ${escapeHtml(f)}</span>`).join('')}
                 </div>
             </div>
             <div style="background:#f5f7fa;padding:12px;border-radius:8px;margin-bottom:10px;font-size:13px;">
@@ -2152,7 +2457,7 @@
             } else {
                 videoContainer.innerHTML = `
                     <i class="fas fa-play-circle placeholder-icon"></i>
-                    <div class="placeholder-text">${productName} · 5秒种草短视频</div>
+                    <div class="placeholder-text">${escapeHtml(productName)} · 5秒种草短视频</div>
                     <div class="placeholder-sub">🎵 轻快流行 · ${data.videoRatio || '9:16'}</div>
                     <div class="placeholder-warn"><i class="fas fa-exclamation-triangle"></i> 视频生成未完成或失败</div>
                 `;
@@ -2175,7 +2480,7 @@
                     <span class="badge-pos">${typeName}${i + 1} · ${img.style || '默认'}</span>
                 </div>
                 <div class="info">
-                    <div class="title">${productName}</div>
+                    <div class="title">${escapeHtml(productName)}</div>
                     <div class="actions">
                         ${img.url ? `<span class="btn-sm blue" onclick="downloadImage('${img.url}', '${typeName}${i+1}.png')"><i class="fas fa-download"></i> 下载</span>` : ''}
                         <span class="btn-sm success" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i> 应用</span>
@@ -2190,10 +2495,10 @@
         list.innerHTML = versions.map((v, idx) => `
             <div class="copy-item ${idx === 0 ? 'recommended' : ''}">
                 <div class="header">
-                    <span class="name">${v.name}</span>
+                    <span class="name">${escapeHtml(v.name)}</span>
                     <span class="btn-sm blue">转化率 ${v.conversion}</span>
                 </div>
-                <div class="content">${v.content}</div>
+                <div class="content">${escapeHtml(v.content)}</div>
                 <div class="actions">
                     <span class="btn-sm success" onclick="copyText('${v.content.replace(/'/g, "\\'").replace(/\n/g, '\\n')}')"><i class="fas fa-copy"></i> 复制</span>
                     <span class="btn-sm outline" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i> 应用</span>
@@ -2245,7 +2550,7 @@
             syncState.filteredProducts = syncState.allProducts.slice();
             renderSyncProductList();
         } catch (e) {
-            box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger);">加载失败：${e.message}</div>`;
+            box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger);">加载失败：${escapeHtml(e.message)}</div>`;
         }
     }
     function renderSyncProductList() {
@@ -2257,10 +2562,10 @@
         }
         box.innerHTML = list.map(p => `
             <label class="sync-product-item ${syncState.selectedProducts.includes(p.name) ? 'selected' : ''}">
-                <input type="checkbox" value="${p.name}"
+                <input type="checkbox" value="${escapeHtml(p.name)}"
                     ${syncState.selectedProducts.includes(p.name) ? 'checked' : ''}
-                    onchange="toggleSyncProduct('${p.name.replace(/'/g, "\\'")}', this.checked)">
-                <span class="name">${p.name}</span>
+                    onchange="toggleSyncProduct('${escapeHtml(p.name).replace(/'/g, "\\'")}', this.checked)">
+                <span class="name">${escapeHtml(p.name)}</span>
                 <span class="meta">¥${p.price} · 库存 ${p.stock}</span>
                 ${p.main_image ? '<span class="badge">已含素材</span>' : ''}
             </label>
@@ -2569,11 +2874,11 @@
         }
         list.innerHTML = state.history.map(h => `
             <div class="history-item">
-                <div class="name">${h.product}</div>
+                <div class="name">${escapeHtml(h.product)}</div>
                 <div class="meta">
-                    <span class="badge">${h.types}</span>
-                    <span>${h.style}</span>
-                    <span>${h.time}</span>
+                    <span class="badge">${escapeHtml(h.types)}</span>
+                    <span>${escapeHtml(h.style)}</span>
+                    <span>${escapeHtml(h.time)}</span>
                 </div>
             </div>
         `).join('');
@@ -2607,11 +2912,7 @@
     // 初始化
     // ================================================================
     document.addEventListener('DOMContentLoaded', () => {
-        const savedKey = safeStorage.get('agnes_api_key');
-        if (savedKey) document.getElementById('agnesApiKey').value = savedKey;
-        document.getElementById('agnesApiKey').addEventListener('input', function() {
-            if (this.value.trim()) safeStorage.set('agnes_api_key', this.value.trim());
-        });
+        // ★ 修改1：不再从 localStorage 读取 API Key 到输入框
         renderCarouselPrompts();
         renderDetailPrompts();
         renderVideoScript();
@@ -2620,7 +2921,16 @@
         loadHistory();
         updatePlatformToggleBtn();
         renderSyncRecords();
-        console.log('🎨 智能素材生成已就绪（iframe 子页面模式）');
+
+        // ESC 关闭商品选择器
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const picker = document.getElementById('productPickerModal');
+                if (picker.classList.contains('show')) closeProductPicker();
+            }
+        });
+
+        console.log('🎨 智能素材生成已就绪（iframe 子页面模式 · API Key 内置 · 支持商品搜索）');
     });
 
     // 全局暴露
@@ -2628,8 +2938,6 @@
     window.goStepBack = goStepBack;
     window.goStepNext = goStepNext;
     window.toggleAdvanced = toggleAdvanced;
-    window.toggleApiKeyVisibility = toggleApiKeyVisibility;
-    window.toggleApiKeyCard = toggleApiKeyCard;
     window.toggleGenType = toggleGenType;
     window.switchPromptTab = switchPromptTab;
     window.switchResultTab = switchResultTab;
@@ -2671,6 +2979,11 @@
     window.openHistoryDrawer = openHistoryDrawer;
     window.closeHistoryDrawer = closeHistoryDrawer;
     window.clearHistory = clearHistory;
+    // ★ 商品选择器
+    window.openProductPicker = openProductPicker;
+    window.closeProductPicker = closeProductPicker;
+    window.filterPickerProducts = filterPickerProducts;
+    window.pickProduct = pickProduct;
 </script>
 </body>
 </html>
