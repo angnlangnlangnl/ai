@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智控电商 · 智能物流管理</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== 全局重置 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #eef2f8;
+            color: #0a1a2b;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* ===== 左侧导航 ===== */
+        .sidebar {
+            width: 220px;
+            background: #0a1e2f;
+            color: #b8cfe0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 20px rgba(10,30,47,0.08);
+            z-index: 100;
+            transition: 0.2s;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        .sidebar .logo {
+            padding: 22px 20px 28px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar .logo i {
+            font-size: 26px;
+            color: #4dabf7;
+            background: rgba(77,171,247,0.12);
+            padding: 8px;
+            border-radius: 12px;
+        }
+        .sidebar .logo span {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        .sidebar .logo .badge {
+            font-size: 10px;
+            background: #4dabf7;
+            color: #0a1e2f;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .sidebar .nav {
+            flex: 1;
+            padding: 16px 12px 20px;
+        }
+        .sidebar .nav .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #5a7f99;
+            padding: 14px 12px 6px 12px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .sidebar .nav .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: #9bb4cc;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-bottom: 2px;
+            position: relative;
+        }
+        .sidebar .nav .item i { width: 18px; font-size: 15px; text-align: center; color: #5a7f99; }
+        .sidebar .nav .item:hover { background: rgba(255,255,255,0.05); color: #d4e4f0; }
+        .sidebar .nav .item:hover i { color: #7aaed9; }
+        .sidebar .nav .item.active { background: rgba(77,171,247,0.12); color: white; }
+        .sidebar .nav .item.active i { color: #4dabf7; }
+        .sidebar .nav .item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 3px;
+            background: #4dabf7;
+            border-radius: 0 4px 4px 0;
+        }
+        .sidebar .nav .item .tag {
+            margin-left: auto;
+            background: rgba(77,171,247,0.15);
+            color: #4dabf7;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .sidebar .bottom {
+            padding: 16px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+            color: #5a7f99;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar .bottom i { font-size: 16px; }
+        /* ===== 主内容 ===== */
+        .main { flex: 1; padding: 20px 28px 40px; max-width: calc(100% - 220px); min-width: 0; }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .topbar .left h2 { font-size: 20px; font-weight: 600; color: #0a1e2f; }
+        .topbar .left p { font-size: 13px; color: #5f7d95; margin-top: 2px; }
+        .topbar .right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .topbar .right .btn {
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .topbar .right .btn:hover { background: #f5f8fc; }
+        .topbar .right .btn-primary { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .topbar .right .btn-primary:hover { background: #1a3a5a; }
+        .topbar .right .btn-success { background: #0d7c4f; border-color: #0d7c4f; color: white; }
+        .topbar .right .btn-success:hover { background: #0e9a5a; }
+        .topbar .right .btn-danger { background: #b51a3f; border-color: #b51a3f; color: white; }
+        .topbar .right .btn-danger:hover { background: #c91e47; }
+        .topbar .right .avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: #4dabf7;
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 600;
+        }
+        /* ===== 页面容器 ===== */
+        .page { display: none; animation: fadeIn 0.25s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0.6; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        /* ===== 统计卡片 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 16px 18px;
+            border-radius: 14px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+            cursor: pointer;
+        }
+        .stat-card:hover { box-shadow: 0 6px 20px rgba(10,30,47,0.06); border-color: #c8d8e8; }
+        .stat-card .label { font-size: 12px; font-weight: 500; color: #5f7d95; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .stat-card .value { font-size: 26px; font-weight: 700; color: #0a1e2f; letter-spacing: -0.02em; }
+        .stat-card .sub { font-size: 12px; color: #5f7d95; margin-top: 2px; display: flex; gap: 12px; flex-wrap: wrap; }
+        /* ===== 卡片 ===== */
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px 18px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+            margin-bottom: 16px;
+        }
+        .card:hover { border-color: #c8d8e8; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .card-header h3 { font-size: 15px; font-weight: 600; color: #0a1e2f; display: flex; align-items: center; gap: 6px; }
+        .card-header h3 i { color: #4dabf7; }
+        .card-header .action { font-size: 12px; color: #4dabf7; font-weight: 500; cursor: pointer; }
+        .card-header .action:hover { color: #2a7faa; }
+        /* ===== 列表项 ===== */
+        .logistics-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f4f9;
+            transition: 0.15s;
+        }
+        .logistics-item:last-child { border: none; }
+        .logistics-item:hover { background: #fafcfe; }
+        .logistics-item .info { flex: 1; min-width: 0; }
+        .logistics-item .info .name { font-weight: 600; color: #0a1e2f; font-size: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .logistics-item .info .meta { font-size: 13px; color: #5f7d95; display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
+        .logistics-item .info .meta i { width: 14px; color: #7e9cb0; }
+        .logistics-item .right { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+        .logistics-item .right .actions { display: flex; gap: 4px; flex-wrap: wrap; }
+        /* ===== 物流进度条 ===== */
+        .logistics-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #5f7d95;
+            flex-wrap: wrap;
+        }
+        .logistics-progress .bar {
+            flex: 1;
+            height: 4px;
+            background: #e8edf4;
+            border-radius: 10px;
+            overflow: hidden;
+            min-width: 80px;
+        }
+        .logistics-progress .bar .fill {
+            height: 100%;
+            border-radius: 10px;
+            background: #4dabf7;
+            transition: width 0.5s;
+        }
+        .logistics-progress .bar .fill.success { background: #0d7c4f; }
+        .logistics-progress .bar .fill.danger { background: #b51a3f; }
+        /* ===== 通用组件 ===== */
+        .badge {
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .badge.warning { background: #fef0e6; color: #b55a1a; }
+        .badge.danger { background: #fde8ed; color: #b51a3f; }
+        .badge.info { background: #e9f0ff; color: #1a5bb5; }
+        .badge.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .badge.pending { background: #fef3e2; color: #a67c00; }
+        .badge.paid { background: #e6f7ec; color: #0d7c4f; }
+        .badge.shipped { background: #e9f0ff; color: #1a5bb5; }
+        .badge.cancelled { background: #fde8ed; color: #b51a3f; }
+        .badge.delivered { background: #e6f7ec; color: #0d7c4f; }
+        .badge.abnormal { background: #fde8ed; color: #b51a3f; }
+        .badge.pickup { background: #fef3e2; color: #a67c00; }
+        .badge.transit { background: #e9f0ff; color: #1a5bb5; }
+        .badge.delivering { background: #fef0e6; color: #b55a1a; }
+        .badge.ai-sent { background: #e6f7ec; color: #0d7c4f; }
+        .badge.ai-pending { background: #fef3e2; color: #a67c00; }
+        .badge.ai-failed { background: #fde8ed; color: #b51a3f; }
+        .btn-sm {
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-sm:active { transform: scale(0.95); }
+        .btn-sm.primary { background: #0a1e2f; color: white; }
+        .btn-sm.primary:hover { background: #1a3a5a; }
+        .btn-sm.success { background: #e6f7ec; color: #0d7c4f; }
+        .btn-sm.success:hover { background: #c8f0d8; }
+        .btn-sm.danger { background: #fde8ed; color: #b51a3f; }
+        .btn-sm.danger:hover { background: #fcd0d9; }
+        .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
+        .btn-sm.outline:hover { background: #f5f8fc; }
+        .btn-sm.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
+        .btn-sm.blue:hover { background: rgba(77,171,247,0.2); }
+        .btn-sm.warning { background: #fef0e6; color: #b55a1a; }
+        .btn-sm.warning:hover { background: #fde8d0; }
+        .flex { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .mt-2 { margin-top: 10px; }
+        .row-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .row-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+        /* ===== 弹窗 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 28px 32px;
+            max-width: 520px;
+            width: 92%;
+            max-height: 85vh;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+            animation: dialogIn 0.25s ease;
+            overflow-y: auto;
+        }
+        .modal-box::-webkit-scrollbar { width: 4px; }
+        .modal-box::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
+        .modal-box::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        @keyframes dialogIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-box .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e8edf4;
+        }
+        .modal-box .modal-header h3 { font-size: 18px; color: #0a1e2f; display: flex; align-items: center; gap: 10px; }
+        .modal-box .modal-header .close {
+            font-size: 24px; color: #94a3b8; cursor: pointer;
+            background: none; border: none; padding: 0 8px;
+        }
+        .modal-box .modal-header .close:hover { color: #0a1e2f; }
+        .modal-box .modal-body { font-size: 14px; color: #0a1e2f; }
+        .modal-box .modal-body .detail-row {
+            display: flex; padding: 6px 0; border-bottom: 1px solid #f5f8fc;
+        }
+        .modal-box .modal-body .detail-row .label { color: #94a3b8; width: 90px; flex-shrink: 0; }
+        .modal-box .modal-body .detail-row .value { flex: 1; font-weight: 500; }
+        .modal-box .modal-actions {
+            display: flex; gap: 10px; justify-content: flex-end;
+            padding-top: 14px; border-top: 1px solid #e8edf4; margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .modal-box .form-group { margin-bottom: 12px; }
+        .modal-box .form-group label { display: block; font-size: 13px; font-weight: 500; color: #0a1e2f; margin-bottom: 4px; }
+        .modal-box .form-group input, .modal-box .form-group textarea, .modal-box .form-group select {
+            width: 100%; padding: 8px 14px; border: 1px solid #dce5ef; border-radius: 8px;
+            font-size: 14px; background: #fafcfe; font-family: inherit;
+        }
+        .modal-box .form-group input:focus, .modal-box .form-group textarea:focus {
+            outline: none; border-color: #4dabf7; box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .modal-box .form-group textarea { min-height: 60px; resize: vertical; }
+        /* ===== 物流轨迹时间线 ===== */
+        .tracking-timeline {
+            padding: 8px 0;
+        }
+        .tracking-timeline .track-node {
+            display: flex;
+            gap: 14px;
+            padding: 6px 0 6px 0;
+            position: relative;
+        }
+        .tracking-timeline .track-node:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 26px;
+            bottom: 0;
+            width: 2px;
+            background: #e8edf4;
+        }
+        .tracking-timeline .track-node .dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+        .tracking-timeline .track-node .dot.current { background: #4dabf7; }
+        .tracking-timeline .track-node .dot.done { background: #0d7c4f; }
+        .tracking-timeline .track-node .dot.pending { background: #dce5ef; color: #94a3b8; }
+        .tracking-timeline .track-node .content { flex: 1; }
+        .tracking-timeline .track-node .content .status { font-weight: 500; color: #0a1e2f; font-size: 14px; }
+        .tracking-timeline .track-node .content .time { font-size: 12px; color: #94a3b8; }
+        .tracking-timeline .track-node .content .location { font-size: 13px; color: #5f7d95; }
+        .tracking-timeline .track-node .content .desc { font-size: 13px; color: #5f7d95; }
+        /* ===== 平台标签 ===== */
+        .platform-tag {
+            display: inline-block;
+            padding: 1px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .platform-tag.taobao { background: #fef0e6; color: #b55a1a; }
+        .platform-tag.douyin { background: #e9f0ff; color: #1a5bb5; }
+        .platform-tag.pdd { background: #fde8ed; color: #b51a3f; }
+        .platform-tag.jd { background: #e6f7ec; color: #0d7c4f; }
+        .platform-tag.other { background: #f0f4f9; color: #5f7d95; }
+
+        .scroll-list { max-height: 320px; overflow-y: auto; padding-right: 4px; }
+        .scroll-list::-webkit-scrollbar { width: 4px; }
+        .scroll-list::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
+        .scroll-list::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+
+        .border-left-warning { border-left: 4px solid #f5b342; }
+        .border-left-danger { border-left: 4px solid #b51a3f; }
+        .border-left-success { border-left: 4px solid #0d7c4f; }
+        .border-left-info { border-left: 4px solid #4dabf7; }
+        .border-left-blue { border-left: 4px solid #4dabf7; }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 999;
+            white-space: nowrap;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .toast.show { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .toast i { margin-right: 8px; }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .row-two { grid-template-columns: 1fr; }
+            .row-three { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar .logo span, .sidebar .logo .badge, .sidebar .nav .item span,
+            .sidebar .nav .section-label, .sidebar .bottom span, .sidebar .nav .item .tag { display: none; }
+            .sidebar .logo { padding: 16px 12px; justify-content: center; }
+            .sidebar .logo i { font-size: 20px; padding: 6px; }
+            .sidebar .nav .item { justify-content: center; padding: 12px; }
+            .sidebar .nav .item i { font-size: 18px; width: auto; }
+            .sidebar .bottom { justify-content: center; }
+            .main { max-width: calc(100% - 60px); padding: 14px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .row-three { grid-template-columns: 1fr; }
+            .topbar { flex-direction: column; align-items: flex-start; }
+            .logistics-item { flex-wrap: wrap; }
+            .logistics-item .right { width: 100%; align-items: flex-start; }
+            .modal-box { padding: 20px; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+        /* ===== AI通知记录样式 ===== */
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f8fc;
+        }
+        .notification-item:last-child { border: none; }
+        .notification-item .noti-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .notification-item .noti-content { flex: 1; }
+        .notification-item .noti-content .title { font-weight: 600; color: #0a1e2f; font-size: 13px; }
+        .notification-item .noti-content .desc { font-size: 12px; color: #5f7d95; }
+        .notification-item .noti-content .time { font-size: 11px; color: #94a3b8; }
+        .notification-item .noti-badge { font-size: 10px; padding: 1px 10px; border-radius: 30px; font-weight: 500; flex-shrink: 0; }
+        .noti-badge.success { background: #e6f7ec; color: #0d7c4f; }
+        .noti-badge.warning { background: #fef0e6; color: #b55a1a; }
+        .noti-badge.danger { background: #fde8ed; color: #b51a3f; }
+        .noti-badge.info { background: #e9f0ff; color: #1a5bb5; }
+    </style>
+</head>
+<body>
+    <!-- ===== 左侧导航 ===== -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-bolt"></i>
+            <span>智控电商</span>
+            <span class="badge">v3.0</span>
+        </div>
+        <div class="nav">
+            <div class="section-label">经营总览</div>
+            <div class="item" data-page="page-dashboard"><i class="fas fa-chart-pie"></i><span>数据总览</span></div>
+            <div class="item" data-page="page-ai"><i class="fas fa-stethoscope"></i><span>店铺经营诊断</span></div>
+            <div class="item" data-page="page-competitor"><i class="fas fa-eye"></i><span>同行竞品分析</span></div>
+            <div class="section-label">交易核心</div>
+            <div class="item" data-page="page-orders"><i class="fas fa-shopping-cart"></i><span>订单管理</span><span class="tag">23</span></div>
+            <div class="item" data-page="page-products"><i class="fas fa-box"></i><span>商品管理</span></div>
+            <div class="item" data-page="page-inventory"><i class="fas fa-warehouse"></i><span>库存管理</span></div>
+            <div class="section-label">AI 智能赋能</div>
+            <div class="item" data-page="page-ai-service"><i class="fas fa-headset"></i><span>AI 客服</span><span class="tag">NEW</span></div>
+            <div class="item" data-page="page-ai-assistant"><i class="fas fa-robot"></i><span>AI 助手</span></div>
+            <div class="item" data-page="page-customer"><i class="fas fa-users"></i><span>客资聚合</span><span class="tag">89</span></div>
+            <div class="section-label">运营支持</div>
+            <div class="item active" data-page="page-logistics"><i class="fas fa-truck"></i><span>物流管理</span></div>
+            <div class="item" data-page="page-sourcing"><i class="fas fa-store-alt"></i><span>素材生成</span></div>
+            <div class="item" data-page="page-channels"><i class="fas fa-plug"></i><span>渠道货源</span></div>
+            <div class="item" data-page="page-procurement"><i class="fas fa-cart-plus"></i><span>智能采购</span><span class="tag">NEW</span></div>
+            <div class="section-label">系统配置</div>
+            <div class="item" data-page="page-channels-config"><i class="fas fa-plug"></i><span>渠道管理</span></div>
+            <div class="item" data-page="page-agents"><i class="fas fa-handshake"></i><span>服务商管理</span></div>
+            <div class="item" data-page="page-settings"><i class="fas fa-cog"></i><span>系统设置</span></div>
+        </div>
+        <div class="bottom">
+            <i class="fas fa-shield-alt"></i>
+            <span>数据加密 · 安全</span>
+        </div>
+    </div>
+
+    <!-- ===== 主内容 ===== -->
+    <div class="main">
+        <div id="page-logistics" class="page active">
+            <!-- 顶部栏 -->
+            <div class="topbar">
+                <div class="left">
+                    <h2><i class="fas fa-truck" style="color:#4dabf7; margin-right:8px;"></i>智能物流管理</h2>
+                    <p>实时监控待发货订单 · 一键发货 · AI客服自动通知买家</p>
+                </div>
+                <div class="right">
+                    <span class="btn" id="syncStatus" onclick="toggleMonitor()"><i class="fas fa-circle" style="color:#0d7c4f; font-size:10px;"></i> 监控运行中</span>
+                    <span class="btn btn-primary" onclick="manualScan()"><i class="fas fa-sync-alt"></i> 立即扫描</span>
+                    <span class="btn btn-success" onclick="simulateNewOrder()"><i class="fas fa-plus"></i> 模拟订单</span>
+                    <span class="btn btn-outline" onclick="exportReport()"><i class="fas fa-file-export"></i> 导出报告</span>
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="filterByStatus('待发货')">
+                    <div class="label"><i class="fas fa-box" style="color:#f5b342;"></i> 待发货</div>
+                    <div class="value" id="pendingCount">0</div>
+                    <div class="sub">等待发货</div>
+                </div>
+                <div class="stat-card" onclick="filterByStatus('运输中')">
+                    <div class="label"><i class="fas fa-truck" style="color:#4dabf7;"></i> 运输中</div>
+                    <div class="value" id="shippingCount">0</div>
+                    <div class="sub">在途追踪</div>
+                </div>
+                <div class="stat-card" onclick="filterByStatus('派送中')">
+                    <div class="label"><i class="fas fa-user-clock" style="color:#f5b342;"></i> 派送中</div>
+                    <div class="value" id="deliveringCount">0</div>
+                    <div class="sub">即将送达</div>
+                </div>
+                <div class="stat-card" onclick="filterByStatus('已签收')">
+                    <div class="label"><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 已签收</div>
+                    <div class="value" id="deliveredCount">0</div>
+                    <div class="sub">已完成</div>
+                </div>
+                <div class="stat-card" onclick="filterByStatus('异常')">
+                    <div class="label"><i class="fas fa-exclamation-triangle" style="color:#b51a3f;"></i> 异常包裹</div>
+                    <div class="value" id="abnormalCount">0</div>
+                    <div class="sub"><span style="color:#b51a3f;" id="abnormalDetail">需人工处理</span></div>
+                </div>
+            </div>
+
+            <!-- 筛选栏 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-filter" style="color:#4dabf7;"></i> 订单筛选</h3>
+                    <span class="action" onclick="resetFilters()"><i class="fas fa-undo"></i> 重置</span>
+                </div>
+                <div class="flex" style="gap:12px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <label style="font-size:13px;color:#5f7d95;">状态</label>
+                        <select id="filterStatus" onchange="applyFilters()" style="padding:6px 12px;border:1px solid #dce5ef;border-radius:8px;font-size:13px;background:white;outline:none;">
+                            <option value="all">全部</option>
+                            <option value="待发货">待发货</option>
+                            <option value="运输中">运输中</option>
+                            <option value="派送中">派送中</option>
+                            <option value="已签收">已签收</option>
+                            <option value="异常">异常</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <label style="font-size:13px;color:#5f7d95;">快递商</label>
+                        <select id="filterProvider" onchange="applyFilters()" style="padding:6px 12px;border:1px solid #dce5ef;border-radius:8px;font-size:13px;background:white;outline:none;">
+                            <option value="all">全部</option>
+                            <option value="顺丰速运">顺丰速运</option>
+                            <option value="中通快递">中通快递</option>
+                            <option value="圆通速递">圆通速递</option>
+                            <option value="韵达快递">韵达快递</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; flex:1; max-width:300px;">
+                        <label style="font-size:13px;color:#5f7d95;"><i class="fas fa-search"></i></label>
+                        <input type="text" id="filterKeyword" placeholder="订单号/物流单号/买家..." oninput="applyFilters()" style="flex:1;padding:6px 12px;border:1px solid #dce5ef;border-radius:8px;font-size:13px;outline:none;background:white;">
+                    </div>
+                    <span style="font-size:13px;color:#5f7d95;margin-left:auto;" id="listCount">共 0 条</span>
+                </div>
+            </div>
+
+            <!-- 待发货订单列表 -->
+            <div class="card border-left-warning">
+                <div class="card-header">
+                    <h3><i class="fas fa-clock" style="color:#f5b342;"></i> 待发货订单</h3>
+                    <span class="action">实时监控 · <span id="pendingListCount">0</span> 单待处理</span>
+                </div>
+                <div class="scroll-list" id="pendingOrderList">
+                    <div style="text-align:center;padding:30px;color:#94a3b8;">📭 暂无待发货订单</div>
+                </div>
+            </div>
+
+            <!-- 已发货 + AI通知记录 两列 -->
+            <div class="row-two">
+                <div class="card border-left-success">
+                    <div class="card-header">
+                        <h3><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 已发货 · 运输中</h3>
+                        <span class="action">共 <span id="shippedListCount">0</span> 单</span>
+                    </div>
+                    <div class="scroll-list" id="shippedOrderList">
+                        <div style="text-align:center;padding:30px;color:#94a3b8;">暂无已发货订单</div>
+                    </div>
+                </div>
+                <div class="card border-left-info">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bell" style="color:#4dabf7;"></i> AI客服通知记录</h3>
+                        <span class="action">实时更新</span>
+                    </div>
+                    <div class="scroll-list" id="notificationList">
+                        <div style="text-align:center;padding:30px;color:#94a3b8;">暂无通知记录</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快递商效能 -->
+            <div class="row-two" style="margin-bottom:0;">
+                <div class="card border-left-blue">
+                    <div class="card-header">
+                        <h3><i class="fas fa-tachometer-alt" style="color:#4dabf7;"></i> 快递商效能</h3>
+                        <span class="action">7日平均</span>
+                    </div>
+                    <div id="providerPerformance">
+                        <!-- 由JS动态渲染 -->
+                    </div>
+                </div>
+                <div class="card border-left-blue">
+                    <div class="card-header">
+                        <h3><i class="fas fa-robot" style="color:#4dabf7;"></i> AI 物流预测</h3>
+                        <span class="action">置信度 92%</span>
+                    </div>
+                    <div id="aiPredictions">
+                        <!-- 由JS动态渲染 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 物流详情弹窗 ===== -->
+    <div class="modal-overlay" id="detailModal" onclick="if(event.target===this) closeModal('detailModal')">
+        <div class="modal-box" style="max-width:600px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-truck" style="color:#4dabf7;"></i> 物流详情</h3>
+                <button class="close" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="detailModalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-sm outline" onclick="closeModal('detailModal')">关闭</button>
+                <button class="btn-sm primary" onclick="refreshTracking()"><i class="fas fa-sync-alt"></i> 刷新轨迹</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 发货弹窗 ===== -->
+    <div class="modal-overlay" id="shipModal" onclick="if(event.target===this) closeModal('shipModal')">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-box" style="color:#f5b342;"></i> 确认发货</h3>
+                <button class="close" onclick="closeModal('shipModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="shipModalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-sm outline" onclick="closeModal('shipModal')">取消</button>
+                <button class="btn-sm success" id="confirmShipBtn" onclick="doConfirmShip()"><i class="fas fa-check"></i> 确认发货并通知买家</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Toast ===== -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ================================================================
+        // ===== Toast =====
+        // ================================================================
+        function showToast(msg) {
+            var toast = document.getElementById('toast');
+            toast.innerHTML = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(function() { toast.classList.remove('show'); }, 3500);
+        }
+
+        // ================================================================
+        // ===== 弹窗管理 =====
+        // ================================================================
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        // ================================================================
+        // ===== 数据层 =====
+        // ================================================================
+
+        var logisticsProviders = [
+            { id: 'SF', name: '顺丰速运', code: 'SF', cost: 12, time: 1.8, score: 95, color: '#0d7c4f', onTime: 98, icon: 'fa-truck' },
+            { id: 'ZTO', name: '中通快递', code: 'ZTO', cost: 6, time: 2.6, score: 88, color: '#4dabf7', onTime: 94, icon: 'fa-truck' },
+            { id: 'YTO', name: '圆通速递', code: 'YTO', cost: 5, time: 3.0, score: 82, color: '#f5b342', onTime: 87, icon: 'fa-truck' },
+            { id: 'YUNDA', name: '韵达快递', code: 'YUNDA', cost: 4.5, time: 3.2, score: 78, color: '#7b4fa0', onTime: 83, icon: 'fa-truck' },
+        ];
+
+        var logisticsOrders = [];
+        var orderIdCounter = 1000;
+        var currentDetailOrderId = null;
+        var currentShipOrderId = null;
+        var aiNotifications = [];
+        var notificationIdCounter = 0;
+
+        var statusMap = {
+            '待发货': { badge: 'warning', label: '待发货', icon: 'fa-box' },
+            '运输中': { badge: 'info', label: '运输中', icon: 'fa-truck' },
+            '派送中': { badge: 'warning', label: '派送中', icon: 'fa-user-clock' },
+            '已签收': { badge: 'success', label: '已签收', icon: 'fa-check-circle' },
+            '异常': { badge: 'danger', label: '异常', icon: 'fa-exclamation-triangle' }
+        };
+        var statusFlow = ['待发货', '运输中', '派送中', '已签收'];
+        var locations = ['北京转运中心', '上海转运中心', '广州转运中心', '深圳转运中心', '杭州转运中心', '成都转运中心', '武汉转运中心'];
+        var platforms = ['淘宝', '抖音', '拼多多', '京东'];
+        var products = ['云山茶叶礼盒', '手工竹编包', '山核桃仁 250g', '云山手工皂套装', '云山陶瓷杯', '手写书法折扇'];
+
+        var surnames = ['王', '张', '李', '刘', '陈', '赵', '周', '吴', '孙', '马'];
+        var givenNames = ['婷', '豪', '萱', '阳', '琳', '瑶', '伟', '芳', '军', '敏'];
+        var cities = ['北京市朝阳区', '上海市浦东新区', '广州市天河区', '深圳市南山区', '杭州市西湖区', '成都市高新区', '武汉市江汉区'];
+        var streets = ['建国路88号', '张杨路88号', '天河路188号', '科技园路68号', '文三路118号', '天府大道188号', '解放大道88号'];
+
+        var monitorTimer = null;
+        var isMonitorRunning = true;
+        var currentFilter = { status: 'all', provider: 'all', keyword: '' };
+
+        // ================================================================
+        // ===== 工具函数 =====
+        // ================================================================
+        function randomName() { return surnames[Math.floor(Math.random() * surnames.length)] + givenNames[Math.floor(Math.random() * givenNames.length)]; }
+        function randomAddress() { return cities[Math.floor(Math.random() * cities.length)] + streets[Math.floor(Math.random() * streets.length)]; }
+        function randomProduct() { return products[Math.floor(Math.random() * products.length)]; }
+        function randomPlatform() { return platforms[Math.floor(Math.random() * platforms.length)]; }
+        function randomPhone() { return '1' + String(Math.floor(Math.random() * 9000000000) + 1000000000); }
+
+        function generateTrackingNumber(providerCode) {
+            var prefix = providerCode || 'SF';
+            var timestamp = Date.now().toString().slice(-6);
+            var random = String(Math.floor(Math.random() * 100000)).padStart(5, '0');
+            return prefix + timestamp + random;
+        }
+
+        function selectBestProvider() {
+            var scored = logisticsProviders.map(function(p) {
+                var costScore = (Math.min.apply(null, logisticsProviders.map(function(x) { return x.cost; })) / p.cost) * 30;
+                var timeScore = (Math.min.apply(null, logisticsProviders.map(function(x) { return x.time; })) / p.time) * 30;
+                var ratingScore = (p.score / 100) * 40;
+                return { ...p, totalScore: Math.round(costScore + timeScore + ratingScore) };
+            });
+            scored.sort(function(a, b) { return b.totalScore - a.totalScore; });
+            return scored[0];
+        }
+
+        // ================================================================
+        // ===== AI客服通知服务 =====
+        // ================================================================
+
+        var aiMessageTemplates = {
+            '淘宝': function(order) {
+                return '📦 您的订单已发货！\n' +
+                       '订单号: ' + order.orderId + '\n' +
+                       '商品: ' + order.productName + ' × ' + order.quantity + '\n' +
+                       '快递: ' + order.provider + '\n' +
+                       '单号: ' + order.trackingNumber + '\n' +
+                       '预计送达: ' + (order.estimatedDelivery || '2-3天') + '\n' +
+                       '点击查看物流: https://m.taobao.com/track/' + order.trackingNumber + '\n' +
+                       '💬 有问题随时找我~';
+            },
+            '抖音': function(order) {
+                return '🎉 亲，您的订单已发货啦！\n' +
+                       '订单号: ' + order.orderId + '\n' +
+                       '商品: ' + order.productName + ' × ' + order.quantity + '\n' +
+                       '快递: ' + order.provider + ' ' + order.trackingNumber + '\n' +
+                       '预计 ' + (order.estimatedDelivery || '2-3天') + ' 送达\n' +
+                       '👉 点击查看物流: https://www.douyin.com/track/' + order.trackingNumber + '\n' +
+                       '💬 有问题随时找AI客服哦~';
+            },
+            '拼多多': function(order) {
+                return '📦 亲，您的订单已发货！\n' +
+                       '订单号: ' + order.orderId + '\n' +
+                       '商品: ' + order.productName + ' × ' + order.quantity + '\n' +
+                       '物流: ' + order.provider + ' ' + order.trackingNumber + '\n' +
+                       '预计送达: ' + (order.estimatedDelivery || '2-3天') + '\n' +
+                       '查看物流: https://www.pinduoduo.com/track/' + order.trackingNumber + '\n' +
+                       '💬 有问题找AI客服哟~';
+            },
+            '京东': function(order) {
+                return '📦 尊敬的 ' + order.buyerName + '，您的订单已发货！\n' +
+                       '订单号: ' + order.orderId + '\n' +
+                       '商品: ' + order.productName + ' × ' + order.quantity + '\n' +
+                       '快递: ' + order.provider + '\n' +
+                       '单号: ' + order.trackingNumber + '\n' +
+                       '预计送达: ' + (order.estimatedDelivery || '2-3天') + '\n' +
+                       '追踪: https://www.jd.com/track/' + order.trackingNumber + '\n' +
+                       '💬 京东AI客服为您服务！';
+            }
+        };
+
+        function sendAICustomerNotification(order) {
+            var template = aiMessageTemplates[order.platform];
+            if (!template) template = aiMessageTemplates['淘宝'];
+            var message = template(order);
+
+            // 添加到通知记录
+            var notification = {
+                id: 'noti-' + (++notificationIdCounter),
+                orderId: order.orderId,
+                platform: order.platform,
+                buyerName: order.buyerName,
+                productName: order.productName,
+                trackingNumber: order.trackingNumber,
+                provider: order.provider,
+                message: message,
+                status: '已发送',
+                sentAt: new Date().toLocaleString(),
+                channels: ['平台消息']
+            };
+
+            aiNotifications.unshift(notification);
+            if (aiNotifications.length > 50) aiNotifications.pop();
+
+            // 模拟发送到各平台
+            console.log('🤖 [AI客服-' + order.platform + '] 已发送通知:');
+            console.log(message);
+
+            return notification;
+        }
+
+        // ================================================================
+        // ===== 创建物流订单 =====
+        // ================================================================
+
+        function createLogisticsOrder() {
+            var provider = selectBestProvider();
+            var trackingNumber = generateTrackingNumber(provider.code);
+            var platform = randomPlatform();
+            
+            var order = {
+                id: 'L-' + Date.now() + '-' + String(++orderIdCounter).padStart(4, '0'),
+                orderId: 'PO-' + Date.now().toString().slice(-6) + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0'),
+                platform: platform,
+                productName: randomProduct(),
+                quantity: Math.floor(Math.random() * 3) + 1,
+                buyerName: randomName(),
+                buyerPhone: randomPhone(),
+                buyerAddress: randomAddress(),
+                provider: provider.name,
+                trackingNumber: trackingNumber,
+                status: '待发货',
+                shippedAt: null,
+                trackingHistory: [
+                    { time: new Date().toLocaleString(), status: '物流单已生成', location: '系统', desc: '订单已创建，等待发货' }
+                ],
+                isAbnormal: false,
+                abnormalReason: null,
+                aiNotificationSent: false,
+                notificationStatus: '待通知',
+                createdAt: new Date().toLocaleString(),
+                updatedAt: new Date().toLocaleString(),
+                estimatedDelivery: new Date(Date.now() + 2 * 24 * 3600 * 1000).toLocaleString()
+            };
+            
+            logisticsOrders.push(order);
+            return order;
+        }
+
+        // ================================================================
+        // ===== 发货操作 =====
+        // ================================================================
+
+        function shipOrder(orderId, provider, trackingNumber) {
+            var order = logisticsOrders.find(function(o) { return o.id === orderId; });
+            if (!order) { showToast('❌ 订单不存在'); return false; }
+            if (order.status !== '待发货') { showToast('⚠️ 订单不是待发货状态'); return false; }
+
+            order.status = '运输中';
+            order.provider = provider || '顺丰速运';
+            order.trackingNumber = trackingNumber || generateTrackingNumber('SF');
+            order.shippedAt = new Date().toLocaleString();
+            order.updatedAt = new Date().toLocaleString();
+            order.notificationStatus = '发送中';
+            
+            order.trackingHistory.push({
+                time: new Date().toLocaleString(),
+                status: '运输中',
+                location: order.provider + ' · 已揽收',
+                desc: '包裹已交由 ' + order.provider + ' 揽收发货'
+            });
+
+            // 发送AI客服通知
+            var notification = sendAICustomerNotification(order);
+            order.aiNotificationSent = true;
+            order.notificationStatus = '已通知';
+            order.notificationId = notification.id;
+
+            renderAll();
+            return true;
+        }
+
+        // ================================================================
+        // ===== 模拟物流更新 =====
+        // ================================================================
+
+        function simulateLogisticsUpdate() {
+            var inTransit = logisticsOrders.filter(function(o) {
+                return o.status === '运输中' || o.status === '派送中';
+            });
+            
+            inTransit.forEach(function(order) {
+                var currentIndex = statusFlow.indexOf(order.status);
+                if (currentIndex < statusFlow.length - 1 && Math.random() < 0.1) {
+                    var newStatus = statusFlow[currentIndex + 1];
+                    var location = locations[Math.floor(Math.random() * locations.length)];
+                    order.status = newStatus;
+                    order.updatedAt = new Date().toLocaleString();
+                    if (newStatus === '已签收') {
+                        order.deliveredAt = new Date().toLocaleString();
+                    }
+                    order.trackingHistory.push({
+                        time: new Date().toLocaleString(),
+                        status: newStatus,
+                        location: location,
+                        desc: newStatus === '已签收' ? '包裹已签收，配送完成' : '包裹已到达 ' + location
+                    });
+                }
+            });
+            
+            detectAbnormal();
+            renderAll();
+        }
+
+        function detectAbnormal() {
+            var now = new Date();
+            logisticsOrders.forEach(function(order) {
+                if (order.status === '已签收') return;
+                if (order.isAbnormal) return;
+                
+                var lastUpdate = new Date(order.updatedAt);
+                var hoursSinceUpdate = (now - lastUpdate) / (3600 * 1000);
+                
+                if (hoursSinceUpdate > 24 && order.status !== '待发货') {
+                    order.isAbnormal = true;
+                    order.abnormalReason = '物流信息超过24小时未更新，请及时联系快递商';
+                    order.status = '异常';
+                    order.trackingHistory.push({
+                        time: new Date().toLocaleString(),
+                        status: '异常',
+                        location: '系统检测',
+                        desc: '⚠️ ' + order.abnormalReason
+                    });
+                }
+            });
+        }
+
+        // ================================================================
+        // ===== 监控服务 =====
+        // ================================================================
+
+        function startMonitor() {
+            if (monitorTimer) return;
+            isMonitorRunning = true;
+            document.getElementById('syncStatus').innerHTML = '<i class="fas fa-circle" style="color:#0d7c4f; font-size:10px;"></i> 监控运行中';
+            
+            monitorTimer = setInterval(function() {
+                if (isMonitorRunning) {
+                    // 模拟新订单产生
+                    if (Math.random() < 0.3) {
+                        var order = createLogisticsOrder();
+                        // 部分订单直接进入运输中状态
+                        if (Math.random() > 0.4) {
+                            shipOrder(order.id, selectBestProvider().name, generateTrackingNumber('SF'));
+                        }
+                        renderAll();
+                    }
+                    simulateLogisticsUpdate();
+                }
+            }, 8000);
+            console.log('🔄 物流监控已启动');
+        }
+
+        function stopMonitor() {
+            isMonitorRunning = false;
+            if (monitorTimer) {
+                clearInterval(monitorTimer);
+                monitorTimer = null;
+            }
+            document.getElementById('syncStatus').innerHTML = '<i class="fas fa-circle" style="color:#b55a1a; font-size:10px;"></i> 监控已暂停';
+            console.log('⏹️ 物流监控已停止');
+        }
+
+        function toggleMonitor() {
+            if (isMonitorRunning) {
+                stopMonitor();
+            } else {
+                startMonitor();
+            }
+        }
+
+        // ================================================================
+        // ===== 手动操作 =====
+        // ================================================================
+
+        function manualScan() {
+            showToast('🔄 正在扫描新订单...');
+            setTimeout(function() {
+                var count = Math.floor(Math.random() * 3) + 1;
+                for (var i = 0; i < count; i++) {
+                    var order = createLogisticsOrder();
+                    if (Math.random() > 0.5) {
+                        shipOrder(order.id, selectBestProvider().name, generateTrackingNumber('SF'));
+                    }
+                }
+                renderAll();
+                showToast('✅ 扫描完成，新增 ' + count + ' 个订单');
+            }, 1500);
+        }
+
+        function simulateNewOrder() {
+            var order = createLogisticsOrder();
+            renderAll();
+            showToast('📦 模拟订单 ' + order.orderId + ' 已创建');
+        }
+
+        // ================================================================
+        // ===== UI操作 =====
+        // ================================================================
+
+        function showShipDialog(orderId) {
+            currentShipOrderId = orderId;
+            var order = logisticsOrders.find(function(o) { return o.id === orderId; });
+            if (!order) { showToast('❌ 订单不存在'); return; }
+
+            var body = document.getElementById('shipModalBody');
+            var providerOptions = logisticsProviders.map(function(p) {
+                return '<option value="' + p.name + '">' + p.name + ' (时效' + p.time + '天)</option>';
+            }).join('');
+
+            body.innerHTML = `
+                <div class="detail-row"><span class="label">订单号</span><span class="value">${order.orderId}</span></div>
+                <div class="detail-row"><span class="label">商品</span><span class="value">${order.productName} × ${order.quantity}</span></div>
+                <div class="detail-row"><span class="label">平台</span><span class="value"><span class="platform-tag ${order.platform === '淘宝' ? 'taobao' : order.platform === '抖音' ? 'douyin' : order.platform === '拼多多' ? 'pdd' : order.platform === '京东' ? 'jd' : 'other'}">${order.platform}</span></span></div>
+                <div class="detail-row"><span class="label">买家</span><span class="value">${order.buyerName} ${order.buyerPhone}</span></div>
+                <div class="detail-row"><span class="label">收货地址</span><span class="value">${order.buyerAddress}</span></div>
+                <div style="margin-top:12px;">
+                    <div class="form-group">
+                        <label>快递公司</label>
+                        <select id="shipProvider" style="width:100%;padding:8px 14px;border:1px solid #dce5ef;border-radius:8px;font-size:14px;background:white;">
+                            ${providerOptions}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>物流单号</label>
+                        <input type="text" id="shipTrackingNumber" placeholder="请输入物流单号..." style="width:100%;padding:8px 14px;border:1px solid #dce5ef;border-radius:8px;font-size:14px;">
+                    </div>
+                </div>
+                <div style="margin-top:10px;padding:10px;background:#f0f7fe;border-radius:8px;font-size:13px;color:#2a7faa;border-left:3px solid #4dabf7;">
+                    <i class="fas fa-robot"></i> 确认发货后，AI客服将自动通知买家
+                </div>
+            `;
+            openModal('shipModal');
+        }
+
+        function doConfirmShip() {
+            if (!currentShipOrderId) return;
+            var provider = document.getElementById('shipProvider').value;
+            var trackingNumber = document.getElementById('shipTrackingNumber').value.trim();
+            
+            if (!trackingNumber) {
+                showToast('⚠️ 请输入物流单号');
+                return;
+            }
+
+            var result = shipOrder(currentShipOrderId, provider, trackingNumber);
+            if (result) {
+                closeModal('shipModal');
+                showToast('✅ 订单已发货，AI客服通知已发送');
+                renderAll();
+            }
+        }
+
+        function showLogisticsDetail(orderId) {
+            currentDetailOrderId = orderId;
+            var order = logisticsOrders.find(function(o) { return o.id === orderId; });
+            if (!order) { showToast('❌ 订单不存在'); return; }
+
+            var body = document.getElementById('detailModalBody');
+            var statusInfo = statusMap[order.status] || statusMap['待发货'];
+
+            var timelineHtml = '';
+            order.trackingHistory.forEach(function(t, idx) {
+                var isLast = idx === order.trackingHistory.length - 1;
+                var dotClass = isLast ? 'current' : 'done';
+                if (t.status === '异常') dotClass = 'done';
+                timelineHtml += `
+                    <div class="track-node">
+                        <div class="dot ${dotClass}" style="background:${t.status === '异常' ? '#b51a3f' : (isLast ? '#4dabf7' : '#0d7c4f')};">
+                            <i class="fas ${t.status === '异常' ? 'fa-exclamation' : 'fa-check'}"></i>
+                        </div>
+                        <div class="content">
+                            <div class="status">${t.status}</div>
+                            <div class="location">${t.location || '—'}</div>
+                            ${t.desc ? '<div class="desc">' + t.desc + '</div>' : ''}
+                            <div class="time">${t.time}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            var notificationStatus = order.aiNotificationSent ? 
+                '<span class="badge success"><i class="fas fa-check"></i> 已通知</span>' :
+                '<span class="badge warning"><i class="fas fa-clock"></i> 待通知</span>';
+
+            body.innerHTML = `
+                <div class="detail-row"><span class="label">订单号</span><span class="value">${order.orderId}</span></div>
+                <div class="detail-row"><span class="label">物流单号</span><span class="value" style="font-family:monospace;color:#4dabf7;">${order.trackingNumber}</span></div>
+                <div class="detail-row"><span class="label">商品</span><span class="value">${order.productName} × ${order.quantity}</span></div>
+                <div class="detail-row"><span class="label">平台</span><span class="value"><span class="platform-tag ${order.platform === '淘宝' ? 'taobao' : order.platform === '抖音' ? 'douyin' : order.platform === '拼多多' ? 'pdd' : order.platform === '京东' ? 'jd' : 'other'}">${order.platform}</span></span></div>
+                <div class="detail-row"><span class="label">买家</span><span class="value">${order.buyerName} ${order.buyerPhone}</span></div>
+                <div class="detail-row"><span class="label">收货地址</span><span class="value">${order.buyerAddress}</span></div>
+                <div class="detail-row"><span class="label">快递商</span><span class="value">${order.provider}</span></div>
+                <div class="detail-row"><span class="label">状态</span><span class="value"><span class="badge ${statusInfo.badge}"><i class="fas ${statusInfo.icon}"></i> ${order.status}</span></span></div>
+                <div class="detail-row"><span class="label">AI通知</span><span class="value">${notificationStatus}</span></div>
+                <div class="detail-row"><span class="label">预计送达</span><span class="value">${order.estimatedDelivery || '待更新'}</span></div>
+                ${order.isAbnormal ? `<div style="margin:8px 0;padding:10px;background:#fde8ed;border-radius:8px;color:#b51a3f;font-size:13px;"><i class="fas fa-exclamation-triangle"></i> ${order.abnormalReason}</div>` : ''}
+                <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eef2f6;">
+                    <div style="font-weight:600;font-size:14px;margin-bottom:8px;"><i class="fas fa-history"></i> 物流轨迹</div>
+                    <div class="tracking-timeline">${timelineHtml}</div>
+                </div>
+                ${order.status === '待发货' ? `
+                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eef2f6;">
+                        <span class="btn-sm success" onclick="closeModal('detailModal');showShipDialog('${order.id}')"><i class="fas fa-box"></i> 发货</span>
+                    </div>
+                ` : ''}
+            `;
+            openModal('detailModal');
+        }
+
+        function refreshTracking() {
+            if (!currentDetailOrderId) return;
+            var order = logisticsOrders.find(function(o) { return o.id === currentDetailOrderId; });
+            if (!order) return;
+            
+            if (order.status !== '已签收' && order.status !== '异常') {
+                var currentIndex = statusFlow.indexOf(order.status);
+                if (currentIndex < statusFlow.length - 1 && Math.random() < 0.4) {
+                    var newStatus = statusFlow[currentIndex + 1];
+                    var location = locations[Math.floor(Math.random() * locations.length)];
+                    order.status = newStatus;
+                    order.updatedAt = new Date().toLocaleString();
+                    order.trackingHistory.push({
+                        time: new Date().toLocaleString(),
+                        status: newStatus,
+                        location: location,
+                        desc: newStatus === '已签收' ? '包裹已签收，配送完成' : '包裹已更新'
+                    });
+                    renderAll();
+                }
+            }
+            showLogisticsDetail(currentDetailOrderId);
+            showToast('🔄 物流轨迹已刷新');
+        }
+
+        // ================================================================
+        // ===== 筛选与导出 =====
+        // ================================================================
+
+        function applyFilters() {
+            currentFilter.status = document.getElementById('filterStatus').value;
+            currentFilter.provider = document.getElementById('filterProvider').value;
+            currentFilter.keyword = document.getElementById('filterKeyword').value.toLowerCase().trim();
+            renderPendingOrders();
+            renderShippedOrders();
+            updateListCount();
+        }
+
+        function filterByStatus(status) {
+            document.getElementById('filterStatus').value = status;
+            applyFilters();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterStatus').value = 'all';
+            document.getElementById('filterProvider').value = 'all';
+            document.getElementById('filterKeyword').value = '';
+            currentFilter = { status: 'all', provider: 'all', keyword: '' };
+            renderAll();
+            showToast('🔄 已重置筛选条件');
+        }
+
+        function updateListCount() {
+            var pending = logisticsOrders.filter(function(o) { 
+                return o.status === '待发货' && matchFilter(o);
+            });
+            var shipped = logisticsOrders.filter(function(o) { 
+                return o.status !== '待发货' && matchFilter(o);
+            });
+            document.getElementById('pendingListCount').textContent = pending.length;
+            document.getElementById('shippedListCount').textContent = shipped.length;
+            document.getElementById('listCount').textContent = '共 ' + (pending.length + shipped.length) + ' 条';
+        }
+
+        function matchFilter(order) {
+            if (currentFilter.status !== 'all' && order.status !== currentFilter.status) return false;
+            if (currentFilter.provider !== 'all' && order.provider !== currentFilter.provider) return false;
+            if (currentFilter.keyword) {
+                var text = (order.orderId + ' ' + order.trackingNumber + ' ' + order.buyerName + ' ' + order.productName).toLowerCase();
+                if (!text.includes(currentFilter.keyword)) return false;
+            }
+            return true;
+        }
+
+        function exportReport() {
+            var text = '===== 物流报告 =====\n';
+            text += '生成时间: ' + new Date().toLocaleString() + '\n\n';
+            var pending = logisticsOrders.filter(function(o) { return o.status === '待发货'; });
+            var shipping = logisticsOrders.filter(function(o) { return o.status === '运输中'; });
+            var delivering = logisticsOrders.filter(function(o) { return o.status === '派送中'; });
+            var delivered = logisticsOrders.filter(function(o) { return o.status === '已签收'; });
+            var abnormal = logisticsOrders.filter(function(o) { return o.isAbnormal; });
+            
+            text += '📊 统计:\n';
+            text += '  待发货: ' + pending.length + '\n';
+            text += '  运输中: ' + shipping.length + '\n';
+            text += '  派送中: ' + delivering.length + '\n';
+            text += '  已签收: ' + delivered.length + '\n';
+            text += '  异常: ' + abnormal.length + '\n\n';
+            
+            text += '📋 订单明细:\n';
+            logisticsOrders.forEach(function(o) {
+                text += '  ' + o.orderId + ' | ' + o.productName + ' | ' + o.status + ' | ' + o.trackingNumber + '\n';
+            });
+            
+            text += '\n📨 AI通知记录:\n';
+            aiNotifications.forEach(function(n) {
+                text += '  ' + n.orderId + ' | ' + n.buyerName + ' | ' + n.status + ' | ' + n.sentAt + '\n';
+            });
+            
+            var blob = new Blob([text], { type: 'text/plain' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = '物流报告_' + new Date().toISOString().slice(0,10) + '.txt';
+            a.click();
+            showToast('📥 物流报告已导出');
+        }
+
+        // ================================================================
+        // ===== 渲染函数 =====
+        // ================================================================
+
+        function renderStats() {
+            var pending = logisticsOrders.filter(function(o) { return o.status === '待发货'; }).length;
+            var shipping = logisticsOrders.filter(function(o) { return o.status === '运输中'; }).length;
+            var delivering = logisticsOrders.filter(function(o) { return o.status === '派送中'; }).length;
+            var delivered = logisticsOrders.filter(function(o) { return o.status === '已签收'; }).length;
+            var abnormal = logisticsOrders.filter(function(o) { return o.isAbnormal; }).length;
+            
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('shippingCount').textContent = shipping;
+            document.getElementById('deliveringCount').textContent = delivering;
+            document.getElementById('deliveredCount').textContent = delivered;
+            document.getElementById('abnormalCount').textContent = abnormal;
+        }
+
+        function renderPendingOrders() {
+            var container = document.getElementById('pendingOrderList');
+            var pending = logisticsOrders.filter(function(o) { 
+                return o.status === '待发货' && matchFilter(o);
+            });
+            
+            if (pending.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;">📭 暂无待发货订单</div>';
+                return;
+            }
+            
+            var html = '';
+            pending.forEach(function(order) {
+                html += `
+                    <div class="logistics-item" onclick="showLogisticsDetail('${order.id}')" style="cursor:pointer;">
+                        <div class="info">
+                            <div class="name">
+                                ${order.productName} × ${order.quantity}
+                                <span class="badge warning"><i class="fas fa-box"></i> 待发货</span>
+                                <span class="platform-tag ${order.platform === '淘宝' ? 'taobao' : order.platform === '抖音' ? 'douyin' : order.platform === '拼多多' ? 'pdd' : order.platform === '京东' ? 'jd' : 'other'}">${order.platform}</span>
+                            </div>
+                            <div class="meta">
+                                <span><i class="fas fa-file-invoice"></i> ${order.orderId}</span>
+                                <span><i class="fas fa-user"></i> ${order.buyerName}</span>
+                                <span><i class="fas fa-map-pin"></i> ${order.buyerAddress.substring(0, 20)}...</span>
+                                <span><i class="fas fa-clock"></i> ${order.createdAt}</span>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <div class="actions">
+                                <span class="btn-sm success" onclick="event.stopPropagation();showShipDialog('${order.id}')"><i class="fas fa-box"></i> 发货</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderShippedOrders() {
+            var container = document.getElementById('shippedOrderList');
+            var shipped = logisticsOrders.filter(function(o) { 
+                return o.status !== '待发货' && matchFilter(o);
+            });
+            
+            if (shipped.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;">暂无已发货订单</div>';
+                return;
+            }
+            
+            var html = '';
+            shipped.forEach(function(order) {
+                var statusInfo = statusMap[order.status] || statusMap['运输中'];
+                var progressPercent = 0;
+                var statusIndex = statusFlow.indexOf(order.status);
+                if (statusIndex >= 0) {
+                    progressPercent = ((statusIndex + 1) / statusFlow.length) * 100;
+                }
+                var barClass = order.isAbnormal ? 'danger' : (order.status === '已签收' ? 'success' : '');
+                
+                html += `
+                    <div class="logistics-item" onclick="showLogisticsDetail('${order.id}')" style="cursor:pointer;">
+                        <div class="info">
+                            <div class="name">
+                                ${order.productName} × ${order.quantity}
+                                <span class="badge ${statusInfo.badge}"><i class="fas ${statusInfo.icon}"></i> ${order.status}</span>
+                                <span class="platform-tag ${order.platform === '淘宝' ? 'taobao' : order.platform === '抖音' ? 'douyin' : order.platform === '拼多多' ? 'pdd' : order.platform === '京东' ? 'jd' : 'other'}">${order.platform}</span>
+                                ${order.aiNotificationSent ? '<span class="badge success"><i class="fas fa-robot"></i> 已通知</span>' : ''}
+                            </div>
+                            <div class="meta">
+                                <span><i class="fas fa-file-invoice"></i> ${order.orderId}</span>
+                                <span><i class="fas fa-tag"></i> ${order.trackingNumber}</span>
+                                <span><i class="fas fa-store"></i> ${order.provider}</span>
+                                <span><i class="fas fa-user"></i> ${order.buyerName}</span>
+                            </div>
+                            <div class="logistics-progress">
+                                <span>待发货</span>
+                                <div class="bar"><div class="fill ${barClass}" style="width:${progressPercent}%;"></div></div>
+                                <span>已签收</span>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <span style="font-size:11px;color:#94a3b8;">${order.shippedAt || order.updatedAt}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderNotifications() {
+            var container = document.getElementById('notificationList');
+            if (aiNotifications.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;">暂无通知记录</div>';
+                return;
+            }
+            
+            var html = '';
+            aiNotifications.slice(0, 20).forEach(function(n) {
+                var iconMap = { '已发送': 'fa-check-circle', '发送中': 'fa-spinner', '失败': 'fa-times-circle' };
+                var colorMap = { '已发送': '#0d7c4f', '发送中': '#f5b342', '失败': '#b51a3f' };
+                var badgeMap = { '已发送': 'success', '发送中': 'warning', '失败': 'danger' };
+                var icon = iconMap[n.status] || 'fa-bell';
+                var color = colorMap[n.status] || '#4dabf7';
+                var badge = badgeMap[n.status] || 'info';
+                
+                html += `
+                    <div class="notification-item">
+                        <div class="noti-icon" style="background:${color};">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="noti-content">
+                            <div class="title">📦 ${n.productName} · ${n.buyerName}</div>
+                            <div class="desc">${n.platform} · 单号: ${n.trackingNumber}</div>
+                            <div class="time">${n.sentAt}</div>
+                        </div>
+                        <span class="noti-badge ${badge}">${n.status}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderProviderPerformance() {
+            var container = document.getElementById('providerPerformance');
+            var html = '';
+            logisticsProviders.forEach(function(p) {
+                var orders = logisticsOrders.filter(function(o) { return o.provider === p.name; });
+                var count = orders.length;
+                var delivered = orders.filter(function(o) { return o.status === '已签收'; }).length;
+                var rate = count > 0 ? Math.round((delivered / count) * 100) : 0;
+                
+                html += `
+                    <div class="logistics-item" style="padding:6px 0;cursor:default;">
+                        <div class="info">
+                            <div class="name" style="font-size:13px;">
+                                <span style="color:${p.color};">●</span> ${p.name}
+                            </div>
+                            <div class="meta">
+                                <span><i class="fas fa-clock"></i> 时效 ${p.time}天</span>
+                                <span><i class="fas fa-percent"></i> 准时率 ${p.onTime}%</span>
+                                <span><i class="fas fa-box"></i> 订单 ${count}单</span>
+                                <span><i class="fas fa-check-circle"></i> 妥投率 ${rate}%</span>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <span style="font-size:12px;color:${p.color};">评分 ${p.score}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderAIPredictions() {
+            var container = document.getElementById('aiPredictions');
+            var pending = logisticsOrders.filter(function(o) { return o.status === '待发货'; }).length;
+            var shipping = logisticsOrders.filter(function(o) { return o.status === '运输中'; }).length;
+            var delivering = logisticsOrders.filter(function(o) { return o.status === '派送中'; }).length;
+            
+            var totalInTransit = shipping + delivering;
+            var estimatedToday = Math.floor(totalInTransit * 0.3) + Math.floor(Math.random() * 3);
+            var riskCount = logisticsOrders.filter(function(o) {
+                return o.isAbnormal || (o.status === '运输中' && o.updatedAt && 
+                    (new Date() - new Date(o.updatedAt)) > 24 * 3600 * 1000);
+            }).length;
+            
+            var notNotified = logisticsOrders.filter(function(o) {
+                return o.status !== '待发货' && !o.aiNotificationSent;
+            }).length;
+            
+            html = `
+                <div style="margin-bottom:8px;">
+                    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+                        <span>今日预计签收</span>
+                        <span style="font-weight:600;color:#0d7c4f;">${estimatedToday} 单</span>
+                    </div>
+                    <div style="background:#eef2f6;border-radius:20px;height:5px;overflow:hidden;">
+                        <div style="background:#4dabf7;width:${Math.min(100, estimatedToday * 6)}%;height:5px;border-radius:20px;"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom:8px;">
+                    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+                        <span>异常风险预测</span>
+                        <span style="font-weight:600;color:${riskCount > 2 ? '#b51a3f' : '#b55a1a'};">${riskCount} 单高风险</span>
+                    </div>
+                    <div style="background:#eef2f6;border-radius:20px;height:5px;overflow:hidden;">
+                        <div style="background:${riskCount > 2 ? '#b51a3f' : '#b55a1a'};width:${Math.min(100, riskCount * 5 + 10)}%;height:5px;border-radius:20px;"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom:8px;">
+                    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+                        <span><i class="fas fa-robot" style="color:#4dabf7;"></i> AI通知待发送</span>
+                        <span style="font-weight:600;color:#f5b342;">${notNotified} 单</span>
+                    </div>
+                    <div style="background:#eef2f6;border-radius:20px;height:5px;overflow:hidden;">
+                        <div style="background:#f5b342;width:${Math.min(100, notNotified * 8 + 5)}%;height:5px;border-radius:20px;"></div>
+                    </div>
+                </div>
+                <div style="background:#f0f7fe;border-radius:8px;padding:10px 14px;font-size:13px;color:#475569;margin-top:6px;border-left:3px solid #4dabf7;">
+                    <i class="fas fa-lightbulb" style="color:#f5b342;"></i> AI建议：${riskCount > 0 ? riskCount + '笔订单存在延误风险，建议优先处理' : '当前物流状况良好，' + (notNotified > 0 ? '还有 ' + notNotified + ' 单待通知买家' : '所有已发货订单均已通知买家')}
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderAll() {
+            renderStats();
+            renderPendingOrders();
+            renderShippedOrders();
+            renderNotifications();
+            renderProviderPerformance();
+            renderAIPredictions();
+            updateListCount();
+        }
+
+        // ================================================================
+        // ===== 初始化 =====
+        // ================================================================
+
+        document.querySelectorAll('.sidebar .item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar .item').forEach(function(i) { i.classList.remove('active'); });
+                this.classList.add('active');
+                var pageId = this.dataset.page;
+                document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+                var target = document.getElementById(pageId);
+                if (target) target.classList.add('active');
+                if (pageId !== 'page-logistics') {
+                    showToast('📌 其他模块已精简，仅保留「物流管理」内容');
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 生成初始数据
+            for (var i = 0; i < 6; i++) {
+                var order = createLogisticsOrder();
+                var statuses = ['待发货', '待发货', '运输中', '运输中', '派送中', '已签收'];
+                var randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                if (randomStatus !== '待发货') {
+                    var provider = selectBestProvider();
+                    shipOrder(order.id, provider.name, generateTrackingNumber(provider.code));
+                }
+            }
+            // 生成一些AI通知记录
+            var shippedOrders = logisticsOrders.filter(function(o) { return o.status !== '待发货'; });
+            shippedOrders.forEach(function(o) {
+                if (o.aiNotificationSent) {
+                    sendAICustomerNotification(o);
+                }
+            });
+            
+            renderAll();
+            startMonitor();
+            showToast('📦 智能物流管理已启动，实时监控待发货订单');
+        });
+
+        // 暴露全局函数
+        window.showLogisticsDetail = showLogisticsDetail;
+        window.refreshTracking = refreshTracking;
+        window.showShipDialog = showShipDialog;
+        window.doConfirmShip = doConfirmShip;
+        window.manualScan = manualScan;
+        window.simulateNewOrder = simulateNewOrder;
+        window.exportReport = exportReport;
+        window.applyFilters = applyFilters;
+        window.resetFilters = resetFilters;
+        window.filterByStatus = filterByStatus;
+        window.toggleMonitor = toggleMonitor;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
