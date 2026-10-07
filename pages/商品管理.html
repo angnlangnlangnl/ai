@@ -3,111 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电商运营后台 · 商品管理（含新增/编辑弹窗）</title>
+    <title>商品管理</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===== 页面容器：不再使用 flex + 侧边栏 ===== */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            padding: 20px 28px 40px;
             background: #eef2f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'PingFang SC', 'Microsoft YaHei', sans-serif;
             color: #0a1a2b;
-            display: flex;
-            min-height: 100vh;
         }
-        .sidebar {
-            width: 220px;
-            background: #0a1e2f;
-            color: #b8cfe0;
+
+        /* ===== 顶栏（页面内标题 + 操作） ===== */
+        .topbar {
             display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            overflow-y: auto;
-            box-shadow: 2px 0 20px rgba(10,30,47,0.08);
-            z-index: 100;
-            transition: 0.2s;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
-        .sidebar::-webkit-scrollbar { width: 3px; }
-        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-        .sidebar .logo { padding: 22px 20px 28px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 12px; }
-        .sidebar .logo i { font-size: 26px; color: #4dabf7; background: rgba(77,171,247,0.12); padding: 8px; border-radius: 12px; }
-        .sidebar .logo span { font-size: 18px; font-weight: 700; color: white; letter-spacing: 0.5px; }
-        .sidebar .logo .badge { font-size: 10px; background: #4dabf7; color: #0a1e2f; padding: 2px 10px; border-radius: 30px; font-weight: 600; margin-left: auto; }
-        .sidebar .nav { flex: 1; padding: 16px 12px 20px; }
-        .sidebar .nav .section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #5a7f99; padding: 14px 12px 6px 12px; font-weight: 600; margin-top: 4px; }
-        .sidebar .nav .section-label:first-of-type { margin-top: 0; }
-        .sidebar .nav .item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: #9bb4cc; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.15s; margin-bottom: 2px; position: relative; }
-        .sidebar .nav .item i { width: 18px; font-size: 15px; text-align: center; color: #5a7f99; transition: 0.15s; }
-        .sidebar .nav .item:hover { background: rgba(255,255,255,0.05); color: #d4e4f0; }
-        .sidebar .nav .item:hover i { color: #7aaed9; }
-        .sidebar .nav .item.active { background: rgba(77,171,247,0.12); color: white; }
-        .sidebar .nav .item.active i { color: #4dabf7; }
-        .sidebar .nav .item.active::before { content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 3px; background: #4dabf7; border-radius: 0 4px 4px 0; }
-        .sidebar .nav .item .tag { margin-left: auto; background: rgba(77,171,247,0.15); color: #4dabf7; font-size: 10px; padding: 2px 10px; border-radius: 30px; font-weight: 600; }
-        .sidebar .bottom { padding: 16px 20px 20px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: #5a7f99; display: flex; align-items: center; gap: 10px; }
-        .sidebar .bottom i { font-size: 16px; }
-
-        .main { flex: 1; padding: 20px 28px 40px; max-width: calc(100% - 220px); min-width: 0; }
-
-        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
-        .topbar .left h2 { font-size: 20px; font-weight: 600; color: #0a1e2f; }
-        .topbar .left p { font-size: 13px; color: #5f7d95; margin-top: 2px; }
-        .topbar .right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .topbar .right .btn { padding: 6px 18px; border-radius: 30px; border: 1px solid #dce5ef; background: white; font-size: 13px; font-weight: 500; color: #1e3a5f; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.1s; }
+        .topbar .left h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0a1e2f;
+        }
+        .topbar .left p {
+            font-size: 13px;
+            color: #5f7d95;
+            margin-top: 2px;
+        }
+        .topbar .right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .topbar .right .btn {
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
         .topbar .right .btn:hover { background: #f5f8fc; }
-        .topbar .right .btn-primary { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .topbar .right .btn-primary {
+            background: #0a1e2f;
+            border-color: #0a1e2f;
+            color: #fff;
+        }
         .topbar .right .btn-primary:hover { background: #1a3a5a; }
         .topbar .right .btn-primary i { color: rgba(255,255,255,0.7); }
         .topbar .right .btn i { color: #5f7d95; }
-        .topbar .right .avatar { width: 36px; height: 36px; border-radius: 50%; background: #4dabf7; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; }
 
-        .page { display: none; animation: fadeIn 0.25s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0.6; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card { background: white; border-radius: 16px; padding: 18px 20px; border: 1px solid #e8edf4; box-shadow: 0 2px 8px rgba(10,30,47,0.02); transition: 0.15s; margin-bottom: 16px; }
+        /* ===== 卡片 ===== */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e8edf4;
+            box-shadow: 0 2px 8px rgba(10,30,47,0.02);
+            transition: 0.15s;
+            margin-bottom: 16px;
+        }
         .card:hover { border-color: #c8d8e8; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-        .card-header h3 { font-size: 15px; font-weight: 600; color: #0a1e2f; display: flex; align-items: center; gap: 6px; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0a1e2f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
         .card-header h3 i { color: #4dabf7; }
-        .card-header .action { font-size: 12px; color: #4dabf7; font-weight: 500; cursor: pointer; }
-        .card-header .action i { margin-right: 4px; }
+        .card-header .action {
+            font-size: 12px;
+            color: #4dabf7;
+            font-weight: 500;
+            cursor: pointer;
+        }
 
+        /* ===== 表格 ===== */
         .table-wrap { overflow-x: auto; }
         .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .table-wrap th { text-align: left; padding: 10px 4px 8px 0; font-weight: 600; color: #5f7d95; border-bottom: 1px solid #e8edf4; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-        .table-wrap td { padding: 10px 4px 10px 0; border-bottom: 1px solid #f0f4f9; color: #0a1e2f; }
+        .table-wrap th {
+            text-align: left;
+            padding: 10px 4px 8px 0;
+            font-weight: 600;
+            color: #5f7d95;
+            border-bottom: 1px solid #e8edf4;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table-wrap td {
+            padding: 10px 4px 10px 0;
+            border-bottom: 1px solid #f0f4f9;
+            color: #0a1e2f;
+        }
         .table-wrap tr:last-child td { border: none; }
-        .table-wrap .product-img { width: 40px; height: 40px; background: #e8edf4; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #7e9cb0; font-size: 18px; overflow: hidden; flex-shrink: 0; }
+        .table-wrap .product-img {
+            width: 40px;
+            height: 40px;
+            background: #e8edf4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7e9cb0;
+            font-size: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
         .table-wrap .product-img img { width: 100%; height: 100%; object-fit: cover; }
 
-        .filter-block { margin-bottom: 12px; }
-        .filter-block:last-child { margin-bottom: 0; }
-        .filter-block .filter-title { font-size: 12px; font-weight: 600; color: #5f7d95; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .filter-block .filter-title i { color: #4dabf7; }
+        /* ===== 表单 ===== */
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0a1e2f;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 14px;
+            border: 1px solid #dce5ef;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fafcfe;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .form-group textarea { min-height: 70px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
+        .form-group.error input,
+        .form-group.error select,
+        .form-group.error textarea {
+            border-color: #b51a3f;
+            box-shadow: 0 0 0 3px rgba(181,26,63,0.08);
+            background: #fff8f9;
+        }
+        .form-group .error-msg { display: none; font-size: 12px; color: #b51a3f; margin-top: 4px; }
+        .form-group.error .error-msg { display: block; }
+
+        /* ===== 类目/标签选择器 ===== */
+        .cat-picker {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px 12px;
+            background: #fafcfe;
+            border: 1px solid #e8edf4;
+            border-radius: 10px;
+        }
+        .cat-picker-level { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .cat-picker-level .level-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f7d95;
+            min-width: 40px;
+        }
+        .cat-picker-level .cat-opt {
+            padding: 3px 12px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #5f7d95;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+        .cat-picker-level .cat-opt:hover { border-color: #4dabf7; color: #2a7faa; }
+        .cat-picker-level .cat-opt.active { background: #0a1e2f; border-color: #0a1e2f; color: #fff; }
+
+        .tag-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px 12px;
+            background: #fafcfe;
+            border: 1px solid #e8edf4;
+            border-radius: 10px;
+            min-height: 42px;
+        }
+        .tag-picker .tag-opt {
+            padding: 3px 12px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #5f7d95;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .tag-picker .tag-opt:hover { border-color: #4dabf7; }
+        .tag-picker .tag-opt.selected { background: #0a1e2f; border-color: #0a1e2f; color: #fff; }
+        .tag-picker .tag-opt .color-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .tag-picker .tag-add-inline {
+            padding: 3px 12px;
+            border-radius: 30px;
+            border: 1px dashed #4dabf7;
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #4dabf7;
+        }
+
+        /* ===== 类目筛选（页面顶部） ===== */
         .category-level { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
-        .category-level .level-label { font-size: 12px; font-weight: 600; color: #5f7d95; margin-right: 4px; min-width: 36px; }
-        .category-level .cat-tag { padding: 3px 14px; border-radius: 30px; border: 1px solid #dce5ef; font-size: 12px; cursor: pointer; background: white; color: #5f7d95; transition: 0.15s; white-space: nowrap; }
+        .category-level .level-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f7d95;
+            margin-right: 4px;
+            min-width: 36px;
+        }
+        .category-level .cat-tag {
+            padding: 3px 14px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #5f7d95;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
         .category-level .cat-tag:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
-        .category-level .cat-tag.active { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .category-level .cat-tag.active { background: #0a1e2f; border-color: #0a1e2f; color: #fff; }
         .category-level .cat-tag .count { font-size: 10px; color: #94a3b8; margin-left: 3px; }
         .category-level .cat-tag.active .count { color: rgba(255,255,255,0.5); }
 
         .tag-filter-wrap { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-        .tag-filter-item { padding: 3px 14px; border-radius: 30px; border: 1px solid #dce5ef; font-size: 12px; cursor: pointer; background: white; color: #5f7d95; transition: 0.15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+        .tag-filter-item {
+            padding: 3px 14px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #5f7d95;
+            transition: 0.15s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
         .tag-filter-item:hover { border-color: #4dabf7; color: #2a7faa; }
-        .tag-filter-item.active { background: #0a1e2f; border-color: #0a1e2f; color: white; }
+        .tag-filter-item.active { background: #0a1e2f; border-color: #0a1e2f; color: #fff; }
         .tag-filter-item .color-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .tag-filter-item .tag-count { font-size: 10px; color: #94a3b8; margin-left: 2px; }
         .tag-filter-item.active .tag-count { color: rgba(255,255,255,0.6); }
-        .tag-add-btn { padding: 3px 14px; border-radius: 30px; border: 1px dashed #4dabf7; font-size: 12px; cursor: pointer; background: white; color: #4dabf7; transition: 0.15s; white-space: nowrap; }
-        .tag-add-btn:hover { background: #f0f7fe; }
+        .tag-add-btn {
+            padding: 3px 14px;
+            border-radius: 30px;
+            border: 1px dashed #4dabf7;
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #4dabf7;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
 
-        .badge { padding: 3px 12px; border-radius: 30px; font-size: 11px; font-weight: 500; white-space: nowrap; display: inline-block; }
+        /* ===== 徽章 ===== */
+        .badge {
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: inline-block;
+        }
         .badge.taobao { background: #fef0e6; color: #b55a1a; }
         .badge.douyin { background: #e9f0ff; color: #1a5bb5; }
         .badge.pdd { background: #fde8ed; color: #b51a3f; }
@@ -117,73 +315,133 @@
         .badge.danger { background: #fde8ed; color: #b51a3f; }
         .badge.info { background: #e9f0ff; color: #1a5bb5; }
         .badge.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
-        .badge.orange { background: #fef0e6; color: #b55a1a; }
-        .badge.custom-tag { background: rgba(77,171,247,0.12); color: #2a7faa; font-size: 10px; padding: 2px 8px; border-radius: 4px; margin-right: 3px; display: inline-block; }
+        .badge.custom-tag {
+            background: rgba(77,171,247,0.12);
+            color: #2a7faa;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 3px;
+            display: inline-block;
+        }
 
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 500; color: #0a1e2f; margin-bottom: 4px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 14px; border: 1px solid #dce5ef; border-radius: 8px; font-size: 14px; background: #fafcfe; transition: 0.15s; font-family: inherit; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #4dabf7; box-shadow: 0 0 0 3px rgba(77,171,247,0.08); }
-        .form-group textarea { min-height: 70px; resize: vertical; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-        .form-group.error input, .form-group.error select, .form-group.error textarea { border-color: #b51a3f; box-shadow: 0 0 0 3px rgba(181,26,63,0.08); background: #fff8f9; }
-        .form-group .error-msg { display: none; font-size: 12px; color: #b51a3f; margin-top: 4px; }
-        .form-group.error .error-msg { display: block; }
-
-        .cat-picker { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: #fafcfe; border: 1px solid #e8edf4; border-radius: 10px; }
-        .cat-picker-level { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-        .cat-picker-level .level-label { font-size: 12px; font-weight: 600; color: #5f7d95; min-width: 40px; }
-        .cat-picker-level .cat-opt { padding: 3px 12px; border-radius: 30px; border: 1px solid #dce5ef; font-size: 12px; cursor: pointer; background: white; color: #5f7d95; transition: 0.15s; white-space: nowrap; }
-        .cat-picker-level .cat-opt:hover { border-color: #4dabf7; color: #2a7faa; }
-        .cat-picker-level .cat-opt.active { background: #0a1e2f; border-color: #0a1e2f; color: white; }
-        .cat-picker-level.empty { display: none; }
-
-        .tag-picker { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; background: #fafcfe; border: 1px solid #e8edf4; border-radius: 10px; min-height: 42px; }
-        .tag-picker .tag-opt { padding: 3px 12px; border-radius: 30px; border: 1px solid #dce5ef; font-size: 12px; cursor: pointer; background: white; color: #5f7d95; transition: 0.15s; display: inline-flex; align-items: center; gap: 4px; }
-        .tag-picker .tag-opt:hover { border-color: #4dabf7; }
-        .tag-picker .tag-opt.selected { background: #0a1e2f; border-color: #0a1e2f; color: white; }
-        .tag-picker .tag-opt .color-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .tag-picker .tag-add-inline { padding: 3px 12px; border-radius: 30px; border: 1px dashed #4dabf7; font-size: 12px; cursor: pointer; background: white; color: #4dabf7; }
-        .tag-picker .tag-add-inline:hover { background: #f0f7fe; }
-
-        .btn-sm { padding: 5px 14px; border-radius: 20px; border: none; font-size: 12px; font-weight: 500; cursor: pointer; transition: 0.1s; display: inline-flex; align-items: center; gap: 4px; }
-        .btn-sm.primary { background: #0a1e2f; color: white; }
+        /* ===== 按钮 ===== */
+        .btn-sm {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-sm.primary { background: #0a1e2f; color: #fff; }
         .btn-sm.primary:hover { background: #1a3a5a; }
         .btn-sm.outline { background: transparent; border: 1px solid #dce5ef; color: #1e3a5f; }
         .btn-sm.outline:hover { background: #f5f8fc; }
         .btn-sm.blue { background: rgba(77,171,247,0.12); color: #2a7faa; }
-        .btn-sm.blue:hover { background: rgba(77,171,247,0.2); }
         .btn-sm.success { background: #e6f7ec; color: #0d7c4f; }
-        .btn-sm.success:hover { background: #c8f0d8; }
         .btn-sm.danger { background: #fde8ed; color: #b51a3f; }
-        .btn-sm.danger:hover { background: #fcd0d9; }
         .btn-sm:active { transform: scale(0.95); }
 
-        .flex { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .text-muted { color: #5f7d95; }
-
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #0a1e2f; color: white; padding: 12px 28px; border-radius: 40px; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: none; z-index: 9999; white-space: nowrap; }
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a1e2f;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 9999;
+            white-space: nowrap;
+        }
         .toast.show { display: block; animation: fadeUp 0.3s ease; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         .toast.success { background: #0d7c4f; }
         .toast.error { background: #b51a3f; }
-        .toast i { margin-right: 8px; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
+        /* ===== 弹窗 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
         .modal-overlay.show { display: flex; }
-        .modal-box { background: white; border-radius: 20px; max-width: 860px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 40px 80px rgba(0,0,0,0.3); animation: dialogIn 0.25s ease; }
-        @keyframes dialogIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 28px 16px; border-bottom: 1px solid #e8edf4; flex-shrink: 0; }
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 860px;
+            width: 95%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+            animation: dialogIn 0.25s ease;
+        }
+        @keyframes dialogIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid #e8edf4;
+            flex-shrink: 0;
+        }
         .modal-header h3 { font-size: 18px; color: #0a1e2f; display: flex; align-items: center; gap: 10px; }
         .modal-header h3 i { color: #4dabf7; }
-        .modal-header .close { font-size: 26px; color: #94a3b8; cursor: pointer; background: none; border: none; padding: 0 8px; line-height: 1; }
+        .modal-header .close {
+            font-size: 26px;
+            color: #94a3b8;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0 8px;
+            line-height: 1;
+        }
         .modal-header .close:hover { color: #0a1e2f; }
 
-        .modal-tabs { display: flex; padding: 0 28px; border-bottom: 1px solid #e8edf4; flex-shrink: 0; gap: 4px; overflow-x: auto; }
-        .modal-tabs::-webkit-scrollbar { height: 2px; }
-        .modal-tabs::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
-        .modal-tab { padding: 12px 18px; font-size: 13px; font-weight: 500; color: #5f7d95; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.15s; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+        .modal-tabs {
+            display: flex;
+            padding: 0 28px;
+            border-bottom: 1px solid #e8edf4;
+            flex-shrink: 0;
+            gap: 4px;
+            overflow-x: auto;
+        }
+        .modal-tab {
+            padding: 12px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #5f7d95;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: 0.15s;
+            white-space: nowrap;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-family: inherit;
+        }
         .modal-tab:hover { color: #0a1e2f; }
         .modal-tab.active { color: #0a1e2f; border-bottom-color: #4dabf7; font-weight: 600; }
 
@@ -194,17 +452,52 @@
 
         .tab-panel { display: none; }
         .tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0.6; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; padding: 16px 28px 20px; border-top: 1px solid #e8edf4; flex-shrink: 0; flex-wrap: wrap; }
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 16px 28px 20px;
+            border-top: 1px solid #e8edf4;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
 
+        /* ===== 图片/视频上传 ===== */
         .media-upload-section { margin-bottom: 18px; }
-        .media-upload-section .media-label { display: block; font-size: 13px; font-weight: 500; color: #0a1e2f; margin-bottom: 8px; }
+        .media-upload-section .media-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0a1e2f;
+            margin-bottom: 8px;
+        }
         .media-upload-section .media-label i { color: #4dabf7; margin-right: 4px; }
 
         .main-upload-area { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
-        .main-upload-preview { width: 180px; height: 180px; border-radius: 12px; border: 2px dashed #dce5ef; background: #fafcfe; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; position: relative; overflow: hidden; cursor: pointer; transition: 0.15s; flex-shrink: 0; }
+        .main-upload-preview {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            border: 2px dashed #dce5ef;
+            background: #fafcfe;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.15s;
+            flex-shrink: 0;
+        }
         .main-upload-preview:hover { border-color: #4dabf7; background: #f0f7fe; }
-        .main-upload-preview.has-image { border-style: solid; border-color: #e8edf4; background: white; }
+        .main-upload-preview.has-image { border-style: solid; border-color: #e8edf4; background: #fff; }
         .main-upload-preview img { width: 100%; height: 100%; object-fit: cover; }
         .main-upload-preview .placeholder { text-align: center; }
         .main-upload-preview .placeholder i { font-size: 32px; display: block; margin-bottom: 6px; }
@@ -213,29 +506,117 @@
         .main-upload-actions { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 180px; }
 
         .sub-upload-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .sub-upload-item { aspect-ratio: 1/1; border-radius: 10px; border: 2px dashed #dce5ef; background: #fafcfe; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; cursor: pointer; transition: 0.15s; font-size: 12px; position: relative; overflow: hidden; }
+        .sub-upload-item {
+            aspect-ratio: 1/1;
+            border-radius: 10px;
+            border: 2px dashed #dce5ef;
+            background: #fafcfe;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 12px;
+            position: relative;
+            overflow: hidden;
+        }
         .sub-upload-item:hover { border-color: #4dabf7; background: #f0f7fe; color: #4dabf7; }
-        .sub-upload-item.filled { border-style: solid; border-color: #e8edf4; background: white; }
+        .sub-upload-item.filled { border-style: solid; border-color: #e8edf4; background: #fff; }
         .sub-upload-item img { width: 100%; height: 100%; object-fit: cover; }
         .sub-upload-item i { font-size: 22px; margin-bottom: 4px; }
-        .sub-upload-item .remove-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(181,26,63,0.9); color: white; border: none; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.15s; z-index: 2; }
+        .sub-upload-item .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(181,26,63,0.9);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.15s;
+            z-index: 2;
+        }
         .sub-upload-item:hover .remove-btn { opacity: 1; }
 
         .video-upload-area { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
-        .video-upload-preview { width: 240px; height: 135px; border-radius: 12px; border: 2px dashed #dce5ef; background: #fafcfe; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; position: relative; overflow: hidden; cursor: pointer; transition: 0.15s; flex-shrink: 0; }
+        .video-upload-preview {
+            width: 240px;
+            height: 135px;
+            border-radius: 12px;
+            border: 2px dashed #dce5ef;
+            background: #fafcfe;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.15s;
+            flex-shrink: 0;
+        }
         .video-upload-preview:hover { border-color: #4dabf7; background: #f0f7fe; }
         .video-upload-preview.has-video { border-style: solid; border-color: #e8edf4; background: #0a0e14; }
         .video-upload-preview video { width: 100%; height: 100%; object-fit: contain; }
         .video-upload-preview .placeholder i { font-size: 32px; display: block; margin-bottom: 4px; }
         .video-upload-preview .placeholder span { font-size: 12px; }
 
-        .detail-editor-toolbar { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 10px; background: #fafcfe; border: 1px solid #e8edf4; border-radius: 10px 10px 0 0; border-bottom: none; }
-        .detail-editor-toolbar button { padding: 5px 10px; border: 1px solid #dce5ef; border-radius: 6px; background: white; color: #1e3a5f; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 3px; transition: 0.15s; }
+        /* ===== 富文本编辑器 ===== */
+        .detail-editor-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 6px 10px;
+            background: #fafcfe;
+            border: 1px solid #e8edf4;
+            border-radius: 10px 10px 0 0;
+            border-bottom: none;
+        }
+        .detail-editor-toolbar button {
+            padding: 5px 10px;
+            border: 1px solid #dce5ef;
+            border-radius: 6px;
+            background: #fff;
+            color: #1e3a5f;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            transition: 0.15s;
+        }
         .detail-editor-toolbar button:hover { border-color: #4dabf7; color: #2a7faa; background: #f0f7fe; }
         .detail-editor-toolbar .separator { width: 1px; background: #e8edf4; margin: 3px 4px; }
         .detail-editor-toolbar .upload-img-btn { position: relative; overflow: hidden; }
-        .detail-editor-toolbar .upload-img-btn input { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; cursor: pointer; }
-        .detail-editor { min-height: 200px; max-height: 400px; overflow-y: auto; padding: 12px 16px; border: 1px solid #e8edf4; border-radius: 0 0 10px 10px; background: white; font-size: 14px; line-height: 1.7; color: #0a1e2f; outline: none; }
+        .detail-editor-toolbar .upload-img-btn input {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .detail-editor {
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 12px 16px;
+            border: 1px solid #e8edf4;
+            border-radius: 0 0 10px 10px;
+            background: #fff;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #0a1e2f;
+            outline: none;
+        }
         .detail-editor:focus { border-color: #4dabf7; box-shadow: 0 0 0 3px rgba(77,171,247,0.08); }
         .detail-editor:empty:before { content: attr(data-placeholder); color: #94a3b8; pointer-events: none; }
         .detail-editor img { width: 100%; height: auto; max-width: 100%; border-radius: 6px; margin: 8px 0; display: block; }
@@ -243,47 +624,108 @@
         .inline-upload-btn { position: relative; overflow: hidden; display: inline-flex !important; cursor: pointer; }
         .inline-upload-btn input { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; cursor: pointer; }
 
+        /* ===== 平台同步 ===== */
         .platform-sync-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .platform-sync-item { border: 1px solid #e8edf4; border-radius: 12px; padding: 14px 16px; background: #fafcfe; display: flex; align-items: center; gap: 12px; transition: 0.15s; }
+        .platform-sync-item {
+            border: 1px solid #e8edf4;
+            border-radius: 12px;
+            padding: 14px 16px;
+            background: #fafcfe;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.15s;
+        }
         .platform-sync-item:hover { border-color: #c8d8e8; }
-        .platform-sync-item .plat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; flex-shrink: 0; }
+        .platform-sync-item .plat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+            flex-shrink: 0;
+        }
         .platform-sync-item .plat-info { flex: 1; }
         .platform-sync-item .plat-info .plat-name { font-weight: 600; font-size: 14px; color: #0a1e2f; }
         .platform-sync-item .plat-info .plat-status { font-size: 12px; color: #5f7d95; }
         .platform-sync-item .plat-toggle { flex-shrink: 0; }
 
-        .toggle { width: 40px; height: 22px; background: #dce5ef; border-radius: 30px; position: relative; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .toggle {
+            width: 40px;
+            height: 22px;
+            background: #dce5ef;
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
         .toggle.active { background: #4dabf7; }
-        .toggle .knob { width: 16px; height: 16px; background: white; border-radius: 16px; position: absolute; top: 3px; left: 3px; transition: 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.10); }
+        .toggle .knob {
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 16px;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: 0.2s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+        }
         .toggle.active .knob { left: 21px; }
 
+        /* ===== SKU 表 ===== */
         .sku-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
-        .sku-table th { text-align: left; padding: 8px 6px; font-weight: 600; color: #5f7d95; border-bottom: 1px solid #e8edf4; font-size: 12px; }
+        .sku-table th {
+            text-align: left;
+            padding: 8px 6px;
+            font-weight: 600;
+            color: #5f7d95;
+            border-bottom: 1px solid #e8edf4;
+            font-size: 12px;
+        }
         .sku-table td { padding: 6px 6px; border-bottom: 1px solid #f0f4f9; }
-        .sku-table input { width: 100%; padding: 6px 10px; border: 1px solid #dce5ef; border-radius: 6px; font-size: 13px; background: #fafcfe; }
+        .sku-table input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #dce5ef;
+            border-radius: 6px;
+            font-size: 13px;
+            background: #fafcfe;
+        }
         .sku-table input:focus { outline: none; border-color: #4dabf7; }
 
-        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.85); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        /* ===== Loading ===== */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
         .loading-overlay.show { display: flex; }
-        .loading-overlay .spinner { width: 48px; height: 48px; border-radius: 50%; border: 4px solid #e8edf4; border-top-color: #4dabf7; animation: spin 0.8s linear infinite; }
+        .loading-overlay .spinner {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 4px solid #e8edf4;
+            border-top-color: #4dabf7;
+            animation: spin 0.8s linear infinite;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ===== 响应式 ===== */
         @media (max-width: 1200px) {
             .form-row { grid-template-columns: 1fr; }
             .platform-sync-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 768px) {
-            .sidebar { width: 60px; }
-            .sidebar .logo span, .sidebar .logo .badge, .sidebar .nav .item span,
-            .sidebar .nav .section-label, .sidebar .bottom span, .sidebar .nav .item .tag { display: none; }
-            .sidebar .logo { padding: 16px 12px; justify-content: center; }
-            .sidebar .logo i { font-size: 20px; padding: 6px; }
-            .sidebar .nav .item { justify-content: center; padding: 12px; }
-            .sidebar .nav .item i { font-size: 18px; width: auto; }
-            .sidebar .bottom { justify-content: center; }
-            .sidebar .bottom i { font-size: 18px; }
-            .main { max-width: calc(100% - 60px); padding: 14px; }
-            .topbar { flex-direction: column; align-items: flex-start; }
+            body { padding: 14px; }
             .modal-box { max-width: 100%; width: 100%; max-height: 100vh; border-radius: 0; }
             .modal-header { padding: 16px 18px 12px; }
             .modal-tabs { padding: 0 18px; }
@@ -300,113 +742,126 @@
 </head>
 <body>
 
-<!-- ===== 左侧导航 ===== -->
-<div class="sidebar">
-    <div class="logo"><i class="fas fa-bolt"></i><span>智控电商</span><span class="badge">v3.0</span></div>
-    <div class="nav">
-        <div class="section-label">经营总览</div>
-        <div class="item" data-page="page-dashboard"><i class="fas fa-chart-pie"></i><span>数据总览</span></div>
-        <div class="item" data-page="page-ai"><i class="fas fa-stethoscope"></i><span>店铺经营诊断</span></div>
-        <div class="item" data-page="page-competitor"><i class="fas fa-eye"></i><span>同行竞品分析</span></div>
-        <div class="section-label">交易核心</div>
-        <div class="item" data-page="page-orders"><i class="fas fa-shopping-cart"></i><span>订单管理</span><span class="tag">23</span></div>
-        <div class="item active" data-page="page-products"><i class="fas fa-box"></i><span>商品管理</span></div>
-        <div class="item" data-page="page-inventory"><i class="fas fa-warehouse"></i><span>库存管理</span></div>
-        <div class="section-label">AI 智能赋能</div>
-        <div class="item" data-page="page-ai-service"><i class="fas fa-headset"></i><span>AI 客服</span><span class="tag">NEW</span></div>
-        <div class="item" data-page="page-ai-assistant"><i class="fas fa-robot"></i><span>AI 助手</span></div>
-        <div class="item" data-page="page-customer"><i class="fas fa-users"></i><span>客资聚合</span><span class="tag">89</span></div>
-        <div class="section-label">运营支持</div>
-        <div class="item" data-page="page-logistics"><i class="fas fa-truck"></i><span>物流管理</span></div>
-        <div class="item" data-page="page-sourcing"><i class="fas fa-store-alt"></i><span>素材生成</span></div>
-        <div class="item" data-page="page-channels"><i class="fas fa-plug"></i><span>渠道货源</span></div>
-        <div class="item" data-page="page-procurement"><i class="fas fa-cart-plus"></i><span>智能采购</span><span class="tag">NEW</span></div>
-        <div class="section-label">系统配置</div>
-        <div class="item" data-page="page-channels-config"><i class="fas fa-plug"></i><span>渠道管理</span></div>
-        <div class="item" data-page="page-agents"><i class="fas fa-handshake"></i><span>服务商管理</span></div>
-        <div class="item" data-page="page-settings"><i class="fas fa-cog"></i><span>系统设置</span></div>
+<!-- ===== 页面内顶栏（无侧边栏，由主框架提供） ===== -->
+<div class="topbar">
+    <div class="left">
+        <h2><i class="fas fa-box" style="color:#4dabf7;"></i> 商品管理</h2>
+        <p>跨平台商品发布 · 库存同步 · 价格管理</p>
     </div>
-    <div class="bottom"><i class="fas fa-shield-alt"></i><span>数据加密 · 安全</span></div>
+    <div class="right">
+        <span class="btn btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> 新增商品</span>
+        <span class="btn" onclick="showToast('📤 批量发布功能演示')"><i class="fas fa-upload"></i> 批量发布</span>
+    </div>
 </div>
 
-<!-- ===== 主内容 ===== -->
-<div class="main">
-    <div id="page-products" class="page active">
-        <div class="topbar">
-            <div class="left"><h2><i class="fas fa-box" style="color:#4dabf7;"></i> 商品管理</h2><p>跨平台商品发布 · 库存同步 · 价格管理</p></div>
-            <div class="right">
-                <span class="btn btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> 新增商品</span>
-                <span class="btn" onclick="showToast('📤 批量发布功能演示')"><i class="fas fa-upload"></i> 批量发布</span>
-                <span class="avatar">T</span>
-            </div>
+<!-- ===== 商品筛选 ===== -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-search"></i> 商品筛选</h3>
+        <span class="action" onclick="resetProductFilters()"><i class="fas fa-undo"></i> 重置</span>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>关键词</label>
+            <input type="text" placeholder="商品名称 / SKU" id="productSearch" onkeyup="filterProducts()">
         </div>
-
-        <div class="card">
-            <div class="card-header"><h3><i class="fas fa-search"></i> 商品筛选</h3><span class="action" onclick="resetProductFilters()"><i class="fas fa-undo"></i> 重置</span></div>
-            <div class="form-row">
-                <div class="form-group"><label>关键词</label><input type="text" placeholder="商品名称 / SKU" id="productSearch" onkeyup="filterProducts()"></div>
-                <div class="form-group"><label>平台</label><select id="productPlatformFilter" onchange="filterProducts()"><option value="all">全部</option><option>淘宝</option><option>抖音</option><option>拼多多</option><option>京东</option></select></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>状态</label><select id="productStatusFilter" onchange="filterProducts()"><option value="all">全部</option><option>在售</option><option>下架</option><option>待审核</option></select></div>
-                <div class="form-group"><label>排序</label><select id="productSortFilter" onchange="filterProducts()"><option value="default">默认</option><option value="sales_desc">销量从高到低</option><option value="price_desc">价格从高到低</option><option value="price_asc">价格从低到高</option></select></div>
-            </div>
+        <div class="form-group">
+            <label>平台</label>
+            <select id="productPlatformFilter" onchange="filterProducts()">
+                <option value="all">全部</option>
+                <option>淘宝</option><option>抖音</option><option>拼多多</option><option>京东</option>
+            </select>
         </div>
-
-        <div class="card" style="padding:12px 20px;">
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                <span style="font-weight:600; color:#0a1e2f; font-size:13px;"><i class="fas fa-sitemap" style="color:#4dabf7;"></i> 平台类目</span>
-                <span style="font-size:12px; color:#94a3b8;">行业标准 · 只读</span>
-                <span style="margin-left:auto; font-size:13px; color:#5f7d95;" id="productCount">加载中...</span>
-            </div>
-            <div id="categoryFilterContainer"><div style="text-align:center; padding:20px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> 加载类目...</div></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>状态</label>
+            <select id="productStatusFilter" onchange="filterProducts()">
+                <option value="all">全部</option>
+                <option>在售</option><option>下架</option><option>待审核</option>
+            </select>
         </div>
-
-        <div class="card" style="padding:12px 20px;">
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                <span style="font-weight:600; color:#0a1e2f; font-size:13px;"><i class="fas fa-tags" style="color:#4dabf7;"></i> 自定义标签</span>
-                <span style="font-size:12px; color:#94a3b8;">商家自建 · 多选筛选</span>
-            </div>
-            <div class="tag-filter-wrap" id="tagFilterContainer"><div style="text-align:center; padding:12px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> 加载标签...</div></div>
+        <div class="form-group">
+            <label>排序</label>
+            <select id="productSortFilter" onchange="filterProducts()">
+                <option value="default">默认</option>
+                <option value="sales_desc">销量从高到低</option>
+                <option value="price_desc">价格从高到低</option>
+                <option value="price_asc">价格从低到高</option>
+            </select>
         </div>
+    </div>
+</div>
 
-        <div class="card">
-            <div class="card-header">
-                <h3><i class="fas fa-list"></i> 商品列表</h3>
-                <span class="action" onclick="loadProducts()"><i class="fas fa-sync-alt"></i> 刷新</span>
-            </div>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width:40px;">#</th>
-                            <th style="width:50px;">图片</th>
-                            <th>商品名称</th>
-                            <th>规格</th>
-                            <th>SKU</th>
-                            <th>类目 / 标签</th>
-                            <th>平台</th>
-                            <th>价格</th>
-                            <th>库存</th>
-                            <th>销量</th>
-                            <th>评价</th>
-                            <th>状态</th>
-                            <th style="width:140px;">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productTableBody">
-                        <tr><td colspan="13" style="text-align:center; padding:30px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid #e8edf4; flex-wrap:wrap; gap:10px;">
-                <span style="font-size:13px; color:#5f7d95;" id="productCountFooter">加载中...</span>
-                <div style="display:flex; gap:8px;">
-                    <span class="btn-sm outline"><i class="fas fa-chevron-left"></i> 上一页</span>
-                    <span class="btn-sm primary">1</span>
-                    <span class="btn-sm outline">下一页 <i class="fas fa-chevron-right"></i></span>
-                </div>
-            </div>
+<!-- ===== 平台类目筛选 ===== -->
+<div class="card" style="padding:12px 20px;">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+        <span style="font-weight:600; color:#0a1e2f; font-size:13px;">
+            <i class="fas fa-sitemap" style="color:#4dabf7;"></i> 平台类目
+        </span>
+        <span style="font-size:12px; color:#94a3b8;">行业标准 · 只读</span>
+        <span style="margin-left:auto; font-size:13px; color:#5f7d95;" id="productCount">加载中...</span>
+    </div>
+    <div id="categoryFilterContainer">
+        <div style="text-align:center; padding:20px; color:#94a3b8;">
+            <i class="fas fa-spinner fa-spin"></i> 加载类目...
+        </div>
+    </div>
+</div>
+
+<!-- ===== 自定义标签筛选 ===== -->
+<div class="card" style="padding:12px 20px;">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+        <span style="font-weight:600; color:#0a1e2f; font-size:13px;">
+            <i class="fas fa-tags" style="color:#4dabf7;"></i> 自定义标签
+        </span>
+        <span style="font-size:12px; color:#94a3b8;">商家自建 · 多选筛选</span>
+    </div>
+    <div class="tag-filter-wrap" id="tagFilterContainer">
+        <div style="text-align:center; padding:12px; color:#94a3b8;">
+            <i class="fas fa-spinner fa-spin"></i> 加载标签...
+        </div>
+    </div>
+</div>
+
+<!-- ===== 商品列表 ===== -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-list"></i> 商品列表</h3>
+        <span class="action" onclick="loadProducts()"><i class="fas fa-sync-alt"></i> 刷新</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th style="width:50px;">图片</th>
+                    <th>商品名称</th>
+                    <th>规格</th>
+                    <th>SKU</th>
+                    <th>类目 / 标签</th>
+                    <th>平台</th>
+                    <th>价格</th>
+                    <th>库存</th>
+                    <th>销量</th>
+                    <th>评价</th>
+                    <th>状态</th>
+                    <th style="width:140px;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                <tr><td colspan="13" style="text-align:center; padding:30px; color:#94a3b8;">
+                    <i class="fas fa-spinner fa-spin"></i> 加载中...
+                </td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid #e8edf4; flex-wrap:wrap; gap:10px;">
+        <span style="font-size:13px; color:#5f7d95;" id="productCountFooter">加载中...</span>
+        <div style="display:flex; gap:8px;">
+            <span class="btn-sm outline"><i class="fas fa-chevron-left"></i> 上一页</span>
+            <span class="btn-sm primary">1</span>
+            <span class="btn-sm outline">下一页 <i class="fas fa-chevron-right"></i></span>
         </div>
     </div>
 </div>
@@ -493,7 +948,9 @@
                             <button class="btn-sm danger" id="editMainDeleteBtn" onclick="deleteEditMainImage()" disabled>
                                 <i class="fas fa-trash"></i> 删除主图
                             </button>
-                            <p style="font-size:12px; color:#94a3b8; margin-top:4px;"><i class="fas fa-info-circle"></i> 支持 JPG、PNG、WEBP，单张不超过 2MB</p>
+                            <p style="font-size:12px; color:#94a3b8; margin-top:4px;">
+                                <i class="fas fa-info-circle"></i> 支持 JPG、PNG、WEBP，单张不超过 2MB
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -516,7 +973,9 @@
                             <button class="btn-sm danger" id="editVideoDeleteBtn" onclick="deleteEditVideo()" disabled>
                                 <i class="fas fa-trash"></i> 删除视频
                             </button>
-                            <p style="font-size:12px; color:#94a3b8; margin-top:4px;"><i class="fas fa-info-circle"></i> 支持 MP4、WEBM，单个不超过 50MB</p>
+                            <p style="font-size:12px; color:#94a3b8; margin-top:4px;">
+                                <i class="fas fa-info-circle"></i> 支持 MP4、WEBM，单个不超过 50MB
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -535,7 +994,10 @@
                         <button type="button" onclick="execEditCmd('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
                         <span class="separator"></span>
                         <button type="button" onclick="execEditCmd('createLink', prompt('请输入链接地址：', 'https://'))"><i class="fas fa-link"></i></button>
-                        <button type="button" class="upload-img-btn" title="插入图片"><i class="fas fa-image"></i> 插入图片<input type="file" accept="image/*" onchange="handleEditDetailImageUpload(event)"></button>
+                        <button type="button" class="upload-img-btn" title="插入图片">
+                            <i class="fas fa-image"></i> 插入图片
+                            <input type="file" accept="image/*" onchange="handleEditDetailImageUpload(event)">
+                        </button>
                         <span class="separator"></span>
                         <button type="button" onclick="execEditCmd('removeFormat')"><i class="fas fa-eraser"></i></button>
                     </div>
@@ -601,7 +1063,7 @@
                 </div>
             </div>
 
-            <!-- Tab 4: 物流售后（补齐版） -->
+            <!-- Tab 4: 物流售后 -->
             <div class="tab-panel" id="edit-tab-logistics">
                 <div class="form-row">
                     <div class="form-group">
@@ -656,7 +1118,7 @@
                 </div>
             </div>
 
-            <!-- Tab 5: 多平台同步（补齐版） -->
+            <!-- Tab 5: 多平台同步 -->
             <div class="tab-panel" id="edit-tab-platform">
                 <div style="background:#f0f7fe; border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13px; color:#475569;">
                     <i class="fas fa-info-circle" style="color:#4dabf7;"></i> 开启同步后，商品信息将自动同步到对应平台。各平台可独立设置价格和库存。
@@ -830,7 +1292,10 @@
                         <button type="button" onclick="execAddCmd('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
                         <span class="separator"></span>
                         <button type="button" onclick="execAddCmd('createLink', prompt('请输入链接地址：', 'https://'))"><i class="fas fa-link"></i></button>
-                        <button type="button" class="upload-img-btn"><i class="fas fa-image"></i> 插入图片<input type="file" accept="image/*" onchange="handleAddDetailImageUpload(event)"></button>
+                        <button type="button" class="upload-img-btn">
+                            <i class="fas fa-image"></i> 插入图片
+                            <input type="file" accept="image/*" onchange="handleAddDetailImageUpload(event)">
+                        </button>
                         <span class="separator"></span>
                         <button type="button" onclick="execAddCmd('removeFormat')"><i class="fas fa-eraser"></i></button>
                     </div>
@@ -1029,19 +1494,6 @@
     }
     function showLoading(show) { document.getElementById('loadingOverlay').classList.toggle('show', show); }
 
-    document.querySelectorAll('.sidebar .item').forEach(function(item) {
-        item.addEventListener('click', function() {
-            document.querySelectorAll('.sidebar .item').forEach(function(i) { i.classList.remove('active'); });
-            this.classList.add('active');
-            var pageId = this.dataset.page;
-            if (pageId !== 'page-products') {
-                showToast('📌 当前仅展示「商品管理」内容，其他模块已精简');
-                document.querySelectorAll('.sidebar .item').forEach(function(i) { i.classList.remove('active'); });
-                document.querySelector('.sidebar .item[data-page="page-products"]').classList.add('active');
-            }
-        });
-    });
-
     async function init() {
         await Promise.all([loadCategoryTree(), loadTags()]);
         await loadProducts();
@@ -1057,7 +1509,8 @@
             categoryMap = data2.map || {};
             renderCategoryFilter();
         } catch (err) {
-            document.getElementById('categoryFilterContainer').innerHTML = `<div style="text-align:center; padding:20px; color:#b51a3f;">类目加载失败：${err.message}</div>`;
+            document.getElementById('categoryFilterContainer').innerHTML =
+                `<div style="text-align:center; padding:20px; color:#b51a3f;">类目加载失败：${err.message}</div>`;
         }
     }
 
@@ -1068,7 +1521,8 @@
             allTags = data.tags || [];
             renderTagFilter();
         } catch (err) {
-            document.getElementById('tagFilterContainer').innerHTML = `<div style="text-align:center; padding:12px; color:#b51a3f;">标签加载失败：${err.message}</div>`;
+            document.getElementById('tagFilterContainer').innerHTML =
+                `<div style="text-align:center; padding:12px; color:#b51a3f;">标签加载失败：${err.message}</div>`;
         }
     }
 
@@ -1080,7 +1534,8 @@
             allProducts = data.products || [];
             renderProductTable(allProducts);
         } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i> 加载失败：${err.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#b51a3f;">
+                <i class="fas fa-exclamation-triangle"></i> 加载失败：${err.message}</td></tr>`;
         }
     }
 
@@ -1092,12 +1547,12 @@
             container.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">暂无类目</div>';
             return;
         }
-        // 统计每个类目下的商品数
         function countByPrefix(prefix) {
             return allProducts.filter(p => (p.category_path || []).includes(prefix)).length;
         }
         var html = '';
-        html += `<div class="category-level" style="margin-bottom:6px;"><span class="level-label">一级</span>
+        html += `<div class="category-level" style="margin-bottom:6px;">
+            <span class="level-label">一级</span>
             <span class="cat-tag ${!categoryFilters.level1 ? 'active' : ''}" onclick="selectCategoryFilter(1, null, this)">全部 <span class="count">(${allProducts.length})</span></span>`;
         categoryTree.forEach(function(cat) {
             var active = categoryFilters.level1 === cat.id ? 'active' : '';
@@ -1109,7 +1564,8 @@
         if (categoryFilters.level1) {
             var l1 = categoryTree.find(c => c.id === categoryFilters.level1);
             if (l1 && l1.children) {
-                html += `<div class="category-level" style="margin-bottom:6px;"><span class="level-label">二级</span>
+                html += `<div class="category-level" style="margin-bottom:6px;">
+                    <span class="level-label">二级</span>
                     <span class="cat-tag ${!categoryFilters.level2 ? 'active' : ''}" onclick="selectCategoryFilter(2, null, this)">全部 <span class="count">(${countByPrefix(l1.id)})</span></span>`;
                 l1.children.forEach(function(cat) {
                     var active = categoryFilters.level2 === cat.id ? 'active' : '';
@@ -1125,7 +1581,8 @@
             if (l1) {
                 var l2 = l1.children.find(c => c.id === categoryFilters.level2);
                 if (l2 && l2.children) {
-                    html += `<div class="category-level"><span class="level-label">三级</span>
+                    html += `<div class="category-level">
+                        <span class="level-label">三级</span>
                         <span class="cat-tag ${!categoryFilters.level3 ? 'active' : ''}" onclick="selectCategoryFilter(3, null, this)">全部 <span class="count">(${countByPrefix(l2.id)})</span></span>`;
                     l2.children.forEach(function(cat) {
                         var active = categoryFilters.level3 === cat.id ? 'active' : '';
@@ -1151,7 +1608,10 @@
 
     function renderTagFilter() {
         var container = document.getElementById('tagFilterContainer');
-        if (!allTags.length) { container.innerHTML = '<div style="padding:8px; color:#94a3b8; font-size:13px;">暂无标签</div>'; return; }
+        if (!allTags.length) {
+            container.innerHTML = '<div style="padding:8px; color:#94a3b8; font-size:13px;">暂无标签</div>';
+            return;
+        }
         var html = '';
         allTags.forEach(function(t) {
             var active = tagFilters.includes(t.name) ? 'active' : '';
@@ -1202,7 +1662,8 @@
     function renderProductTable(products) {
         const tbody = document.getElementById('productTableBody');
         if (products.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#94a3b8;"><i class="fas fa-box-open"></i> 暂无商品</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:#94a3b8;">
+                <i class="fas fa-box-open"></i> 暂无商品</td></tr>`;
             return;
         }
         tbody.innerHTML = products.map((p, idx) => {
@@ -1274,7 +1735,6 @@
             if (match) visibleRows.push(row);
         });
 
-        // 排序
         if (sortVal !== 'default' && visibleRows.length > 0) {
             var tbody = document.getElementById('productTableBody');
             visibleRows.sort((a, b) => {
@@ -1311,10 +1771,12 @@
     document.getElementById('productStatusFilter').addEventListener('change', applyProductFilters);
     document.getElementById('productSortFilter').addEventListener('change', applyProductFilters);
 
-    // 类目选择器
     function renderCatPicker(containerId, selectedPath, onChange) {
         var container = document.getElementById(containerId);
-        if (!categoryTree.length) { container.innerHTML = '<div style="color:#94a3b8; font-size:12px;">类目加载中...</div>'; return; }
+        if (!categoryTree.length) {
+            container.innerHTML = '<div style="color:#94a3b8; font-size:12px;">类目加载中...</div>';
+            return;
+        }
         var html = '';
         html += `<div class="cat-picker-level"><span class="level-label">一级</span>`;
         categoryTree.forEach(function(cat) {
@@ -1368,7 +1830,10 @@
 
     function renderTagPicker(containerId, selectedTags) {
         var container = document.getElementById(containerId);
-        if (!allTags.length) { container.innerHTML = '<div style="color:#94a3b8; font-size:12px;">标签加载中...</div>'; return; }
+        if (!allTags.length) {
+            container.innerHTML = '<div style="color:#94a3b8; font-size:12px;">标签加载中...</div>';
+            return;
+        }
         var html = '';
         allTags.forEach(function(t) {
             var sel = selectedTags.includes(t.name) ? 'selected' : '';
@@ -1507,10 +1972,13 @@
         var subs = p.sub_images || [];
         var html = '';
         subs.forEach((img, i) => {
-            html += `<div class="sub-upload-item filled"><img src="${img}" alt="副图${i+1}"><button class="remove-btn" onclick="deleteEditSubImage(${i})"><i class="fas fa-times"></i></button></div>`;
+            html += `<div class="sub-upload-item filled"><img src="${img}" alt="副图${i+1}">
+                <button class="remove-btn" onclick="deleteEditSubImage(${i})"><i class="fas fa-times"></i></button></div>`;
         });
-        if (subs.length < MAX_SUB_IMAGES) html += `<div class="sub-upload-item" onclick="document.getElementById('editSubInput').click()"><i class="fas fa-plus"></i><span>添加副图</span></div>`;
-        else html += `<div class="sub-upload-item" style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-check-circle"></i><span>已达上限</span></div>`;
+        if (subs.length < MAX_SUB_IMAGES)
+            html += `<div class="sub-upload-item" onclick="document.getElementById('editSubInput').click()"><i class="fas fa-plus"></i><span>添加副图</span></div>`;
+        else
+            html += `<div class="sub-upload-item" style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-check-circle"></i><span>已达上限</span></div>`;
         grid.innerHTML = html;
     }
 
@@ -1545,8 +2013,12 @@
             var res = await fetch(BACKEND_URL + '/api/images/upload', { method: 'POST', body: fd });
             var data = await res.json();
             showLoading(false);
-            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditMainImage(currentEditProduct); }
-            else showToast('❌ ' + data.message, 'error');
+            if (data.success) {
+                showToast('✅ ' + data.message, 'success');
+                await loadProducts();
+                currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id);
+                if (currentEditProduct) renderEditMainImage(currentEditProduct);
+            } else showToast('❌ ' + data.message, 'error');
         } catch (err) { showLoading(false); showToast('❌ 上传失败：' + err.message, 'error'); }
         event.target.value = '';
     }
@@ -1556,11 +2028,18 @@
         if (!confirm('确定要删除主图吗？')) return;
         showLoading(true);
         try {
-            var res = await fetch(BACKEND_URL + '/api/images/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'main' }) });
+            var res = await fetch(BACKEND_URL + '/api/images/delete', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'main' })
+            });
             var data = await res.json();
             showLoading(false);
-            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditMainImage(currentEditProduct); }
-            else showToast('❌ ' + data.message, 'error');
+            if (data.success) {
+                showToast('✅ ' + data.message, 'success');
+                await loadProducts();
+                currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id);
+                if (currentEditProduct) renderEditMainImage(currentEditProduct);
+            } else showToast('❌ ' + data.message, 'error');
         } catch (err) { showLoading(false); showToast('❌ 删除失败：' + err.message, 'error'); }
     }
 
@@ -1580,8 +2059,12 @@
             var res = await fetch(BACKEND_URL + '/api/images/upload', { method: 'POST', body: fd });
             var data = await res.json();
             showLoading(false);
-            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditSubImages(currentEditProduct); }
-            else showToast('❌ ' + data.message, 'error');
+            if (data.success) {
+                showToast('✅ ' + data.message, 'success');
+                await loadProducts();
+                currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id);
+                if (currentEditProduct) renderEditSubImages(currentEditProduct);
+            } else showToast('❌ ' + data.message, 'error');
         } catch (err) { showLoading(false); showToast('❌ 上传失败：' + err.message, 'error'); }
         event.target.value = '';
     }
@@ -1591,11 +2074,18 @@
         if (!confirm('确定要删除第 ' + (index + 1) + ' 张副图吗？')) return;
         showLoading(true);
         try {
-            var res = await fetch(BACKEND_URL + '/api/images/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'sub', index: index }) });
+            var res = await fetch(BACKEND_URL + '/api/images/delete', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'sub', index: index })
+            });
             var data = await res.json();
             showLoading(false);
-            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditSubImages(currentEditProduct); }
-            else showToast('❌ ' + data.message, 'error');
+            if (data.success) {
+                showToast('✅ ' + data.message, 'success');
+                await loadProducts();
+                currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id);
+                if (currentEditProduct) renderEditSubImages(currentEditProduct);
+            } else showToast('❌ ' + data.message, 'error');
         } catch (err) { showLoading(false); showToast('❌ 删除失败：' + err.message, 'error'); }
     }
 
@@ -1613,8 +2103,12 @@
             var res = await fetch(BACKEND_URL + '/api/images/upload', { method: 'POST', body: fd });
             var data = await res.json();
             showLoading(false);
-            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditVideo(currentEditProduct); }
-            else showToast('❌ ' + data.message, 'error');
+            if (data.success) {
+                showToast('✅ ' + data.message, 'success');
+                await loadProducts();
+                currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id);
+                if (currentEditProduct) renderEditVideo(currentEditProduct);
+            } else showToast('❌ ' + data.message, 'error');
         } catch (err) { showLoading(false); showToast('❌ 上传失败：' + err.message, 'error'); }
         event.target.value = '';
     }
@@ -1624,11 +2118,18 @@
         if (!confirm('确定要删除视频吗？')) return;
         showLoading(true);
         try {
-            var res = await fetch(BACKEND_URL + '/api/images/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'video' }) });
+            var res = await fetch(BACKEND_URL + '/api/images/delete', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_name: currentEditProduct.name, image_type: 'video' })
+            });
             var data = await res.json();
             showLoading(false);
-            if (data.success) { showToast('✅ ' + data.message, 'success'); await loadProducts(); currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id); if (currentEditProduct) renderEditVideo(currentEditProduct); }
-            else showToast('❌ ' + data.message, 'error');
+            if (data.success) {
+                showToast('✅ ' + data.message, 'success');
+                await loadProducts();
+                currentEditProduct = allProducts.find(x => x.id === currentEditProduct.id);
+                if (currentEditProduct) renderEditVideo(currentEditProduct);
+            } else showToast('❌ ' + data.message, 'error');
         } catch (err) { showLoading(false); showToast('❌ 删除失败：' + err.message, 'error'); }
     }
 
@@ -1651,8 +2152,11 @@
             var res = await fetch(BACKEND_URL + '/api/images/upload', { method: 'POST', body: fd });
             var data = await res.json();
             showLoading(false);
-            if (data.success && data.url) { document.getElementById('editDetailEditor').focus(); document.execCommand('insertImage', false, data.url); showToast('✅ 图片已插入', 'success'); }
-            else showToast('❌ ' + (data.message || '上传失败'), 'error');
+            if (data.success && data.url) {
+                document.getElementById('editDetailEditor').focus();
+                document.execCommand('insertImage', false, data.url);
+                showToast('✅ 图片已插入', 'success');
+            } else showToast('❌ ' + (data.message || '上传失败'), 'error');
         } catch (err) { showLoading(false); showToast('❌ 上传失败：' + err.message, 'error'); }
         event.target.value = '';
     }
@@ -1660,7 +2164,10 @@
     function addEditSkuRow() {
         var tbody = document.querySelector('#editSkuTable tbody');
         var tr = document.createElement('tr');
-        tr.innerHTML = `<td><input type="text" placeholder="规格名"></td><td><input type="number" value="0" step="0.01"></td><td><input type="number" value="0"></td><td><span class="btn-sm danger" onclick="removeEditSkuRow(this)"><i class="fas fa-trash"></i></span></td>`;
+        tr.innerHTML = `<td><input type="text" placeholder="规格名"></td>
+            <td><input type="number" value="0" step="0.01"></td>
+            <td><input type="number" value="0"></td>
+            <td><span class="btn-sm danger" onclick="removeEditSkuRow(this)"><i class="fas fa-trash"></i></span></td>`;
         tbody.appendChild(tr);
     }
     function removeEditSkuRow(btn) {
@@ -1671,7 +2178,12 @@
 
     function saveEditDraft() {
         var name = document.getElementById('editProductName').value.trim();
-        if (!name) { setFieldError('editGroupName', true, '请输入商品名称后再保存草稿'); switchEditTab('edit-tab-basic'); document.getElementById('editProductName').focus(); return; }
+        if (!name) {
+            setFieldError('editGroupName', true, '请输入商品名称后再保存草稿');
+            switchEditTab('edit-tab-basic');
+            document.getElementById('editProductName').focus();
+            return;
+        }
         showToast('💾 草稿已保存：' + name);
         closeEditModal();
     }
@@ -1693,13 +2205,23 @@
         };
         showLoading(true);
         try {
-            var res = await fetch(BACKEND_URL + '/api/products/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: currentEditProduct.name, fields: fields }) });
+            var res = await fetch(BACKEND_URL + '/api/products/update', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_name: currentEditProduct.name, fields: fields })
+            });
             var data = await res.json();
             var detailHtml = document.getElementById('editDetailEditor').innerHTML;
-            await fetch(BACKEND_URL + '/api/products/detail', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_name: fields.name, detail_html: detailHtml }) });
+            await fetch(BACKEND_URL + '/api/products/detail', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_name: fields.name, detail_html: detailHtml })
+            });
             showLoading(false);
-            if (data.success) { showToast('✅ 商品「' + fields.name + '」已保存', 'success'); closeEditModal(); await loadProducts(); renderTagFilter(); }
-            else showToast('❌ ' + data.message, 'error');
+            if (data.success) {
+                showToast('✅ 商品「' + fields.name + '」已保存', 'success');
+                closeEditModal();
+                await loadProducts();
+                renderTagFilter();
+            } else showToast('❌ ' + data.message, 'error');
         } catch (err) { showLoading(false); showToast('❌ 保存失败：' + err.message, 'error'); }
     }
 
@@ -1735,7 +2257,11 @@
         document.getElementById('addVideoDeleteBtn').disabled = true;
         document.getElementById('addVideoBtnText').textContent = '上传视频';
         document.getElementById('addDetailEditor').innerHTML = '';
-        document.querySelector('#addSkuTable tbody').innerHTML = `<tr><td><input type="text" placeholder="规格名"></td><td><input type="number" value="0" step="0.01"></td><td><input type="number" value="0"></td><td><span class="btn-sm danger" onclick="removeAddSkuRow(this)"><i class="fas fa-trash"></i></span></td></tr>`;
+        document.querySelector('#addSkuTable tbody').innerHTML = `<tr>
+            <td><input type="text" placeholder="规格名"></td>
+            <td><input type="number" value="0" step="0.01"></td>
+            <td><input type="number" value="0"></td>
+            <td><span class="btn-sm danger" onclick="removeAddSkuRow(this)"><i class="fas fa-trash"></i></span></td></tr>`;
         window._addTemp = { main_image: '', sub_images: [], video: '', detail_html: '' };
         switchAddTab('add-tab-basic');
         document.getElementById('addModal').classList.add('show');
@@ -1756,9 +2282,14 @@
     function renderAddSubImages(subs) {
         var grid = document.getElementById('addSubGrid');
         var html = '';
-        subs.forEach((img, i) => { html += `<div class="sub-upload-item filled"><img src="${img}" alt="副图${i+1}"><button class="remove-btn" onclick="deleteAddSubImage(${i})"><i class="fas fa-times"></i></button></div>`; });
-        if (subs.length < MAX_SUB_IMAGES) html += `<div class="sub-upload-item" onclick="document.getElementById('addSubInput').click()"><i class="fas fa-plus"></i><span>添加副图</span></div>`;
-        else html += `<div class="sub-upload-item" style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-check-circle"></i><span>已达上限</span></div>`;
+        subs.forEach((img, i) => {
+            html += `<div class="sub-upload-item filled"><img src="${img}" alt="副图${i+1}">
+                <button class="remove-btn" onclick="deleteAddSubImage(${i})"><i class="fas fa-times"></i></button></div>`;
+        });
+        if (subs.length < MAX_SUB_IMAGES)
+            html += `<div class="sub-upload-item" onclick="document.getElementById('addSubInput').click()"><i class="fas fa-plus"></i><span>添加副图</span></div>`;
+        else
+            html += `<div class="sub-upload-item" style="opacity:0.5; cursor:not-allowed;"><i class="fas fa-check-circle"></i><span>已达上限</span></div>`;
         grid.innerHTML = html;
     }
 
@@ -1799,7 +2330,12 @@
         if (!file.type.startsWith('image/')) { showToast('❌ 只支持图片文件', 'error'); return; }
         if (file.size > 2 * 1024 * 1024) { showToast('❌ 图片不能超过 2MB', 'error'); return; }
         var reader = new FileReader();
-        reader.onload = function(e) { subs.push(e.target.result); window._addTemp.sub_images = subs; renderAddSubImages(subs); showToast('✅ 已添加副图', 'success'); };
+        reader.onload = function(e) {
+            subs.push(e.target.result);
+            window._addTemp.sub_images = subs;
+            renderAddSubImages(subs);
+            showToast('✅ 已添加副图', 'success');
+        };
         reader.readAsDataURL(file);
         event.target.value = '';
     }
@@ -1849,7 +2385,11 @@
         if (!file.type.startsWith('image/')) { showToast('❌ 只支持图片文件', 'error'); return; }
         if (file.size > 2 * 1024 * 1024) { showToast('❌ 图片不能超过 2MB', 'error'); return; }
         var reader = new FileReader();
-        reader.onload = function(e) { document.getElementById('addDetailEditor').focus(); document.execCommand('insertImage', false, e.target.result); showToast('✅ 图片已插入', 'success'); };
+        reader.onload = function(e) {
+            document.getElementById('addDetailEditor').focus();
+            document.execCommand('insertImage', false, e.target.result);
+            showToast('✅ 图片已插入', 'success');
+        };
         reader.readAsDataURL(file);
         event.target.value = '';
     }
@@ -1857,7 +2397,10 @@
     function addAddSkuRow() {
         var tbody = document.querySelector('#addSkuTable tbody');
         var tr = document.createElement('tr');
-        tr.innerHTML = `<td><input type="text" placeholder="规格名"></td><td><input type="number" value="0" step="0.01"></td><td><input type="number" value="0"></td><td><span class="btn-sm danger" onclick="removeAddSkuRow(this)"><i class="fas fa-trash"></i></span></td>`;
+        tr.innerHTML = `<td><input type="text" placeholder="规格名"></td>
+            <td><input type="number" value="0" step="0.01"></td>
+            <td><input type="number" value="0"></td>
+            <td><span class="btn-sm danger" onclick="removeAddSkuRow(this)"><i class="fas fa-trash"></i></span></td>`;
         tbody.appendChild(tr);
     }
     function removeAddSkuRow(btn) {
@@ -1868,7 +2411,12 @@
 
     function saveAddDraft() {
         var name = document.getElementById('addProductName').value.trim();
-        if (!name) { setFieldError('addGroupName', true, '请输入商品名称后再保存草稿'); switchAddTab('add-tab-basic'); document.getElementById('addProductName').focus(); return; }
+        if (!name) {
+            setFieldError('addGroupName', true, '请输入商品名称后再保存草稿');
+            switchAddTab('add-tab-basic');
+            document.getElementById('addProductName').focus();
+            return;
+        }
         showToast('💾 草稿已保存：' + name);
         closeAddModal();
     }
@@ -1903,11 +2451,18 @@
         });
         showLoading(true);
         try {
-            var res = await fetch(BACKEND_URL + '/api/products/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: fields }) });
+            var res = await fetch(BACKEND_URL + '/api/products/create', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fields: fields })
+            });
             var data = await res.json();
             showLoading(false);
-            if (data.success) { showToast('✅ 商品「' + fields.name + '」已创建', 'success'); closeAddModal(); await loadProducts(); renderTagFilter(); }
-            else showToast('❌ ' + data.message, 'error');
+            if (data.success) {
+                showToast('✅ 商品「' + fields.name + '」已创建', 'success');
+                closeAddModal();
+                await loadProducts();
+                renderTagFilter();
+            } else showToast('❌ ' + data.message, 'error');
         } catch (err) { showLoading(false); showToast('❌ 创建失败：' + err.message, 'error'); }
     }
 
@@ -1930,7 +2485,9 @@
         editor.addEventListener('paste', function(e) {
             var items = e.clipboardData.items;
             var imageFile = null;
-            for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') !== -1) { imageFile = items[i].getAsFile(); break; } }
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) { imageFile = items[i].getAsFile(); break; }
+            }
             if (imageFile) {
                 e.preventDefault();
                 if (imageFile.size > 2 * 1024 * 1024) { showToast('❌ 粘贴的图片不能超过 2MB', 'error'); return; }
@@ -1942,7 +2499,11 @@
                 var reader = new FileReader();
                 reader.onload = function(ev) {
                     editor.focus();
-                    if (savedRange) { var newSel = window.getSelection(); newSel.removeAllRanges(); newSel.addRange(savedRange); }
+                    if (savedRange) {
+                        var newSel = window.getSelection();
+                        newSel.removeAllRanges();
+                        newSel.addRange(savedRange);
+                    }
                     document.execCommand('insertImage', false, ev.target.result);
                     showToast('✅ 图片已粘贴', 'success');
                 };
@@ -1954,7 +2515,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         init();
         setupPasteHandler('editDetailEditor');
-        setupPasteHandler('addDetailPane');
+        setupPasteHandler('addDetailEditor');
     });
 </script>
 </body>
