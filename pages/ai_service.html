@@ -2154,15 +2154,18 @@
            ★ 仪表盘视图（店铺首页）
            ============================================================ */
         .view { display: none; }
-        .view.active { display: block; }
-        #viewWorkspace.active { display: flex; flex-direction: column; height: 100%; }
+        .view.active { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+        #viewDashboard.active { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+        #viewWorkspace.active { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
 
         .dashboard-wrap {
-            flex: 1;
+            flex: 1 1 auto;
+            min-height: 0;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 24px;
             background: #f4f7fa;
-            min-height: 0;
+            -webkit-overflow-scrolling: touch;
         }
         .dashboard-wrap::-webkit-scrollbar { width: 6px; }
         .dashboard-wrap::-webkit-scrollbar-thumb { background: #d0d8e4; border-radius: 10px; }
