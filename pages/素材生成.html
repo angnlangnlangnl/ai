@@ -31,7 +31,6 @@
             position: relative;
         }
 
-        /* 顶部工具条 */
         .toolbar {
             background: #fff;
             border: 1px solid var(--border);
@@ -103,18 +102,16 @@
             outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); background: white;
         }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 
         .hero-input { font-size: 16px !important; padding: 14px 16px !important; font-weight: 500; }
 
-        /* ★ 商品名称 + 搜索按钮 */
         .name-input-row {
             display: flex;
             gap: 8px;
             align-items: stretch;
         }
-        .name-input-row input {
-            flex: 1;
-        }
+        .name-input-row input { flex: 1; }
         .name-input-row .pick-btn {
             padding: 0 18px;
             border-radius: 10px;
@@ -136,6 +133,55 @@
             background: rgba(77,171,247,0.2);
             border-color: #2a7faa;
         }
+
+        /* ★ 张数切换 */
+        .count-switch {
+            display: inline-flex;
+            gap: 4px;
+            padding: 3px;
+            background: #f0f4f9;
+            border-radius: 10px;
+        }
+        .count-switch button {
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-2);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .count-switch button.active {
+            background: white;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(10,30,47,0.08);
+        }
+
+        /* ★ 一键生成按钮 */
+        .one-click-btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: none;
+            background: linear-gradient(135deg, #4dabf7, #2a7faa);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.15s;
+            font-family: inherit;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(77,171,247,0.3);
+        }
+        .one-click-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(77,171,247,0.4); }
+        .one-click-btn:active { transform: translateY(0); }
+        .one-click-btn i { font-size: 14px; }
 
         .type-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 8px; }
         .type-pill {
@@ -178,21 +224,31 @@
         .advanced-body { display: none; padding: 4px 0 0; }
         .advanced-body.open { display: block; animation: fadeIn 0.2s ease; }
 
-        .prompt-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
-        .prompt-tab { padding: 8px 16px; font-size: 13px; color: var(--text-2); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+        .prompt-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 14px; overflow-x: auto; }
+        .prompt-tabs::-webkit-scrollbar { height: 2px; }
+        .prompt-tab { padding: 8px 16px; font-size: 13px; color: var(--text-2); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; white-space: nowrap; }
         .prompt-tab:hover { color: var(--text); }
         .prompt-tab.active { color: var(--primary); border-bottom-color: var(--accent); font-weight: 600; }
         .prompt-panel { display: none; }
         .prompt-panel.active { display: block; }
 
         .carousel-prompts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .carousel-prompts.count-8 { grid-template-columns: repeat(4, 1fr); }
         .carousel-prompt-card { background: #fafcfe; border: 1px solid var(--border); border-radius: 10px; padding: 8px; }
-        .carousel-prompt-card .num { font-size: 10px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+        .carousel-prompt-card .num {
+            font-size: 10px; font-weight: 700; color: var(--accent);
+            margin-bottom: 4px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .carousel-prompt-card .num .tag {
+            font-size: 9px; padding: 1px 6px; border-radius: 8px;
+            background: rgba(77,171,247,0.12); color: var(--accent); font-weight: 500;
+        }
         .carousel-prompt-card textarea {
             width: 100%; border: 1px solid var(--border); border-radius: 6px;
             padding: 6px 8px; font-size: 11px; line-height: 1.5;
             background: white; resize: none; font-family: inherit;
-            min-height: 56px; transition: 0.15s;
+            min-height: 76px; transition: 0.15s;
         }
         .carousel-prompt-card textarea:focus { outline: none; border-color: var(--accent); }
 
@@ -203,11 +259,29 @@
             background: #fafcfe; border: 1px solid var(--border); border-radius: 10px;
             padding: 10px 12px;
         }
-        .detail-prompt-item .step { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-        .detail-prompt-item input { padding: 6px 10px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border); background: white; width: 100%; font-family: inherit; }
+        .detail-prompt-item .step {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--accent); color: white; font-size: 12px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .detail-prompt-item .body { display: flex; flex-direction: column; gap: 4px; }
+        .detail-prompt-item .body .module-name {
+            font-size: 11px; color: var(--accent); font-weight: 600;
+        }
+        .detail-prompt-item input {
+            padding: 6px 10px; font-size: 12px; border-radius: 6px;
+            border: 1px solid var(--border); background: white;
+            width: 100%; font-family: inherit;
+        }
         .detail-prompt-item input:focus { outline: none; border-color: var(--accent); }
-        .detail-prompt-item .del { width: 28px; height: 28px; border-radius: 6px; border: none; background: #fde8ed; color: var(--danger); cursor: pointer; font-size: 12px; }
+        .detail-prompt-item .del {
+            width: 28px; height: 28px; border-radius: 6px; border: none;
+            background: #fde8ed; color: var(--danger); cursor: pointer; font-size: 12px;
+        }
         .detail-prompt-item .del:hover { background: #fcd0d9; }
+        .detail-prompt-item .del.ai {
+            background: var(--accent-soft); color: var(--accent);
+        }
         .add-line-btn {
             padding: 10px; border: 2px dashed var(--border); border-radius: 10px;
             background: #fafcfe; color: var(--text-2); font-size: 12px;
@@ -254,6 +328,23 @@
         }
         .platform-tag:hover { border-color: var(--accent); }
         .platform-tag.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .platform-tag.highlight {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: #2a7faa;
+        }
+        .platform-tag.highlight.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .platform-tag.highlight::after {
+            content: '★';
+            font-size: 9px;
+            color: var(--accent);
+            margin-left: 2px;
+        }
+        .platform-tag.highlight.active::after { color: #fff; }
 
         .upload-zone {
             border: 2px dashed var(--border); border-radius: 10px; padding: 16px;
@@ -264,205 +355,102 @@
         .upload-zone .hint { font-size: 13px; color: var(--text-2); }
         .upload-zone .sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
 
-        .ref-video-chips {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
+        .ref-video-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
         .ref-video-chip {
-            position: relative;
-            width: 160px;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid var(--border);
-            background: #0a0e14;
+            position: relative; width: 160px; border-radius: 10px;
+            overflow: hidden; border: 2px solid var(--border); background: #0a0e14;
         }
         .ref-video-chip video { width: 100%; display: block; max-height: 100px; object-fit: cover; }
         .ref-video-chip .chip-play {
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            color: white;
-            font-size: 20px;
-            text-shadow: 0 1px 6px rgba(0,0,0,0.8);
-            pointer-events: none;
+            color: white; font-size: 20px;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.8); pointer-events: none;
         }
         .ref-video-chip .chip-info {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            background: rgba(10,30,47,0.85);
-            color: white;
-            font-size: 10px;
-            padding: 3px 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: rgba(10,30,47,0.85); color: white; font-size: 10px;
+            padding: 3px 8px; display: flex; align-items: center; gap: 4px;
         }
         .ref-video-chip .chip-info .kf-badge {
-            background: var(--success);
-            color: white;
-            padding: 0 5px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 600;
+            background: var(--success); color: white;
+            padding: 0 5px; border-radius: 6px; font-size: 9px; font-weight: 600;
         }
         .ref-video-chip .chip-remove {
-            position: absolute;
-            top: 4px; right: 4px;
-            width: 22px; height: 22px;
-            border-radius: 50%;
-            background: rgba(181,26,63,0.9);
-            color: white;
-            border: 2px solid white;
-            font-size: 11px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            z-index: 3;
-            font-family: inherit;
+            position: absolute; top: 4px; right: 4px;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(181,26,63,0.9); color: white;
+            border: 2px solid white; font-size: 11px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0; z-index: 3; font-family: inherit;
         }
         .ref-video-chip .chip-remove:hover { background: #8a1533; }
 
-        .kf-thumbnails {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
+        .kf-thumbnails { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
         .kf-thumbnail {
-            width: 56px;
-            height: 56px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid var(--border);
-            position: relative;
+            width: 56px; height: 56px; border-radius: 8px;
+            overflow: hidden; border: 2px solid var(--border); position: relative;
         }
         .kf-thumbnail img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .kf-thumbnail .kf-idx {
-            position: absolute;
-            bottom: 2px; right: 2px;
-            background: rgba(10,30,47,0.75);
-            color: white;
-            font-size: 9px;
-            padding: 0 4px;
-            border-radius: 4px;
+            position: absolute; bottom: 2px; right: 2px;
+            background: rgba(10,30,47,0.75); color: white; font-size: 9px;
+            padding: 0 4px; border-radius: 4px;
         }
 
         .video-analysis-result {
             background: linear-gradient(135deg, #f0f7fe, #e6f3ff);
-            border: 1px solid #b8d8f7;
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-top: 12px;
-            font-size: 13px;
+            border: 1px solid #b8d8f7; border-radius: 10px;
+            padding: 12px 14px; margin-top: 12px; font-size: 13px;
         }
         .video-analysis-result .va-title {
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-weight: 600; color: var(--text); margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
         }
         .video-analysis-result .va-title i { color: var(--accent); }
-        .video-analysis-result .va-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 4px;
-            line-height: 1.6;
-        }
-        .video-analysis-result .va-row .va-label {
-            color: #2a7faa;
-            font-weight: 500;
-            flex-shrink: 0;
-        }
-        .video-analysis-result .va-row .va-val {
-            color: var(--text);
-            word-break: break-word;
-        }
-        .video-analysis-result .va-tags {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-        }
+        .video-analysis-result .va-row { display: flex; gap: 6px; margin-bottom: 4px; line-height: 1.6; }
+        .video-analysis-result .va-row .va-label { color: #2a7faa; font-weight: 500; flex-shrink: 0; }
+        .video-analysis-result .va-row .va-val { color: var(--text); word-break: break-word; }
+        .video-analysis-result .va-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
         .video-analysis-result .va-tags .va-tag {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: white;
-            color: #2a7faa;
-            border: 1px solid #b8d8f7;
+            font-size: 10px; padding: 2px 8px; border-radius: 10px;
+            background: white; color: #2a7faa; border: 1px solid #b8d8f7;
         }
 
         .sync-record-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 360px;
-            overflow-y: auto;
-            padding: 4px;
+            display: flex; flex-direction: column; gap: 8px;
+            max-height: 360px; overflow-y: auto; padding: 4px;
         }
         .sync-record-list::-webkit-scrollbar { width: 4px; }
         .sync-record-list::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
         .sync-record-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: #fafcfe;
-            transition: 0.15s;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; border: 1px solid var(--border);
+            border-radius: 10px; background: #fafcfe; transition: 0.15s;
         }
         .sync-record-item:hover { border-color: var(--accent); background: #f0f8ff; }
         .sync-record-item .rec-icon {
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
         }
         .sync-record-item .rec-icon.success { background: #e6f7ec; color: var(--success); }
         .sync-record-item .rec-icon.partial { background: #fef0e6; color: #b55a1a; }
         .sync-record-item .rec-icon.fail { background: #fde8ed; color: var(--danger); }
-        .sync-record-item .rec-main {
-            flex: 1;
-            min-width: 0;
-        }
+        .sync-record-item .rec-main { flex: 1; min-width: 0; }
         .sync-record-item .rec-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 13px; font-weight: 600; color: var(--text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .sync-record-item .rec-meta {
-            font-size: 11px;
-            color: var(--text-3);
-            margin-top: 2px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            font-size: 11px; color: var(--text-3); margin-top: 2px;
+            display: flex; gap: 8px; flex-wrap: wrap;
         }
         .sync-record-item .rec-meta .badge {
-            font-size: 10px;
-            padding: 1px 6px;
-            border-radius: 8px;
-            background: var(--accent-soft);
-            color: var(--accent);
+            font-size: 10px; padding: 1px 6px; border-radius: 8px;
+            background: var(--accent-soft); color: var(--accent);
         }
-        .sync-record-item .rec-time {
-            font-size: 11px;
-            color: var(--text-3);
-            flex-shrink: 0;
-        }
+        .sync-record-item .rec-time { font-size: 11px; color: var(--text-3); flex-shrink: 0; }
 
         .action-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -687,29 +675,19 @@
         .history-item .meta { font-size: 11px; color: var(--text-3); margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
         .history-item .badge { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); }
 
-        /* ★ 商品选择弹窗 */
         .product-picker-modal {
             position: fixed; inset: 0;
             background: rgba(10,30,47,0.55);
             backdrop-filter: blur(4px);
             z-index: 9998;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            display: none; align-items: center; justify-content: center;
             padding: 20px;
         }
-        .product-picker-modal.show {
-            display: flex;
-            animation: fadeIn 0.2s ease;
-        }
+        .product-picker-modal.show { display: flex; animation: fadeIn 0.2s ease; }
         .product-picker-box {
-            background: white;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 560px;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
+            background: white; border-radius: 16px;
+            width: 100%; max-width: 560px; max-height: 85vh;
+            display: flex; flex-direction: column;
             box-shadow: 0 24px 64px rgba(0,0,0,0.3);
             animation: slideUp 0.25s ease;
         }
@@ -718,160 +696,87 @@
             to { transform: translateY(0); opacity: 1; }
         }
         .product-picker-header {
-            padding: 18px 22px 14px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
+            padding: 18px 22px 14px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
         }
         .product-picker-header h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 16px; font-weight: 600; color: var(--text);
+            display: flex; align-items: center; gap: 8px;
         }
         .product-picker-header h3 i { color: var(--accent); }
         .product-picker-header .close-btn {
-            width: 30px; height: 30px;
-            border-radius: 50%;
-            border: none;
-            background: #f0f4f9;
-            color: var(--text-2);
-            cursor: pointer;
-            font-size: 15px;
-            display: flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 50%; border: none;
+            background: #f0f4f9; color: var(--text-2); cursor: pointer;
+            font-size: 15px; display: flex; align-items: center; justify-content: center;
             transition: 0.15s;
         }
-        .product-picker-header .close-btn:hover {
-            background: #fde8ed; color: var(--danger);
-        }
+        .product-picker-header .close-btn:hover { background: #fde8ed; color: var(--danger); }
         .product-picker-search {
-            padding: 12px 22px;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
+            padding: 12px 22px; border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
         .product-picker-search input {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            background: #fafcfe;
-            font-family: inherit;
-            transition: 0.15s;
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+            border-radius: 10px; font-size: 14px; background: #fafcfe;
+            font-family: inherit; transition: 0.15s;
         }
         .product-picker-search input:focus {
             outline: none; border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-soft);
-            background: white;
+            box-shadow: 0 0 0 3px var(--accent-soft); background: white;
         }
-        .product-picker-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 12px;
-        }
+        .product-picker-body { flex: 1; overflow-y: auto; padding: 8px 12px; }
         .product-picker-body::-webkit-scrollbar { width: 4px; }
         .product-picker-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
         .pp-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.12s;
-            border: 1px solid transparent;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: 10px;
+            cursor: pointer; transition: 0.12s; border: 1px solid transparent;
         }
-        .pp-item:hover {
-            background: #f5f9fe;
-            border-color: var(--accent);
-        }
+        .pp-item:hover { background: #f5f9fe; border-color: var(--accent); }
         .pp-item .pp-img {
-            width: 44px; height: 44px;
-            border-radius: 8px;
-            background: #e8edf4;
-            display: flex; align-items: center; justify-content: center;
-            color: #7e9cb0; font-size: 18px;
-            flex-shrink: 0;
-            overflow: hidden;
+            width: 44px; height: 44px; border-radius: 8px;
+            background: #e8edf4; display: flex; align-items: center; justify-content: center;
+            color: #7e9cb0; font-size: 18px; flex-shrink: 0; overflow: hidden;
         }
-        .pp-item .pp-img img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .pp-item .pp-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .pp-item .pp-img img { width: 100%; height: 100%; object-fit: cover; }
+        .pp-item .pp-info { flex: 1; min-width: 0; }
         .pp-item .pp-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 14px; font-weight: 600; color: var(--text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             margin-bottom: 2px;
         }
-        .pp-item .pp-meta {
-            font-size: 12px;
-            color: var(--text-2);
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .pp-item .pp-meta { font-size: 12px; color: var(--text-2); display: flex; gap: 10px; flex-wrap: wrap; }
         .pp-item .pp-meta .badge {
-            font-size: 10px;
-            padding: 1px 7px;
-            border-radius: 10px;
-            background: var(--accent-soft);
-            color: var(--accent);
+            font-size: 10px; padding: 1px 7px; border-radius: 10px;
+            background: var(--accent-soft); color: var(--accent);
         }
-        .pp-item .pp-price {
-            font-size: 13px;
-            font-weight: 700;
-            color: #b55a1a;
-            flex-shrink: 0;
-        }
-        .product-picker-empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-3);
-        }
-        .product-picker-empty i {
-            font-size: 36px;
-            margin-bottom: 10px;
-            display: block;
-            opacity: 0.4;
-        }
+        .pp-item .pp-price { font-size: 13px; font-weight: 700; color: #b55a1a; flex-shrink: 0; }
+        .product-picker-empty { text-align: center; padding: 40px 20px; color: var(--text-3); }
+        .product-picker-empty i { font-size: 36px; margin-bottom: 10px; display: block; opacity: 0.4; }
         .product-picker-footer {
-            padding: 12px 22px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: var(--text-3);
-            flex-shrink: 0;
+            padding: 12px 22px; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; color: var(--text-3); flex-shrink: 0;
         }
 
         @media (max-width: 1200px) {
             .image-grid { grid-template-columns: repeat(3, 1fr); }
             .carousel-prompts { grid-template-columns: repeat(3, 1fr); }
+            .carousel-prompts.count-8 { grid-template-columns: repeat(3, 1fr); }
             .sub-picker { grid-template-columns: repeat(4, 1fr); }
         }
         @media (max-width: 900px) {
             .type-pills { grid-template-columns: repeat(3, 1fr); }
             .stepper { justify-content: flex-start; overflow-x: auto; padding-bottom: 2px; }
             .stepper::-webkit-scrollbar { display: none; }
+            .form-row-3 { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 768px) {
             body { padding: 12px 14px 90px; }
-            .form-row { grid-template-columns: 1fr; }
+            .form-row, .form-row-3 { grid-template-columns: 1fr; }
             .type-pills { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .image-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .carousel-prompts { grid-template-columns: 1fr; }
+            .carousel-prompts.count-8 { grid-template-columns: 1fr; }
             .action-bar { padding: 12px 14px; }
             .btn-lg { padding: 11px 20px; font-size: 13px; }
             .drawer { width: 100%; max-width: 100%; }
@@ -914,14 +819,36 @@
             <div class="card">
                 <div class="form-group">
                     <label><i class="fas fa-tag"></i> 商品名称 <span class="req">*</span></label>
-                    <!-- ★ 修改2：商品名称 + 搜索按钮 -->
                     <div class="name-input-row">
-                        <input type="text" id="productName" class="hero-input" placeholder="例如：云山茶叶礼盒" value="云山茶叶礼盒" onkeydown="if(event.key==='Enter') startGenerate()">
+                        <input type="text" id="productName" class="hero-input" placeholder="例如：新鲜现挖芋头" value="新鲜现挖芋头" onkeydown="if(event.key==='Enter') startGenerate()">
                         <button class="pick-btn" onclick="openProductPicker()" title="从商品库选择">
                             <i class="fas fa-search"></i><span> 从商品库选择</span>
                         </button>
                     </div>
                 </div>
+
+                <!-- ★ 新增：5 个变量独立输入 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-star"></i> 核心卖点1</label>
+                        <input type="text" id="varSell1" placeholder="如：农家现挖，粉糯香甜" value="农家现挖，粉糯香甜">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-star"></i> 核心卖点2</label>
+                        <input type="text" id="varSell2" placeholder="如：无丝易蒸" value="无丝易蒸">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-home"></i> 产品场景</label>
+                        <input type="text" id="varScene" placeholder="如：家庭餐桌、节日送礼" value="家庭餐桌、节日送礼">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-gem"></i> 产品优势</label>
+                        <input type="text" id="varAdvantage" placeholder="如：肉质绵密" value="肉质绵密">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label><i class="fas fa-list"></i> 商品类别</label>
                     <select id="productCategory">
@@ -946,7 +873,7 @@
                             <span class="check"><i class="fas fa-check"></i></span>
                             <i class="fas fa-images"></i>
                             <div class="name">轮播图</div>
-                            <div class="desc">5 张</div>
+                            <div class="desc" id="carouselDesc">5 张</div>
                         </div>
                         <div class="type-pill selected" data-type="copy" onclick="toggleGenType(this)">
                             <span class="check"><i class="fas fa-check"></i></span>
@@ -958,7 +885,7 @@
                             <span class="check"><i class="fas fa-check"></i></span>
                             <i class="fas fa-file-alt"></i>
                             <div class="name">详情页</div>
-                            <div class="desc">4 张</div>
+                            <div class="desc">8 屏</div>
                         </div>
                         <div class="type-pill" data-type="video" onclick="toggleGenType(this)">
                             <span class="check"><i class="fas fa-check"></i></span>
@@ -974,7 +901,7 @@
                 <div class="label">
                     <i class="fas fa-cog"></i>
                     <span>高级设置</span>
-                    <span style="font-size:11px; color:var(--text-3);">（参考图、参考视频、卖点、风格、提示词）</span>
+                    <span style="font-size:11px; color:var(--text-3);">（参考图、参考视频、风格、提示词微调）</span>
                 </div>
                 <i class="fas fa-chevron-down arrow"></i>
             </div>
@@ -1017,8 +944,8 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>核心卖点（逗号分隔）</label>
-                            <input type="text" id="productFeatures" placeholder="明前采摘, 特级龙井, 礼盒包装" value="明前采摘, 特级龙井, 礼盒包装, 一件代发">
+                            <label>完整卖点（逗号分隔）</label>
+                            <input type="text" id="productFeatures" placeholder="明前采摘, 特级龙井, 礼盒包装" value="农家现挖，粉糯香甜, 无丝易蒸, 肉质绵密">
                         </div>
                         <div class="form-group">
                             <label>设计风格</label>
@@ -1037,28 +964,40 @@
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-comment-dots"></i> 提示词编辑</h3>
-                        <span class="action" onclick="resetAllPrompts()"><i class="fas fa-undo"></i> 重置默认</span>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button class="one-click-btn" onclick="handleOneClickPrompts()">
+                                <i class="fas fa-magic"></i> 一键生成提示词
+                            </button>
+                            <span class="action" onclick="resetAllPrompts()"><i class="fas fa-undo"></i> 重置默认</span>
+                        </div>
                     </div>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <span><i class="fas fa-image"></i> 主副图张数</span>
+                            <span class="count-switch" id="countSwitch">
+                                <button class="active" data-count="5" onclick="switchCount(5)">5 张</button>
+                                <button data-count="8" onclick="switchCount(8)">8 张</button>
+                            </span>
+                            <span style="font-size:11px; color:var(--text-3);" id="countHint">（当前平台：抖音淘宝 · 5 张 · 3:4）</span>
+                        </label>
+                    </div>
+
                     <div class="prompt-tabs" id="promptTabs">
-                        <button class="prompt-tab active" data-tab="carousel" onclick="switchPromptTab('carousel')">轮播图（5）</button>
-                        <button class="prompt-tab" data-tab="detail" onclick="switchPromptTab('detail')">详情页（4）</button>
-                        <button class="prompt-tab" data-tab="video" onclick="switchPromptTab('video')">视频剧本（4）</button>
+                        <button class="prompt-tab active" data-tab="carousel" onclick="switchPromptTab('carousel')" id="tabCarousel">主副图（5）</button>
+                        <button class="prompt-tab" data-tab="detail" onclick="switchPromptTab('detail')" id="tabDetail">详情页（8 屏）</button>
+                        <button class="prompt-tab" data-tab="video" onclick="switchPromptTab('video')" id="tabVideo">视频剧本（4 段）</button>
                     </div>
                     <div class="prompt-panel active" id="prompt-carousel">
                         <div class="carousel-prompts" id="carouselPrompts"></div>
                     </div>
                     <div class="prompt-panel" id="prompt-detail">
                         <div class="detail-prompts" id="detailPrompts"></div>
-                        <button class="add-line-btn" onclick="addDetailItem()">
-                            <i class="fas fa-plus"></i> 添加详情图片
-                        </button>
                     </div>
                     <div class="prompt-panel" id="prompt-video">
                         <div class="video-script" id="videoScript"></div>
                     </div>
                 </div>
-
-                <!-- ★ 修改1：已删除 Agnes AI API Key 卡片 -->
 
             </div>
         </div>
@@ -1095,7 +1034,7 @@
             <div class="result-panel" id="result-carousel">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-images"></i> 轮播图（5 张）</h3>
+                        <h3><i class="fas fa-images"></i> 轮播图</h3>
                         <span class="btn-sm blue" onclick="applyCarousel()"><i class="fas fa-check"></i> 全部应用</span>
                     </div>
                     <div class="image-grid" id="carouselGrid"></div>
@@ -1189,9 +1128,11 @@
                     <h3><i class="fas fa-globe"></i> 目标平台 <span class="action" onclick="toggleAllPlatforms()" id="platformToggleBtn">全选</span></h3>
                 </div>
                 <div class="platform-tags" id="platformContainer">
+                    <span class="platform-tag highlight active" data-platform="淘宝" onclick="togglePlatform(this)">🛒 淘宝</span>
+                    <span class="platform-tag highlight active" data-platform="抖音" onclick="togglePlatform(this)">🎵 抖音</span>
+                    <span class="platform-tag highlight active" data-platform="TikTok Shop" onclick="togglePlatform(this)">🌍 TikTok Shop</span>
+                    <span class="platform-tag highlight active" data-platform="Temu" onclick="togglePlatform(this)">✨ Temu</span>
                     <span class="platform-tag active" data-platform="1688" onclick="togglePlatform(this)">🏭 1688</span>
-                    <span class="platform-tag active" data-platform="淘宝" onclick="togglePlatform(this)">🛒 淘宝</span>
-                    <span class="platform-tag active" data-platform="抖音" onclick="togglePlatform(this)">🎵 抖音</span>
                     <span class="platform-tag active" data-platform="拼多多" onclick="togglePlatform(this)">🛍️ 拼多多</span>
                     <span class="platform-tag active" data-platform="京东" onclick="togglePlatform(this)">📦 京东</span>
                     <span class="platform-tag active" data-platform="亚马逊" onclick="togglePlatform(this)">🌍 亚马逊</span>
@@ -1201,10 +1142,9 @@
                     <span class="platform-tag active" data-platform="希音" onclick="togglePlatform(this)">👗 希音</span>
                     <span class="platform-tag active" data-platform="Shopify" onclick="togglePlatform(this)">🛍️ Shopify</span>
                     <span class="platform-tag active" data-platform="Shopee" onclick="togglePlatform(this)">🛒 Shopee</span>
-                    <span class="platform-tag active" data-platform="Temu" onclick="togglePlatform(this)">✨ Temu</span>
                 </div>
                 <div style="font-size:11px; color:var(--text-3); margin-top:8px;">
-                    <i class="fas fa-info-circle"></i> 勾选的平台将自动适配尺寸比例
+                    <i class="fas fa-info-circle"></i> ★ 标记的平台有专属提示词模板（淘宝/抖音 5张3:4 · TikTok Shop 5张1:1 · Temu 8张1:1），其余平台用通用模板
                 </div>
             </div>
 
@@ -1251,7 +1191,7 @@
 
     <div class="action-bar" id="actionBar">
         <div class="info" id="actionInfo">
-            <i class="fas fa-info-circle"></i> 填写商品名称，选择生成类型，然后点击「开始生成」
+            <i class="fas fa-info-circle"></i> 填写商品名称和卖点，点「一键生成提示词」自动填充
         </div>
         <div class="btns" id="actionBtns">
             <button class="btn-lg outline" id="btnBack" onclick="goStepBack()" style="display:none;">
@@ -1294,7 +1234,6 @@
     <div class="drawer-body" id="historyList"></div>
 </div>
 
-<!-- ★ 商品选择弹窗 -->
 <div class="product-picker-modal" id="productPickerModal" onclick="if(event.target===this) closeProductPicker()">
     <div class="product-picker-box">
         <div class="product-picker-header">
@@ -1327,8 +1266,6 @@
     const AGNES_IMAGE_MODEL = 'agnes-image-2.5-flash';
     const AGNES_VIDEO_MODEL = 'agnes-video-2.5-flash';
     const BACKEND_URL = 'https://ai-ecommerce-backend-production-0776.up.railway.app';
-
-    // ★ 修改1：API Key 硬编码（对齐 AI 助手页）
     const AGNES_API_KEY_DEFAULT = 'sk-XmLjN9e3Mhh8wf';
 
     const REF_VIDEO_MAX = 1;
@@ -1352,23 +1289,156 @@
 
     const PLATFORM_CONFIG = {
         '1688':       { imageRatio: '1:1',  videoRatio: '1:1'  },
-        '淘宝':       { imageRatio: '1:1',  videoRatio: '9:16' },
-        '抖音':       { imageRatio: '1:1',  videoRatio: '9:16' },
+        '淘宝':       { imageRatio: '3:4',  videoRatio: '9:16' },
+        '抖音':       { imageRatio: '3:4',  videoRatio: '9:16' },
         '拼多多':     { imageRatio: '1:1',  videoRatio: '9:16' },
         '京东':       { imageRatio: '1:1',  videoRatio: '16:9' },
+        'TikTok Shop':{ imageRatio: '1:1',  videoRatio: '9:16' },
+        'Temu':       { imageRatio: '1:1',  videoRatio: '9:16' },
         '亚马逊':     { imageRatio: '1:1',  videoRatio: '16:9' },
         '速卖通':     { imageRatio: '1:1',  videoRatio: '16:9' },
         '阿里国际站': { imageRatio: '1:1',  videoRatio: '16:9' },
         '美客多':     { imageRatio: '1:1',  videoRatio: '9:16' },
         '希音':       { imageRatio: '3:4',  videoRatio: '9:16' },
         'Shopify':    { imageRatio: '1:1',  videoRatio: '16:9' },
-        'Shopee':     { imageRatio: '1:1',  videoRatio: '9:16' },
-        'Temu':       { imageRatio: '1:1',  videoRatio: '9:16' }
+        'Shopee':     { imageRatio: '1:1',  videoRatio: '9:16' }
     };
 
-    // ★ 修改1：直接返回硬编码密钥，不再从 input 或 storage 读取
     function getAgnesApiKey() {
         return AGNES_API_KEY_DEFAULT;
+    }
+
+    // ================================================================
+    // ★ 平台 → 张数 映射
+    // ================================================================
+    const PLATFORM_COUNT_RULE = {
+        '淘宝': 5,
+        '抖音': 5,
+        'TikTok Shop': 5,
+        'Temu': 8
+    };
+
+    function getCountByPlatform(platform) {
+        return PLATFORM_COUNT_RULE[platform] || 5;
+    }
+
+    // ================================================================
+    // ★ 主副图模板
+    // ================================================================
+
+    // 国内（抖音/淘宝）5 张 3:4
+    const MAIN_IMG_TPL_CN_5 = [
+        { tag: '首图·引流', tpl: (v) =>
+            `电商商品主图，3:4，高清实拍，自然光，${v.name}完整主体，构图居中，干净简约背景。画面加简短醒目文案：${v.sell1}，色彩通透有食欲，产品质感强，无多余杂物，不要大面积文字牛皮癣，商业摄影，8K，细节清晰` },
+        { tag: '核心卖点', tpl: (v) =>
+            `电商商品副图，3:4，商业实拍，${v.name}，突出${v.sell2}，简洁背景，重点放大产品优势，少量文字标注卖点，画面干净，真实质感，8K高清，柔和自然光` },
+        { tag: '场景使用', tpl: (v) =>
+            `电商商品副图，3:4，生活化场景摄影，${v.name}放置在${v.scene}环境，氛围感，真实自然，展示用户使用状态，柔和暖光，画面干净，商业实拍，8K，低饱和高级感，少量文字` },
+        { tag: '细节特写', tpl: (v) =>
+            `电商商品副图，3:4，微距特写，拍摄${v.name}细节，突出${v.advantage}，质感清晰，光影柔和，浅景深，干净背景，商业产品摄影，8K高清，无多余杂物` },
+        { tag: '白底图', tpl: (v) =>
+            `电商白底产品图，3:4，${v.name}完整摆放，纯白色背景，均匀柔光，产品轮廓完整，无阴影、无水印、无任何文字，产品商业摄影，高清8K，边缘干净，平台活动标准白底图` }
+    ];
+
+    // TikTok Shop 5 张 1:1（英文）
+    const MAIN_IMG_TPL_TIKTOK_5 = [
+        { tag: 'White BG', tpl: (v) =>
+            `e-commerce product main image, 1:1 square, ${v.name}, pure white background, soft studio light, full product view, no text, no watermark, amazon product photography, ultra realistic, 8k, sharp detail` },
+        { tag: 'Selling Point', tpl: (v) =>
+            `e-commerce product image, 1:1, ${v.name}, show advantage: ${v.sell1}, simple background, few english text, studio shot, real photo, 8k` },
+        { tag: 'Lifestyle', tpl: (v) =>
+            `e-commerce lifestyle image, 1:1, ${v.name} in ${v.scene}, natural warm light, realistic lifestyle scene, commercial product photo, 8k` },
+        { tag: 'Macro Detail', tpl: (v) =>
+            `macro close-up photo, 1:1, ${v.name}, show texture of ${v.advantage}, clean background, soft lighting, real commercial shot, 8k` },
+        { tag: 'Spec', tpl: (v) =>
+            `product specification diagram, 1:1, ${v.name} with simple size marking, white background, clean layout, little english text, commercial product image, 8k` }
+    ];
+
+    // Temu 8 张 1:1（英文）
+    const MAIN_IMG_TPL_TEMU_8 = [
+        { tag: 'White BG', tpl: (v) =>
+            `product photo, 1:1, ${v.name}, pure white background, studio soft light, complete product, no text, no watermark, realistic commercial photography, 8k` },
+        { tag: 'Point 1', tpl: (v) =>
+            `e-commerce product image, 1:1, ${v.name}, highlight ${v.sell1}, simple background, minimal text, real photo, 8k` },
+        { tag: 'Point 2', tpl: (v) =>
+            `e-commerce product image, 1:1, ${v.name}, highlight ${v.sell2}, clean background, studio lighting, realistic, 8k` },
+        { tag: 'Lifestyle', tpl: (v) =>
+            `lifestyle photo, 1:1, ${v.name} used in ${v.scene}, natural ambient light, real scene, commercial shot, 8k` },
+        { tag: 'Macro', tpl: (v) =>
+            `macro close up, 1:1, ${v.name}, show ${v.advantage} texture, clean background, soft light, high detail, 8k` },
+        { tag: 'Size Chart', tpl: (v) =>
+            `product size chart, 1:1, ${v.name}, simple size label, white background, minimal text, clear layout, product graphic, 8k` },
+        { tag: 'Package', tpl: (v) =>
+            `product package photo, 1:1, ${v.name} outer package, studio lighting, white background, real shot, 8k, few text` },
+        { tag: 'Usage Demo', tpl: (v) =>
+            `product usage demo image, 1:1, show how to use ${v.name}, simple background, clear demonstration, real photo, 8k` }
+    ];
+
+    // 通用 5 张 1:1
+    const MAIN_IMG_TPL_GENERIC_5 = [
+        { tag: '主图', tpl: (v) =>
+            `电商商品主图，1:1，高清实拍，自然光，${v.name}完整主体，构图居中，干净简约背景，少量文字：${v.sell1}，8K，商业摄影` },
+        { tag: '卖点', tpl: (v) =>
+            `电商商品副图，1:1，商业实拍，${v.name}，突出${v.sell2}，简洁背景，8K高清，柔和自然光` },
+        { tag: '场景', tpl: (v) =>
+            `电商商品副图，1:1，生活化场景，${v.name}放置在${v.scene}环境，氛围感，8K，商业实拍` },
+        { tag: '细节', tpl: (v) =>
+            `电商商品副图，1:1，微距特写，拍摄${v.name}细节，突出${v.advantage}，8K高清，商业产品摄影` },
+        { tag: '白底图', tpl: (v) =>
+            `电商白底产品图，1:1，${v.name}完整摆放，纯白色背景，无文字、无水印，8K高清` }
+    ];
+
+    // 通用 8 张 1:1
+    const MAIN_IMG_TPL_GENERIC_8 = [
+        ...MAIN_IMG_TPL_GENERIC_5,
+        { tag: '规格参数', tpl: (v) =>
+            `电商商品图，1:1，${v.name}规格参数展示，简洁白底，清晰布局，8K高清` },
+        { tag: '包装展示', tpl: (v) =>
+            `电商商品图，1:1，${v.name}外包装展示，工作室灯光，白底，8K高清` },
+        { tag: '使用演示', tpl: (v) =>
+            `电商商品图，1:1，展示${v.name}使用方法，简洁背景，真实清晰，8K高清` }
+    ];
+
+    function getMainImageTemplates(platform, count) {
+        if (platform === 'Temu' && count === 8) return MAIN_IMG_TPL_TEMU_8;
+        if ((platform === '抖音' || platform === '淘宝') && count === 5) return MAIN_IMG_TPL_CN_5;
+        if (platform === 'TikTok Shop' && count === 5) return MAIN_IMG_TPL_TIKTOK_5;
+        // 通用
+        return count === 8 ? MAIN_IMG_TPL_GENERIC_8 : MAIN_IMG_TPL_GENERIC_5;
+    }
+
+    // ================================================================
+    // ★ 详情页 8 屏模板
+    // ================================================================
+    const DETAIL_SCREEN_TEMPLATES = [
+        { name: '首屏主视觉', tpl: (v) =>
+            `电商详情页首屏主视觉图，3:4，${v.name}主体居中高清展示，干净高级背景，配合大标题"${v.sell1}"，视觉冲击力强，一眼知道产品核心利益点，8K商业摄影` },
+        { name: '核心卖点总览', tpl: (v) =>
+            `电商详情页卖点总览图，3:4，${v.name}多角度拼图，3-5 个卖点图标化排版：${v.sell1}、${v.sell2}、${v.advantage}，简洁清晰，便于快速扫读，8K` },
+        { name: '功能细节展示', tpl: (v) =>
+            `电商详情页功能细节图，3:4，${v.name}局部特写 + 功能标注，讲清怎么用，突出${v.advantage}，配简洁说明文字，8K高清，商业实拍` },
+        { name: '使用场景', tpl: (v) =>
+            `电商详情页场景图，3:4，${v.name}在${v.scene}的真实使用场景，氛围感强，真实自然，柔和暖光，用户代入感强，8K` },
+        { name: '对比强化', tpl: (v) =>
+            `电商详情页对比图，3:4，左侧"普通款"vs右侧"${v.name}"，突出${v.advantage}优势，对比鲜明，数据化呈现，8K高清` },
+        { name: '参数/规格', tpl: (v) =>
+            `电商详情页参数规格图，3:4，${v.name}参数一览表，清晰列明容量/尺寸/材质等，简洁白底，易读排版，8K` },
+        { name: '包装/售后', tpl: (v) =>
+            `电商详情页信任建立图，3:4，${v.name}完整包装清单展示 + 售后保障图标（7天无理由退换 / 正品保证 / 快速发货），增强购买信心，8K` },
+        { name: '行动引导', tpl: (v) =>
+            `电商详情页行动引导图，3:4，${v.name}主图 + 行动按钮视觉设计，文案"立即下单 · 限时福利"，引导加购/下单，8K` }
+    ];
+
+    // ================================================================
+    // ★ 视频剧本模板（1 个视频 4 段）
+    // ================================================================
+    function getVideoTemplates(v) {
+        return [
+            { time: '0-3s', type: '开场', prompt: `特写${v.name}细节慢动作，配合轻快音乐开场，字幕"${v.sell1}"` },
+            { time: '3-8s', type: '产品', prompt: `展示${v.name}外观与内部细节，突出${v.sell2}，360度环绕拍摄` },
+            { time: '8-12s', type: '场景', prompt: `展示${v.name}在${v.scene}的真实使用场景，突出${v.advantage}` },
+            { time: '12-15s', type: '收尾', prompt: `品牌 logo + 行动引导"点击下方链接购买"，商品整体展示` }
+        ];
     }
 
     // ================================================================
@@ -1385,25 +1455,11 @@
         keyframes: [],
         keyframeUrls: [],
         videoAnalysis: null,
-        carouselPrompts: [
-            '商品正面主图，突出包装设计，暖色调，自然光',
-            '商品细节特写，展示材质质感，微距拍摄',
-            '礼盒展开效果，展示内部商品，温馨氛围',
-            '商品使用场景图，茶席布置，优雅自然',
-            '商品+赠品组合图，展示超值感，促销风'
-        ],
-        detailPrompts: [
-            { step: 1, prompt: '品牌故事开篇，展示茶园风光，传递匠心精神' },
-            { step: 2, prompt: '核心卖点展示，明前采摘工艺，突出品质' },
-            { step: 3, prompt: '产品参数与规格，清晰展示礼盒内容物' },
-            { step: 4, prompt: '使用场景与评价，展示用户好评与复购' }
-        ],
-        videoPrompts: [
-            { time: '0-3s', type: '开场', prompt: '特写茶叶落入杯中的慢动作，配合轻快音乐' },
-            { time: '3-8s', type: '产品', prompt: '展示礼盒外观，打开礼盒展示内部，特写茶叶' },
-            { time: '8-12s', type: '卖点', prompt: '文字叠加"明前采摘 · 特级龙井"，配冲泡画面' },
-            { time: '12-15s', type: '收尾', prompt: '品牌logo+购买引导"点击下方链接购买"' }
-        ]
+        imageCount: 5,          // ★ 当前张数（5 或 8）
+        currentPlatform: '淘宝', // ★ 当前平台（决定用哪套模板）
+        carouselPrompts: [],
+        detailPrompts: [],
+        videoPrompts: []
     };
 
     const syncState = {
@@ -1419,7 +1475,6 @@
         maxRecords: 50
     };
 
-    // ★ 商品选择器状态
     const pickerState = {
         allProducts: [],
         filteredProducts: [],
@@ -1428,7 +1483,7 @@
     };
 
     // ================================================================
-    // 工具函数
+    // 工具
     // ================================================================
     function showToast(msg) {
         const toast = document.getElementById('toast');
@@ -1457,6 +1512,83 @@
         return String(s || '').replace(/[&<>"']/g, c => ({
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
         })[c]);
+    }
+
+    // ================================================================
+    // ★ 收集用户输入的 5 个变量
+    // ================================================================
+    function collectVars() {
+        return {
+            name: (document.getElementById('productName').value || '').trim() || '商品',
+            sell1: (document.getElementById('varSell1').value || '').trim() || '优质好物',
+            sell2: (document.getElementById('varSell2').value || '').trim() || '品质保证',
+            scene: (document.getElementById('varScene').value || '').trim() || '日常使用',
+            advantage: (document.getElementById('varAdvantage').value || '').trim() || '精工细作'
+        };
+    }
+
+    // ================================================================
+    // ★ 一键生成提示词
+    // ================================================================
+    function handleOneClickPrompts() {
+        const v = collectVars();
+        const platform = state.currentPlatform;
+        const count = state.imageCount;
+
+        // 主副图
+        const mainTpls = getMainImageTemplates(platform, count);
+        state.carouselPrompts = mainTpls.map(t => t.tpl(v));
+
+        // 详情页（固定 8 屏）
+        state.detailPrompts = DETAIL_SCREEN_TEMPLATES.map((s, i) => ({
+            step: i + 1,
+            moduleName: s.name,
+            prompt: s.tpl(v)
+        }));
+
+        // 视频剧本
+        state.videoPrompts = getVideoTemplates(v);
+
+        renderCarouselPrompts();
+        renderDetailPrompts();
+        renderVideoScript();
+
+        updateTabCounts();
+
+        showToast(`⚡ 已根据「${v.name}」生成 ${count} 张主副图 + 8 屏详情 + 4 段视频剧本`);
+    }
+
+    function updateTabCounts() {
+        const tabCarousel = document.getElementById('tabCarousel');
+        const tabDetail = document.getElementById('tabDetail');
+        const tabVideo = document.getElementById('tabVideo');
+        if (tabCarousel) tabCarousel.textContent = `主副图（${state.imageCount}）`;
+        if (tabDetail) tabDetail.textContent = `详情页（8 屏）`;
+        if (tabVideo) tabVideo.textContent = `视频剧本（4 段）`;
+    }
+
+    // ================================================================
+    // ★ 张数切换
+    // ================================================================
+    function switchCount(n) {
+        state.imageCount = n;
+        document.querySelectorAll('#countSwitch button').forEach(b => {
+            b.classList.toggle('active', parseInt(b.dataset.count) === n);
+        });
+        // 切换后自动重新生成提示词
+        handleOneClickPrompts();
+        updateCountHint();
+        // 更新轮播图标签 desc
+        const carouselDesc = document.getElementById('carouselDesc');
+        if (carouselDesc) carouselDesc.textContent = `${n} 张`;
+    }
+
+    function updateCountHint() {
+        const hint = document.getElementById('countHint');
+        if (!hint) return;
+        const platform = state.currentPlatform;
+        const ratio = PLATFORM_CONFIG[platform]?.imageRatio || '1:1';
+        hint.textContent = `（当前平台：${platform} · ${state.imageCount} 张 · ${ratio}）`;
     }
 
     // ================================================================
@@ -1489,7 +1621,7 @@
 
         if (n === 1) {
             btnGen.style.display = 'inline-flex';
-            actionInfo.innerHTML = '<i class="fas fa-info-circle"></i> 填写商品名称，选择生成类型，然后点击「开始生成」';
+            actionInfo.innerHTML = '<i class="fas fa-info-circle"></i> 填写商品名称和卖点，点「一键生成提示词」自动填充';
         } else if (n === 2) {
             btnNext.style.display = 'inline-flex';
             actionInfo.innerHTML = '<i class="fas fa-info-circle"></i> 检查生成结果，满意后点击「下一步」进行同步';
@@ -1517,23 +1649,18 @@
         for (const t of tabs) { if (map[t]) { switchResultTab(t); return; } }
     }
 
-    // ================================================================
-    // 高级折叠
-    // ================================================================
     function toggleAdvanced() {
         document.getElementById('advancedToggle').classList.toggle('open');
         document.getElementById('advancedBody').classList.toggle('open');
     }
 
     // ================================================================
-    // ★ 商品选择器
+    // 商品选择器
     // ================================================================
     function openProductPicker() {
         document.getElementById('productPickerModal').classList.add('show');
         document.getElementById('ppSearchInput').value = '';
         document.body.style.overflow = 'hidden';
-
-        // 如果已加载，直接渲染
         if (pickerState.loaded) {
             pickerState.filteredProducts = pickerState.allProducts.slice();
             renderPickerProducts();
@@ -1542,12 +1669,10 @@
         }
         setTimeout(() => { document.getElementById('ppSearchInput').focus(); }, 200);
     }
-
     function closeProductPicker() {
         document.getElementById('productPickerModal').classList.remove('show');
         document.body.style.overflow = '';
     }
-
     async function loadPickerProducts() {
         pickerState.loading = true;
         const box = document.getElementById('ppProductList');
@@ -1565,7 +1690,6 @@
             pickerState.loading = false;
         }
     }
-
     function filterPickerProducts() {
         const kw = document.getElementById('ppSearchInput').value.trim().toLowerCase();
         if (!kw) {
@@ -1580,12 +1704,10 @@
         }
         renderPickerProducts();
     }
-
     function renderPickerProducts() {
         const box = document.getElementById('ppProductList');
         const list = pickerState.filteredProducts;
         document.getElementById('ppCountInfo').textContent = `共 ${list.length} 个商品`;
-
         if (list.length === 0) {
             box.innerHTML = `<div class="product-picker-empty">
                 <i class="fas fa-box-open"></i>
@@ -1593,7 +1715,6 @@
             </div>`;
             return;
         }
-
         box.innerHTML = list.map(p => {
             const imgHTML = p.main_image
                 ? `<img src="${escapeHtml(p.main_image)}" alt="" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-box\\'></i>';">`
@@ -1616,10 +1737,8 @@
             `;
         }).join('');
     }
-
     function pickProduct(name) {
         document.getElementById('productName').value = name;
-        // 如果商品带分类，自动同步分类下拉
         const product = pickerState.allProducts.find(p => p.name === name);
         if (product && product.category) {
             const catSelect = document.getElementById('productCategory');
@@ -1648,7 +1767,6 @@
         videoTab.style.pointerEvents = hasVideo ? 'auto' : 'none';
         if (!hasVideo && videoTab.classList.contains('active')) switchPromptTab('carousel');
     }
-
     function switchPromptTab(tab) {
         document.querySelectorAll('.prompt-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
         document.querySelectorAll('.prompt-panel').forEach(p => p.classList.toggle('active', p.id === 'prompt-' + tab));
@@ -1660,6 +1778,23 @@
     function togglePlatform(el) {
         el.classList.toggle('active');
         updatePlatformToggleBtn();
+        // ★ 如果切换的是主平台，更新 state.currentPlatform + 自动切换张数
+        const platform = el.dataset.platform;
+        if (el.classList.contains('active')) {
+            state.currentPlatform = platform;
+            const autoCount = getCountByPlatform(platform);
+            state.imageCount = autoCount;
+            document.querySelectorAll('#countSwitch button').forEach(b => {
+                b.classList.toggle('active', parseInt(b.dataset.count) === autoCount);
+            });
+            const carouselDesc = document.getElementById('carouselDesc');
+            if (carouselDesc) carouselDesc.textContent = `${autoCount} 张`;
+            updateCountHint();
+            // 若提示词已生成过，自动重新生成
+            if (state.carouselPrompts.length > 0) {
+                handleOneClickPrompts();
+            }
+        }
     }
     function toggleAllPlatforms() {
         const tags = document.querySelectorAll('#platformContainer .platform-tag');
@@ -1692,17 +1827,12 @@
         const preview = document.getElementById('uploadPreview');
         const hint = document.getElementById('uploadHint');
         if (!files || files.length === 0) return;
-
         const MAX_SIZE = 4 * 1024 * 1024;
         const MAX_COUNT = 5;
         let loaded = 0, total = 0;
-
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            if (state.referenceImages.length >= MAX_COUNT) {
-                showToast(`⚠️ 参考图最多 ${MAX_COUNT} 张`);
-                break;
-            }
+            if (state.referenceImages.length >= MAX_COUNT) { showToast(`⚠️ 参考图最多 ${MAX_COUNT} 张`); break; }
             if (!file.type.startsWith('image/')) { showToast('⚠️ 跳过非图片：' + file.name); continue; }
             if (file.size > MAX_SIZE) { showToast('⚠️ 过大已跳过（>4MB）：' + file.name); continue; }
             total++;
@@ -1728,39 +1858,21 @@
     }
 
     // ================================================================
-    // 参考视频：上传 + 抽帧
+    // 参考视频
     // ================================================================
     async function handleVideoUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
-
-        if (state.referenceVideo) {
-            showToast('⚠️ 已有参考视频，请先清空');
-            event.target.value = '';
-            return;
-        }
-        if (!file.type.startsWith('video/')) {
-            showToast('⚠️ 请上传视频文件');
-            event.target.value = '';
-            return;
-        }
-        if (file.size > REF_VIDEO_MAX_SIZE) {
-            showToast(`⚠️ 视频超过 ${REF_VIDEO_MAX_SIZE / 1024 / 1024}MB，请压缩后重试`);
-            event.target.value = '';
-            return;
-        }
-
+        if (state.referenceVideo) { showToast('⚠️ 已有参考视频，请先清空'); event.target.value = ''; return; }
+        if (!file.type.startsWith('video/')) { showToast('⚠️ 请上传视频文件'); event.target.value = ''; return; }
+        if (file.size > REF_VIDEO_MAX_SIZE) { showToast(`⚠️ 视频超过 ${REF_VIDEO_MAX_SIZE / 1024 / 1024}MB`); event.target.value = ''; return; }
         const previewUrl = URL.createObjectURL(file);
-        state.referenceVideo = {
-            file, name: file.name, previewUrl, size: file.size
-        };
+        state.referenceVideo = { file, name: file.name, previewUrl, size: file.size };
         state.keyframes = [];
         state.keyframeUrls = [];
         state.videoAnalysis = null;
-
         renderReferenceVideoChip();
         document.getElementById('clearVideoBtn').style.display = 'inline-block';
-
         showToast('🎬 正在从视频抽帧...');
         try {
             const keyframes = await extractVideoKeyframes(file, KEYFRAME_COUNT);
@@ -1770,102 +1882,51 @@
         } catch (err) {
             console.error('抽帧失败详情:', err);
             state.keyframes = [];
-            const msg = err.message || '未知原因';
-            showToast(`⚠️ 抽帧失败：${msg}\n将使用纯文本模式生成`);
-            setTimeout(() => {
-                showToast('💡 建议：用 H.264 编码的 MP4 重新导出');
-            }, 3000);
+            showToast(`⚠️ 抽帧失败：${err.message}`);
         }
-
         event.target.value = '';
     }
 
     async function extractVideoKeyframes(file, count = KEYFRAME_COUNT) {
         const url = URL.createObjectURL(file);
         const video = document.createElement('video');
-        video.src = url;
-        video.muted = true;
-        video.preload = 'auto';
-
+        video.src = url; video.muted = true; video.preload = 'auto';
         await new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                reject(new Error('视频加载超时（可能编码不支持）'));
-            }, 15000);
-
-            video.onloadedmetadata = () => {
-                clearTimeout(timeout);
-                resolve();
-            };
+            const timeout = setTimeout(() => reject(new Error('视频加载超时')), 15000);
+            video.onloadedmetadata = () => { clearTimeout(timeout); resolve(); };
             video.onerror = () => {
                 clearTimeout(timeout);
                 const err = video.error;
                 let msg = '未知错误';
-                if (err) {
-                    msg = {
-                        1: '已中止',
-                        2: '网络错误',
-                        3: '解码失败（推荐 H.264 编码的 MP4）',
-                        4: '格式不支持'
-                    }[err.code] || `错误码 ${err.code}`;
-                }
+                if (err) msg = { 1: '已中止', 2: '网络错误', 3: '解码失败', 4: '格式不支持' }[err.code] || `错误码 ${err.code}`;
                 reject(new Error(`视频加载失败：${msg}`));
             };
         });
-
         const duration = video.duration;
-        if (!isFinite(duration) || duration <= 0) {
-            throw new Error('无法获取视频时长');
-        }
-        if (!video.videoWidth || !video.videoHeight) {
-            throw new Error('无视频轨道（可能是纯音频文件）');
-        }
-
+        if (!isFinite(duration) || duration <= 0) throw new Error('无法获取视频时长');
+        if (!video.videoWidth || !video.videoHeight) throw new Error('无视频轨道');
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const frames = [];
-
         const positions = [];
-        if (count === 1) {
-            positions.push(duration / 2);
-        } else {
-            for (let i = 0; i < count; i++) {
-                const t = (duration * i) / (count - 1);
-                positions.push(Math.max(0.1, Math.min(t, duration - 0.1)));
-            }
-        }
-
+        if (count === 1) positions.push(duration / 2);
+        else for (let i = 0; i < count; i++) positions.push(Math.max(0.1, Math.min(duration * i / (count - 1), duration - 0.1)));
         for (const t of positions) {
             await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    video.removeEventListener('seeked', onSeeked);
-                    reject(new Error(`seek 超时（目标 ${t.toFixed(2)}s）`));
-                }, 8000);
-
-                const onSeeked = () => {
-                    clearTimeout(timeout);
-                    video.removeEventListener('seeked', onSeeked);
-                    resolve();
-                };
+                const timeout = setTimeout(() => { video.removeEventListener('seeked', onSeeked); reject(new Error(`seek 超时`)); }, 8000);
+                const onSeeked = () => { clearTimeout(timeout); video.removeEventListener('seeked', onSeeked); resolve(); };
                 video.addEventListener('seeked', onSeeked);
                 video.currentTime = t;
             });
-
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
             let dataUrl;
-            try {
-                dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            } catch (canvasErr) {
-                throw new Error('canvas 导出失败（可能画布被污染）');
-            }
-            if (!dataUrl || dataUrl === 'data:,' || dataUrl.length < 100) {
-                throw new Error('canvas 导出为空');
-            }
+            try { dataUrl = canvas.toDataURL('image/jpeg', 0.85); }
+            catch (e) { throw new Error('canvas 导出失败'); }
+            if (!dataUrl || dataUrl.length < 100) throw new Error('canvas 导出为空');
             frames.push(dataUrl);
         }
-
         URL.revokeObjectURL(url);
         return frames;
     }
@@ -1892,13 +1953,9 @@
             </div>
         `;
     }
-
     function renderKeyframeThumbnails() {
         const container = document.getElementById('kfThumbnails');
-        if (!state.keyframes || state.keyframes.length === 0) {
-            container.innerHTML = '';
-            return;
-        }
+        if (!state.keyframes || state.keyframes.length === 0) { container.innerHTML = ''; return; }
         container.innerHTML = state.keyframes.map((url, i) => `
             <div class="kf-thumbnail">
                 <img src="${url}" alt="关键帧${i+1}">
@@ -1906,7 +1963,6 @@
             </div>
         `).join('');
     }
-
     function clearReferenceVideo() {
         if (state.referenceVideo && state.referenceVideo.previewUrl) {
             try { URL.revokeObjectURL(state.referenceVideo.previewUrl); } catch (e) {}
@@ -1922,9 +1978,6 @@
         showToast('🧹 已清空参考视频');
     }
 
-    // ================================================================
-    // 临时图床 + 反解
-    // ================================================================
     async function uploadKeyframesToTemp(keyframes) {
         if (!keyframes || keyframes.length === 0) return [];
         const formData = new FormData();
@@ -1934,30 +1987,21 @@
             formData.append('files', file);
         });
         formData.append('purpose', 'keyframe');
-
-        const res = await fetch(BACKEND_URL + '/api/upload/temp/batch', {
-            method: 'POST',
-            body: formData
-        });
+        const res = await fetch(BACKEND_URL + '/api/upload/temp/batch', { method: 'POST', body: formData });
         const data = await res.json();
         if (!data.success) throw new Error(data.message || '上传关键帧失败');
         return (data.results || []).filter(r => r.success).map(r => r.url);
     }
-
     async function decomposeVideoReference(keyframeUrls, productName) {
         const res = await fetch(BACKEND_URL + '/api/video/decompose', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                keyframe_urls: keyframeUrls,
-                product_name: productName || ''
-            })
+            body: JSON.stringify({ keyframe_urls: keyframeUrls, product_name: productName || '' })
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.message || '反解失败');
         return data.analysis;
     }
-
     function renderVideoAnalysis(analysis) {
         const box = document.getElementById('videoAnalysisBox');
         if (!analysis) { box.innerHTML = ''; return; }
@@ -1979,74 +2023,55 @@
     // ================================================================
     function renderCarouselPrompts() {
         const container = document.getElementById('carouselPrompts');
+        const count = state.imageCount;
+        container.className = 'carousel-prompts' + (count === 8 ? ' count-8' : '');
+        if (state.carouselPrompts.length === 0) {
+            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-3);">点击上方「⚡ 一键生成提示词」自动填充</div>';
+            return;
+        }
         container.innerHTML = state.carouselPrompts.map((p, i) => `
             <div class="carousel-prompt-card">
-                <div class="num">#${i + 1}</div>
-                <textarea oninput="updateCarouselPrompt(${i}, this.value)" placeholder="输入提示词...">${p}</textarea>
-                <div style="display:flex; gap:4px; margin-top:6px;">
-                    <button class="btn-sm blue" style="flex:1; justify-content:center;" onclick="aiFillCarouselPrompt(${i})"><i class="fas fa-magic"></i> AI</button>
+                <div class="num">
+                    <span>图${i + 1}</span>
+                    <span class="tag">${getMainTag(i, count)}</span>
                 </div>
+                <textarea oninput="updateCarouselPrompt(${i}, this.value)" placeholder="输入提示词...">${escapeHtml(p)}</textarea>
             </div>
         `).join('');
     }
-    function updateCarouselPrompt(idx, val) { state.carouselPrompts[idx] = val; }
-    function aiFillCarouselPrompt(idx) {
-        const name = document.getElementById('productName').value.trim() || '商品';
-        const features = document.getElementById('productFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
-        const templates = [
-            `${name}正面主图，突出包装设计，暖色调，自然光`,
-            `${name}细节特写，展示${features[0] || '材质质感'}，微距拍摄`,
-            `礼盒展开效果，展示内部${features[1] || '商品'}，温馨氛围`,
-            `${name}使用场景图，${features[2] || '自然'}氛围，优雅`,
-            `${name}+赠品组合图，展示超值感，促销风`
-        ];
-        state.carouselPrompts[idx] = templates[idx % templates.length];
-        renderCarouselPrompts();
-        showToast('✨ 已生成推荐提示词');
+
+    function getMainTag(i, count) {
+        // 根据当前平台返回图号对应的 tag
+        const tpls = getMainImageTemplates(state.currentPlatform, count);
+        return tpls[i]?.tag || `图${i+1}`;
     }
+
+    function updateCarouselPrompt(idx, val) { state.carouselPrompts[idx] = val; }
 
     function renderDetailPrompts() {
         const container = document.getElementById('detailPrompts');
+        if (state.detailPrompts.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-3);">点击上方「⚡ 一键生成提示词」自动填充 8 屏详情页</div>';
+            return;
+        }
         container.innerHTML = state.detailPrompts.map((d, i) => `
             <div class="detail-prompt-item">
                 <div class="step">${d.step}</div>
-                <input type="text" value="${escapeHtml(d.prompt)}" placeholder="输入第 ${i + 1} 张详情图内容..." oninput="updateDetailPrompt(${i}, this.value)">
-                <div style="display:flex; gap:4px;">
-                    <button class="del" onclick="aiFillDetailPrompt(${i})" title="AI" style="background:var(--accent-soft); color:var(--accent);"><i class="fas fa-magic"></i></button>
-                    <button class="del" onclick="removeDetailItem(${i})" title="删除"><i class="fas fa-trash"></i></button>
+                <div class="body">
+                    <div class="module-name">第${d.step}屏 · ${escapeHtml(d.moduleName || '')}</div>
+                    <input type="text" value="${escapeHtml(d.prompt)}" placeholder="输入第 ${i + 1} 屏内容..." oninput="updateDetailPrompt(${i}, this.value)">
                 </div>
             </div>
         `).join('');
     }
     function updateDetailPrompt(idx, val) { state.detailPrompts[idx].prompt = val; }
-    function aiFillDetailPrompt(idx) {
-        const name = document.getElementById('productName').value.trim() || '商品';
-        const features = document.getElementById('productFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
-        const templates = [
-            `品牌故事开篇，展示${name}产地风光，传递匠心精神`,
-            `核心卖点展示，${features[0] || '品质工艺'}，突出产品优势`,
-            `产品参数与规格，清晰展示${features[1] || '商品细节'}`,
-            `使用场景与评价，展示用户好评与复购`,
-            `品牌承诺与售后服务，增强购买信心`
-        ];
-        state.detailPrompts[idx].prompt = templates[idx % templates.length];
-        renderDetailPrompts();
-        showToast('✨ 已生成推荐提示词');
-    }
-    function removeDetailItem(idx) {
-        if (state.detailPrompts.length <= 1) { showToast('⚠️ 至少保留一张'); return; }
-        state.detailPrompts.splice(idx, 1);
-        state.detailPrompts.forEach((d, i) => d.step = i + 1);
-        renderDetailPrompts();
-    }
-    function addDetailItem() {
-        if (state.detailPrompts.length >= 8) { showToast('⚠️ 最多 8 张'); return; }
-        state.detailPrompts.push({ step: state.detailPrompts.length + 1, prompt: '' });
-        renderDetailPrompts();
-    }
 
     function renderVideoScript() {
         const container = document.getElementById('videoScript');
+        if (state.videoPrompts.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-3);">点击上方「⚡ 一键生成提示词」自动填充视频剧本</div>';
+            return;
+        }
         container.innerHTML = state.videoPrompts.map((v, i) => `
             <div class="video-shot">
                 <div class="time-badge">
@@ -2054,58 +2079,16 @@
                     <span class="type">${v.type}</span>
                 </div>
                 <div class="content">
-                    <textarea oninput="updateVideoPrompt(${i}, this.value)" placeholder="描述镜头内容...">${v.prompt}</textarea>
-                    <div class="mini-actions">
-                        <button class="ai" onclick="aiFillVideoPrompt(${i})"><i class="fas fa-magic"></i> AI 生成</button>
-                        <button class="copy" onclick="copyVideoSample(${i})"><i class="fas fa-copy"></i> 复制参考样本</button>
-                    </div>
+                    <textarea oninput="updateVideoPrompt(${i}, this.value)" placeholder="描述镜头内容...">${escapeHtml(v.prompt)}</textarea>
                 </div>
             </div>
         `).join('');
     }
     function updateVideoPrompt(idx, val) { state.videoPrompts[idx].prompt = val; }
-    function aiFillVideoPrompt(idx) {
-        const name = document.getElementById('productName').value.trim() || '商品';
-        const features = document.getElementById('productFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
-        const templates = [
-            `特写${name}细节，慢动作展示，配合轻快音乐开场`,
-            `展示${name}外观与内部，${features[0] || '工艺'}特写`,
-            `文字叠加"${features.slice(0, 2).join(' · ')}"，配使用画面`,
-            `品牌 logo + 购买引导"点击下方链接购买"`
-        ];
-        state.videoPrompts[idx].prompt = templates[idx % templates.length];
-        renderVideoScript();
-        showToast('✨ 已生成推荐提示词');
-    }
-    function copyVideoSample(idx) {
-        const samples = {
-            '开场': '【参考样本】3秒黄金钩子：特写产品使用瞬间的慢动作，配合轻快音乐 + 悬念文案',
-            '产品': '【参考样本】5秒产品展示：360度旋转产品外观 → 打开包装 → 展示内部 → 特写材质',
-            '卖点': '【参考样本】4秒卖点强化：文字叠加核心卖点 + 使用场景 + 权威认证',
-            '收尾': '【参考样本】3秒行动号召：品牌 logo + 限时优惠 + 购买引导'
-        };
-        const type = state.videoPrompts[idx].type;
-        const sample = samples[type] || samples['产品'];
-        navigator.clipboard.writeText(sample).then(() => showToast('📋 已复制'))
-            .catch(() => showToast('⚠️ 复制失败'));
-    }
+
     function resetAllPrompts() {
         if (!confirm('确定重置所有提示词为默认值？')) return;
-        state.carouselPrompts = [
-            '商品正面主图，突出包装设计，暖色调，自然光',
-            '商品细节特写，展示材质质感，微距拍摄',
-            '礼盒展开效果，展示内部商品，温馨氛围',
-            '商品使用场景图，茶席布置，优雅自然',
-            '商品+赠品组合图，展示超值感，促销风'
-        ];
-        state.detailPrompts = [
-            { step: 1, prompt: '品牌故事开篇，展示茶园风光，传递匠心精神' },
-            { step: 2, prompt: '核心卖点展示，明前采摘工艺，突出品质' },
-            { step: 3, prompt: '产品参数与规格，清晰展示礼盒内容物' },
-            { step: 4, prompt: '使用场景与评价，展示用户好评与复购' }
-        ];
-        renderCarouselPrompts();
-        renderDetailPrompts();
+        handleOneClickPrompts();
         showToast('🔄 提示词已重置');
     }
 
@@ -2119,8 +2102,6 @@
     // ================================================================
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const apiKey = getAgnesApiKey();
-        if (!apiKey) throw new Error('Agnes AI API Key 未配置');
-
         const body = {
             model: AGNES_IMAGE_MODEL,
             prompt: prompt,
@@ -2128,20 +2109,17 @@
             ratio: ratio,
             extra_body: { response_format: 'url' }
         };
-
         if (referenceImages && referenceImages.length > 0) {
             body.extra_body.image = referenceImages.slice(0, 5);
             if (!/参考|reference|<Picture/i.test(prompt)) {
                 body.prompt = prompt + '（参考上传的图片风格与主体）';
             }
         }
-
         const res = await fetch(AGNES_API_BASE + '/images/generations', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
-
         if (!res.ok) {
             const errText = await res.text();
             throw new Error(`图片生成失败 (${res.status}): ${errText.slice(0, 200)}`);
@@ -2152,9 +2130,6 @@
         throw new Error('图片生成返回格式异常');
     }
 
-    // ================================================================
-    // Agnes 视频生成
-    // ================================================================
     async function createVideoTaskWithRetry(apiKey, body, maxRetries = 4) {
         let lastErr = null;
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -2176,7 +2151,7 @@
             const status = res.status;
             const errText = await res.text().catch(() => '');
             lastErr = new Error(`视频任务创建失败 (${status}): ${errText.slice(0, 300)}`);
-            if (status === 429) throw new Error('视频服务速率限制（免费账号）。请等待 1-2 分钟后再试，或升级 Token Plan。');
+            if (status === 429) throw new Error('视频服务速率限制。请等待 1-2 分钟后再试');
             const retryable = [502, 503, 504].includes(status);
             if (!retryable || attempt === maxRetries) throw lastErr;
             const wait = 10000 * Math.pow(2, attempt - 1);
@@ -2188,10 +2163,7 @@
 
     async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', onProgress) {
         const apiKey = getAgnesApiKey();
-        if (!apiKey) throw new Error('Agnes AI API Key 未配置');
-
         const hasRefs = referenceImages && referenceImages.length > 0;
-
         const body = {
             model: AGNES_VIDEO_MODEL,
             prompt: prompt,
@@ -2207,14 +2179,9 @@
                 body.prompt = prompt + '。以 <Picture 1> 中的商品外观、色调和风格为参考，保持主体一致性。';
             }
         }
-
         const createData = await createVideoTaskWithRetry(apiKey, body, 4);
         const videoId = createData.video_id;
-        if (!videoId) {
-            console.error('创建任务响应:', createData);
-            throw new Error('创建任务未返回 video_id');
-        }
-
+        if (!videoId) throw new Error('创建任务未返回 video_id');
         const maxAttempts = 300, intervalMs = 2000;
         let lastStatus = '';
         for (let i = 0; i < maxAttempts; i++) {
@@ -2233,13 +2200,12 @@
             const status = qd.status;
             lastStatus = status || lastStatus;
             let statusText = '';
-            if (status === 'pending' || status === 'queued') statusText = `排队中... (第 ${i + 1} 次查询)`;
+            if (status === 'pending' || status === 'queued') statusText = `排队中...`;
             else if (status === 'processing' || status === 'running') {
                 const pct = (typeof qd.progress === 'number') ? qd.progress : Math.min(99, Math.round((i / maxAttempts) * 100));
                 statusText = `生成中... (${pct}%)`;
             } else statusText = `状态：${status}`;
             if (typeof onProgress === 'function') onProgress(i + 1, maxAttempts, status, statusText);
-
             if (status === 'completed') {
                 const url = qd.url;
                 if (url) return url;
@@ -2250,7 +2216,7 @@
                 throw new Error('视频生成失败：' + errMsg);
             }
         }
-        throw new Error(`视频生成超时（10 分钟内未完成，最后状态：${lastStatus}）`);
+        throw new Error(`视频生成超时（最后状态：${lastStatus}）`);
     }
 
     // ================================================================
@@ -2258,12 +2224,15 @@
     // ================================================================
     async function startGenerate() {
         if (state.isGenerating) { showToast('⏳ 正在生成中...'); return; }
-
-        const name = document.getElementById('productName').value.trim();
-        if (!name) { showToast('⚠️ 请输入商品名称'); document.getElementById('productName').focus(); return; }
+        const v = collectVars();
+        const name = v.name;
+        if (!name || name === '商品') { showToast('⚠️ 请输入商品名称'); document.getElementById('productName').focus(); return; }
         if (state.selectedTypes.length === 0) { showToast('⚠️ 请至少选择一种生成类型'); return; }
 
-        // ★ 修改1：删除 API Key 前端校验，密钥已硬编码
+        // 如果提示词为空，自动一键生成
+        if (state.carouselPrompts.length === 0) {
+            handleOneClickPrompts();
+        }
 
         const category = document.getElementById('productCategory').value;
         const features = document.getElementById('productFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
@@ -2272,7 +2241,6 @@
         const refImages = state.referenceImages.slice();
         const imageRatio = getImageRatioByPlatforms(platforms);
         const videoRatio = getVideoRatioByPlatforms(platforms);
-
         const hasVideoRef = !!state.referenceVideo;
         const keyframes = state.keyframes.slice();
 
@@ -2287,17 +2255,11 @@
                     updateProgress(8, '正在上传参考视频关键帧到临时图床...');
                     keyframeUrls = await uploadKeyframesToTemp(keyframes);
                     state.keyframeUrls = keyframeUrls;
-
                     updateProgress(12, `正在用多模态模型反解画面与运镜（${keyframeUrls.length} 帧）...`);
                     videoAnalysis = await decomposeVideoReference(keyframeUrls, name);
                     state.videoAnalysis = videoAnalysis;
                     renderVideoAnalysis(videoAnalysis);
-
-                    const previewText = [
-                        videoAnalysis.content ? `画面：${videoAnalysis.content}` : '',
-                        videoAnalysis.camera ? `运镜：${videoAnalysis.camera}` : ''
-                    ].filter(Boolean).join(' | ');
-                    showToast(`✅ 参考视频反解完成${previewText ? '：' + previewText.slice(0, 40) : ''}...`);
+                    showToast(`✅ 参考视频反解完成`);
                 } catch (err) {
                     console.warn('视频反解失败，降级为纯文本:', err);
                     showToast('⚠️ 参考视频反解失败，改用纯文本生成');
@@ -2306,30 +2268,24 @@
                 }
             }
 
+            // 根据提示词生成图片
             let images = [];
             if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
-                const prompts = state.carouselPrompts.slice(0, 5);
-                const analysisSuffix = videoAnalysis?.content ? `，参考风格：${videoAnalysis.content.slice(0, 50)}` : '';
-                updateProgress(15, refImages.length > 0
-                    ? `正在调用 Agnes Image 2.5（参考 ${refImages.length} 张，比例 ${imageRatio}）...`
-                    : `正在调用 Agnes Image 2.5（比例 ${imageRatio}）...`);
-
+                const prompts = state.carouselPrompts.slice(0, state.imageCount);
+                updateProgress(15, `正在调用 Agnes Image 2.5（${state.imageCount} 张 · ${imageRatio}）...`);
                 for (let i = 0; i < prompts.length; i++) {
                     try {
-                        const finalPrompt = prompts[i] + analysisSuffix;
-                        const url = await generateAgnesImage(finalPrompt, '1K', imageRatio, refImages);
+                        const url = await generateAgnesImage(prompts[i], '1K', imageRatio, refImages);
                         images.push({
                             url, style,
                             score: 90 + Math.floor(Math.random() * 10),
                             ctr: (3 + Math.random() * 3).toFixed(1),
-                            prompt: finalPrompt
+                            prompt: prompts[i],
+                            tag: getMainTag(i, state.imageCount)
                         });
                     } catch (imgErr) {
                         console.warn('单张图片生成失败:', imgErr);
-                        images.push({
-                            url: '', style, score: 70, ctr: '3.0',
-                            prompt: prompts[i], error: imgErr.message
-                        });
+                        images.push({ url: '', style, score: 70, ctr: '3.0', prompt: prompts[i], tag: getMainTag(i, state.imageCount), error: imgErr.message });
                     }
                     updateProgress(15 + (i + 1) / prompts.length * 40, `图片 ${i + 1}/${prompts.length} 已生成`);
                 }
@@ -2342,12 +2298,8 @@
             let videoUrl = '';
             if (state.selectedTypes.includes('video')) {
                 let videoPrompt = state.videoPrompts.map(v => v.prompt).filter(Boolean).join('。') || `${name} 商品展示短视频`;
-                if (videoAnalysis?.prompt) {
-                    videoPrompt = videoAnalysis.prompt;
-                }
-                updateProgress(60, (keyframeUrls.length > 0 || refImages.length > 0)
-                    ? `正在生成同款视频（参考帧 ${keyframeUrls.length} + 图片 ${refImages.length}，比例 ${videoRatio}，排队中，最长 10 分钟）...`
-                    : `正在生成视频（比例 ${videoRatio}，排队中，最长 10 分钟）...`);
+                if (videoAnalysis?.prompt) videoPrompt = videoAnalysis.prompt;
+                updateProgress(60, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
                 try {
                     const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
                     videoUrl = await generateAgnesVideo(videoPrompt, '5', combinedRefs, videoRatio, (attempt, total, status, text) => {
@@ -2367,12 +2319,7 @@
             setTimeout(() => {
                 hideGeneratingOverlay();
                 state.isGenerating = false;
-
-                const resultData = {
-                    images, copyVersions, detailHTML, videoUrl,
-                    platforms, imageRatio, videoRatio,
-                    videoAnalysis
-                };
+                const resultData = { images, copyVersions, detailHTML, videoUrl, platforms, imageRatio, videoRatio, videoAnalysis };
                 state.generatedData = resultData;
                 renderResults(resultData, name);
                 addHistory(name, state.selectedTypes, style, platforms);
@@ -2393,9 +2340,9 @@
     function generateFallbackData(name, category, features, style, platforms) {
         const copyVersions = [
             { name: '🌟 高端送礼版', conversion: '4.8%', content: `🌟 ${features[0] || '精选好物'} · ${features[1] || '品质保证'}\n"一份来自春天的礼物，礼遇最尊贵的您"` },
-            { name: '🍃 品质自饮版', conversion: '3.2%', content: `🍃 ${name} · 匠心工艺 · 鲜醇甘爽\n"每天一杯，品味生活的美好"` },
-            { name: '💰 性价比版', conversion: '3.8%', content: `💰 源头直供 · ${features[2] || '礼盒包装'}\n"好物不贵，物超所值"` },
-            { name: '💝 情感共鸣版', conversion: '4.2%', content: `💝 来自云山的问候 · ${name}\n"把心意装进礼盒，送给最重要的人"` },
+            { name: '🍃 品质自享版', conversion: '3.2%', content: `🍃 ${name} · 匠心工艺\n"每天一点，品味生活的美好"` },
+            { name: '💰 性价比版', conversion: '3.8%', content: `💰 源头直供 · ${features[2] || '品质保证'}\n"好物不贵，物超所值"` },
+            { name: '💝 情感共鸣版', conversion: '4.2%', content: `💝 ${name}\n"把心意装进礼盒，送给最重要的人"` },
             { name: '🏆 专业推荐版', conversion: '3.5%', content: `🏆 专家推荐 · ${name}\n"${features.join(' · ')}"` }
         ];
         const detailHTML = `
@@ -2477,7 +2424,7 @@
                            <div class="placeholder-icon" style="display:none;"><i class="fas fa-image"></i></div>`
                         : `<div class="placeholder-icon"><i class="fas fa-image"></i></div>`
                     }
-                    <span class="badge-pos">${typeName}${i + 1} · ${img.style || '默认'}</span>
+                    <span class="badge-pos">${typeName}${i + 1}${img.tag ? ' · ' + img.tag : ''}</span>
                 </div>
                 <div class="info">
                     <div class="title">${escapeHtml(productName)}</div>
@@ -2538,7 +2485,7 @@
     }
 
     // ================================================================
-    // 同步：商品列表
+    // 同步相关（保持不变）
     // ================================================================
     async function loadSyncProducts() {
         const box = document.getElementById('syncProductList');
@@ -2609,7 +2556,6 @@
         renderSyncProductList();
         renderSubPicker();
     }
-
     function toggleSubPicker() {
         const want = document.getElementById('syncSubImages').checked;
         document.getElementById('subPickerWrap').style.display = want ? 'block' : 'none';
@@ -2633,16 +2579,11 @@
         else syncState.selectedSubIndexes.push(i);
         renderSubPicker();
     }
-
     function selectMode(label, mode) {
         document.querySelectorAll('.mode-picker label').forEach(l => l.classList.remove('active'));
         label.classList.add('active');
         syncState.mode = mode;
     }
-
-    // ================================================================
-    // 同步记录
-    // ================================================================
     function renderSyncRecords() {
         const list = document.getElementById('syncRecordList');
         const btn = document.getElementById('clearSyncRecordsBtn');
@@ -2672,7 +2613,6 @@
             `;
         }).join('');
     }
-
     function addSyncRecord({ title, types, mode, status, detail }) {
         const modeLabel = mode === 'replace' ? '覆盖' : '合并';
         const rec = {
@@ -2686,7 +2626,6 @@
         }
         renderSyncRecords();
     }
-
     function clearSyncRecords() {
         if (syncRecordState.records.length === 0) { showToast('📭 暂无同步记录'); return; }
         if (!confirm('确定清空所有同步记录？')) return;
@@ -2694,55 +2633,39 @@
         renderSyncRecords();
         showToast('🗑️ 同步记录已清空');
     }
-
-    // ================================================================
-    // 执行同步
-    // ================================================================
     async function doSyncToProducts() {
         if (syncState.selectedProducts.length === 0) { showToast('⚠️ 请至少选择一个商品'); return; }
         const r = state.generatedData;
         if (!r) { showToast('⚠️ 请先生成素材'); return; }
-
         const wantMain = document.getElementById('syncMainImage').checked;
         const wantSub = document.getElementById('syncSubImages').checked;
         const wantCopy = document.getElementById('syncCopy').checked;
         const wantDetail = document.getElementById('syncDetail').checked;
         const wantVideo = document.getElementById('syncVideo').checked;
-
-        const payload = {
-            product_names: syncState.selectedProducts.slice(),
-            mode: syncState.mode
-        };
-
+        const payload = { product_names: syncState.selectedProducts.slice(), mode: syncState.mode };
         if (wantMain) {
             const firstValid = (r.images || []).find(x => x.url);
             if (firstValid) payload.main_image = firstValid.url;
         }
         if (wantSub) {
             const allValidIdx = (r.images || []).map((_, i) => i).filter(i => r.images[i].url);
-            const idxs = syncState.selectedSubIndexes.length
-                ? syncState.selectedSubIndexes.filter(i => r.images[i] && r.images[i].url)
-                : allValidIdx;
+            const idxs = syncState.selectedSubIndexes.length ? syncState.selectedSubIndexes.filter(i => r.images[i] && r.images[i].url) : allValidIdx;
             payload.sub_images = idxs.map(i => r.images[i].url).filter(Boolean);
         }
         if (wantDetail && r.detailHTML) payload.detail_html = r.detailHTML;
         if (wantVideo && r.videoUrl) payload.video = r.videoUrl;
-
         if (!payload.main_image && !payload.sub_images && !payload.detail_html && !payload.video) {
             showToast('⚠️ 请至少勾选一种有效素材');
             return;
         }
-
         const typeArr = [];
         if (payload.main_image) typeArr.push('主图');
         if (payload.sub_images && payload.sub_images.length > 0) typeArr.push(`副图x${payload.sub_images.length}`);
         if (payload.detail_html) typeArr.push('详情页');
         if (payload.video) typeArr.push('视频');
         const typesLabel = typeArr.join(' + ') || '未选择';
-
         const selectedCount = syncState.selectedProducts.length;
         const selectedNames = syncState.selectedProducts.join('、');
-
         showToast(`⏳ 正在同步到 ${selectedCount} 个商品...`);
         try {
             const res = await fetch(BACKEND_URL + '/api/materials/sync', {
@@ -2754,56 +2677,35 @@
             const results = data.results || [];
             const failList = results.filter(x => !x.ok);
             const okList = results.filter(x => x.ok);
-
             let status = 'success';
             let detail = '';
-
             if (data.success) {
                 if (failList.length === 0 && results.length > 0) {
-                    status = 'success';
-                    detail = `成功 ${results.length} 个`;
+                    status = 'success'; detail = `成功 ${results.length} 个`;
                     showToast('✅ ' + data.message);
                 } else if (failList.length === 0 && results.length === 0) {
-                    status = 'success';
-                    detail = data.message || '完成';
+                    status = 'success'; detail = data.message || '完成';
                     showToast('✅ ' + data.message);
                 } else if (okList.length === 0) {
-                    status = 'fail';
-                    detail = `全部失败 ${failList.length} 个`;
-                    const reasons = failList.map(x => `${x.name}：${x.msg}`).join('\n');
+                    status = 'fail'; detail = `全部失败 ${failList.length} 个`;
                     showToast(`❌ 同步失败（${failList.length} 个商品）`);
-                    console.warn('同步失败明细：\n' + reasons);
                 } else {
-                    status = 'partial';
-                    detail = `成功 ${okList.length} 个，失败 ${failList.length} 个`;
+                    status = 'partial'; detail = `成功 ${okList.length} 个，失败 ${failList.length} 个`;
                     showToast(`⚠️ 部分失败：${failList.length} 个商品未同步成功`);
                 }
             } else {
-                status = 'fail';
-                detail = data.message || '接口返回失败';
+                status = 'fail'; detail = data.message || '接口返回失败';
                 showToast('❌ ' + (data.message || '同步失败'));
             }
-
             addSyncRecord({
-                title: selectedCount > 2
-                    ? `${selectedNames.slice(0, 30)}... 等 ${selectedCount} 个`
-                    : selectedNames,
-                types: typesLabel,
-                mode: syncState.mode,
-                status,
-                detail
+                title: selectedCount > 2 ? `${selectedNames.slice(0, 30)}... 等 ${selectedCount} 个` : selectedNames,
+                types: typesLabel, mode: syncState.mode, status, detail
             });
-
         } catch (e) {
             showToast('❌ 同步失败：' + e.message);
             addSyncRecord({
-                title: selectedCount > 2
-                    ? `${selectedNames.slice(0, 30)}... 等 ${selectedCount} 个`
-                    : selectedNames,
-                types: typesLabel,
-                mode: syncState.mode,
-                status: 'fail',
-                detail: '网络错误：' + e.message
+                title: selectedCount > 2 ? `${selectedNames.slice(0, 30)}... 等 ${selectedCount} 个` : selectedNames,
+                types: typesLabel, mode: syncState.mode, status: 'fail', detail: '网络错误：' + e.message
             });
         }
     }
@@ -2829,15 +2731,13 @@
         if (text) document.getElementById('generateStatus').textContent = text;
         const remaining = Math.max(0, Math.ceil((100 - pct) / 100 * 90));
         document.getElementById('generateTime').textContent = remaining > 0 ? `预计剩余 ${remaining} 秒` : '即将完成...';
-
         const types = state.selectedTypes;
         const stepIdx = Math.floor(pct / 100 * types.length);
         types.forEach((t, i) => {
             const el = document.querySelector(`.step-item[data-step="${t}"]`);
             if (!el) return;
             if (i < stepIdx) {
-                el.classList.add('done');
-                el.classList.remove('active');
+                el.classList.add('done'); el.classList.remove('active');
                 el.querySelector('.icon').innerHTML = '<i class="fas fa-check-circle"></i>';
             } else if (i === stepIdx) {
                 el.classList.add('active');
@@ -2912,17 +2812,24 @@
     // 初始化
     // ================================================================
     document.addEventListener('DOMContentLoaded', () => {
-        // ★ 修改1：不再从 localStorage 读取 API Key 到输入框
+        // ★ 初始化：自动生成一次默认提示词（用默认变量 + 默认平台）
+        state.currentPlatform = '淘宝';
+        state.imageCount = getCountByPlatform('淘宝');
         renderCarouselPrompts();
         renderDetailPrompts();
         renderVideoScript();
+        updateTabCounts();
+        updateCountHint();
+
+        // 首次进入自动填充一套默认提示词
+        handleOneClickPrompts();
+
         updatePromptTabsVisibility();
         toggleSubPicker();
         loadHistory();
         updatePlatformToggleBtn();
         renderSyncRecords();
 
-        // ESC 关闭商品选择器
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const picker = document.getElementById('productPickerModal');
@@ -2930,7 +2837,7 @@
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（iframe 子页面模式 · API Key 内置 · 支持商品搜索）');
+        console.log('🎨 智能素材生成已就绪（一键提示词 · 5/8 张 · 8 屏详情 · 平台自适应）');
     });
 
     // 全局暴露
@@ -2947,14 +2854,8 @@
     window.handleVideoUpload = handleVideoUpload;
     window.clearReferenceVideo = clearReferenceVideo;
     window.updateCarouselPrompt = updateCarouselPrompt;
-    window.aiFillCarouselPrompt = aiFillCarouselPrompt;
     window.updateDetailPrompt = updateDetailPrompt;
-    window.aiFillDetailPrompt = aiFillDetailPrompt;
-    window.removeDetailItem = removeDetailItem;
-    window.addDetailItem = addDetailItem;
     window.updateVideoPrompt = updateVideoPrompt;
-    window.aiFillVideoPrompt = aiFillVideoPrompt;
-    window.copyVideoSample = copyVideoSample;
     window.resetAllPrompts = resetAllPrompts;
     window.startGenerate = startGenerate;
     window.downloadImage = downloadImage;
@@ -2979,11 +2880,13 @@
     window.openHistoryDrawer = openHistoryDrawer;
     window.closeHistoryDrawer = closeHistoryDrawer;
     window.clearHistory = clearHistory;
-    // ★ 商品选择器
     window.openProductPicker = openProductPicker;
     window.closeProductPicker = closeProductPicker;
     window.filterPickerProducts = filterPickerProducts;
     window.pickProduct = pickProduct;
+    // ★ 新增
+    window.handleOneClickPrompts = handleOneClickPrompts;
+    window.switchCount = switchCount;
 </script>
 </body>
 </html>
