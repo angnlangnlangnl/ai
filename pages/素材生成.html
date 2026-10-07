@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>智控电商 · 智能素材生成</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能素材生成</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
@@ -21,66 +22,55 @@
             --text-2: #5f7d95;
             --text-3: #94a3b8;
         }
+        /* ★ iframe 子页面布局：不使用 flex + 侧边栏 */
+        html, body { min-height: 100%; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: var(--bg);
             color: var(--text);
-            display: flex;
-            min-height: 100vh;
-            min-height: 100dvh;
+            padding: 20px 28px 100px;   /* ★ 底部留出操作条空间 */
+            position: relative;
         }
 
-        .sidebar {
-            width: 220px;
-            background: var(--primary);
-            color: #b8cfe0;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            height: 100vh;
-            height: 100dvh;
-            position: sticky;
-            top: 0;
-            overflow-y: auto;
-            z-index: 100;
-        }
-        .sidebar::-webkit-scrollbar { width: 3px; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-        .sidebar .logo { padding: 22px 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 12px; }
-        .sidebar .logo i { font-size: 26px; color: var(--accent); background: rgba(77,171,247,0.12); padding: 8px; border-radius: 12px; }
-        .sidebar .logo span { font-size: 17px; font-weight: 700; color: white; }
-        .sidebar .logo .badge { font-size: 10px; background: var(--accent); color: var(--primary); padding: 2px 8px; border-radius: 30px; font-weight: 600; margin-left: auto; }
-        .sidebar .nav { flex: 1; padding: 12px 12px 20px; }
-        .sidebar .nav .section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #5a7f99; padding: 14px 12px 6px; font-weight: 600; }
-        .sidebar .nav .item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: #9bb4cc; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.15s; margin-bottom: 2px; position: relative; }
-        .sidebar .nav .item i { width: 16px; font-size: 14px; text-align: center; color: #5a7f99; }
-        .sidebar .nav .item:hover { background: rgba(255,255,255,0.05); color: #d4e4f0; }
-        .sidebar .nav .item.active { background: rgba(77,171,247,0.12); color: white; }
-        .sidebar .nav .item.active i { color: var(--accent); }
-        .sidebar .nav .item.active::before { content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 3px; background: var(--accent); border-radius: 0 4px 4px 0; }
-        .sidebar .nav .item .tag { margin-left: auto; background: rgba(77,171,247,0.15); color: var(--accent); font-size: 10px; padding: 2px 8px; border-radius: 30px; font-weight: 600; }
-        .sidebar .bottom { padding: 16px 20px calc(20px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: #5a7f99; display: flex; align-items: center; gap: 10px; }
-
-        .main { flex: 1; display: flex; flex-direction: column; max-width: calc(100% - 220px); min-width: 0; }
-
-        .topbar {
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 28px;
+        /* ★ 顶部细工具条（替代原大 topbar） */
+        .toolbar {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             flex-wrap: wrap;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            padding-top: calc(14px + env(safe-area-inset-top, 0px));
+            margin-bottom: 16px;
         }
-        .topbar .title { display: flex; align-items: center; gap: 10px; }
-        .topbar .title i { color: var(--accent); font-size: 20px; }
-        .topbar .title h1 { font-size: 16px; font-weight: 600; color: var(--text); }
+        .toolbar .tb-left {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; color: var(--text-2);
+            min-width: 0;
+        }
+        .toolbar .tb-left .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .toolbar .tb-btn {
+            padding: 6px 14px; border-radius: 20px;
+            border: 1px solid var(--border); background: #fff;
+            color: var(--primary); font-size: 12px; font-weight: 500;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+            transition: 0.12s; font-family: inherit; white-space: nowrap;
+        }
+        .toolbar .tb-btn:hover {
+            border-color: var(--accent); color: #2a7faa; background: #f5f9fe;
+        }
+        .toolbar .tb-btn i { color: var(--text-2); }
+        .toolbar .tb-btn:hover i { color: var(--accent); }
 
+        /* Stepper */
         .stepper { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: center; min-width: 0; }
         .stepper .step { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--text-3); cursor: pointer; transition: 0.15s; white-space: nowrap; }
         .stepper .step .num { width: 20px; height: 20px; border-radius: 50%; background: var(--border); color: var(--text-2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
@@ -92,13 +82,8 @@
         .stepper .step.done .num::before { font-size: 11px; }
         .stepper .arrow { color: var(--border); font-size: 12px; }
 
-        .topbar .actions { display: flex; gap: 8px; align-items: center; }
-        .topbar .actions .btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: white; font-size: 13px; font-weight: 500; color: var(--primary); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.1s; }
-        .topbar .actions .btn:hover { background: #f5f8fc; }
-        .topbar .actions .btn i { color: var(--text-2); }
-        .topbar .actions .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
-
-        .content { flex: 1; padding: 24px 28px 100px; overflow-y: auto; }
+        /* 内容区：外层 body 已有 padding，这里不再重复 */
+        .content { padding: 0 0 100px; }
         .step-panel { display: none; }
         .step-panel.active { display: block; animation: fadeIn 0.25s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -452,10 +437,11 @@
             flex-shrink: 0;
         }
 
+        /* ★ 底部操作条：iframe 内全宽，不再偏移 220px */
         .action-bar {
-            position: fixed; bottom: 0; left: 220px; right: 0;
+            position: fixed; bottom: 0; left: 0; right: 0;
             background: white; border-top: 1px solid var(--border);
-            padding: 14px 28px calc(14px + env(safe-area-inset-bottom, 0px));
+            padding: 14px 28px;
             display: flex; justify-content: space-between; align-items: center;
             gap: 12px; z-index: 40;
             box-shadow: 0 -2px 8px rgba(10,30,47,0.04);
@@ -662,6 +648,7 @@
             background: white; z-index: 201; transform: translateX(100%);
             transition: transform 0.3s ease; display: flex; flex-direction: column;
             box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            max-width: 100%;
         }
         .drawer.show { transform: translateX(0); }
         .drawer-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -685,24 +672,12 @@
             .stepper::-webkit-scrollbar { display: none; }
         }
         @media (max-width: 768px) {
-            .sidebar { width: 60px; }
-            .sidebar .logo span, .sidebar .logo .badge, .sidebar .nav .item span,
-            .sidebar .nav .section-label, .sidebar .bottom span, .sidebar .nav .item .tag { display: none; }
-            .sidebar .logo { padding: 16px 12px; justify-content: center; }
-            .sidebar .logo i { font-size: 20px; padding: 6px; }
-            .sidebar .nav .item { justify-content: center; padding: 12px; }
-            .sidebar .nav .item i { font-size: 18px; width: auto; }
-            .sidebar .bottom { justify-content: center; }
-            .main { max-width: calc(100% - 60px); }
-            .topbar { padding: 12px 14px; padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
-            .topbar .title h1 { font-size: 14px; }
-            .topbar .actions .btn span { display: none; }
-            .content { padding: 16px 14px 100px; }
+            body { padding: 12px 14px 90px; }
             .form-row { grid-template-columns: 1fr; }
             .type-pills { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .image-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .carousel-prompts { grid-template-columns: 1fr; }
-            .action-bar { left: 60px; padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)); }
+            .action-bar { padding: 12px 14px; }
             .btn-lg { padding: 11px 20px; font-size: 13px; }
             .drawer { width: 100%; max-width: 100%; }
         }
@@ -715,47 +690,11 @@
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="logo">
-        <i class="fas fa-bolt"></i>
-        <span>智控电商</span>
-        <span class="badge">v3.0</span>
-    </div>
-    <div class="nav">
-        <div class="section-label">经营总览</div>
-        <div class="item"><i class="fas fa-chart-pie"></i><span>数据总览</span></div>
-        <div class="item"><i class="fas fa-stethoscope"></i><span>店铺经营诊断</span></div>
-        <div class="item"><i class="fas fa-eye"></i><span>同行竞品分析</span></div>
-        <div class="section-label">交易核心</div>
-        <div class="item"><i class="fas fa-shopping-cart"></i><span>订单管理</span><span class="tag">23</span></div>
-        <div class="item"><i class="fas fa-box"></i><span>商品管理</span></div>
-        <div class="item"><i class="fas fa-warehouse"></i><span>库存管理</span></div>
-        <div class="section-label">AI 智能赋能</div>
-        <div class="item"><i class="fas fa-headset"></i><span>AI 客服</span><span class="tag">NEW</span></div>
-        <div class="item"><i class="fas fa-robot"></i><span>AI 助手</span></div>
-        <div class="item"><i class="fas fa-users"></i><span>客资聚合</span><span class="tag">89</span></div>
-        <div class="section-label">运营支持</div>
-        <div class="item"><i class="fas fa-truck"></i><span>物流管理</span></div>
-        <div class="item active"><i class="fas fa-store-alt"></i><span>素材生成</span></div>
-        <div class="item"><i class="fas fa-plug"></i><span>渠道货源</span></div>
-        <div class="item"><i class="fas fa-cart-plus"></i><span>智能采购</span><span class="tag">NEW</span></div>
-        <div class="section-label">系统配置</div>
-        <div class="item"><i class="fas fa-plug"></i><span>渠道管理</span></div>
-        <div class="item"><i class="fas fa-handshake"></i><span>服务商管理</span></div>
-        <div class="item"><i class="fas fa-cog"></i><span>系统设置</span></div>
-    </div>
-    <div class="bottom">
-        <i class="fas fa-shield-alt"></i>
-        <span>数据加密 · 安全</span>
-    </div>
-</div>
-
-<div class="main">
-
-    <div class="topbar">
-        <div class="title">
-            <i class="fas fa-wand-magic-sparkles"></i>
-            <h1>智能素材生成</h1>
+    <!-- ===== 顶部工具条（含 Stepper） ===== -->
+    <div class="toolbar">
+        <div class="tb-left">
+            <span class="status-dot"></span>
+            <span>AI 驱动 · 一次生成主图 / 轮播 / 文案 / 详情 / 视频</span>
         </div>
         <div class="stepper">
             <div class="step active" data-step="1" onclick="goStep(1)"><span class="num">1</span><span>输入</span></div>
@@ -764,9 +703,10 @@
             <span class="arrow"><i class="fas fa-chevron-right"></i></span>
             <div class="step" data-step="3" onclick="goStep(3)"><span class="num">3</span><span>同步</span></div>
         </div>
-        <div class="actions">
-            <span class="btn" onclick="openHistoryDrawer()"><i class="fas fa-history"></i> <span>历史</span></span>
-            <span class="avatar">M</span>
+        <div class="tb-right">
+            <button class="tb-btn" onclick="openHistoryDrawer()">
+                <i class="fas fa-history"></i><span> 历史</span>
+            </button>
         </div>
     </div>
 
@@ -1101,7 +1041,6 @@
                 </div>
             </div>
 
-            <!-- ★ 新增：同步记录卡片 -->
             <div class="card" id="syncRecordCard">
                 <div class="card-header">
                     <h3><i class="fas fa-clipboard-check"></i> 同步记录</h3>
@@ -1140,7 +1079,6 @@
             </button>
         </div>
     </div>
-</div>
 
 <div class="generating-overlay" id="generatingOverlay">
     <div class="generating-box">
@@ -1182,7 +1120,6 @@
     const REF_VIDEO_MAX_SIZE = 20 * 1024 * 1024;
     const KEYFRAME_COUNT = 3;
 
-    // ★ 安全 storage
     const safeStorage = {
         get(key, def = null) {
             try { return localStorage.getItem(key) ?? def; }
@@ -1267,9 +1204,8 @@
         mode: 'merge',
     };
 
-    // ★ 同步记录状态
     const syncRecordState = {
-        records: [],   // [{id, productNames, types, mode, status, time, detail}]
+        records: [],
         maxRecords: 50
     };
 
@@ -1341,7 +1277,7 @@
             loadSyncProducts();
             renderSyncRecords();
         }
-        document.querySelector('.content').scrollTop = 0;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function goStepBack() { if (state.currentStep > 1) goStep(state.currentStep - 1); }
     function goStepNext() { if (state.currentStep < 3) goStep(state.currentStep + 1); }
@@ -2400,7 +2336,7 @@
     }
 
     // ================================================================
-    // ★ 同步记录：渲染 + 新增 + 清空
+    // 同步记录
     // ================================================================
     function renderSyncRecords() {
         const list = document.getElementById('syncRecordList');
@@ -2436,12 +2372,7 @@
         const modeLabel = mode === 'replace' ? '覆盖' : '合并';
         const rec = {
             id: 'rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-            title,
-            types,
-            mode,
-            modeLabel,
-            status,     // 'success' | 'partial' | 'fail'
-            detail,
+            title, types, mode, modeLabel, status, detail,
             time: new Date().toLocaleTimeString('zh-CN', { hour12: false })
         };
         syncRecordState.records.unshift(rec);
@@ -2497,7 +2428,6 @@
             return;
         }
 
-        // 组装素材类型字符串（用于同步记录）
         const typeArr = [];
         if (payload.main_image) typeArr.push('主图');
         if (payload.sub_images && payload.sub_images.length > 0) typeArr.push(`副图x${payload.sub_images.length}`);
@@ -2529,7 +2459,6 @@
                     detail = `成功 ${results.length} 个`;
                     showToast('✅ ' + data.message);
                 } else if (failList.length === 0 && results.length === 0) {
-                    // 接口没返回明细，保守成功
                     status = 'success';
                     detail = data.message || '完成';
                     showToast('✅ ' + data.message);
@@ -2691,7 +2620,7 @@
         loadHistory();
         updatePlatformToggleBtn();
         renderSyncRecords();
-        console.log('🎨 智能素材生成已就绪（Agnes 2.5 + 13 平台 + 参考视频反解 + 同步记录）');
+        console.log('🎨 智能素材生成已就绪（iframe 子页面模式）');
     });
 
     // 全局暴露
