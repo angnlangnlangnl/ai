@@ -134,7 +134,6 @@
             border-color: #2a7faa;
         }
 
-        /* ★ 张数切换 */
         .count-switch {
             display: inline-flex;
             gap: 4px;
@@ -161,7 +160,6 @@
             box-shadow: 0 1px 3px rgba(10,30,47,0.08);
         }
 
-        /* ★ 一键生成按钮 */
         .one-click-btn {
             padding: 8px 18px;
             border-radius: 20px;
@@ -232,64 +230,101 @@
         .prompt-panel { display: none; }
         .prompt-panel.active { display: block; }
 
-        .carousel-prompts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .carousel-prompts.count-8 { grid-template-columns: repeat(4, 1fr); }
-        .carousel-prompt-card { background: #fafcfe; border: 1px solid var(--border); border-radius: 10px; padding: 8px; }
-        .carousel-prompt-card .num {
-            font-size: 10px; font-weight: 700; color: var(--accent);
-            margin-bottom: 4px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .carousel-prompt-card .num .tag {
-            font-size: 9px; padding: 1px 6px; border-radius: 8px;
-            background: rgba(77,171,247,0.12); color: var(--accent); font-weight: 500;
-        }
-        .carousel-prompt-card textarea {
-            width: 100%; border: 1px solid var(--border); border-radius: 6px;
-            padding: 6px 8px; font-size: 11px; line-height: 1.5;
-            background: white; resize: none; font-family: inherit;
-            min-height: 76px; transition: 0.15s;
-        }
-        .carousel-prompt-card textarea:focus { outline: none; border-color: var(--accent); }
-
+        /* ============================================================
+           ★ 提示词列表（主副图 & 详情页共用）
+           修改：
+           1. 左侧序号 → 暗淡图片背景 + 大号数字
+           2. 文本输入 → textarea，可换行，不溢出
+           ============================================================ */
         .detail-prompts { display: flex; flex-direction: column; gap: 8px; }
         .detail-prompt-item {
-            display: grid; grid-template-columns: 32px 1fr auto;
-            gap: 10px; align-items: center;
-            background: #fafcfe; border: 1px solid var(--border); border-radius: 10px;
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            gap: 12px;
+            align-items: flex-start;
+            background: #fafcfe;
+            border: 1px solid var(--border);
+            border-radius: 10px;
             padding: 10px 12px;
         }
+
+        /* 暗淡图片背景 + 序号 */
         .detail-prompt-item .step {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: var(--accent); color: white; font-size: 12px; font-weight: 700;
-            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* 暗淡图片背景（斜向渐变 + 网格纹理） */
+            background:
+                linear-gradient(135deg, rgba(10,30,47,0.06) 0%, rgba(77,171,247,0.10) 100%),
+                repeating-linear-gradient(45deg,
+                    rgba(10,30,47,0.03) 0px,
+                    rgba(10,30,47,0.03) 6px,
+                    transparent 6px,
+                    transparent 12px);
+            border: 1px solid rgba(10,30,47,0.08);
         }
-        .detail-prompt-item .body { display: flex; flex-direction: column; gap: 4px; }
+        /* 大号数字 */
+        .detail-prompt-item .step::after {
+            content: attr(data-num);
+            position: relative;
+            font-size: 32px;
+            font-weight: 800;
+            color: rgba(10,30,47,0.22);
+            letter-spacing: -1px;
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            line-height: 1;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+        }
+
+        .detail-prompt-item .body {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;   /* ★ 关键：防止 grid 子元素溢出 */
+        }
         .detail-prompt-item .body .module-name {
-            font-size: 11px; color: var(--accent); font-weight: 600;
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
         }
-        .detail-prompt-item input {
-            padding: 6px 10px; font-size: 12px; border-radius: 6px;
-            border: 1px solid var(--border); background: white;
-            width: 100%; font-family: inherit;
-        }
-        .detail-prompt-item input:focus { outline: none; border-color: var(--accent); }
-        .detail-prompt-item .del {
-            width: 28px; height: 28px; border-radius: 6px; border: none;
-            background: #fde8ed; color: var(--danger); cursor: pointer; font-size: 12px;
-        }
-        .detail-prompt-item .del:hover { background: #fcd0d9; }
-        .detail-prompt-item .del.ai {
-            background: var(--accent-soft); color: var(--accent);
-        }
-        .add-line-btn {
-            padding: 10px; border: 2px dashed var(--border); border-radius: 10px;
-            background: #fafcfe; color: var(--text-2); font-size: 12px;
-            cursor: pointer; width: 100%; margin-top: 8px;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+
+        /* ★ textarea 替换 input：自动换行、不溢出 */
+        .detail-prompt-item textarea {
+            padding: 8px 12px;
+            font-size: 13px;
+            line-height: 1.6;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            width: 100%;
             font-family: inherit;
+            resize: vertical;
+            min-height: 44px;
+            max-height: 220px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
         }
-        .add-line-btn:hover { border-color: var(--accent); color: var(--accent); background: #f0f8ff; }
+        .detail-prompt-item textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        /* Placeholder 浅淡样式 */
+        .detail-prompt-item textarea::placeholder,
+        .video-shot .content textarea::placeholder {
+            color: #c8d4e0;
+            font-style: italic;
+        }
 
         .video-script { display: flex; flex-direction: column; gap: 8px; }
         .video-shot {
@@ -304,20 +339,16 @@
         }
         .video-shot .time-badge .sec { font-size: 12px; font-weight: 700; }
         .video-shot .time-badge .type { font-size: 9px; opacity: 0.85; margin-top: 2px; }
-        .video-shot .content { display: flex; flex-direction: column; gap: 6px; }
+        .video-shot .content { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
         .video-shot .content textarea {
             width: 100%; border: 1px solid var(--border); border-radius: 6px;
             padding: 6px 10px; font-size: 12px; background: white;
             resize: vertical; min-height: 48px; font-family: inherit;
+            line-height: 1.6;
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
         .video-shot .content textarea:focus { outline: none; border-color: var(--accent); }
-        .video-shot .content .mini-actions { display: flex; gap: 6px; }
-        .video-shot .content .mini-actions button {
-            padding: 3px 10px; border-radius: 6px; border: none; font-size: 10px;
-            cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
-        }
-        .video-shot .content .mini-actions .ai { background: var(--accent-soft); color: var(--accent); }
-        .video-shot .content .mini-actions .copy { background: rgba(13,124,79,0.1); color: var(--success); }
 
         .platform-tags { display: flex; gap: 8px; flex-wrap: wrap; }
         .platform-tag {
@@ -349,6 +380,8 @@
         .upload-zone {
             border: 2px dashed var(--border); border-radius: 10px; padding: 16px;
             text-align: center; color: var(--text-3); transition: 0.15s; cursor: pointer;
+            height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .upload-zone:hover { border-color: var(--accent); background: #fafdff; }
         .upload-zone i { font-size: 24px; color: var(--accent); display: block; margin-bottom: 4px; }
@@ -760,8 +793,6 @@
 
         @media (max-width: 1200px) {
             .image-grid { grid-template-columns: repeat(3, 1fr); }
-            .carousel-prompts { grid-template-columns: repeat(3, 1fr); }
-            .carousel-prompts.count-8 { grid-template-columns: repeat(3, 1fr); }
             .sub-picker { grid-template-columns: repeat(4, 1fr); }
         }
         @media (max-width: 900px) {
@@ -772,17 +803,20 @@
         }
         @media (max-width: 768px) {
             body { padding: 12px 14px 90px; }
+            .form-row.ref-media-row { grid-template-columns: 1fr; }
             .form-row, .form-row-3 { grid-template-columns: 1fr; }
             .type-pills { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .image-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .carousel-prompts { grid-template-columns: 1fr; }
-            .carousel-prompts.count-8 { grid-template-columns: 1fr; }
             .action-bar { padding: 12px 14px; }
             .btn-lg { padding: 11px 20px; font-size: 13px; }
             .drawer { width: 100%; max-width: 100%; }
             .name-input-row .pick-btn span { display: none; }
             .name-input-row .pick-btn { padding: 0 14px; }
             .product-picker-box { max-width: 100%; }
+            /* 小屏序号缩小 */
+            .detail-prompt-item { grid-template-columns: 56px 1fr; gap: 10px; }
+            .detail-prompt-item .step { width: 56px; height: 56px; }
+            .detail-prompt-item .step::after { font-size: 24px; }
         }
         @media (max-width: 480px) {
             .type-pills { grid-template-columns: repeat(2, 1fr); }
@@ -820,35 +854,12 @@
                 <div class="form-group">
                     <label><i class="fas fa-tag"></i> 商品名称 <span class="req">*</span></label>
                     <div class="name-input-row">
-                        <input type="text" id="productName" class="hero-input" placeholder="例如：新鲜现挖芋头" value="新鲜现挖芋头" onkeydown="if(event.key==='Enter') startGenerate()">
+                        <input type="text" id="productName" class="hero-input" placeholder="例如：新鲜现挖芋头" onkeydown="if(event.key==='Enter') startGenerate()">
                         <button class="pick-btn" onclick="openProductPicker()" title="从商品库选择">
                             <i class="fas fa-search"></i><span> 从商品库选择</span>
                         </button>
                     </div>
                 </div>
-
-                <!-- ★ 新增：5 个变量独立输入 -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label><i class="fas fa-star"></i> 核心卖点1</label>
-                        <input type="text" id="varSell1" placeholder="如：农家现挖，粉糯香甜" value="农家现挖，粉糯香甜">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-star"></i> 核心卖点2</label>
-                        <input type="text" id="varSell2" placeholder="如：无丝易蒸" value="无丝易蒸">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label><i class="fas fa-home"></i> 产品场景</label>
-                        <input type="text" id="varScene" placeholder="如：家庭餐桌、节日送礼" value="家庭餐桌、节日送礼">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-gem"></i> 产品优势</label>
-                        <input type="text" id="varAdvantage" placeholder="如：肉质绵密" value="肉质绵密">
-                    </div>
-                </div>
-
                 <div class="form-group">
                     <label><i class="fas fa-list"></i> 商品类别</label>
                     <select id="productCategory">
@@ -901,41 +912,43 @@
                 <div class="label">
                     <i class="fas fa-cog"></i>
                     <span>高级设置</span>
-                    <span style="font-size:11px; color:var(--text-3);">（参考图、参考视频、风格、提示词微调）</span>
+                    <span style="font-size:11px; color:var(--text-3);">（参考图、参考视频、卖点、风格、提示词）</span>
                 </div>
                 <i class="fas fa-chevron-down arrow"></i>
             </div>
 
             <div class="advanced-body" id="advancedBody">
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-cloud-upload-alt"></i> 参考图（可选）</h3>
+                <div class="form-row ref-media-row">
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header">
+                            <h3><i class="fas fa-cloud-upload-alt"></i> 参考图（可选）</h3>
+                        </div>
+                        <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <div class="hint">点击上传 3-5 张参考图</div>
+                            <div class="sub">AI 将参考图风格生成图片/视频（≤4MB/张，最多 5 张）</div>
+                            <input type="file" id="fileUpload" multiple accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
+                        </div>
+                        <div id="uploadPreview" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;"></div>
+                        <div id="uploadHint" style="font-size:11px; color:var(--text-3); margin-top:6px; display:none;"></div>
                     </div>
-                    <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <div class="hint">点击上传 3-5 张参考图</div>
-                        <div class="sub">AI 将参考图风格生成图片/视频（≤4MB/张，最多 5 张）</div>
-                        <input type="file" id="fileUpload" multiple accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
-                    </div>
-                    <div id="uploadPreview" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;"></div>
-                    <div id="uploadHint" style="font-size:11px; color:var(--text-3); margin-top:6px; display:none;"></div>
-                </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-video"></i> 参考视频（可选）</h3>
-                        <span class="action" onclick="clearReferenceVideo()" id="clearVideoBtn" style="display:none;">清空</span>
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header">
+                            <h3><i class="fas fa-video"></i> 参考视频（可选）</h3>
+                            <span class="action" onclick="clearReferenceVideo()" id="clearVideoBtn" style="display:none;">清空</span>
+                        </div>
+                        <div class="upload-zone" onclick="document.getElementById('videoUpload').click()" id="videoUploadZone">
+                            <i class="fas fa-video"></i>
+                            <div class="hint">点击上传参考视频（≤20MB）</div>
+                            <div class="sub">AI 将自动抽帧 + 反解画面与运镜 + 生成同款</div>
+                            <input type="file" id="videoUpload" accept="video/mp4,video/webm,video/quicktime" style="display:none;" onchange="handleVideoUpload(event)">
+                        </div>
+                        <div class="ref-video-chips" id="refVideoChips" style="display:none;"></div>
+                        <div class="kf-thumbnails" id="kfThumbnails"></div>
+                        <div id="videoAnalysisBox"></div>
                     </div>
-                    <div class="upload-zone" onclick="document.getElementById('videoUpload').click()" id="videoUploadZone">
-                        <i class="fas fa-video"></i>
-                        <div class="hint">点击上传参考视频（≤20MB）</div>
-                        <div class="sub">AI 将自动抽帧 + 反解画面与运镜 + 生成同款</div>
-                        <input type="file" id="videoUpload" accept="video/mp4,video/webm,video/quicktime" style="display:none;" onchange="handleVideoUpload(event)">
-                    </div>
-                    <div class="ref-video-chips" id="refVideoChips" style="display:none;"></div>
-                    <div class="kf-thumbnails" id="kfThumbnails"></div>
-                    <div id="videoAnalysisBox"></div>
                 </div>
 
                 <div class="card">
@@ -944,8 +957,8 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>完整卖点（逗号分隔）</label>
-                            <input type="text" id="productFeatures" placeholder="明前采摘, 特级龙井, 礼盒包装" value="农家现挖，粉糯香甜, 无丝易蒸, 肉质绵密">
+                            <label>核心卖点（逗号分隔，可选）</label>
+                            <input type="text" id="productFeatures" placeholder="例如：农家现挖，粉糯香甜, 无丝易蒸, 肉质绵密">
                         </div>
                         <div class="form-group">
                             <label>设计风格</label>
@@ -979,7 +992,7 @@
                                 <button class="active" data-count="5" onclick="switchCount(5)">5 张</button>
                                 <button data-count="8" onclick="switchCount(8)">8 张</button>
                             </span>
-                            <span style="font-size:11px; color:var(--text-3);" id="countHint">（当前平台：抖音淘宝 · 5 张 · 3:4）</span>
+                            <span style="font-size:11px; color:var(--text-3);" id="countHint">（当前平台：淘宝 · 5 张 · 3:4）</span>
                         </label>
                     </div>
 
@@ -989,7 +1002,7 @@
                         <button class="prompt-tab" data-tab="video" onclick="switchPromptTab('video')" id="tabVideo">视频剧本（4 段）</button>
                     </div>
                     <div class="prompt-panel active" id="prompt-carousel">
-                        <div class="carousel-prompts" id="carouselPrompts"></div>
+                        <div class="detail-prompts" id="carouselPrompts"></div>
                     </div>
                     <div class="prompt-panel" id="prompt-detail">
                         <div class="detail-prompts" id="detailPrompts"></div>
@@ -1191,7 +1204,7 @@
 
     <div class="action-bar" id="actionBar">
         <div class="info" id="actionInfo">
-            <i class="fas fa-info-circle"></i> 填写商品名称和卖点，点「一键生成提示词」自动填充
+            <i class="fas fa-info-circle"></i> 填写商品名称，点「一键生成提示词」自动填充
         </div>
         <div class="btns" id="actionBtns">
             <button class="btn-lg outline" id="btnBack" onclick="goStepBack()" style="display:none;">
@@ -1308,9 +1321,6 @@
         return AGNES_API_KEY_DEFAULT;
     }
 
-    // ================================================================
-    // ★ 平台 → 张数 映射
-    // ================================================================
     const PLATFORM_COUNT_RULE = {
         '淘宝': 5,
         '抖音': 5,
@@ -1323,10 +1333,8 @@
     }
 
     // ================================================================
-    // ★ 主副图模板
+    // 主副图模板
     // ================================================================
-
-    // 国内（抖音/淘宝）5 张 3:4
     const MAIN_IMG_TPL_CN_5 = [
         { tag: '首图·引流', tpl: (v) =>
             `电商商品主图，3:4，高清实拍，自然光，${v.name}完整主体，构图居中，干净简约背景。画面加简短醒目文案：${v.sell1}，色彩通透有食欲，产品质感强，无多余杂物，不要大面积文字牛皮癣，商业摄影，8K，细节清晰` },
@@ -1340,7 +1348,6 @@
             `电商白底产品图，3:4，${v.name}完整摆放，纯白色背景，均匀柔光，产品轮廓完整，无阴影、无水印、无任何文字，产品商业摄影，高清8K，边缘干净，平台活动标准白底图` }
     ];
 
-    // TikTok Shop 5 张 1:1（英文）
     const MAIN_IMG_TPL_TIKTOK_5 = [
         { tag: 'White BG', tpl: (v) =>
             `e-commerce product main image, 1:1 square, ${v.name}, pure white background, soft studio light, full product view, no text, no watermark, amazon product photography, ultra realistic, 8k, sharp detail` },
@@ -1354,7 +1361,6 @@
             `product specification diagram, 1:1, ${v.name} with simple size marking, white background, clean layout, little english text, commercial product image, 8k` }
     ];
 
-    // Temu 8 张 1:1（英文）
     const MAIN_IMG_TPL_TEMU_8 = [
         { tag: 'White BG', tpl: (v) =>
             `product photo, 1:1, ${v.name}, pure white background, studio soft light, complete product, no text, no watermark, realistic commercial photography, 8k` },
@@ -1374,7 +1380,6 @@
             `product usage demo image, 1:1, show how to use ${v.name}, simple background, clear demonstration, real photo, 8k` }
     ];
 
-    // 通用 5 张 1:1
     const MAIN_IMG_TPL_GENERIC_5 = [
         { tag: '主图', tpl: (v) =>
             `电商商品主图，1:1，高清实拍，自然光，${v.name}完整主体，构图居中，干净简约背景，少量文字：${v.sell1}，8K，商业摄影` },
@@ -1388,7 +1393,6 @@
             `电商白底产品图，1:1，${v.name}完整摆放，纯白色背景，无文字、无水印，8K高清` }
     ];
 
-    // 通用 8 张 1:1
     const MAIN_IMG_TPL_GENERIC_8 = [
         ...MAIN_IMG_TPL_GENERIC_5,
         { tag: '规格参数', tpl: (v) =>
@@ -1403,13 +1407,9 @@
         if (platform === 'Temu' && count === 8) return MAIN_IMG_TPL_TEMU_8;
         if ((platform === '抖音' || platform === '淘宝') && count === 5) return MAIN_IMG_TPL_CN_5;
         if (platform === 'TikTok Shop' && count === 5) return MAIN_IMG_TPL_TIKTOK_5;
-        // 通用
         return count === 8 ? MAIN_IMG_TPL_GENERIC_8 : MAIN_IMG_TPL_GENERIC_5;
     }
 
-    // ================================================================
-    // ★ 详情页 8 屏模板
-    // ================================================================
     const DETAIL_SCREEN_TEMPLATES = [
         { name: '首屏主视觉', tpl: (v) =>
             `电商详情页首屏主视觉图，3:4，${v.name}主体居中高清展示，干净高级背景，配合大标题"${v.sell1}"，视觉冲击力强，一眼知道产品核心利益点，8K商业摄影` },
@@ -1429,9 +1429,6 @@
             `电商详情页行动引导图，3:4，${v.name}主图 + 行动按钮视觉设计，文案"立即下单 · 限时福利"，引导加购/下单，8K` }
     ];
 
-    // ================================================================
-    // ★ 视频剧本模板（1 个视频 4 段）
-    // ================================================================
     function getVideoTemplates(v) {
         return [
             { time: '0-3s', type: '开场', prompt: `特写${v.name}细节慢动作，配合轻快音乐开场，字幕"${v.sell1}"` },
@@ -1455,8 +1452,8 @@
         keyframes: [],
         keyframeUrls: [],
         videoAnalysis: null,
-        imageCount: 5,          // ★ 当前张数（5 或 8）
-        currentPlatform: '淘宝', // ★ 当前平台（决定用哪套模板）
+        imageCount: 5,
+        currentPlatform: '淘宝',
         carouselPrompts: [],
         detailPrompts: [],
         videoPrompts: []
@@ -1513,40 +1510,43 @@
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
         })[c]);
     }
+    // ★ 自动增高 textarea
+    function autoGrowTextarea(el) {
+        if (!el) return;
+        el.style.height = 'auto';
+        const maxH = 220;
+        el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
+    }
 
-    // ================================================================
-    // ★ 收集用户输入的 5 个变量
-    // ================================================================
+    // 收集变量
     function collectVars() {
+        const name = (document.getElementById('productName').value || '').trim() || '商品';
+        const featStr = (document.getElementById('productFeatures').value || '').trim();
+        const features = featStr.split(/[,，]/).map(s => s.trim()).filter(Boolean);
         return {
-            name: (document.getElementById('productName').value || '').trim() || '商品',
-            sell1: (document.getElementById('varSell1').value || '').trim() || '优质好物',
-            sell2: (document.getElementById('varSell2').value || '').trim() || '品质保证',
-            scene: (document.getElementById('varScene').value || '').trim() || '日常使用',
-            advantage: (document.getElementById('varAdvantage').value || '').trim() || '精工细作'
+            name: name,
+            sell1: features[0] || '优质好物',
+            sell2: features[1] || '品质保证',
+            scene: features[2] || '日常使用',
+            advantage: features[3] || features[0] || '精工细作'
         };
     }
 
-    // ================================================================
-    // ★ 一键生成提示词
-    // ================================================================
+    // 一键生成提示词
     function handleOneClickPrompts() {
         const v = collectVars();
         const platform = state.currentPlatform;
         const count = state.imageCount;
 
-        // 主副图
         const mainTpls = getMainImageTemplates(platform, count);
         state.carouselPrompts = mainTpls.map(t => t.tpl(v));
 
-        // 详情页（固定 8 屏）
         state.detailPrompts = DETAIL_SCREEN_TEMPLATES.map((s, i) => ({
             step: i + 1,
             moduleName: s.name,
             prompt: s.tpl(v)
         }));
 
-        // 视频剧本
         state.videoPrompts = getVideoTemplates(v);
 
         renderCarouselPrompts();
@@ -1567,18 +1567,13 @@
         if (tabVideo) tabVideo.textContent = `视频剧本（4 段）`;
     }
 
-    // ================================================================
-    // ★ 张数切换
-    // ================================================================
     function switchCount(n) {
         state.imageCount = n;
         document.querySelectorAll('#countSwitch button').forEach(b => {
             b.classList.toggle('active', parseInt(b.dataset.count) === n);
         });
-        // 切换后自动重新生成提示词
         handleOneClickPrompts();
         updateCountHint();
-        // 更新轮播图标签 desc
         const carouselDesc = document.getElementById('carouselDesc');
         if (carouselDesc) carouselDesc.textContent = `${n} 张`;
     }
@@ -1621,7 +1616,7 @@
 
         if (n === 1) {
             btnGen.style.display = 'inline-flex';
-            actionInfo.innerHTML = '<i class="fas fa-info-circle"></i> 填写商品名称和卖点，点「一键生成提示词」自动填充';
+            actionInfo.innerHTML = '<i class="fas fa-info-circle"></i> 填写商品名称，点「一键生成提示词」自动填充';
         } else if (n === 2) {
             btnNext.style.display = 'inline-flex';
             actionInfo.innerHTML = '<i class="fas fa-info-circle"></i> 检查生成结果，满意后点击「下一步」进行同步';
@@ -1778,7 +1773,6 @@
     function togglePlatform(el) {
         el.classList.toggle('active');
         updatePlatformToggleBtn();
-        // ★ 如果切换的是主平台，更新 state.currentPlatform + 自动切换张数
         const platform = el.dataset.platform;
         if (el.classList.contains('active')) {
             state.currentPlatform = platform;
@@ -1790,7 +1784,6 @@
             const carouselDesc = document.getElementById('carouselDesc');
             if (carouselDesc) carouselDesc.textContent = `${autoCount} 张`;
             updateCountHint();
-            // 若提示词已生成过，自动重新生成
             if (state.carouselPrompts.length > 0) {
                 handleOneClickPrompts();
             }
@@ -2021,56 +2014,109 @@
     // ================================================================
     // 提示词渲染
     // ================================================================
+
+    // 主副图
     function renderCarouselPrompts() {
         const container = document.getElementById('carouselPrompts');
         const count = state.imageCount;
-        container.className = 'carousel-prompts' + (count === 8 ? ' count-8' : '');
         if (state.carouselPrompts.length === 0) {
-            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-3);">点击上方「⚡ 一键生成提示词」自动填充</div>';
+            const tpls = getMainImageTemplates(state.currentPlatform, count);
+            container.innerHTML = tpls.map((t, i) => `
+                <div class="detail-prompt-item">
+                    <div class="step" data-num="${i + 1}"></div>
+                    <div class="body">
+                        <div class="module-name">第${i + 1}张 · ${escapeHtml(t.tag)}</div>
+                        <textarea rows="1"
+                            placeholder="点击上方「⚡ 一键生成提示词」自动填充，或手动输入第 ${i+1} 张图的描述..."
+                            oninput="onPromptInput(this, 'carousel', ${i})"></textarea>
+                    </div>
+                </div>
+            `).join('');
+            state.carouselPrompts = tpls.map(() => '');
             return;
         }
-        container.innerHTML = state.carouselPrompts.map((p, i) => `
-            <div class="carousel-prompt-card">
-                <div class="num">
-                    <span>图${i + 1}</span>
-                    <span class="tag">${getMainTag(i, count)}</span>
+        container.innerHTML = state.carouselPrompts.map((p, i) => {
+            const tag = getMainTag(i, count);
+            return `
+                <div class="detail-prompt-item">
+                    <div class="step" data-num="${i + 1}"></div>
+                    <div class="body">
+                        <div class="module-name">第${i + 1}张 · ${escapeHtml(tag)}</div>
+                        <textarea rows="1"
+                            placeholder="输入第 ${i+1} 张图的描述..."
+                            oninput="onPromptInput(this, 'carousel', ${i})">${escapeHtml(p)}</textarea>
+                    </div>
                 </div>
-                <textarea oninput="updateCarouselPrompt(${i}, this.value)" placeholder="输入提示词...">${escapeHtml(p)}</textarea>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+        // 挂载后自动增高
+        requestAnimationFrame(() => {
+            container.querySelectorAll('textarea').forEach(autoGrowTextarea);
+        });
     }
 
     function getMainTag(i, count) {
-        // 根据当前平台返回图号对应的 tag
         const tpls = getMainImageTemplates(state.currentPlatform, count);
         return tpls[i]?.tag || `图${i+1}`;
     }
 
-    function updateCarouselPrompt(idx, val) { state.carouselPrompts[idx] = val; }
+    // 通用输入处理：写入 state + 自动增高
+    function onPromptInput(el, type, idx) {
+        autoGrowTextarea(el);
+        const val = el.value;
+        if (type === 'carousel') {
+            while (state.carouselPrompts.length <= idx) state.carouselPrompts.push('');
+            state.carouselPrompts[idx] = val;
+        } else if (type === 'detail') {
+            state.detailPrompts[idx].prompt = val;
+        } else if (type === 'video') {
+            state.videoPrompts[idx].prompt = val;
+        }
+    }
 
+    function updateCarouselPrompt(idx, val) {
+        while (state.carouselPrompts.length <= idx) state.carouselPrompts.push('');
+        state.carouselPrompts[idx] = val;
+    }
+
+    // 详情页
     function renderDetailPrompts() {
         const container = document.getElementById('detailPrompts');
         if (state.detailPrompts.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-3);">点击上方「⚡ 一键生成提示词」自动填充 8 屏详情页</div>';
-            return;
+            state.detailPrompts = DETAIL_SCREEN_TEMPLATES.map((s, i) => ({
+                step: i + 1,
+                moduleName: s.name,
+                prompt: ''
+            }));
         }
         container.innerHTML = state.detailPrompts.map((d, i) => `
             <div class="detail-prompt-item">
-                <div class="step">${d.step}</div>
+                <div class="step" data-num="${d.step}"></div>
                 <div class="body">
                     <div class="module-name">第${d.step}屏 · ${escapeHtml(d.moduleName || '')}</div>
-                    <input type="text" value="${escapeHtml(d.prompt)}" placeholder="输入第 ${i + 1} 屏内容..." oninput="updateDetailPrompt(${i}, this.value)">
+                    <textarea rows="1"
+                        placeholder="点击「⚡ 一键生成提示词」自动填充，或手动输入第 ${d.step} 屏描述..."
+                        oninput="onPromptInput(this, 'detail', ${i})">${escapeHtml(d.prompt)}</textarea>
                 </div>
             </div>
         `).join('');
+        requestAnimationFrame(() => {
+            container.querySelectorAll('textarea').forEach(autoGrowTextarea);
+        });
     }
     function updateDetailPrompt(idx, val) { state.detailPrompts[idx].prompt = val; }
 
+    // 视频剧本
     function renderVideoScript() {
         const container = document.getElementById('videoScript');
+        const defaultSegments = [
+            { time: '0-3s', type: '开场' },
+            { time: '3-8s', type: '产品' },
+            { time: '8-12s', type: '场景' },
+            { time: '12-15s', type: '收尾' }
+        ];
         if (state.videoPrompts.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-3);">点击上方「⚡ 一键生成提示词」自动填充视频剧本</div>';
-            return;
+            state.videoPrompts = defaultSegments.map(s => ({ time: s.time, type: s.type, prompt: '' }));
         }
         container.innerHTML = state.videoPrompts.map((v, i) => `
             <div class="video-shot">
@@ -2079,10 +2125,14 @@
                     <span class="type">${v.type}</span>
                 </div>
                 <div class="content">
-                    <textarea oninput="updateVideoPrompt(${i}, this.value)" placeholder="描述镜头内容...">${escapeHtml(v.prompt)}</textarea>
+                    <textarea placeholder="点击「⚡ 一键生成提示词」自动填充，或手动输入「${v.type}」镜头描述..."
+                        oninput="onPromptInput(this, 'video', ${i})">${escapeHtml(v.prompt)}</textarea>
                 </div>
             </div>
         `).join('');
+        requestAnimationFrame(() => {
+            container.querySelectorAll('textarea').forEach(autoGrowTextarea);
+        });
     }
     function updateVideoPrompt(idx, val) { state.videoPrompts[idx].prompt = val; }
 
@@ -2098,7 +2148,7 @@
     }
 
     // ================================================================
-    // Agnes 图片生成
+    // Agnes 图片 / 视频生成
     // ================================================================
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const apiKey = getAgnesApiKey();
@@ -2229,13 +2279,12 @@
         if (!name || name === '商品') { showToast('⚠️ 请输入商品名称'); document.getElementById('productName').focus(); return; }
         if (state.selectedTypes.length === 0) { showToast('⚠️ 请至少选择一种生成类型'); return; }
 
-        // 如果提示词为空，自动一键生成
-        if (state.carouselPrompts.length === 0) {
+        if (state.carouselPrompts.length === 0 || state.carouselPrompts.every(p => !p)) {
             handleOneClickPrompts();
         }
 
         const category = document.getElementById('productCategory').value;
-        const features = document.getElementById('productFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
+        const features = document.getElementById('productFeatures').value.split(/[,，]/).map(s => s.trim()).filter(Boolean);
         const style = document.getElementById('designStyle').value;
         const platforms = getSelectedPlatforms();
         const refImages = state.referenceImages.slice();
@@ -2268,7 +2317,6 @@
                 }
             }
 
-            // 根据提示词生成图片
             let images = [];
             if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
                 const prompts = state.carouselPrompts.slice(0, state.imageCount);
@@ -2485,7 +2533,7 @@
     }
 
     // ================================================================
-    // 同步相关（保持不变）
+    // 同步相关
     // ================================================================
     async function loadSyncProducts() {
         const box = document.getElementById('syncProductList');
@@ -2812,17 +2860,17 @@
     // 初始化
     // ================================================================
     document.addEventListener('DOMContentLoaded', () => {
-        // ★ 初始化：自动生成一次默认提示词（用默认变量 + 默认平台）
         state.currentPlatform = '淘宝';
         state.imageCount = getCountByPlatform('淘宝');
+        state.carouselPrompts = [];
+        state.detailPrompts = [];
+        state.videoPrompts = [];
+
         renderCarouselPrompts();
         renderDetailPrompts();
         renderVideoScript();
         updateTabCounts();
         updateCountHint();
-
-        // 首次进入自动填充一套默认提示词
-        handleOneClickPrompts();
 
         updatePromptTabsVisibility();
         toggleSubPicker();
@@ -2837,7 +2885,7 @@
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（一键提示词 · 5/8 张 · 8 屏详情 · 平台自适应）');
+        console.log('🎨 智能素材生成已就绪（暗淡图片序号 · textarea 自动换行）');
     });
 
     // 全局暴露
@@ -2884,9 +2932,10 @@
     window.closeProductPicker = closeProductPicker;
     window.filterPickerProducts = filterPickerProducts;
     window.pickProduct = pickProduct;
-    // ★ 新增
     window.handleOneClickPrompts = handleOneClickPrompts;
     window.switchCount = switchCount;
+    // ★ 新增
+    window.onPromptInput = onPromptInput;
 </script>
 </body>
 </html>
