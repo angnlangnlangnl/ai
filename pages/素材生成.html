@@ -722,7 +722,7 @@
         }
         .image-item .info { padding: 8px 10px; }
         .image-item .info .title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .image-item .info .actions { margin-top: 6px; display: flex; gap: 4px; }
+        .image-item .info .actions { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
 
         .copy-list { display: flex; flex-direction: column; gap: 10px; }
         .copy-item { padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; background: white; }
@@ -731,39 +731,6 @@
         .copy-item .name { font-weight: 600; font-size: 14px; }
         .copy-item .content { font-size: 13px; margin-top: 8px; line-height: 1.7; white-space: pre-line; }
         .copy-item .actions { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
-
-        /* ★ 详情页预览：无缝展示 8 屏 */
-        .detail-preview {
-            background: white;
-            border-radius: 10px;
-            padding: 0;
-            max-height: 600px;
-            overflow-y: auto;
-            font-size: 13px;
-            line-height: 0;
-            border: 1px solid var(--border);
-        }
-        .detail-preview::-webkit-scrollbar { width: 4px; }
-        .detail-preview::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
-        .detail-preview img {
-            display: block;
-            width: 100%;
-            height: auto;
-            margin: 0;
-            padding: 0;
-        }
-
-        .video-preview {
-            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
-            border-radius: 12px; padding: 24px 20px;
-            text-align: center; color: white; min-height: 220px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .video-preview video { max-width: 100%; max-height: 420px; border-radius: 8px; }
-        .video-preview .placeholder-icon { font-size: 48px; color: var(--accent); margin-bottom: 10px; }
-        .video-preview .placeholder-text { font-size: 14px; font-weight: 500; }
-        .video-preview .placeholder-sub { font-size: 12px; color: var(--text-3); margin-top: 6px; }
-        .video-preview .placeholder-warn { font-size: 11px; color: #f59e0b; margin-top: 6px; }
 
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-3); }
         .empty-state i { font-size: 40px; margin-bottom: 10px; display: block; opacity: 0.4; }
@@ -977,6 +944,432 @@
             z-index: 2;
         }
 
+        /* ============================================================
+           ★ 主副图编辑弹窗
+           ============================================================ */
+        .edit-img-modal {
+            position: fixed; inset: 0;
+            background: rgba(10,30,47,0.65);
+            backdrop-filter: blur(6px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .edit-img-modal.show { display: flex; animation: fadeIn 0.2s ease; }
+        .edit-img-box {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 720px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.35);
+            animation: slideUp 0.25s ease;
+            overflow: hidden;
+        }
+        .edit-img-header {
+            padding: 18px 24px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .edit-img-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .edit-img-header h3 i { color: var(--accent); }
+        .edit-img-header .close-btn {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f4f9;
+            color: var(--text-2);
+            cursor: pointer;
+            font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.15s;
+        }
+        .edit-img-header .close-btn:hover { background: #fde8ed; color: var(--danger); }
+        .edit-img-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 24px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+        }
+        .edit-img-body::-webkit-scrollbar { width: 4px; }
+        .edit-img-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        .edit-img-preview {
+            width: 240px;
+            aspect-ratio: 3/4;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, #f0f7fe, #e0f0ff);
+            display: flex;
+            align-items: center; justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .edit-img-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .edit-img-preview .placeholder-icon { font-size: 42px; color: var(--accent); }
+        .edit-img-preview .badge-pos {
+            position: absolute; top: 8px; left: 8px;
+            font-size: 11px; padding: 3px 10px; border-radius: 10px;
+            background: rgba(10,30,47,0.8); color: white; font-weight: 500;
+        }
+        .edit-img-form { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+        .edit-img-form label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .edit-img-form label i { color: var(--accent); margin-right: 4px; }
+        .edit-img-form textarea {
+            width: 100%;
+            min-height: 160px;
+            max-height: 300px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.7;
+            font-family: inherit;
+            background: #fafcfe;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .edit-img-form textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            background: white;
+        }
+        .edit-img-footer {
+            padding: 14px 24px 18px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+            background: #fafcfe;
+        }
+
+        /* ============================================================
+           ★ 详情页：左右分栏
+           ============================================================ */
+        .detail-split {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 16px;
+            align-items: start;
+        }
+        @media (max-width: 1100px) {
+            .detail-split { grid-template-columns: 1fr; }
+        }
+
+        .detail-preview-wrap {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            max-height: 640px;
+            overflow-y: auto;
+            line-height: 0;
+            position: relative;
+        }
+        .detail-preview-wrap::-webkit-scrollbar { width: 6px; }
+        .detail-preview-wrap::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+
+        .detail-screen {
+            position: relative;
+            cursor: pointer;
+            transition: 0.15s;
+            line-height: 0;
+        }
+        .detail-screen img {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin: 0;
+            padding: 0;
+        }
+        .detail-screen .screen-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(10,30,47,0.8);
+            color: white;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 500;
+            line-height: 1.4;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .detail-screen:hover .screen-label { background: rgba(77,171,247,0.95); }
+        .detail-screen.active {
+            box-shadow: inset 0 0 0 3px var(--accent);
+        }
+        .detail-screen.active .screen-label { background: var(--accent); }
+        .detail-screen.failed {
+            aspect-ratio: 3/4;
+            background: repeating-linear-gradient(45deg,
+                #f8fafc 0px, #f8fafc 12px,
+                #f0f4f9 12px, #f0f4f9 24px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #94a3b8;
+            border: 1px dashed #dce5ef;
+        }
+        .detail-screen.failed i { font-size: 36px; color: #c8d4e0; }
+        .detail-screen.failed .f-title { font-weight: 600; color: #5f7d95; font-size: 14px; line-height: 1.5; }
+        .detail-screen.failed .f-sub { font-size: 12px; line-height: 1.5; }
+
+        .detail-edit-panel {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 16px;
+            position: sticky;
+            top: 0;
+        }
+        .detail-edit-panel .de-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .detail-edit-panel .de-title i { color: var(--accent); }
+        .detail-edit-panel .de-title .de-step {
+            margin-left: auto;
+            font-size: 11px;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .detail-edit-panel .de-thumb {
+            width: 100%;
+            aspect-ratio: 3/4;
+            max-height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f0f4f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+        .detail-edit-panel .de-thumb img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .detail-edit-panel .de-thumb .placeholder-icon { font-size: 36px; color: #c8d4e0; }
+        .detail-edit-panel .de-field {
+            margin-bottom: 10px;
+        }
+        .detail-edit-panel .de-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .detail-edit-panel .de-field label i { color: var(--accent); margin-right: 4px; }
+        .detail-edit-panel .de-field textarea {
+            width: 100%;
+            min-height: 100px;
+            max-height: 200px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            font-family: inherit;
+            background: #fafcfe;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .detail-edit-panel .de-field textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            background: white;
+        }
+        .detail-screen-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        .detail-screen-nav button {
+            padding: 6px 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-2);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.12s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+        .detail-screen-nav button:hover { border-color: var(--accent); color: #2a7faa; }
+        .detail-screen-nav button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .detail-screen-nav button.failed { border-color: #fde8ed; color: var(--danger); }
+        .detail-screen-nav button.active.failed { background: var(--danger); border-color: var(--danger); color: white; }
+        .detail-screen-nav button .nav-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--success);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .detail-screen-nav button.failed .nav-dot { background: var(--danger); }
+
+        /* ============================================================
+           ★ 视频卡片：左右分栏
+           ============================================================ */
+        .video-split {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 16px;
+            align-items: start;
+        }
+        @media (max-width: 1100px) {
+            .video-split { grid-template-columns: 1fr; }
+        }
+        .video-preview-half {
+            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .video-preview-half video {
+            max-width: 100%;
+            max-height: 480px;
+            border-radius: 8px;
+            display: block;
+        }
+        .video-preview-half .placeholder-icon { font-size: 48px; color: var(--accent); margin-bottom: 10px; }
+        .video-preview-half .placeholder-text { font-size: 14px; font-weight: 500; }
+        .video-preview-half .placeholder-sub { font-size: 12px; color: var(--text-3); margin-top: 6px; }
+        .video-preview-half .placeholder-warn { font-size: 11px; color: #f59e0b; margin-top: 6px; }
+
+        .video-edit-panel {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 16px;
+        }
+        .video-edit-panel .ve-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .video-edit-panel .ve-title i { color: var(--accent); }
+        .video-edit-panel .ve-field { margin-bottom: 12px; }
+        .video-edit-panel .ve-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+        .video-edit-panel .ve-field label i { color: var(--accent); margin-right: 4px; }
+        .video-edit-panel .ve-field textarea {
+            width: 100%;
+            min-height: 120px;
+            max-height: 220px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            font-family: inherit;
+            background: #fafcfe;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .video-edit-panel .ve-field textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            background: white;
+        }
+        .video-edit-panel .ve-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .video-edit-panel .ve-select {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .video-edit-panel .ve-select button {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-2);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.12s;
+            min-width: 44px;
+        }
+        .video-edit-panel .ve-select button:hover { border-color: var(--accent); color: #2a7faa; }
+        .video-edit-panel .ve-select button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
         @media (max-width: 1200px) {
             .image-grid { grid-template-columns: repeat(3, 1fr); }
             .sub-picker { grid-template-columns: repeat(4, 1fr); }
@@ -1005,6 +1398,8 @@
             .video-shot-item { grid-template-columns: 64px 1fr; gap: 10px; }
             .video-config-row { flex-direction: column; align-items: flex-start; gap: 6px; }
             .video-config-label { min-width: 0; }
+            .edit-img-body { grid-template-columns: 1fr; }
+            .edit-img-preview { width: 100%; max-width: 240px; margin: 0 auto; }
         }
         @media (max-width: 480px) {
             .type-pills { grid-template-columns: repeat(2, 1fr); }
@@ -1317,13 +1712,36 @@
             <div class="result-panel" id="result-detail">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-file-alt"></i> 智能详情页</h3>
+                        <h3><i class="fas fa-file-alt"></i> 智能详情页（8 屏）</h3>
                         <div style="display:flex; gap:8px;">
                             <span class="btn-sm primary" onclick="applyDetail()"><i class="fas fa-check"></i> 应用</span>
                             <span class="btn-sm outline" onclick="exportDetailHTML()"><i class="fas fa-file-code"></i> 导出</span>
                         </div>
                     </div>
-                    <div class="detail-preview" id="detailPreview"></div>
+                    <div class="detail-split">
+                        <!-- ★ 左：8 屏预览 -->
+                        <div class="detail-preview-wrap" id="detailPreview"></div>
+                        <!-- ★ 右：编辑面板 -->
+                        <div class="detail-edit-panel" id="detailEditPanel">
+                            <div class="de-title">
+                                <i class="fas fa-edit"></i> 编辑第 <span id="deCurrentStep">1</span> 屏
+                                <span class="de-step" id="deModuleName">首屏主视觉</span>
+                            </div>
+                            <div class="de-thumb" id="deThumb">
+                                <div class="placeholder-icon"><i class="fas fa-image"></i></div>
+                            </div>
+                            <div class="de-field">
+                                <label><i class="fas fa-comment-dots"></i> 提示词</label>
+                                <textarea id="dePrompt" placeholder="输入提示词..."></textarea>
+                            </div>
+                            <div class="de-field" style="display:flex; gap:8px;">
+                                <span class="btn-sm primary" style="flex:1; justify-content:center; padding:8px;" onclick="regenerateDetailScreen()">
+                                    <i class="fas fa-redo"></i> 重新生成此屏
+                                </span>
+                            </div>
+                            <div class="detail-screen-nav" id="detailScreenNav"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1334,13 +1752,50 @@
                         <div style="display:flex; gap:8px;">
                             <span class="btn-sm primary" onclick="applyVideo()"><i class="fas fa-check"></i> 应用</span>
                             <span class="btn-sm outline" onclick="downloadVideo()"><i class="fas fa-download"></i> 下载</span>
-                            <span class="btn-sm danger" onclick="retryVideo()"><i class="fas fa-redo"></i> 重试</span>
                         </div>
                     </div>
-                    <div class="video-preview" id="videoPreviewContainer">
-                        <i class="fas fa-play-circle placeholder-icon"></i>
-                        <div class="placeholder-text">暂无视频</div>
-                        <div class="placeholder-sub">生成后将在此展示</div>
+                    <div class="video-split">
+                        <!-- ★ 左：视频预览 -->
+                        <div class="video-preview-half" id="videoPreviewContainer">
+                            <i class="fas fa-play-circle placeholder-icon"></i>
+                            <div class="placeholder-text">暂无视频</div>
+                            <div class="placeholder-sub">生成后将在此展示</div>
+                        </div>
+                        <!-- ★ 右：编辑面板 -->
+                        <div class="video-edit-panel">
+                            <div class="ve-title"><i class="fas fa-edit"></i> 视频编辑</div>
+                            <div class="ve-row">
+                                <div>
+                                    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">
+                                        <i class="fas fa-crop" style="color:var(--accent);"></i> 比例
+                                    </label>
+                                    <div class="ve-select" id="veRatioGroup">
+                                        <button data-ratio="9:16" class="active" onclick="selectVideoRatio(this)">9:16</button>
+                                        <button data-ratio="16:9" onclick="selectVideoRatio(this)">16:9</button>
+                                        <button data-ratio="1:1" onclick="selectVideoRatio(this)">1:1</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">
+                                        <i class="fas fa-hd" style="color:var(--accent);"></i> 画质
+                                    </label>
+                                    <div class="ve-select" id="veQualityGroup">
+                                        <button data-quality="720P" class="active" onclick="selectVideoQuality(this)">720P</button>
+                                        <button data-quality="2K" onclick="selectVideoQuality(this)">2K</button>
+                                        <button data-quality="8K" onclick="selectVideoQuality(this)">8K</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ve-field">
+                                <label><i class="fas fa-comment-dots"></i> 提示词</label>
+                                <textarea id="vePrompt" placeholder="输入视频提示词..."></textarea>
+                            </div>
+                            <div class="ve-field" style="display:flex; gap:8px;">
+                                <span class="btn-sm primary" style="flex:1; justify-content:center; padding:8px;" onclick="regenerateVideo()">
+                                    <i class="fas fa-redo"></i> 重新生成视频
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1517,6 +1972,38 @@
         <div class="product-picker-footer">
             <span id="ppCountInfo">共 0 个商品</span>
             <span style="font-size:11px;color:var(--text-3);">点击商品即可填充</span>
+        </div>
+    </div>
+</div>
+
+<!-- ★ 主副图编辑弹窗 -->
+<div class="edit-img-modal" id="editImgModal" onclick="if(event.target===this) closeEditImgModal()">
+    <div class="edit-img-box">
+        <div class="edit-img-header">
+            <h3><i class="fas fa-edit"></i> 编辑图片 · 第 <span id="editImgIndex">1</span> 张</h3>
+            <button class="close-btn" onclick="closeEditImgModal()" title="关闭">×</button>
+        </div>
+        <div class="edit-img-body">
+            <div class="edit-img-preview" id="editImgPreview">
+                <div class="placeholder-icon"><i class="fas fa-image"></i></div>
+                <span class="badge-pos" id="editImgBadge">图 1</span>
+            </div>
+            <div class="edit-img-form">
+                <div>
+                    <label><i class="fas fa-comment-dots"></i> 提示词</label>
+                    <textarea id="editImgPrompt" placeholder="输入提示词..."></textarea>
+                </div>
+                <div style="font-size:11px;color:var(--text-3);line-height:1.6;">
+                    <i class="fas fa-info-circle"></i>
+                    修改提示词后点「重新生成」会**只重生成这张图**，其它图不变。
+                </div>
+            </div>
+        </div>
+        <div class="edit-img-footer">
+            <span class="btn-lg outline" onclick="closeEditImgModal()">取消</span>
+            <span class="btn-lg primary" id="editImgRegenBtn" onclick="regenerateSingleImage()">
+                <i class="fas fa-redo"></i> 重新生成
+            </span>
         </div>
     </div>
 </div>
@@ -1860,7 +2347,7 @@
             images: state.generatedData.images && state.generatedData.images.length > 0,
             carousel: state.generatedData.images && state.generatedData.images.length > 0,
             copy: state.generatedData.copyVersions && state.generatedData.copyVersions.length > 0,
-            detail: !!state.generatedData.detailHTML,
+            detail: !!state.generatedData.detailImages,
             video: !!state.generatedData.videoUrl,
         };
         for (const t of tabs) { if (map[t]) { switchResultTab(t); return; } }
@@ -2326,6 +2813,7 @@
     function switchResultTab(tab) {
         document.querySelectorAll('.result-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
         document.querySelectorAll('.result-panel').forEach(p => p.classList.toggle('active', p.id === 'result-' + tab));
+        if (tab === 'video') fillVideoEditPanel();
     }
 
     // ================================================================
@@ -2650,8 +3138,8 @@
         throw new Error(data.message || '图片生成失败');
     }
 
-    async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', onProgress) {
-        console.log('📤 [视频] 调用后端代理:', prompt.slice(0, 60) + '...');
+    async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', quality = '720P', onProgress) {
+        console.log('📤 [视频] 调用后端代理:', prompt.slice(0, 60) + '...', 'ratio:', aspectRatio, 'quality:', quality);
 
         if (typeof onProgress === 'function') {
             onProgress(1, 60, 'processing', '生成中（队列满会自动重试）...');
@@ -2664,6 +3152,7 @@
                 prompt: prompt,
                 seconds: String(seconds),
                 aspect_ratio: aspectRatio,
+                quality: quality,
                 reference_images: (referenceImages && referenceImages.length > 0)
                     ? referenceImages.slice(0, 5) : null
             })
@@ -2778,11 +3267,10 @@
             const fallbackData = generateFallbackData(name, category, features, style, platforms);
             const copyVersions = fallbackData.copyVersions;
 
-            // ============ ③ 详情页（★ 真实调 AI 生成 8 张图，全部预留） ============
-            let detailHTML = '';
+            // ============ ③ 详情页 ============
+            let detailImages = [];
             if (state.selectedTypes.includes('detail')) {
                 const detailRatio = '3:4';
-                const detailImages = [];
                 updateProgress(45, `正在生成详情页（8 屏 · ${detailRatio}）...`);
                 let dSuccess = 0, dFail = 0;
 
@@ -2790,54 +3278,18 @@
                     const d = state.detailPrompts[i];
                     try {
                         const url = await generateAgnesImage(d.prompt, '1K', detailRatio, refImages);
-                        detailImages.push({ url, step: d.step, moduleName: d.moduleName });
+                        detailImages.push({ url, step: d.step, moduleName: d.moduleName, prompt: d.prompt });
                         dSuccess++;
                     } catch (err) {
                         console.error(`❌ 详情页第 ${i+1} 屏失败:`, err);
-                        detailImages.push({ url: '', step: d.step, moduleName: d.moduleName, error: err.message });
+                        detailImages.push({ url: '', step: d.step, moduleName: d.moduleName, prompt: d.prompt, error: err.message });
                         dFail++;
                     }
                     updateProgress(45 + (i + 1) / state.detailPrompts.length * 30,
                         `详情页 ${i + 1}/${state.detailPrompts.length}（成功 ${dSuccess}，失败 ${dFail}）`);
                 }
 
-                // ★ 无论成功/失败，都保留 8 屏完整结构（失败屏用同尺寸 3:4 占位）
-                detailHTML = `<div style="max-width:100%;overflow:hidden;line-height:0;">` +
-                    detailImages.map(x => {
-                        if (x.url) {
-                            return `<img src="${x.url}" alt="第${x.step}屏 ${x.moduleName}"
-                                style="width:100%;display:block;margin:0;padding:0;line-height:0;" />`;
-                        }
-                        // 失败屏：保留 3:4 同尺寸占位，不塌缩
-                        return `<div style="
-                            width:100%;
-                            aspect-ratio:3/4;
-                            background:repeating-linear-gradient(45deg,
-                                #f8fafc 0px, #f8fafc 12px,
-                                #f0f4f9 12px, #f0f4f9 24px);
-                            color:#94a3b8;
-                            font-size:14px;
-                            display:flex;
-                            flex-direction:column;
-                            align-items:center;
-                            justify-content:center;
-                            gap:8px;
-                            margin:0;
-                            padding:0;
-                            border:1px dashed #dce5ef;
-                            box-sizing:border-box;
-                            line-height:1.6;
-                        ">
-                            <i class="fas fa-image" style="font-size:32px;color:#c8d4e0;font-style:normal;"></i>
-                            <div style="font-weight:600;color:#5f7d95;">第 ${x.step} 屏 · ${x.moduleName || ''}</div>
-                            <div style="font-size:12px;color:#94a3b8;">生成失败，可稍后重试</div>
-                        </div>`;
-                    }).join('') +
-                `</div>`;
-
-                if (dSuccess === 0) {
-                    console.warn('⚠️ 详情页所有图片生成失败，已保留 8 屏占位');
-                }
+                if (dSuccess === 0) console.warn('⚠️ 详情页所有图片生成失败，已保留 8 屏占位');
             }
 
             // ============ ④ 短视频 ============
@@ -2868,7 +3320,7 @@
                 updateProgress(78, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
                 try {
                     const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
-                    videoUrl = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, (attempt, total, status, text) => {
+                    videoUrl = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, '720P', (attempt, total, status, text) => {
                         const pct = 78 + Math.min(20, (attempt / total) * 20);
                         updateProgress(pct, '视频：' + text);
                     });
@@ -2886,7 +3338,10 @@
                 hideGeneratingOverlay();
                 state.isGenerating = false;
                 const resultData = {
-                    images, copyVersions, detailHTML, videoUrl,
+                    images, copyVersions,
+                    detailImages,
+                    detailHTML: '',
+                    videoUrl,
                     platforms, imageRatio, videoRatio, videoAnalysis,
                     productName: name
                 };
@@ -2895,7 +3350,7 @@
                 addHistory(name, state.selectedTypes, style, platforms);
 
                 const validCount = images.filter(i => i.url).length;
-                const dValid = detailHTML && detailHTML.includes('<img');
+                const dValid = detailImages.some(x => x.url);
                 if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
                     if (validCount === 0) showToast('❌ 图片生成失败，请检查后端服务');
                     else if (validCount < images.length) showToast(`⚠️ 部分图片失败（${validCount}/${images.length}）`);
@@ -2937,7 +3392,7 @@
         document.getElementById('cnt-images').textContent = (data.images || []).filter(i => i.url).length > 0 ? '1' : '0';
         document.getElementById('cnt-carousel').textContent = (data.images || []).filter(i => i.url).length;
         document.getElementById('cnt-copy').textContent = (data.copyVersions || []).length;
-        document.getElementById('cnt-detail').textContent = data.detailHTML && data.detailHTML.includes('<img') ? '1' : '0';
+        document.getElementById('cnt-detail').textContent = (data.detailImages || []).some(x => x.url) ? '1' : '0';
         document.getElementById('cnt-video').textContent = data.videoUrl ? '1' : '0';
 
         if (state.selectedTypes.includes('images') && data.images && data.images.length > 0) {
@@ -2955,17 +3410,18 @@
         } else {
             document.getElementById('copyList').innerHTML = `<div class="empty-state"><i class="fas fa-pen-fancy"></i><p>未生成文案</p></div>`;
         }
-        // ★ 详情页：8 屏全部展示（失败的也保留占位）
-        if (state.selectedTypes.includes('detail') && data.detailHTML) {
-            const preview = document.getElementById('detailPreview');
-            preview.innerHTML = data.detailHTML;
-            preview.style.padding = '0';
-            preview.style.background = 'white';
+        // ★ 详情页：左右分栏 + 单屏编辑
+        if (state.selectedTypes.includes('detail') && data.detailImages) {
+            deCurrentIdx = 0;
+            renderDetailSplit(data.detailImages);
         } else if (state.selectedTypes.includes('detail')) {
-            document.getElementById('detailPreview').innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>详情页未生成</p></div>`;
+            document.getElementById('detailPreview').innerHTML = `<div class="empty-state" style="padding:40px;"><i class="fas fa-file-alt"></i><p>详情页未生成</p></div>`;
+            document.getElementById('detailScreenNav').innerHTML = '';
         } else {
-            document.getElementById('detailPreview').innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>未选择生成详情页</p></div>`;
+            document.getElementById('detailPreview').innerHTML = `<div class="empty-state" style="padding:40px;"><i class="fas fa-file-alt"></i><p>未选择生成详情页</p></div>`;
+            document.getElementById('detailScreenNav').innerHTML = '';
         }
+        // ★ 视频：左右分栏
         const videoContainer = document.getElementById('videoPreviewContainer');
         if (state.selectedTypes.includes('video')) {
             if (data.videoUrl) {
@@ -2973,14 +3429,20 @@
             } else {
                 videoContainer.innerHTML = `
                     <i class="fas fa-exclamation-triangle placeholder-icon" style="color:#f59e0b;"></i>
-                    <div class="placeholder-text">${escapeHtml(productName)} · 视频生成失败</div>
-                    <div class="placeholder-sub">点击右上角「重试」重新生成</div>
+                    <div class="placeholder-text">视频生成失败</div>
+                    <div class="placeholder-sub">在右侧修改提示词后重新生成</div>
                     <div class="placeholder-warn">可能原因：后端接口未实现 / 网络问题 / 队列繁忙</div>
                 `;
             }
         } else {
-            videoContainer.innerHTML = `<div class="empty-state"><i class="fas fa-video"></i><p>未生成视频</p></div>`;
+            videoContainer.innerHTML = `
+                <i class="fas fa-video placeholder-icon"></i>
+                <div class="placeholder-text">未生成视频</div>
+                <div class="placeholder-sub">请在第一步勾选"短视频"</div>
+            `;
         }
+        // ★ 填充视频编辑面板
+        fillVideoEditPanel();
     }
 
     function renderImageGrid(gridId, images, productName, typeName) {
@@ -3003,10 +3465,11 @@
                     <div class="info">
                         <div class="title">${escapeHtml(productName)}</div>
                         <div class="actions">
+                            ${img.url ? `<span class="btn-sm blue" onclick="downloadImage('${img.url}', '${typeName}${i+1}.png')" title="下载"><i class="fas fa-download"></i></span>` : ''}
+                            <span class="btn-sm outline" onclick="openEditImgModal(${i})" title="编辑提示词并重新生成"><i class="fas fa-edit"></i> 编辑</span>
                             ${img.url
-                                ? `<span class="btn-sm blue" onclick="downloadImage('${img.url}', '${typeName}${i+1}.png')"><i class="fas fa-download"></i> 下载</span>
-                                   <span class="btn-sm success" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i> 应用</span>`
-                                : `<span class="btn-sm danger" onclick="retrySingleImage(${i})"><i class="fas fa-redo"></i> 重试</span>`
+                                ? `<span class="btn-sm success" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i></span>`
+                                : `<span class="btn-sm danger" onclick="retrySingleImage(${i})" title="快速重试"><i class="fas fa-redo"></i></span>`
                             }
                         </div>
                     </div>
@@ -3015,6 +3478,313 @@
         }).join('');
     }
 
+    // ================================================================
+    // ★ 主副图编辑弹窗
+    // ================================================================
+    let editImgIndex = -1;
+
+    function openEditImgModal(index) {
+        const r = state.generatedData;
+        if (!r || !r.images || !r.images[index]) { showToast('⚠️ 图片数据丢失'); return; }
+        editImgIndex = index;
+        const img = r.images[index];
+
+        document.getElementById('editImgIndex').textContent = index + 1;
+        document.getElementById('editImgBadge').textContent = '图 ' + (index + 1) + (img.tag ? ' · ' + img.tag : '');
+
+        const preview = document.getElementById('editImgPreview');
+        if (img.url) {
+            preview.innerHTML = `<img src="${img.url}" alt="图${index+1}">
+                <span class="badge-pos">图 ${index+1}${img.tag ? ' · ' + img.tag : ''}</span>`;
+        } else {
+            preview.innerHTML = `<div class="placeholder-icon" style="color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i></div>
+                <span class="badge-pos">图 ${index+1} 失败</span>`;
+        }
+
+        document.getElementById('editImgPrompt').value = img.prompt || '';
+        document.getElementById('editImgModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditImgModal() {
+        document.getElementById('editImgModal').classList.remove('show');
+        document.body.style.overflow = '';
+        editImgIndex = -1;
+    }
+
+    async function regenerateSingleImage() {
+        if (editImgIndex < 0) return;
+        const r = state.generatedData;
+        if (!r || !r.images[editImgIndex]) return;
+
+        const newPrompt = document.getElementById('editImgPrompt').value.trim();
+        if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
+
+        const btn = document.getElementById('editImgRegenBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+
+        const platforms = getSelectedPlatforms();
+        const imageRatio = getImageRatioByPlatforms(platforms);
+        const refImages = state.referenceImages.slice();
+        const style = document.getElementById('designStyle').value;
+
+        try {
+            const url = await generateAgnesImage(newPrompt, '1K', imageRatio, refImages);
+            r.images[editImgIndex] = {
+                ...r.images[editImgIndex],
+                url,
+                prompt: newPrompt,
+                error: null,
+                style
+            };
+            const pName = r.productName || '商品';
+            if (state.selectedTypes.includes('images')) {
+                renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
+            }
+            if (state.selectedTypes.includes('carousel')) {
+                renderImageGrid('carouselGrid', r.images, pName, '轮播图');
+            }
+            document.getElementById('cnt-images').textContent = r.images.filter(i => i.url).length > 0 ? '1' : '0';
+            document.getElementById('cnt-carousel').textContent = r.images.filter(i => i.url).length;
+
+            showToast(`✅ 第 ${editImgIndex + 1} 张已重新生成`);
+            closeEditImgModal();
+        } catch (err) {
+            console.error('❌ 重新生成失败:', err);
+            showToast('❌ 重新生成失败：' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-redo"></i> 重新生成';
+        }
+    }
+
+    // ================================================================
+    // ★ 详情页：左右分栏 + 单屏编辑
+    // ================================================================
+    let deCurrentIdx = 0;
+
+    function renderDetailSplit(detailImages) {
+        const preview = document.getElementById('detailPreview');
+        if (!detailImages || detailImages.length === 0) {
+            preview.innerHTML = '<div class="empty-state" style="padding:40px;"><i class="fas fa-file-alt"></i><p>详情页未生成</p></div>';
+            document.getElementById('detailScreenNav').innerHTML = '';
+            return;
+        }
+
+        preview.innerHTML = detailImages.map((x, i) => {
+            if (x.url) {
+                return `<div class="detail-screen ${i === deCurrentIdx ? 'active' : ''}" data-idx="${i}" onclick="selectDetailScreen(${i})">
+                    <img src="${x.url}" alt="第${x.step}屏 ${x.moduleName}" />
+                    <span class="screen-label">第${x.step}屏 · ${escapeHtml(x.moduleName || '')}</span>
+                </div>`;
+            }
+            return `<div class="detail-screen failed ${i === deCurrentIdx ? 'active' : ''}" data-idx="${i}" onclick="selectDetailScreen(${i})">
+                <i class="fas fa-image"></i>
+                <div class="f-title">第 ${x.step} 屏 · ${escapeHtml(x.moduleName || '')}</div>
+                <div class="f-sub">生成失败，点击右侧编辑面板可重试</div>
+                <span class="screen-label">第${x.step}屏</span>
+            </div>`;
+        }).join('');
+
+        const nav = document.getElementById('detailScreenNav');
+        nav.innerHTML = detailImages.map((x, i) => `
+            <button data-idx="${i}" class="${i === deCurrentIdx ? 'active' : ''} ${x.url ? '' : 'failed'}"
+                onclick="selectDetailScreen(${i})">
+                <span class="nav-dot"></span> ${x.step}
+            </button>
+        `).join('');
+
+        updateDetailEditPanel();
+    }
+
+    function selectDetailScreen(idx) {
+        const r = state.generatedData;
+        if (!r || !r.detailImages) return;
+        deCurrentIdx = idx;
+
+        document.querySelectorAll('#detailPreview .detail-screen').forEach(el => {
+            el.classList.toggle('active', parseInt(el.dataset.idx) === idx);
+        });
+        document.querySelectorAll('#detailScreenNav button').forEach(el => {
+            el.classList.toggle('active', parseInt(el.dataset.idx) === idx);
+        });
+
+        updateDetailEditPanel();
+
+        const target = document.querySelector(`#detailPreview .detail-screen[data-idx="${idx}"]`);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function updateDetailEditPanel() {
+        const r = state.generatedData;
+        if (!r || !r.detailImages || !r.detailImages[deCurrentIdx]) return;
+        const d = r.detailImages[deCurrentIdx];
+
+        document.getElementById('deCurrentStep').textContent = d.step;
+        document.getElementById('deModuleName').textContent = d.moduleName || '';
+
+        const thumb = document.getElementById('deThumb');
+        if (d.url) {
+            thumb.innerHTML = `<img src="${d.url}" alt="第${d.step}屏" />`;
+        } else {
+            thumb.innerHTML = `<div class="placeholder-icon"><i class="fas fa-image"></i></div>`;
+        }
+
+        document.getElementById('dePrompt').value = d.prompt || '';
+    }
+
+    async function regenerateDetailScreen() {
+        const r = state.generatedData;
+        if (!r || !r.detailImages || !r.detailImages[deCurrentIdx]) return;
+        const d = r.detailImages[deCurrentIdx];
+
+        const newPrompt = document.getElementById('dePrompt').value.trim();
+        if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
+
+        showToast(`⏳ 正在重新生成第 ${d.step} 屏...`);
+        d.prompt = newPrompt;
+
+        const refImages = state.referenceImages.slice();
+
+        try {
+            const url = await generateAgnesImage(newPrompt, '1K', '3:4', refImages);
+            d.url = url;
+            d.error = null;
+
+            renderDetailSplit(r.detailImages);
+            rebuildDetailHTML();
+            document.getElementById('cnt-detail').textContent = '1';
+            showToast(`✅ 第 ${d.step} 屏已重新生成`);
+        } catch (err) {
+            console.error('❌ 详情页重生成失败:', err);
+            d.error = err.message;
+            renderDetailSplit(r.detailImages);
+            rebuildDetailHTML();
+            showToast(`❌ 第 ${d.step} 屏重生成失败：${err.message}`);
+        }
+    }
+
+    function rebuildDetailHTML() {
+        const r = state.generatedData;
+        if (!r || !r.detailImages) return;
+        r.detailHTML = `<div style="max-width:100%;overflow:hidden;line-height:0;">` +
+            r.detailImages.map(x => {
+                if (x.url) {
+                    return `<img src="${x.url}" alt="第${x.step}屏 ${x.moduleName}"
+                        style="width:100%;display:block;margin:0;padding:0;line-height:0;" />`;
+                }
+                return `<div style="width:100%;aspect-ratio:3/4;
+                    background:repeating-linear-gradient(45deg,
+                        #f8fafc 0px, #f8fafc 12px,
+                        #f0f4f9 12px, #f0f4f9 24px);
+                    color:#94a3b8;display:flex;flex-direction:column;
+                    align-items:center;justify-content:center;gap:8px;
+                    border:1px dashed #dce5ef;box-sizing:border-box;line-height:1.6;">
+                    <i class="fas fa-image" style="font-size:32px;color:#c8d4e0;font-style:normal;"></i>
+                    <div style="font-weight:600;color:#5f7d95;">第 ${x.step} 屏 · ${x.moduleName || ''}</div>
+                    <div style="font-size:12px;color:#94a3b8;">生成失败，可重试</div>
+                </div>`;
+            }).join('') +
+        `</div>`;
+    }
+
+    // ================================================================
+    // ★ 视频：左右分栏 + 比例/画质/提示词编辑
+    // ================================================================
+    const videoEditState = {
+        ratio: '9:16',
+        quality: '720P'
+    };
+
+    function selectVideoRatio(el) {
+        document.querySelectorAll('#veRatioGroup button').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        videoEditState.ratio = el.dataset.ratio;
+    }
+
+    function selectVideoQuality(el) {
+        document.querySelectorAll('#veQualityGroup button').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        videoEditState.quality = el.dataset.quality;
+    }
+
+    function fillVideoEditPanel() {
+        const r = state.generatedData;
+        if (!r) return;
+
+        let videoPrompt = '';
+        const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+        if (videoConfigState.platform === 'TikTok Shop' || videoConfigState.platform === 'Temu') {
+            videoPrompt = `Real commercial product video, 4K, 60fps, ${cfg.duration}s. `;
+            videoPrompt += state.videoPrompts.map((s, i) => `Shot${i+1}(${s.time} ${s.tag}): ${s.prompt}`).join('. ');
+        } else {
+            videoPrompt = `真实商业实拍短视频，4K，60fps，时长${cfg.duration}秒。`;
+            videoPrompt += state.videoPrompts.map((s, i) => `镜头${i+1}（${s.time} ${s.tag}）：${s.prompt}`).join('。');
+        }
+        const promptEl = document.getElementById('vePrompt');
+        if (promptEl && !promptEl.value) {
+            promptEl.value = videoPrompt;
+        }
+
+        const platforms = getSelectedPlatforms();
+        const videoRatio = getVideoRatioByPlatforms(platforms) || '9:16';
+        videoEditState.ratio = videoRatio;
+        document.querySelectorAll('#veRatioGroup button').forEach(b => {
+            b.classList.toggle('active', b.dataset.ratio === videoRatio);
+        });
+    }
+
+    async function regenerateVideo() {
+        const r = state.generatedData;
+        if (!r) { showToast('⚠️ 请先生成素材'); return; }
+
+        const newPrompt = document.getElementById('vePrompt').value.trim();
+        if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
+
+        const container = document.getElementById('videoPreviewContainer');
+        container.innerHTML = `
+            <i class="fas fa-spinner fa-spin placeholder-icon"></i>
+            <div class="placeholder-text">视频重新生成中...</div>
+            <div class="placeholder-sub">排队中，最长 10 分钟 · ${videoEditState.ratio} · ${videoEditState.quality}</div>
+        `;
+        showToast(`⏳ 正在重新生成视频（${videoEditState.ratio} · ${videoEditState.quality}）...`);
+
+        const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+        const seconds = String(cfg?.duration || 5);
+        const refImages = state.referenceImages.slice();
+        const keyframeUrls = state.keyframeUrls || [];
+        const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
+
+        try {
+            const videoUrl = await generateAgnesVideo(
+                newPrompt,
+                seconds,
+                combinedRefs,
+                videoEditState.ratio,
+                videoEditState.quality
+            );
+            r.videoUrl = videoUrl;
+            document.getElementById('cnt-video').textContent = '1';
+            container.innerHTML = `<video src="${videoUrl}" controls preload="metadata"></video>`;
+            showToast('✅ 视频已重新生成');
+        } catch (err) {
+            console.error('❌ 视频重生成失败:', err);
+            container.innerHTML = `
+                <i class="fas fa-exclamation-triangle placeholder-icon" style="color:#f59e0b;"></i>
+                <div class="placeholder-text">视频生成失败</div>
+                <div class="placeholder-sub">可修改提示词后重试</div>
+                <div class="placeholder-warn">${escapeHtml(err.message)}</div>
+            `;
+            showToast('❌ 视频重生成失败：' + err.message);
+        }
+    }
+
+    // ================================================================
+    // 单张图片重试（快速）
+    // ================================================================
     async function retrySingleImage(idx) {
         const r = state.generatedData;
         if (!r || !r.images[idx]) { showToast('⚠️ 数据已丢失'); return; }
@@ -3049,62 +3819,6 @@
         }
     }
 
-    async function retryVideo() {
-        const r = state.generatedData;
-        if (!r) { showToast('⚠️ 数据已丢失，请重新生成'); return; }
-        const name = r.productName || state.currentProductName || '商品';
-        const platforms = getSelectedPlatforms();
-        const videoRatio = getVideoRatioByPlatforms(platforms);
-        const refImages = state.referenceImages.slice();
-        const keyframeUrls = state.keyframeUrls || [];
-        const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
-        const isEN = videoConfigState.platform === 'TikTok Shop' || videoConfigState.platform === 'Temu';
-
-        let videoPrompt = '';
-        if (isEN) {
-            videoPrompt = `Real commercial product video, 4K, 60fps, ${cfg.duration}s e-commerce selling short video. `;
-            videoPrompt += state.videoPrompts.map((s, i) => `Shot${i+1}(${s.time} ${s.tag}): ${s.prompt}`).join('. ');
-            videoPrompt += `. Camera: slow push shot, slight natural handheld. Light: soft studio natural light, real color. `;
-            videoPrompt += `Category: ${VIDEO_CATEGORY_MODS[videoConfigState.category]}. `;
-            videoPrompt += `Scene: ${VIDEO_SCENE_MODS_EN[videoConfigState.scene] || ''}. `;
-            videoPrompt += `Negative prompt: ${VIDEO_NEGATIVE_EN}`;
-        } else {
-            videoPrompt = `真实商业实拍短视频，4K，60fps，时长${cfg.duration}秒，电商带货短视频。`;
-            videoPrompt += state.videoPrompts.map((s, i) => `镜头${i+1}（${s.time} ${s.tag}）：${s.prompt}`).join('。');
-            videoPrompt += `。运镜：缓慢推拉镜头，轻微自然手持抖动，稳定不晃动。`;
-            videoPrompt += `光影：柔和自然光，色彩真实，原生色彩，不饱和度拉高。`;
-            videoPrompt += `画质：商业产品实拍，细节清晰，无过度磨皮，无塑料质感。`;
-            videoPrompt += `类目：${VIDEO_CATEGORY_MODS[videoConfigState.category]}。`;
-            videoPrompt += `出镜：${VIDEO_SCENE_MODS[videoConfigState.scene] || ''}。`;
-            videoPrompt += `禁止：${VIDEO_NEGATIVE_CN}`;
-        }
-
-        const container = document.getElementById('videoPreviewContainer');
-        container.innerHTML = `
-            <i class="fas fa-spinner fa-spin placeholder-icon"></i>
-            <div class="placeholder-text">视频重试中...</div>
-            <div class="placeholder-sub">排队中，最长 10 分钟</div>
-        `;
-        showToast('⏳ 正在重试视频...');
-        try {
-            const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
-            const videoUrl = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio);
-            r.videoUrl = videoUrl;
-            document.getElementById('cnt-video').textContent = '1';
-            container.innerHTML = `<video src="${videoUrl}" controls preload="metadata"></video>`;
-            showToast('✅ 视频重试成功');
-        } catch (err) {
-            console.error('❌ 视频重试失败:', err);
-            container.innerHTML = `
-                <i class="fas fa-exclamation-triangle placeholder-icon" style="color:#f59e0b;"></i>
-                <div class="placeholder-text">${escapeHtml(name)} · 视频生成失败</div>
-                <div class="placeholder-sub">点击右上角「重试」重新生成</div>
-                <div class="placeholder-warn">${escapeHtml(err.message)}</div>
-            `;
-            showToast('❌ 视频重试失败：' + err.message);
-        }
-    }
-
     function renderCopyList(versions) {
         const list = document.getElementById('copyList');
         list.innerHTML = versions.map((v, idx) => `
@@ -3135,8 +3849,10 @@
     }
     function applyDetail() { showToast('✅ 详情页已应用'); }
     function exportDetailHTML() {
-        const html = document.getElementById('detailPreview').innerHTML;
-        const blob = new Blob([html], { type: 'text/html' });
+        const r = state.generatedData;
+        if (!r || !r.detailImages) { showToast('⚠️ 详情页未生成'); return; }
+        rebuildDetailHTML();
+        const blob = new Blob([r.detailHTML], { type: 'text/html' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob); a.download = 'detail.html'; a.click();
         URL.revokeObjectURL(a.href);
@@ -3320,7 +4036,10 @@
             const idxs = syncState.selectedSubIndexes.length ? syncState.selectedSubIndexes.filter(i => r.images[i] && r.images[i].url) : allValidIdx;
             payload.sub_images = idxs.map(i => r.images[i].url).filter(Boolean);
         }
-        if (wantDetail && r.detailHTML) payload.detail_html = r.detailHTML;
+        if (wantDetail && r.detailImages) {
+            rebuildDetailHTML();
+            payload.detail_html = r.detailHTML;
+        }
         if (wantVideo && r.videoUrl) payload.video = r.videoUrl;
         if (!payload.main_image && !payload.sub_images && !payload.detail_html && !payload.video) {
             showToast('⚠️ 请至少勾选一种有效素材');
@@ -3503,10 +4222,12 @@
             if (e.key === 'Escape') {
                 const picker = document.getElementById('productPickerModal');
                 if (picker.classList.contains('show')) closeProductPicker();
+                const editImg = document.getElementById('editImgModal');
+                if (editImg.classList.contains('show')) closeEditImgModal();
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（详情页 8 屏全部预留 · 走后端代理）');
+        console.log('🎨 智能素材生成已就绪（主副图编辑弹窗 + 详情页左右分栏 + 视频左右分栏）');
         console.log('💡 后端:', BACKEND_URL);
     });
 
@@ -3563,7 +4284,15 @@
     window.copyFullPrompt = copyFullPrompt;
     window.renderVideoScript = renderVideoScript;
     window.retrySingleImage = retrySingleImage;
-    window.retryVideo = retryVideo;
+    // ★ 新增暴露
+    window.openEditImgModal = openEditImgModal;
+    window.closeEditImgModal = closeEditImgModal;
+    window.regenerateSingleImage = regenerateSingleImage;
+    window.selectDetailScreen = selectDetailScreen;
+    window.regenerateDetailScreen = regenerateDetailScreen;
+    window.selectVideoRatio = selectVideoRatio;
+    window.selectVideoQuality = selectVideoQuality;
+    window.regenerateVideo = regenerateVideo;
 </script>
 </body>
 </html>
