@@ -230,7 +230,6 @@
         .prompt-panel { display: none; }
         .prompt-panel.active { display: block; }
 
-        /* ====== 提示词列表（主副图 & 详情页共用） ====== */
         .detail-prompts { display: flex; flex-direction: column; gap: 8px; }
         .detail-prompt-item {
             display: grid;
@@ -242,8 +241,6 @@
             border-radius: 10px;
             padding: 10px 12px;
         }
-
-        /* 暗淡图片背景 + 序号 */
         .detail-prompt-item .step {
             position: relative;
             width: 72px;
@@ -274,7 +271,6 @@
             line-height: 1;
             text-shadow: 0 1px 0 rgba(255,255,255,0.6);
         }
-
         .detail-prompt-item .body {
             display: flex;
             flex-direction: column;
@@ -309,16 +305,13 @@
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-soft);
         }
-
         .detail-prompt-item textarea::placeholder,
         .video-shot .content textarea::placeholder {
             color: #c8d4e0;
             font-style: italic;
         }
 
-        /* ============================================================
-           ★ 短视频配置面板
-           ============================================================ */
+        /* ★ 短视频配置面板 */
         .video-config-card {
             background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
             border: 1px solid #d8e8fb;
@@ -326,7 +319,6 @@
             padding: 16px 18px;
             margin-bottom: 14px;
         }
-
         .video-config-row {
             display: flex;
             gap: 10px;
@@ -335,7 +327,6 @@
             margin-bottom: 12px;
         }
         .video-config-row:last-child { margin-bottom: 0; }
-
         .video-config-label {
             font-size: 12px;
             font-weight: 600;
@@ -346,12 +337,7 @@
             align-items: center;
             gap: 4px;
         }
-
-        .pill-group {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
+        .pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
         .pill-btn {
             padding: 6px 14px;
             border-radius: 20px;
@@ -368,23 +354,9 @@
             align-items: center;
             gap: 4px;
         }
-        .pill-btn:hover {
-            border-color: var(--accent);
-            color: #2a7faa;
-            background: #f5f9fe;
-        }
-        .pill-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            font-weight: 600;
-        }
-        .pill-btn.active::after {
-            content: '✓';
-            font-size: 10px;
-            margin-left: 2px;
-        }
-
+        .pill-btn:hover { border-color: var(--accent); color: #2a7faa; background: #f5f9fe; }
+        .pill-btn.active { background: var(--primary); border-color: var(--primary); color: white; font-weight: 600; }
+        .pill-btn.active::after { content: '✓'; font-size: 10px; margin-left: 2px; }
         .video-config-actions {
             display: flex;
             gap: 8px;
@@ -394,7 +366,6 @@
             margin-top: 12px;
             flex-wrap: wrap;
         }
-
         .video-script-preview {
             background: white;
             border: 1px solid var(--border);
@@ -402,7 +373,6 @@
             padding: 12px 14px;
             margin-bottom: 14px;
         }
-
         .video-shot-item {
             display: grid;
             grid-template-columns: 80px 1fr;
@@ -411,7 +381,6 @@
             border-bottom: 1px dashed #f0f4f9;
         }
         .video-shot-item:last-child { border-bottom: none; }
-
         .video-shot-item .shot-label {
             display: flex;
             flex-direction: column;
@@ -426,27 +395,10 @@
             height: fit-content;
             align-self: flex-start;
         }
-        .video-shot-item .shot-label .shot-num {
-            font-size: 11px;
-            opacity: 0.85;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .video-shot-item .shot-label .shot-time {
-            font-size: 14px;
-            font-weight: 800;
-        }
-        .video-shot-item .shot-label .shot-tag {
-            font-size: 10px;
-            opacity: 0.9;
-        }
-
-        .video-shot-item .shot-content {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            min-width: 0;
-        }
+        .video-shot-item .shot-label .shot-num { font-size: 11px; opacity: 0.85; font-weight: 600; letter-spacing: 0.5px; }
+        .video-shot-item .shot-label .shot-time { font-size: 14px; font-weight: 800; }
+        .video-shot-item .shot-label .shot-tag { font-size: 10px; opacity: 0.9; }
+        .video-shot-item .shot-content { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
         .video-shot-item .shot-title {
             font-size: 12px;
             font-weight: 600;
@@ -484,11 +436,7 @@
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-soft);
         }
-        .video-shot-item textarea::placeholder {
-            color: #c8d4e0;
-            font-style: italic;
-        }
-
+        .video-shot-item textarea::placeholder { color: #c8d4e0; font-style: italic; }
         .video-global-params {
             background: #fafcfe;
             border: 1px solid var(--border);
@@ -514,7 +462,6 @@
             color: var(--text-2);
             word-break: break-word;
         }
-
         .full-prompt-box {
             background: #0a1e2f;
             color: #e2e8f0;
@@ -533,7 +480,6 @@
         .full-prompt-box.show { display: block; }
         .full-prompt-box::-webkit-scrollbar { width: 6px; }
         .full-prompt-box::-webkit-scrollbar-thumb { background: #2a4a6a; border-radius: 10px; }
-
         .btn-mini {
             padding: 5px 12px;
             border-radius: 16px;
@@ -549,19 +495,10 @@
             gap: 4px;
             transition: 0.15s;
         }
-        .btn-mini:hover {
-            border-color: var(--accent);
-            color: #2a7faa;
-            background: #f5f9fe;
-        }
-        .btn-mini.primary {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
+        .btn-mini:hover { border-color: var(--accent); color: #2a7faa; background: #f5f9fe; }
+        .btn-mini.primary { background: var(--primary); border-color: var(--primary); color: white; }
         .btn-mini.primary:hover { background: var(--primary-hover); }
 
-        /* 旧版视频剧本样式（保留兼容） */
         .video-script { display: flex; flex-direction: column; gap: 8px; }
         .video-shot {
             display: grid; grid-template-columns: 60px 1fr;
@@ -595,22 +532,9 @@
         }
         .platform-tag:hover { border-color: var(--accent); }
         .platform-tag.active { background: var(--primary); border-color: var(--primary); color: white; }
-        .platform-tag.highlight {
-            border-color: var(--accent);
-            background: var(--accent-soft);
-            color: #2a7faa;
-        }
-        .platform-tag.highlight.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-        .platform-tag.highlight::after {
-            content: '★';
-            font-size: 9px;
-            color: var(--accent);
-            margin-left: 2px;
-        }
+        .platform-tag.highlight { border-color: var(--accent); background: var(--accent-soft); color: #2a7faa; }
+        .platform-tag.highlight.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .platform-tag.highlight::after { content: '★'; font-size: 9px; color: var(--accent); margin-left: 2px; }
         .platform-tag.highlight.active::after { color: #fff; }
 
         .upload-zone {
@@ -1027,6 +951,21 @@
             font-size: 12px; color: var(--text-3); flex-shrink: 0;
         }
 
+        /* ★ 图片失败角标 */
+        .img-error-tip {
+            position: absolute;
+            bottom: 4px; left: 4px; right: 4px;
+            background: rgba(181,26,63,0.92);
+            color: white;
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            z-index: 2;
+        }
+
         @media (max-width: 1200px) {
             .image-grid { grid-template-columns: repeat(3, 1fr); }
             .sub-picker { grid-template-columns: repeat(4, 1fr); }
@@ -1247,10 +1186,8 @@
                     </div>
                     <div class="prompt-panel" id="prompt-video">
 
-                        <!-- ★ 短视频配置面板 -->
                         <div class="video-config-card">
 
-                            <!-- 平台自动适配 -->
                             <div class="video-config-row">
                                 <span class="video-config-label"><i class="fas fa-globe"></i> 平台</span>
                                 <div class="pill-group" id="videoPlatformGroup">
@@ -1260,7 +1197,6 @@
                                 </div>
                             </div>
 
-                            <!-- 类目修饰 -->
                             <div class="video-config-row">
                                 <span class="video-config-label"><i class="fas fa-tag"></i> 类目</span>
                                 <div class="pill-group" id="videoCategoryGroup">
@@ -1271,7 +1207,6 @@
                                 </div>
                             </div>
 
-                            <!-- 钩子类型 -->
                             <div class="video-config-row">
                                 <span class="video-config-label"><i class="fas fa-fire"></i> 钩子</span>
                                 <div class="pill-group" id="videoHookGroup">
@@ -1282,7 +1217,6 @@
                                 </div>
                             </div>
 
-                            <!-- ★ 出镜方式（新增 东方人物全景 / 海外人物全景） -->
                             <div class="video-config-row">
                                 <span class="video-config-label"><i class="fas fa-hand-paper"></i> 出镜</span>
                                 <div class="pill-group" id="videoSceneGroup">
@@ -1294,7 +1228,6 @@
                                 </div>
                             </div>
 
-                            <!-- 一键按钮 -->
                             <div class="video-config-actions">
                                 <button class="one-click-btn" onclick="handleOneClickVideoScript()">
                                     <i class="fas fa-magic"></i> 一键生成视频剧本
@@ -1310,14 +1243,10 @@
                                 </span>
                             </div>
 
-                            <!-- 完整 Prompt 预览 -->
                             <div class="full-prompt-box" id="fullPromptBox"></div>
                         </div>
 
-                        <!-- ★ 分镜头剧本（5 段） -->
                         <div class="video-script-preview" id="videoScript"></div>
-
-                        <!-- ★ 全局参数预览 -->
                         <div class="video-global-params" id="videoGlobalParams"></div>
 
                     </div>
@@ -1394,6 +1323,7 @@
                         <div style="display:flex; gap:8px;">
                             <span class="btn-sm primary" onclick="applyVideo()"><i class="fas fa-check"></i> 应用</span>
                             <span class="btn-sm outline" onclick="downloadVideo()"><i class="fas fa-download"></i> 下载</span>
+                            <span class="btn-sm danger" onclick="retryVideo()"><i class="fas fa-redo"></i> 重试</span>
                         </div>
                     </div>
                     <div class="video-preview" id="videoPreviewContainer">
@@ -1468,7 +1398,7 @@
                     <span class="platform-tag active" data-platform="Shopee" onclick="togglePlatform(this)">🛒 Shopee</span>
                 </div>
                 <div style="font-size:11px; color:var(--text-3); margin-top:8px;">
-                    <i class="fas fa-info-circle"></i> ★ 标记的平台有专属提示词模板（淘宝/抖音 5张3:4 · TikTok Shop 5张1:1 · Temu 8张1:1），其余平台用通用模板
+                    <i class="fas fa-info-circle"></i> ★ 标记的平台有专属提示词模板
                 </div>
             </div>
 
@@ -1586,11 +1516,7 @@
     // ================================================================
     // 常量
     // ================================================================
-    const AGNES_API_BASE = 'https://apihub.agnes-ai.com/v1';
-    const AGNES_IMAGE_MODEL = 'agnes-image-2.5-flash';
-    const AGNES_VIDEO_MODEL = 'agnes-video-2.5-flash';
     const BACKEND_URL = 'https://ai-ecommerce-backend-production-0776.up.railway.app';
-    const AGNES_API_KEY_DEFAULT = 'sk-XmLjN9e3Mhh8wf';
 
     const REF_VIDEO_MAX = 1;
     const REF_VIDEO_MAX_SIZE = 20 * 1024 * 1024;
@@ -1627,10 +1553,6 @@
         'Shopify':    { imageRatio: '1:1',  videoRatio: '16:9' },
         'Shopee':     { imageRatio: '1:1',  videoRatio: '9:16' }
     };
-
-    function getAgnesApiKey() {
-        return AGNES_API_KEY_DEFAULT;
-    }
 
     const PLATFORM_COUNT_RULE = {
         '淘宝': 5,
@@ -1758,7 +1680,8 @@
         currentPlatform: '淘宝',
         carouselPrompts: [],
         detailPrompts: [],
-        videoPrompts: []
+        videoPrompts: [],
+        currentProductName: ''
     };
 
     const syncState = {
@@ -1791,14 +1714,6 @@
         clearTimeout(toast._timer);
         toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
     }
-    function fileToDataUrl(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = e => resolve(e.target.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
-    }
     function dataUrlToBlob(dataUrl) {
         const [header, base64] = dataUrl.split(',');
         const mime = header.match(/:(.*?);/)[1];
@@ -1819,7 +1734,6 @@
         el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
     }
 
-    // 收集变量
     function collectVars() {
         const name = (document.getElementById('productName').value || '').trim() || '商品';
         const featStr = (document.getElementById('productFeatures').value || '').trim();
@@ -1833,7 +1747,6 @@
         };
     }
 
-    // 一键生成提示词（主副图 + 详情页 + 视频剧本）
     function handleOneClickPrompts() {
         const v = collectVars();
         const platform = state.currentPlatform;
@@ -1850,10 +1763,7 @@
 
         renderCarouselPrompts();
         renderDetailPrompts();
-
-        // 视频剧本
         handleOneClickVideoScript();
-
         updateTabCounts();
 
         showToast(`⚡ 已根据「${v.name}」生成 ${count} 张主副图 + 8 屏详情 + 视频剧本`);
@@ -2371,11 +2281,6 @@
         }
     }
 
-    function updateCarouselPrompt(idx, val) {
-        while (state.carouselPrompts.length <= idx) state.carouselPrompts.push('');
-        state.carouselPrompts[idx] = val;
-    }
-
     function renderDetailPrompts() {
         const container = document.getElementById('detailPrompts');
         if (state.detailPrompts.length === 0) {
@@ -2400,7 +2305,6 @@
             container.querySelectorAll('textarea').forEach(autoGrowTextarea);
         });
     }
-    function updateDetailPrompt(idx, val) { state.detailPrompts[idx].prompt = val; }
 
     function resetAllPrompts() {
         if (!confirm('确定重置所有提示词为默认值？')) return;
@@ -2416,7 +2320,6 @@
     // ================================================================
     // ★ 短视频配置系统
     // ================================================================
-
     const VIDEO_PLATFORM_CONFIG = {
         '抖音': {
             duration: 22,
@@ -2463,7 +2366,6 @@
         '开箱': (v) => `开箱瞬间特写，缓缓打开${v.name}包装，仪式感强，${v.sell1}`
     };
 
-    // ★ 出镜方式修饰（新增 东方人物全景 / 海外人物全景）
     const VIDEO_SCENE_MODS = {
         '手部': '干净白皙的手演示产品，只拍手部，不露出人脸',
         '无人物': '只拍摄产品，无任何人物出镜',
@@ -2472,7 +2374,6 @@
         '海外人物全景': '欧美面孔模特全景出镜，自然使用产品，五官清晰，欧美面孔，全身或半身完整入镜，自然光'
     };
 
-    // 英文版出镜修饰
     const VIDEO_SCENE_MODS_EN = {
         '手部': 'Clean hands demo the product, only hands shown, no face',
         '无人物': 'Product only, no human in frame',
@@ -2499,7 +2400,6 @@
         updateVideoDurationHint();
         rebuildVideoScript();
     }
-
     function selectVideoCategory(el) {
         document.querySelectorAll('#videoCategoryGroup .pill-btn').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
@@ -2508,7 +2408,6 @@
             handleOneClickVideoScript();
         }
     }
-
     function selectVideoHook(el) {
         document.querySelectorAll('#videoHookGroup .pill-btn').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
@@ -2517,7 +2416,6 @@
             handleOneClickVideoScript();
         }
     }
-
     function selectVideoScene(el) {
         document.querySelectorAll('#videoSceneGroup .pill-btn').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
@@ -2526,7 +2424,6 @@
             handleOneClickVideoScript();
         }
     }
-
     function updateVideoDurationHint() {
         const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
         const hint = document.getElementById('videoDurationHint');
@@ -2534,16 +2431,11 @@
             hint.textContent = `当前：${videoConfigState.platform} · ${cfg.duration}s · 分镜 ${cfg.timeline.length} 段`;
         }
     }
-
     function rebuildVideoScript() {
         const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
         if (!cfg) return;
         state.videoPrompts = cfg.timeline.map(t => ({
-            time: t.time,
-            type: t.type,
-            tag: t.tag,
-            hint: t.hint,
-            prompt: ''
+            time: t.time, type: t.type, tag: t.tag, hint: t.hint, prompt: ''
         }));
         renderVideoScript();
     }
@@ -2554,93 +2446,56 @@
         const category = videoConfigState.category;
         const hook = videoConfigState.hook;
         const scene = videoConfigState.scene;
-
         const cfg = VIDEO_PLATFORM_CONFIG[platform];
         if (!cfg) { showToast('⚠️ 平台配置缺失'); return; }
 
         const isEN = platform === 'TikTok Shop' || platform === 'Temu';
         const categoryMod = VIDEO_CATEGORY_MODS[category] || '';
         const sceneMod = isEN ? (VIDEO_SCENE_MODS_EN[scene] || '') : (VIDEO_SCENE_MODS[scene] || '');
-
         const prompts = [];
 
-        // ① 钩子
-        let hookText;
-        if (isEN) {
-            hookText = `Hook shot: macro close-up, ${v.sell1}, eye-catching opening`;
-        } else {
-            hookText = VIDEO_HOOK_TEMPLATES[hook] ? VIDEO_HOOK_TEMPLATES[hook](v) : `微距特写，${v.sell1}，快速抓眼球`;
-        }
+        let hookText = isEN
+            ? `Hook shot: macro close-up, ${v.sell1}, eye-catching opening`
+            : (VIDEO_HOOK_TEMPLATES[hook] ? VIDEO_HOOK_TEMPLATES[hook](v) : `微距特写，${v.sell1}，快速抓眼球`);
         prompts.push(hookText + (categoryMod ? `，${categoryMod}` : ''));
 
-        // ② 产品全景
-        let fullText;
-        if (isEN) {
-            fullText = `Top view full display of ${v.name}, complete product view, clean composition`;
-        } else {
-            fullText = `俯拍全景，${v.name}完整展示，干净构图`;
-        }
-        prompts.push(fullText);
+        prompts.push(isEN
+            ? `Top view full display of ${v.name}, complete product view, clean composition`
+            : `俯拍全景，${v.name}完整展示，干净构图`);
 
-        // ③ 细节特写
-        let detailText;
-        if (isEN) {
-            detailText = `Macro close-up of ${v.name} texture detail, show ${v.advantage}`;
-        } else {
-            detailText = `特写细节，展示${v.name}的${v.advantage}质感，微距拍摄`;
-        }
-        prompts.push(detailText);
+        prompts.push(isEN
+            ? `Macro close-up of ${v.name} texture detail, show ${v.advantage}`
+            : `特写细节，展示${v.name}的${v.advantage}质感，微距拍摄`);
 
-        // ④ 场景演示（仅 5 段的平台）
         if (cfg.timeline.length >= 5) {
-            let sceneText;
-            if (isEN) {
-                sceneText = `Usage demo in ${v.scene}, natural lifestyle scene, ${sceneMod}`;
-            } else {
-                sceneText = `${v.scene}实景使用演示，自然生活化，${sceneMod}`;
-            }
-            prompts.push(sceneText);
+            prompts.push(isEN
+                ? `Usage demo in ${v.scene}, natural lifestyle scene, ${sceneMod}`
+                : `${v.scene}实景使用演示，自然生活化，${sceneMod}`);
         }
 
-        // ⑤ 结尾
-        let endText;
-        if (isEN) {
-            endText = `End card with product display and call-to-action text, guide to purchase`;
-        } else {
-            endText = `效果展示 + 字幕引导"点击下方链接购买"，商品整体展示，${v.sell2}`;
-        }
-        prompts.push(endText);
+        prompts.push(isEN
+            ? `End card with product display and call-to-action text, guide to purchase`
+            : `效果展示 + 字幕引导"点击下方链接购买"，商品整体展示，${v.sell2}`);
 
         state.videoPrompts = cfg.timeline.map((t, i) => ({
-            time: t.time,
-            type: t.type,
-            tag: t.tag,
-            hint: t.hint,
-            prompt: prompts[i] || ''
+            time: t.time, type: t.type, tag: t.tag, hint: t.hint, prompt: prompts[i] || ''
         }));
 
         renderVideoScript();
         renderVideoGlobalParams();
         updateVideoDurationHint();
-
         showToast(`⚡ 已生成「${platform} · ${cfg.duration}s」完整视频剧本（${cfg.timeline.length} 段）`);
     }
 
     function renderVideoScript() {
         const container = document.getElementById('videoScript');
         if (!container) return;
-
         if (state.videoPrompts.length === 0) {
             const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
             state.videoPrompts = cfg.timeline.map(t => ({
-                time: t.time,
-                type: t.type,
-                tag: t.tag,
-                hint: t.hint,
-                prompt: ''
+                time: t.time, type: t.type, tag: t.tag, hint: t.hint, prompt: ''
             }));
         }
-
         container.innerHTML = state.videoPrompts.map((v, i) => `
             <div class="video-shot-item">
                 <div class="shot-label">
@@ -2659,7 +2514,6 @@
                 </div>
             </div>
         `).join('');
-
         requestAnimationFrame(() => {
             container.querySelectorAll('textarea').forEach(autoGrowTextarea);
         });
@@ -2668,12 +2522,10 @@
     function renderVideoGlobalParams() {
         const container = document.getElementById('videoGlobalParams');
         if (!container) return;
-
         const platform = videoConfigState.platform;
         const category = videoConfigState.category;
         const scene = videoConfigState.scene;
         const isEN = platform === 'TikTok Shop' || platform === 'Temu';
-
         const sceneMod = isEN ? (VIDEO_SCENE_MODS_EN[scene] || '') : (VIDEO_SCENE_MODS[scene] || '');
 
         const rows = [
@@ -2685,7 +2537,6 @@
             { key: '出镜方式', val: sceneMod },
             { key: '负面词', val: isEN ? VIDEO_NEGATIVE_EN : VIDEO_NEGATIVE_CN }
         ];
-
         container.innerHTML = rows.map(r => `
             <div class="param-row">
                 <span class="param-key">${r.key}</span>
@@ -2697,12 +2548,11 @@
     function previewFullPrompt() {
         const box = document.getElementById('fullPromptBox');
         if (!box) return;
-
-        const v = collectVars();
         const platform = videoConfigState.platform;
         const cfg = VIDEO_PLATFORM_CONFIG[platform];
         const isEN = platform === 'TikTok Shop' || platform === 'Temu';
         const scene = videoConfigState.scene;
+        const category = videoConfigState.category;
 
         let prompt = '';
         if (isEN) {
@@ -2712,7 +2562,7 @@
             });
             prompt += `\nCamera movement: slow push shot, slight natural handheld\n`;
             prompt += `Light: soft studio natural light, real color\n`;
-            prompt += `Category: ${VIDEO_CATEGORY_MODS[videoConfigState.category]}\n`;
+            prompt += `Category: ${VIDEO_CATEGORY_MODS[category]}\n`;
             prompt += `Scene: ${VIDEO_SCENE_MODS_EN[scene] || ''}\n`;
             prompt += `\nNegative prompt: ${VIDEO_NEGATIVE_EN}`;
         } else {
@@ -2723,7 +2573,7 @@
             prompt += `\n运镜：缓慢推拉镜头，轻微自然手持抖动，稳定不晃动\n`;
             prompt += `光影：柔和自然光，色彩真实，原生色彩，不饱和度拉高\n`;
             prompt += `画质：商业产品实拍，细节清晰，无过度磨皮，无塑料质感\n`;
-            prompt += `类目：${VIDEO_CATEGORY_MODS[videoConfigState.category]}\n`;
+            prompt += `类目：${VIDEO_CATEGORY_MODS[category]}\n`;
             prompt += `出镜：${VIDEO_SCENE_MODS[scene] || ''}\n`;
             prompt += `\n禁止：${VIDEO_NEGATIVE_CN}`;
         }
@@ -2756,125 +2606,74 @@
     }
 
     // ================================================================
-    // Agnes 图片 / 视频生成
+    // ★★★ 核心修复：Agnes 图片 / 视频生成（改为走后端代理）
     // ================================================================
+
+    // ★ 图片生成 —— 走后端代理，避免 CORS 和 Key 暴露
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
-        const apiKey = getAgnesApiKey();
         const body = {
-            model: AGNES_IMAGE_MODEL,
             prompt: prompt,
             size: sizeTier,
             ratio: ratio,
-            extra_body: { response_format: 'url' }
+            reference_images: (referenceImages && referenceImages.length > 0)
+                ? referenceImages.slice(0, 5) : null
         };
-        if (referenceImages && referenceImages.length > 0) {
-            body.extra_body.image = referenceImages.slice(0, 5);
-            if (!/参考|reference|<Picture/i.test(prompt)) {
-                body.prompt = prompt + '（参考上传的图片风格与主体）';
-            }
-        }
-        const res = await fetch(AGNES_API_BASE + '/images/generations', {
+
+        console.log('📤 调用后端图片代理:', prompt.slice(0, 60) + '...');
+        const res = await fetch(BACKEND_URL + '/api/agnes/generate-image', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
+
         if (!res.ok) {
-            const errText = await res.text();
+            const errText = await res.text().catch(() => '');
+            console.error(`❌ 图片代理报错 (${res.status}):`, errText);
             throw new Error(`图片生成失败 (${res.status}): ${errText.slice(0, 200)}`);
         }
+
         const data = await res.json();
-        if (data.data && data.data[0] && data.data[0].url) return data.data[0].url;
-        if (data.data && data.data[0] && data.data[0].b64_json) return 'data:image/png;base64,' + data.data[0].b64_json;
-        throw new Error('图片生成返回格式异常');
-    }
-
-    async function createVideoTaskWithRetry(apiKey, body, maxRetries = 4) {
-        let lastErr = null;
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            let res;
-            try {
-                res = await fetch(AGNES_API_BASE + '/videos', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-            } catch (netErr) {
-                lastErr = netErr;
-                if (attempt === maxRetries) throw netErr;
-                const wait = 10000 * Math.pow(2, attempt - 1);
-                await new Promise(r => setTimeout(r, wait));
-                continue;
-            }
-            if (res.ok) return await res.json();
-            const status = res.status;
-            const errText = await res.text().catch(() => '');
-            lastErr = new Error(`视频任务创建失败 (${status}): ${errText.slice(0, 300)}`);
-            if (status === 429) throw new Error('视频服务速率限制。请等待 1-2 分钟后再试');
-            const retryable = [502, 503, 504].includes(status);
-            if (!retryable || attempt === maxRetries) throw lastErr;
-            const wait = 10000 * Math.pow(2, attempt - 1);
-            showToast(`⏳ 视频队列繁忙，${Math.round(wait/1000)}s 后重试（${attempt}/${maxRetries}）`);
-            await new Promise(r => setTimeout(r, wait));
+        if (data.success && data.url) {
+            console.log('✅ 图片已生成:', data.url);
+            return data.url;
         }
-        throw lastErr || new Error('视频任务创建失败');
+        console.error('❌ 图片代理返回错误:', data);
+        throw new Error(data.message || '图片生成失败');
     }
 
+    // ★ 视频生成 —— 走后端代理，避免 CORS 和 Key 暴露
     async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', onProgress) {
-        const apiKey = getAgnesApiKey();
-        const hasRefs = referenceImages && referenceImages.length > 0;
-        const body = {
-            model: AGNES_VIDEO_MODEL,
-            prompt: prompt,
-            seconds: String(seconds),
-            mode: hasRefs ? 'reference' : 'text',
-            size: '720P',
-            aspect_ratio: aspectRatio,
-            n: 1
-        };
-        if (hasRefs) {
-            body.images = referenceImages.slice(0, 5);
-            if (!/<Picture\s*\d+/i.test(prompt)) {
-                body.prompt = prompt + '。以 <Picture 1> 中的商品外观、色调和风格为参考，保持主体一致性。';
-            }
+        console.log('📤 调用后端视频代理:', prompt.slice(0, 60) + '...');
+
+        if (typeof onProgress === 'function') {
+            onProgress(1, 60, 'processing', '生成中（队列满会自动重试）...');
         }
-        const createData = await createVideoTaskWithRetry(apiKey, body, 4);
-        const videoId = createData.video_id;
-        if (!videoId) throw new Error('创建任务未返回 video_id');
-        const maxAttempts = 300, intervalMs = 2000;
-        let lastStatus = '';
-        for (let i = 0; i < maxAttempts; i++) {
-            await new Promise(r => setTimeout(r, intervalMs));
-            let queryRes;
-            try {
-                queryRes = await fetch(`https://apihub.agnes-ai.com/agnesapi?video_id=${encodeURIComponent(videoId)}&model_name=${encodeURIComponent(AGNES_VIDEO_MODEL)}`,
-                    { headers: { 'Authorization': 'Bearer ' + apiKey } });
-            } catch { continue; }
-            if (!queryRes.ok) {
-                if (queryRes.status === 401 || queryRes.status === 403) throw new Error(`鉴权失败`);
-                if (queryRes.status === 404) throw new Error(`video_id 无效`);
-                continue;
-            }
-            const qd = await queryRes.json();
-            const status = qd.status;
-            lastStatus = status || lastStatus;
-            let statusText = '';
-            if (status === 'pending' || status === 'queued') statusText = `排队中...`;
-            else if (status === 'processing' || status === 'running') {
-                const pct = (typeof qd.progress === 'number') ? qd.progress : Math.min(99, Math.round((i / maxAttempts) * 100));
-                statusText = `生成中... (${pct}%)`;
-            } else statusText = `状态：${status}`;
-            if (typeof onProgress === 'function') onProgress(i + 1, maxAttempts, status, statusText);
-            if (status === 'completed') {
-                const url = qd.url;
-                if (url) return url;
-                throw new Error('视频已完成但未返回 URL');
-            }
-            if (status === 'failed') {
-                const errMsg = (qd.error && (qd.error.message || qd.error.code)) || qd.error || '未知错误';
-                throw new Error('视频生成失败：' + errMsg);
-            }
+
+        const res = await fetch(BACKEND_URL + '/api/agnes/generate-video', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt: prompt,
+                seconds: String(seconds),
+                aspect_ratio: aspectRatio,
+                reference_images: (referenceImages && referenceImages.length > 0)
+                    ? referenceImages.slice(0, 5) : null
+            })
+        });
+
+        if (!res.ok) {
+            const errText = await res.text().catch(() => '');
+            console.error(`❌ 视频代理报错 (${res.status}):`, errText);
+            throw new Error(`视频生成失败 (${res.status}): ${errText.slice(0, 200)}`);
         }
-        throw new Error(`视频生成超时（最后状态：${lastStatus}）`);
+
+        const data = await res.json();
+        if (data.success && data.url) {
+            console.log('✅ 视频已生成:', data.url);
+            return data.url;
+        }
+        console.error('❌ 视频代理返回错误:', data);
+        throw new Error(data.message || '视频生成失败');
     }
 
     // ================================================================
@@ -2890,6 +2689,9 @@
         if (state.carouselPrompts.length === 0 || state.carouselPrompts.every(p => !p)) {
             handleOneClickPrompts();
         }
+
+        // 记录当前商品名，用于重试
+        state.currentProductName = name;
 
         const category = document.getElementById('productCategory').value;
         const features = document.getElementById('productFeatures').value.split(/[,，]/).map(s => s.trim()).filter(Boolean);
@@ -2928,7 +2730,9 @@
             let images = [];
             if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
                 const prompts = state.carouselPrompts.slice(0, state.imageCount);
-                updateProgress(15, `正在调用 Agnes Image 2.5（${state.imageCount} 张 · ${imageRatio}）...`);
+                updateProgress(15, `正在调用 Agnes Image（${state.imageCount} 张 · ${imageRatio}）...`);
+                let successCount = 0, failCount = 0;
+
                 for (let i = 0; i < prompts.length; i++) {
                     try {
                         const url = await generateAgnesImage(prompts[i], '1K', imageRatio, refImages);
@@ -2939,11 +2743,26 @@
                             prompt: prompts[i],
                             tag: getMainTag(i, state.imageCount)
                         });
+                        successCount++;
                     } catch (imgErr) {
-                        console.warn('单张图片生成失败:', imgErr);
-                        images.push({ url: '', style, score: 70, ctr: '3.0', prompt: prompts[i], tag: getMainTag(i, state.imageCount), error: imgErr.message });
+                        console.error(`❌ 第 ${i+1} 张图片生成失败:`, imgErr);
+                        images.push({
+                            url: '', style, score: 0, ctr: '0',
+                            prompt: prompts[i],
+                            tag: getMainTag(i, state.imageCount),
+                            error: imgErr.message || '生成失败'
+                        });
+                        failCount++;
                     }
-                    updateProgress(15 + (i + 1) / prompts.length * 40, `图片 ${i + 1}/${prompts.length} 已生成`);
+                    updateProgress(15 + (i + 1) / prompts.length * 40, `图片 ${i + 1}/${prompts.length} 已处理（成功 ${successCount}，失败 ${failCount}）`);
+                }
+
+                // ★ 图片全部失败时，提前提示
+                if (successCount === 0) {
+                    console.error('❌ 所有图片生成失败');
+                    showToast(`❌ 所有图片生成失败，请检查网络或稍后重试`);
+                } else if (failCount > 0) {
+                    showToast(`⚠️ ${failCount} 张图片生成失败（${successCount}/${prompts.length} 成功）`);
                 }
             }
 
@@ -2953,7 +2772,6 @@
 
             let videoUrl = '';
             if (state.selectedTypes.includes('video')) {
-                // 拼装完整视频 prompt
                 const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
                 const isEN = videoConfigState.platform === 'TikTok Shop' || videoConfigState.platform === 'Temu';
                 let videoPrompt = '';
@@ -2985,9 +2803,9 @@
                     });
                     updateProgress(95, '视频生成完成');
                 } catch (vidErr) {
-                    console.warn('视频生成失败:', vidErr);
+                    console.error('❌ 视频生成失败:', vidErr);
                     videoUrl = '';
-                    showToast('⚠️ 视频：' + vidErr.message);
+                    showToast('⚠️ 视频生成失败：' + vidErr.message);
                 }
             }
 
@@ -2996,15 +2814,36 @@
             setTimeout(() => {
                 hideGeneratingOverlay();
                 state.isGenerating = false;
-                const resultData = { images, copyVersions, detailHTML, videoUrl, platforms, imageRatio, videoRatio, videoAnalysis };
+                const resultData = {
+                    images, copyVersions, detailHTML, videoUrl,
+                    platforms, imageRatio, videoRatio, videoAnalysis,
+                    productName: name,
+                    videoPrompt: state.selectedTypes.includes('video') ? '参考视频剧本' : ''
+                };
                 state.generatedData = resultData;
                 renderResults(resultData, name);
                 addHistory(name, state.selectedTypes, style, platforms);
-                showToast('✅ 素材生成完成');
+
+                // ★ 根据实际结果给不同提示
+                const validCount = images.filter(i => i.url).length;
+                if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
+                    if (validCount === 0) {
+                        showToast('❌ 图片生成失败，请检查后端服务');
+                    } else if (validCount < images.length) {
+                        showToast(`⚠️ 部分图片失败（${validCount}/${images.length} 成功）`);
+                    } else {
+                        showToast('✅ 素材生成完成');
+                    }
+                } else if (!videoUrl && state.selectedTypes.includes('video')) {
+                    showToast('⚠️ 视频生成失败，可重试');
+                } else {
+                    showToast('✅ 素材生成完成');
+                }
                 goStep(2);
             }, 500);
 
         } catch (err) {
+            console.error('❌ 生成失败:', err);
             updateProgress(100, '生成出错');
             setTimeout(() => {
                 hideGeneratingOverlay();
@@ -3080,10 +2919,10 @@
                 videoContainer.innerHTML = `<video src="${data.videoUrl}" controls preload="metadata"></video>`;
             } else {
                 videoContainer.innerHTML = `
-                    <i class="fas fa-play-circle placeholder-icon"></i>
-                    <div class="placeholder-text">${escapeHtml(productName)} · 视频</div>
-                    <div class="placeholder-sub">🎵 轻快流行 · ${data.videoRatio || '9:16'}</div>
-                    <div class="placeholder-warn"><i class="fas fa-exclamation-triangle"></i> 视频生成未完成或失败</div>
+                    <i class="fas fa-exclamation-triangle placeholder-icon" style="color:#f59e0b;"></i>
+                    <div class="placeholder-text">${escapeHtml(productName)} · 视频生成失败</div>
+                    <div class="placeholder-sub">点击右上角「重试」重新生成</div>
+                    <div class="placeholder-warn">可能原因：后端接口未实现 / 网络问题 / 队列繁忙</div>
                 `;
             }
         } else {
@@ -3093,25 +2932,127 @@
 
     function renderImageGrid(gridId, images, productName, typeName) {
         const grid = document.getElementById(gridId);
-        grid.innerHTML = images.map((img, i) => `
-            <div class="image-item">
-                <div class="preview">
-                    ${img.url
-                        ? `<img src="${img.url}" alt="${typeName}${i+1}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                           <div class="placeholder-icon" style="display:none;"><i class="fas fa-image"></i></div>`
-                        : `<div class="placeholder-icon"><i class="fas fa-image"></i></div>`
-                    }
-                    <span class="badge-pos">${typeName}${i + 1}${img.tag ? ' · ' + img.tag : ''}</span>
-                </div>
-                <div class="info">
-                    <div class="title">${escapeHtml(productName)}</div>
-                    <div class="actions">
-                        ${img.url ? `<span class="btn-sm blue" onclick="downloadImage('${img.url}', '${typeName}${i+1}.png')"><i class="fas fa-download"></i> 下载</span>` : ''}
-                        <span class="btn-sm success" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i> 应用</span>
+        grid.innerHTML = images.map((img, i) => {
+            const errTip = img.error
+                ? `<div class="img-error-tip" title="${escapeHtml(img.error)}"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(img.error).slice(0, 30)}</div>`
+                : '';
+            return `
+                <div class="image-item">
+                    <div class="preview">
+                        ${img.url
+                            ? `<img src="${img.url}" alt="${typeName}${i+1}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                               <div class="placeholder-icon" style="display:none;"><i class="fas fa-image"></i></div>`
+                            : `<div class="placeholder-icon" style="color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i></div>`
+                        }
+                        <span class="badge-pos">${typeName}${i + 1}${img.tag ? ' · ' + img.tag : ''}</span>
+                        ${errTip}
+                    </div>
+                    <div class="info">
+                        <div class="title">${escapeHtml(productName)}</div>
+                        <div class="actions">
+                            ${img.url
+                                ? `<span class="btn-sm blue" onclick="downloadImage('${img.url}', '${typeName}${i+1}.png')"><i class="fas fa-download"></i> 下载</span>
+                                   <span class="btn-sm success" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i> 应用</span>`
+                                : `<span class="btn-sm danger" onclick="retrySingleImage(${i})"><i class="fas fa-redo"></i> 重试</span>`
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+    }
+
+    // ★ 单张图片重试
+    async function retrySingleImage(idx) {
+        const r = state.generatedData;
+        if (!r || !r.images[idx]) { showToast('⚠️ 数据已丢失'); return; }
+        const style = document.getElementById('designStyle').value;
+        const platforms = getSelectedPlatforms();
+        const imageRatio = getImageRatioByPlatforms(platforms);
+        const refImages = state.referenceImages.slice();
+
+        showToast(`⏳ 正在重试第 ${idx + 1} 张...`);
+        try {
+            const url = await generateAgnesImage(r.images[idx].prompt, '1K', imageRatio, refImages);
+            r.images[idx] = { ...r.images[idx], url, error: null };
+            // 刷新两个网格
+            const pName = r.productName || '商品';
+            if (state.selectedTypes.includes('images')) {
+                renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
+            }
+            if (state.selectedTypes.includes('carousel')) {
+                renderImageGrid('carouselGrid', r.images, pName, '轮播图');
+            }
+            showToast(`✅ 第 ${idx + 1} 张已重试成功`);
+        } catch (err) {
+            console.error(`❌ 重试失败:`, err);
+            r.images[idx].error = err.message;
+            const pName = r.productName || '商品';
+            if (state.selectedTypes.includes('images')) {
+                renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
+            }
+            if (state.selectedTypes.includes('carousel')) {
+                renderImageGrid('carouselGrid', r.images, pName, '轮播图');
+            }
+            showToast(`❌ 重试失败：${err.message}`);
+        }
+    }
+
+    // ★ 视频重试
+    async function retryVideo() {
+        const r = state.generatedData;
+        if (!r) { showToast('⚠️ 数据已丢失，请重新生成'); return; }
+        const name = r.productName || state.currentProductName || '商品';
+        const platforms = getSelectedPlatforms();
+        const videoRatio = getVideoRatioByPlatforms(platforms);
+        const refImages = state.referenceImages.slice();
+        const keyframeUrls = state.keyframeUrls || [];
+        const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+        const isEN = videoConfigState.platform === 'TikTok Shop' || videoConfigState.platform === 'Temu';
+
+        let videoPrompt = '';
+        if (isEN) {
+            videoPrompt = `Real commercial product video, 4K, 60fps, ${cfg.duration}s e-commerce selling short video. `;
+            videoPrompt += state.videoPrompts.map((s, i) => `Shot${i+1}(${s.time} ${s.tag}): ${s.prompt}`).join('. ');
+            videoPrompt += `. Camera: slow push shot, slight natural handheld. Light: soft studio natural light, real color. `;
+            videoPrompt += `Category: ${VIDEO_CATEGORY_MODS[videoConfigState.category]}. `;
+            videoPrompt += `Scene: ${VIDEO_SCENE_MODS_EN[videoConfigState.scene] || ''}. `;
+            videoPrompt += `Negative prompt: ${VIDEO_NEGATIVE_EN}`;
+        } else {
+            videoPrompt = `真实商业实拍短视频，4K，60fps，时长${cfg.duration}秒，电商带货短视频。`;
+            videoPrompt += state.videoPrompts.map((s, i) => `镜头${i+1}（${s.time} ${s.tag}）：${s.prompt}`).join('。');
+            videoPrompt += `。运镜：缓慢推拉镜头，轻微自然手持抖动，稳定不晃动。`;
+            videoPrompt += `光影：柔和自然光，色彩真实，原生色彩，不饱和度拉高。`;
+            videoPrompt += `画质：商业产品实拍，细节清晰，无过度磨皮，无塑料质感。`;
+            videoPrompt += `类目：${VIDEO_CATEGORY_MODS[videoConfigState.category]}。`;
+            videoPrompt += `出镜：${VIDEO_SCENE_MODS[videoConfigState.scene] || ''}。`;
+            videoPrompt += `禁止：${VIDEO_NEGATIVE_CN}`;
+        }
+
+        const container = document.getElementById('videoPreviewContainer');
+        container.innerHTML = `
+            <i class="fas fa-spinner fa-spin placeholder-icon"></i>
+            <div class="placeholder-text">视频重试中...</div>
+            <div class="placeholder-sub">排队中，最长 10 分钟</div>
+        `;
+        showToast('⏳ 正在重试视频...');
+        try {
+            const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
+            const videoUrl = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio);
+            r.videoUrl = videoUrl;
+            document.getElementById('cnt-video').textContent = '1';
+            container.innerHTML = `<video src="${videoUrl}" controls preload="metadata"></video>`;
+            showToast('✅ 视频重试成功');
+        } catch (err) {
+            console.error('❌ 视频重试失败:', err);
+            container.innerHTML = `
+                <i class="fas fa-exclamation-triangle placeholder-icon" style="color:#f59e0b;"></i>
+                <div class="placeholder-text">${escapeHtml(name)} · 视频生成失败</div>
+                <div class="placeholder-sub">点击右上角「重试」重新生成</div>
+                <div class="placeholder-warn">${escapeHtml(err.message)}</div>
+            `;
+            showToast('❌ 视频重试失败：' + err.message);
+        }
     }
 
     function renderCopyList(versions) {
@@ -3506,7 +3447,6 @@
         updatePlatformToggleBtn();
         renderSyncRecords();
 
-        // ★ 初始化视频配置
         initVideoConfig();
 
         document.addEventListener('keydown', (e) => {
@@ -3516,7 +3456,8 @@
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（新增东方/海外人物全景选项）');
+        console.log('🎨 智能素材生成已就绪（走后端代理 · 支持失败重试）');
+        console.log('💡 后端:', BACKEND_URL);
     });
 
     // 全局暴露
@@ -3532,9 +3473,6 @@
     window.handleFileUpload = handleFileUpload;
     window.handleVideoUpload = handleVideoUpload;
     window.clearReferenceVideo = clearReferenceVideo;
-    window.updateCarouselPrompt = updateCarouselPrompt;
-    window.updateDetailPrompt = updateDetailPrompt;
-    window.updateVideoPrompt = updateVideoPrompt;
     window.resetAllPrompts = resetAllPrompts;
     window.startGenerate = startGenerate;
     window.downloadImage = downloadImage;
@@ -3566,7 +3504,6 @@
     window.handleOneClickPrompts = handleOneClickPrompts;
     window.switchCount = switchCount;
     window.onPromptInput = onPromptInput;
-    // ★ 视频配置
     window.selectVideoPlatform = selectVideoPlatform;
     window.selectVideoCategory = selectVideoCategory;
     window.selectVideoHook = selectVideoHook;
@@ -3575,6 +3512,9 @@
     window.previewFullPrompt = previewFullPrompt;
     window.copyFullPrompt = copyFullPrompt;
     window.renderVideoScript = renderVideoScript;
+    // ★ 新增：重试
+    window.retrySingleImage = retrySingleImage;
+    window.retryVideo = retryVideo;
 </script>
 </body>
 </html>
