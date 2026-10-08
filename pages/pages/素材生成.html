@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI电商素材生产中台｜专业版</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            sidebar: '#0F172A',
+            cardbg: '#ffffff',
+            textMuted: '#64748b',
+            success: '#00B42A',
+            warning: '#FF7D00',
+            danger: '#F53F3F'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto { content-visibility: auto; }
+      .scrollbar-thin::-webkit-scrollbar { width:4px; height:4px; }
+      .scrollbar-thin::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
+      .card-shadow { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+      .drag-ghost { opacity: 0.4; background-color: #b9d6ff; }
+      .drag-chosen { box-shadow: 0 8px 24px rgba(22, 93, 255,0.25); }
+      .tab-active{ border-bottom:2px solid #165DFF; color:#165DFF; font-weight:500; }
+    }
+  </style>
+  <style>
+    /* Lightbox 动画 */
+    @keyframes lbFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes lbZoomIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .lightbox-show { animation: lbFadeIn 0.18s ease; }
+    .lightbox-img-show { animation: lbZoomIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    /* 卡片 Hover 微反馈 */
+    .material-card {
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .material-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.10);
+    }
+
+    /* ★ iframe 子页面布局：不再使用 flex + 侧边栏 */
+    html, body {
+      height: auto;
+      min-height: 100%;
+      overflow: auto;
+    }
+    body {
+      background: #f8fafc;
+      padding: 20px 24px 40px;
+      font-size: 14px;
+    }
+
+    /* ★ 主内容 + 右侧编辑面板的两栏布局 */
+    .app-layout {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .app-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .app-side {
+      width: 320px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+    }
+    .app-side::-webkit-scrollbar { width: 4px; }
+    .app-side::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    @media (max-width: 1100px) {
+      .app-layout { flex-direction: column; }
+      .app-side { width: 100%; position: static; max-height: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       顶部工具条（细条，替代原大顶部导航）
+       只保留跟"素材生成"相关的操作
+       ============================================================ -->
+  <div class="bg-white rounded-lg px-4 py-2.5 card-shadow mb-4 flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-3 flex-wrap">
+      <h1 class="text-base font-bold text-slate-800">AI电商素材生产中台</h1>
+      <span class="bg-blue-50 text-primary text-xs px-2 py-0.5 rounded">专业版 v2.0</span>
+      <div class="h-4 w-px bg-slate-300"></div>
+      <select class="border border-slate-300 rounded px-2 py-1 text-xs bg-white">
+        <option>当前商品：汝窑茶具礼盒</option>
+      </select>
+      <select class="border border-slate-300 rounded px-2 py-1 text-xs bg-white">
+        <option>茶叶旗舰店</option>
+        <option>生鲜芋头店</option>
+        <option>家居茶具店</option>
+      </select>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap">
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-slate-500">API额度：</span>
+        <span class="font-medium">234 / 1000次</span>
+      </div>
+      <button class="bg-primary text-white px-3 py-1 rounded text-xs hover:bg-blue-600 transition">
+        <i class="fa fa-refresh mr-1"></i>同步店铺商品
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       两栏布局：主内容（左） + 编辑面板（右）
+       ============================================================ -->
+  <div class="app-layout">
+
+    <!-- ============ 左：主素材区 ============ -->
+    <div class="app-main">
+
+      <!-- 任务配置栏 -->
+      <div class="bg-white rounded-lg p-4 card-shadow mb-4">
+        <div class="grid grid-cols-5 gap-3 items-end">
+          <div>
+            <label class="text-xs text-slate-600 block mb-1">商品名称</label>
+            <input type="text" class="w-full border border-slate-300 rounded px-3 py-1.5 text-xs" value="汝窑茶具礼盒">
+          </div>
+          <div>
+            <label class="text-xs text-slate-600 block mb-1">核心卖点</label>
+            <input type="text" class="w-full border border-slate-300 rounded px-3 py-1.5 text-xs" placeholder="新中式、送礼礼盒、温润汝瓷">
+          </div>
+          <div>
+            <label class="text-xs text-slate-600 block mb-1">目标平台模板</label>
+            <select class="w-full border border-slate-300 rounded px-3 py-1.5 text-xs bg-white">
+              <option>Temu跨境模板</option>
+              <option>TikTok Shop模板</option>
+              <option>国内抖音小店模板</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-600 block mb-1">生成素材</label>
+            <div class="flex gap-2 text-xs">
+              <label class="flex items-center gap-1"><input type="checkbox" checked>8主副图</label>
+              <label class="flex items-center gap-1"><input type="checkbox" checked>8详情图</label>
+              <label class="flex items-center gap-1"><input type="checkbox" checked>短视频</label>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="bg-primary text-white py-1.5 rounded text-xs hover:bg-blue-600 transition">
+              <i class="fa fa-magic mr-1"></i>一键AI生成全部
+            </button>
+            <button class="border border-slate-300 py-1.5 rounded text-xs hover:bg-slate-50 transition">保存配置模板</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 批量操作工具栏 -->
+      <div class="bg-white rounded p-3 card-shadow mb-4 flex justify-between items-center flex-wrap gap-2">
+        <div class="flex gap-3 items-center flex-wrap">
+          <label class="flex items-center gap-1 text-xs"><input id="checkAll" type="checkbox"> 全选素材</label>
+          <button class="text-xs border border-slate-300 px-2 py-1 rounded hover:bg-slate-50 transition"><i class="fa fa-repeat"></i> 批量重绘选中</button>
+          <button class="text-xs border border-slate-300 px-2 py-1 rounded hover:bg-slate-50 transition"><i class="fa fa-tag"></i> 批量添加标签</button>
+          <button class="text-xs border border-slate-300 px-2 py-1 rounded hover:bg-slate-50 transition"><i class="fa fa-download"></i>批量导出打包</button>
+          <button class="text-xs border border-slate-300 px-2 py-1 rounded text-danger hover:bg-red-50 transition"><i class="fa fa-trash"></i>批量删除</button>
+        </div>
+        <div class="text-xs text-slate-500">💡 卡片支持拖拽排序；点击卡片查看大图，键盘 ← → 快速切换</div>
+      </div>
+
+      <!-- 素材卡片墙 -->
+      <div>
+        <!-- 主副图 拖拽容器 -->
+        <div class="mb-5">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-slate-700 text-sm font-medium">【主副图 8张】</h3>
+            <span class="text-xs text-slate-400">电商主图顺序，拖拽排序，直接对应店铺上传顺序</span>
+          </div>
+          <div id="mainImgContainer" class="grid grid-cols-8 gap-2.5">
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer border-2 border-primary" data-title="主图1·产品全景">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">主图1·产品全景</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="主图2·细节特写">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">主图2·细节特写</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="主图3·场景图">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">主图3·场景图</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="主图4·卖点图">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">主图4·卖点图</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="副图5·礼盒开箱">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">副图5·礼盒开箱</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="副图6·材质">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">副图6·材质</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="副图7·规格">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">副图7·规格</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="副图8·送礼">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">副图8·送礼</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 详情图 拖拽容器 -->
+        <div class="mb-5">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-slate-700 text-sm font-medium">【详情图 8张】</h3>
+            <span class="text-xs text-slate-400">商品详情页长图素材，拖拽调整上下阅读顺序</span>
+          </div>
+          <div id="descImgContainer" class="grid grid-cols-8 gap-2.5">
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="详情1·头图海报">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">详情1·头图海报</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="详情2·产品介绍">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">详情2·产品介绍</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="详情3·工艺">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">详情3·工艺</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="详情4·细节">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">详情4·细节</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="详情5·规格参数">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">详情5·规格参数</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="详情6·场景展示">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">详情6·场景展示</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="详情7·包装">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">详情7·包装</div>
+            </div>
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40" data-title="详情8·售后">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-picture-o text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">详情8·售后</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 短视频素材 -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-slate-700 text-sm font-medium">【带货短视频素材】</h3>
+            <span class="text-xs text-slate-400">AI批量剪辑生成短视频，可单独修改脚本、字幕、BGM</span>
+          </div>
+          <div id="videoContainer" class="grid grid-cols-8 gap-2.5">
+            <div class="material-card bg-white rounded card-shadow overflow-hidden cursor-pointer hover:border-primary/40 col-span-2" data-title="短视频 15~25s">
+              <div class="h-20 bg-slate-100 flex items-center justify-center relative">
+                <input type="checkbox" class="absolute top-1 left-1 z-10">
+                <i class="fa fa-play-circle text-xl text-slate-400"></i>
+              </div>
+              <div class="p-1.5 text-xs">短视频 15~25s</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 右：编辑面板（保留） ============ -->
+    <div class="app-side">
+      <div class="bg-white rounded-lg card-shadow overflow-hidden">
+        <div class="flex border-b border-slate-200">
+          <button class="tab-active px-3 py-2 text-xs">素材编辑</button>
+          <button class="px-3 py-2 text-xs text-slate-500 hover:text-slate-700">版本记录</button>
+          <button class="px-3 py-2 text-xs text-slate-500 hover:text-slate-700">发布配置</button>
+        </div>
+        <div class="p-3">
+          <h3 class="text-sm text-slate-700 mb-2">当前素材：<span id="panelTitle">主图1·产品全景</span></h3>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-slate-500 block mb-1">正面提示词</label>
+              <textarea class="w-full border border-slate-300 rounded p-2 text-xs h-16" placeholder="产品实拍，新中式汝窑茶具，柔和自然光，极简背景，电商主图，高清4K"></textarea>
+            </div>
+            <div>
+              <label class="text-xs text-slate-500 block mb-1">反向提示词</label>
+              <textarea class="w-full border border-slate-300 rounded p-2 text-xs h-10" placeholder="文字乱码，畸形，水印，模糊，低画质"></textarea>
+            </div>
+            <div>
+              <label class="text-xs text-slate-500 block mb-1">快速套用模板</label>
+              <select class="w-full border border-slate-300 rounded p-1.5 text-xs bg-white">
+                <option>Temu商品主图模板</option>
+                <option>TikTok Shop主图模板</option>
+                <option>国内电商白底图模板</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-xs text-slate-500 block mb-1">图片比例</label>
+                <select class="w-full border border-slate-300 rounded p-1.5 text-xs bg-white">
+                  <option>1:1 正方形</option>
+                  <option>3:4 竖版</option>
+                  <option>16:9 横版</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-slate-500 block mb-1">画质</label>
+                <select class="w-full border border-slate-300 rounded p-1.5 text-xs bg-white">
+                  <option>4K高清</option>
+                  <option>2K</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button class="border border-slate-300 rounded py-1.5 text-xs hover:bg-slate-50 transition">重绘当前素材</button>
+              <button class="bg-primary text-white rounded py-1.5 text-xs hover:bg-blue-600 transition">保存并生成新版本</button>
+            </div>
+          </div>
+
+          <div class="border-t mt-4 pt-4">
+            <h3 class="text-sm text-slate-700 mb-2">多平台发布配置</h3>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2 text-xs"><input type="checkbox" checked>抖音小店</label>
+              <label class="flex items-center gap-2 text-xs"><input type="checkbox" checked>TikTok Shop</label>
+              <label class="flex items-center gap-2 text-xs"><input type="checkbox" checked>Temu</label>
+              <label class="flex items-center gap-2 text-xs"><input type="checkbox">视频号小店</label>
+              <label class="flex items-center gap-2 text-xs"><input type="checkbox">Shein</label>
+            </div>
+            <div class="mt-3 space-y-2">
+              <button class="w-full bg-primary text-white py-1.5 rounded text-xs hover:bg-blue-600 transition">
+                <i class="fa fa-paper-plane mr-1"></i>全部素材同步发布
+              </button>
+              <button class="w-full border border-slate-300 py-1.5 rounded text-xs hover:bg-slate-50 transition">仅导出素材打包下载</button>
+            </div>
+          </div>
+
+          <!-- 发布任务队列 -->
+          <div class="border-t mt-4 pt-4">
+            <h4 class="text-xs font-medium mb-2">发布任务队列</h4>
+            <div class="text-xs space-y-1.5">
+              <div class="flex justify-between items-center">
+                <span>主副图8张</span>
+                <span class="text-green-600">待发布</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>详情图8张</span>
+                <span class="text-green-600">待发布</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>带货短视频</span>
+                <span class="text-green-600">待发布</span>
+              </div>
+            </div>
+            <div class="mt-3 bg-slate-50 p-2 rounded">
+              <h4 class="text-xs font-medium mb-1">任务日志</h4>
+              <div class="text-xs text-slate-500 h-16 overflow-auto scrollbar-thin">
+                [10:22] 任务初始化，开始批量生成素材<br/>
+                [10:23] 主图素材生成完成<br/>
+                [10:24] 详情图素材生成完成
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       ★ Lightbox 大图预览
+       ============================================================ -->
+  <div id="lightbox" class="hidden fixed inset-0 bg-black/85 z-[9999] items-center justify-center">
+    <!-- 顶部信息栏 -->
+    <div class="absolute top-0 left-0 right-0 px-6 py-3 flex justify-between items-center text-white text-sm bg-gradient-to-b from-black/50 to-transparent">
+      <div class="flex items-center gap-4">
+        <span id="lbTitle" class="font-medium">主图1·产品全景</span>
+        <span class="text-xs text-slate-300" id="lbMeta">4K · 1:1</span>
+        <span class="text-xs text-slate-400" id="lbCounter">1 / 8</span>
+      </div>
+      <button onclick="closeLightbox()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+
+    <!-- 上一张 -->
+    <button onclick="lbPrev(event)" id="lbPrevBtn"
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition">
+      <i class="fa fa-chevron-left text-lg"></i>
+    </button>
+
+    <!-- 大图显示区 -->
+    <div class="flex items-center justify-center w-full h-full px-20 py-16">
+      <div id="lbImgWrap" class="lightbox-img-show">
+        <img id="lbImg" src="" class="max-w-[80vw] max-h-[78vh] object-contain rounded-lg shadow-2xl" />
+      </div>
+    </div>
+
+    <!-- 下一张 -->
+    <button onclick="lbNext(event)" id="lbNextBtn"
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition">
+      <i class="fa fa-chevron-right text-lg"></i>
+    </button>
+
+    <!-- 底部工具条 -->
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full px-3 py-1.5 flex gap-1 text-white text-xs">
+      <button onclick="lbAction('download')" class="px-3 py-1.5 rounded-full hover:bg-white/20 transition flex items-center gap-1.5">
+        <i class="fa fa-download"></i><span>下载</span>
+      </button>
+      <button onclick="lbAction('redraw')" class="px-3 py-1.5 rounded-full hover:bg-white/20 transition flex items-center gap-1.5">
+        <i class="fa fa-repeat"></i><span>重绘</span>
+      </button>
+      <button onclick="lbAction('edit')" class="px-3 py-1.5 rounded-full hover:bg-white/20 transition flex items-center gap-1.5">
+        <i class="fa fa-edit"></i><span>编辑提示词</span>
+      </button>
+      <div class="w-px bg-white/20 mx-1"></div>
+      <button onclick="lbAction('select')" id="lbSelectBtn" class="px-3 py-1.5 rounded-full hover:bg-white/20 transition flex items-center gap-1.5">
+        <i class="fa fa-check-circle-o"></i><span>选中</span>
+      </button>
+    </div>
+  </div>
+
+<script>
+// ============================================================
+// Sortable 拖拽
+// ============================================================
+const mainImgSort = new Sortable(document.getElementById('mainImgContainer'), {
+  animation: 150, ghostClass: "drag-ghost", chosenClass: "drag-chosen",
+  onEnd: function (evt) { console.log("主副图排序更新", evt.oldIndex, "→", evt.newIndex); }
+})
+const descImgSort = new Sortable(document.getElementById('descImgContainer'), {
+  animation: 150, ghostClass: "drag-ghost", chosenClass: "drag-chosen",
+  onEnd: function (evt) { console.log("详情图排序更新", evt.oldIndex, "→", evt.newIndex); }
+})
+const videoSort = new Sortable(document.getElementById('videoContainer'), {
+  animation: 150, ghostClass: "drag-ghost", chosenClass: "drag-chosen",
+  onEnd: function (evt) { console.log("视频素材排序更新"); }
+})
+
+// ============================================================
+// 卡片点击 → 选中 + 面板同步 + Lightbox
+// ============================================================
+const allCards = document.querySelectorAll('.material-card');
+allCards.forEach(card => {
+  card.addEventListener('click', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+
+    allCards.forEach(c => c.classList.remove('border-2', 'border-primary'));
+    card.classList.add('border-2', 'border-primary');
+
+    const title = card.dataset.title || card.querySelector('.p-1\\.5')?.textContent?.trim() || '素材';
+    document.getElementById('panelTitle').textContent = title;
+
+    openLightbox(card);
+  });
+});
+
+// ============================================================
+// Lightbox 核心逻辑
+// ============================================================
+let lbCards = [];
+let lbIndex = 0;
+
+function openLightbox(card) {
+  const container = card.closest('[id$="Container"]');
+  if (!container) return;
+  lbCards = Array.from(container.querySelectorAll('.material-card'));
+  lbIndex = lbCards.indexOf(card);
+  if (lbIndex < 0) lbIndex = 0;
+
+  const lb = document.getElementById('lightbox');
+  lb.classList.remove('hidden');
+  lb.classList.add('flex', 'lightbox-show');
+
+  renderLightbox();
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('lightbox');
+  lb.classList.add('hidden');
+  lb.classList.remove('flex', 'lightbox-show');
+}
+
+function renderLightbox() {
+  if (lbIndex < 0 || lbIndex >= lbCards.length) return;
+  const card = lbCards[lbIndex];
+
+  const title = card.dataset.title || card.querySelector('.p-1\\.5')?.textContent?.trim() || '素材';
+  document.getElementById('lbTitle').textContent = title;
+
+  const imgEl = card.querySelector('img');
+  const lbImg = document.getElementById('lbImg');
+
+  if (imgEl && imgEl.src) {
+    lbImg.src = imgEl.src;
+  } else {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+      <defs>
+        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f1f5f9"/>
+          <stop offset="100%" stop-color="#e2e8f0"/>
+        </linearGradient>
+      </defs>
+      <rect width="900" height="900" fill="url(#g)"/>
+      <text x="50%" y="48%" text-anchor="middle" fill="#94a3b8" font-size="80" font-family="sans-serif">📷</text>
+      <text x="50%" y="56%" text-anchor="middle" fill="#64748b" font-size="28" font-family="sans-serif" font-weight="500">${escapeXml(title)}</text>
+      <text x="50%" y="62%" text-anchor="middle" fill="#94a3b8" font-size="18" font-family="sans-serif">预览占位 · 待生成</text>
+    </svg>`;
+    lbImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+
+  document.getElementById('lbCounter').textContent = `${lbIndex + 1} / ${lbCards.length}`;
+  document.getElementById('lbPrevBtn').style.opacity = lbIndex === 0 ? '0.3' : '1';
+  document.getElementById('lbNextBtn').style.opacity = lbIndex === lbCards.length - 1 ? '0.3' : '1';
+
+  const wrap = document.getElementById('lbImgWrap');
+  wrap.classList.remove('lightbox-img-show');
+  void wrap.offsetWidth;
+  wrap.classList.add('lightbox-img-show');
+
+  const isSelected = card.classList.contains('border-primary');
+  const selBtn = document.getElementById('lbSelectBtn');
+  selBtn.innerHTML = isSelected
+    ? '<i class="fa fa-check-circle"></i><span>已选中</span>'
+    : '<i class="fa fa-check-circle-o"></i><span>选中</span>';
+}
+
+function escapeXml(s) {
+  return String(s || '').replace(/[<>&"']/g, c => ({
+    '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;'
+  })[c]);
+}
+
+function lbPrev(e) {
+  if (e) e.stopPropagation();
+  if (lbIndex > 0) { lbIndex--; renderLightbox(); }
+}
+
+function lbNext(e) {
+  if (e) e.stopPropagation();
+  if (lbIndex < lbCards.length - 1) { lbIndex++; renderLightbox(); }
+}
+
+function lbAction(action) {
+  const card = lbCards[lbIndex];
+  const title = card?.dataset.title || '素材';
+
+  if (action === 'download') {
+    const img = document.getElementById('lbImg');
+    const a = document.createElement('a');
+    a.href = img.src;
+    a.download = title + '.png';
+    a.click();
+    showToast('⬇️ 正在下载：' + title);
+  } else if (action === 'redraw') {
+    showToast('🔄 正在重绘：' + title);
+  } else if (action === 'edit') {
+    closeLightbox();
+    document.querySelector('.app-side')?.scrollIntoView({ behavior: 'smooth' });
+    showToast('✏️ 已在右侧面板打开编辑：' + title);
+  } else if (action === 'select') {
+    if (card.classList.contains('border-primary')) {
+      card.classList.remove('border-2', 'border-primary');
+      showToast('☑️ 已取消选中：' + title);
+    } else {
+      allCards.forEach(c => c.classList.remove('border-2', 'border-primary'));
+      card.classList.add('border-2', 'border-primary');
+      showToast('✅ 已选中：' + title);
+    }
+    renderLightbox();
+  }
+}
+
+document.getElementById('lightbox').addEventListener('click', (e) => {
+  if (e.target.id === 'lightbox') closeLightbox();
+});
+
+document.addEventListener('keydown', (e) => {
+  const lb = document.getElementById('lightbox');
+  if (lb.classList.contains('hidden')) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); lbPrev(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); lbNext(); }
+  else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); lbAction('select'); }
+});
+
+// ============================================================
+// Toast
+// ============================================================
+function showToast(msg) {
+  let toast = document.getElementById('__toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = '__toast';
+    toast.style.cssText = `
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      background: #0F172A; color: #fff; padding: 10px 22px; border-radius: 40px;
+      font-size: 13px; z-index: 10001; opacity: 0; transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      white-space: nowrap;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(-6px)';
+  });
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+  }, 2200);
+}
+</script>
+</body>
+</html>
