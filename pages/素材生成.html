@@ -732,13 +732,26 @@
         .copy-item .content { font-size: 13px; margin-top: 8px; line-height: 1.7; white-space: pre-line; }
         .copy-item .actions { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
 
+        /* ★ 详情页预览：无缝展示 8 屏 */
         .detail-preview {
-            background: #f8fafc; border-radius: 10px; padding: 16px;
-            max-height: 500px; overflow-y: auto;
-            font-size: 13px; line-height: 1.8; border: 1px solid var(--border);
+            background: white;
+            border-radius: 10px;
+            padding: 0;
+            max-height: 600px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 0;
+            border: 1px solid var(--border);
         }
         .detail-preview::-webkit-scrollbar { width: 4px; }
         .detail-preview::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        .detail-preview img {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin: 0;
+            padding: 0;
+        }
 
         .video-preview {
             background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
@@ -2316,7 +2329,7 @@
     }
 
     // ================================================================
-    // ★ 短视频配置系统
+    // 短视频配置系统
     // ================================================================
     const VIDEO_PLATFORM_CONFIG = {
         '抖音': {
@@ -2604,7 +2617,7 @@
     }
 
     // ================================================================
-    // ★★★ 核心：Agnes 图片 / 视频生成（走后端代理）
+    // Agnes 图片 / 视频生成（走后端代理）
     // ================================================================
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const body = {
@@ -2765,7 +2778,7 @@
             const fallbackData = generateFallbackData(name, category, features, style, platforms);
             const copyVersions = fallbackData.copyVersions;
 
-            // ============ ③ 详情页（★ 真正调 AI 生成 8 张图） ============
+            // ============ ③ 详情页（★ 真实调 AI 生成 8 张图，全部预留） ============
             let detailHTML = '';
             if (state.selectedTypes.includes('detail')) {
                 const detailRatio = '3:4';
@@ -2788,24 +2801,42 @@
                         `详情页 ${i + 1}/${state.detailPrompts.length}（成功 ${dSuccess}，失败 ${dFail}）`);
                 }
 
-                if (dSuccess === 0) {
-                    console.error('❌ 详情页所有图片生成失败');
-                    showToast('❌ 详情页所有图片生成失败');
-                } else if (dFail > 0) {
-                    showToast(`⚠️ 详情页 ${dFail} 屏失败`);
-                }
+                // ★ 无论成功/失败，都保留 8 屏完整结构（失败屏用同尺寸 3:4 占位）
+                detailHTML = `<div style="max-width:100%;overflow:hidden;line-height:0;">` +
+                    detailImages.map(x => {
+                        if (x.url) {
+                            return `<img src="${x.url}" alt="第${x.step}屏 ${x.moduleName}"
+                                style="width:100%;display:block;margin:0;padding:0;line-height:0;" />`;
+                        }
+                        // 失败屏：保留 3:4 同尺寸占位，不塌缩
+                        return `<div style="
+                            width:100%;
+                            aspect-ratio:3/4;
+                            background:repeating-linear-gradient(45deg,
+                                #f8fafc 0px, #f8fafc 12px,
+                                #f0f4f9 12px, #f0f4f9 24px);
+                            color:#94a3b8;
+                            font-size:14px;
+                            display:flex;
+                            flex-direction:column;
+                            align-items:center;
+                            justify-content:center;
+                            gap:8px;
+                            margin:0;
+                            padding:0;
+                            border:1px dashed #dce5ef;
+                            box-sizing:border-box;
+                            line-height:1.6;
+                        ">
+                            <i class="fas fa-image" style="font-size:32px;color:#c8d4e0;font-style:normal;"></i>
+                            <div style="font-weight:600;color:#5f7d95;">第 ${x.step} 屏 · ${x.moduleName || ''}</div>
+                            <div style="font-size:12px;color:#94a3b8;">生成失败，可稍后重试</div>
+                        </div>`;
+                    }).join('') +
+                `</div>`;
 
-                if (dSuccess > 0) {
-                    detailHTML = `<div style="max-width:100%;overflow:hidden;">` +
-                        detailImages.map(x => x.url
-                            ? `<img src="${x.url}" alt="第${x.step}屏 ${x.moduleName}" style="width:100%;display:block;margin:0;padding:0;" />`
-                            : `<div style="padding:20px;background:#f8fafc;color:#94a3b8;text-align:center;font-size:13px;border:1px dashed #e8edf4;margin:4px 0;">
-                                第${x.step}屏 · ${x.moduleName} — 生成失败
-                            </div>`
-                        ).join('') +
-                    `</div>`;
-                } else {
-                    detailHTML = `<div style="padding:40px;text-align:center;color:#b51a3f;">❌ 详情页生成失败</div>`;
+                if (dSuccess === 0) {
+                    console.warn('⚠️ 详情页所有图片生成失败，已保留 8 屏占位');
                 }
             }
 
@@ -2891,7 +2922,6 @@
         }
     }
 
-    // ★ 只返回 copyVersions（不再写死 detailHTML）
     function generateFallbackData(name, category, features, style, platforms) {
         const copyVersions = [
             { name: '🌟 高端送礼版', conversion: '4.8%', content: `🌟 ${features[0] || '精选好物'} · ${features[1] || '品质保证'}\n"一份来自春天的礼物，礼遇最尊贵的您"` },
@@ -2925,9 +2955,12 @@
         } else {
             document.getElementById('copyList').innerHTML = `<div class="empty-state"><i class="fas fa-pen-fancy"></i><p>未生成文案</p></div>`;
         }
-        // ★ 详情页：直接塞 HTML（里面是 img 标签）
+        // ★ 详情页：8 屏全部展示（失败的也保留占位）
         if (state.selectedTypes.includes('detail') && data.detailHTML) {
-            document.getElementById('detailPreview').innerHTML = data.detailHTML;
+            const preview = document.getElementById('detailPreview');
+            preview.innerHTML = data.detailHTML;
+            preview.style.padding = '0';
+            preview.style.background = 'white';
         } else if (state.selectedTypes.includes('detail')) {
             document.getElementById('detailPreview').innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>详情页未生成</p></div>`;
         } else {
@@ -3473,7 +3506,7 @@
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（详情页真实调 AI · 走后端代理）');
+        console.log('🎨 智能素材生成已就绪（详情页 8 屏全部预留 · 走后端代理）');
         console.log('💡 后端:', BACKEND_URL);
     });
 
