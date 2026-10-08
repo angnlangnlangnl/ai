@@ -311,7 +311,6 @@
             font-style: italic;
         }
 
-        /* ★ 短视频配置面板 */
         .video-config-card {
             background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
             border: 1px solid #d8e8fb;
@@ -951,7 +950,6 @@
             font-size: 12px; color: var(--text-3); flex-shrink: 0;
         }
 
-        /* ★ 图片失败角标 */
         .img-error-tip {
             position: absolute;
             bottom: 4px; left: 4px; right: 4px;
@@ -2606,10 +2604,8 @@
     }
 
     // ================================================================
-    // ★★★ 核心修复：Agnes 图片 / 视频生成（改为走后端代理）
+    // ★★★ 核心：Agnes 图片 / 视频生成（走后端代理）
     // ================================================================
-
-    // ★ 图片生成 —— 走后端代理，避免 CORS 和 Key 暴露
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const body = {
             prompt: prompt,
@@ -2619,7 +2615,7 @@
                 ? referenceImages.slice(0, 5) : null
         };
 
-        console.log('📤 调用后端图片代理:', prompt.slice(0, 60) + '...');
+        console.log('📤 [图] 调用后端代理:', prompt.slice(0, 60) + '...');
         const res = await fetch(BACKEND_URL + '/api/agnes/generate-image', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -2628,22 +2624,21 @@
 
         if (!res.ok) {
             const errText = await res.text().catch(() => '');
-            console.error(`❌ 图片代理报错 (${res.status}):`, errText);
+            console.error(`❌ [图] 后端报错 (${res.status}):`, errText);
             throw new Error(`图片生成失败 (${res.status}): ${errText.slice(0, 200)}`);
         }
 
         const data = await res.json();
         if (data.success && data.url) {
-            console.log('✅ 图片已生成:', data.url);
+            console.log('✅ [图] 生成成功:', data.url);
             return data.url;
         }
-        console.error('❌ 图片代理返回错误:', data);
+        console.error('❌ [图] 后端返回错误:', data);
         throw new Error(data.message || '图片生成失败');
     }
 
-    // ★ 视频生成 —— 走后端代理，避免 CORS 和 Key 暴露
     async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', onProgress) {
-        console.log('📤 调用后端视频代理:', prompt.slice(0, 60) + '...');
+        console.log('📤 [视频] 调用后端代理:', prompt.slice(0, 60) + '...');
 
         if (typeof onProgress === 'function') {
             onProgress(1, 60, 'processing', '生成中（队列满会自动重试）...');
@@ -2663,16 +2658,16 @@
 
         if (!res.ok) {
             const errText = await res.text().catch(() => '');
-            console.error(`❌ 视频代理报错 (${res.status}):`, errText);
+            console.error(`❌ [视频] 后端报错 (${res.status}):`, errText);
             throw new Error(`视频生成失败 (${res.status}): ${errText.slice(0, 200)}`);
         }
 
         const data = await res.json();
         if (data.success && data.url) {
-            console.log('✅ 视频已生成:', data.url);
+            console.log('✅ [视频] 生成成功:', data.url);
             return data.url;
         }
-        console.error('❌ 视频代理返回错误:', data);
+        console.error('❌ [视频] 后端返回错误:', data);
         throw new Error(data.message || '视频生成失败');
     }
 
@@ -2690,7 +2685,6 @@
             handleOneClickPrompts();
         }
 
-        // 记录当前商品名，用于重试
         state.currentProductName = name;
 
         const category = document.getElementById('productCategory').value;
@@ -2711,10 +2705,10 @@
             let keyframeUrls = [];
             if (hasVideoRef && keyframes.length > 0) {
                 try {
-                    updateProgress(8, '正在上传参考视频关键帧到临时图床...');
+                    updateProgress(5, '正在上传参考视频关键帧到临时图床...');
                     keyframeUrls = await uploadKeyframesToTemp(keyframes);
                     state.keyframeUrls = keyframeUrls;
-                    updateProgress(12, `正在用多模态模型反解画面与运镜（${keyframeUrls.length} 帧）...`);
+                    updateProgress(8, `正在用多模态模型反解画面与运镜（${keyframeUrls.length} 帧）...`);
                     videoAnalysis = await decomposeVideoReference(keyframeUrls, name);
                     state.videoAnalysis = videoAnalysis;
                     renderVideoAnalysis(videoAnalysis);
@@ -2727,10 +2721,11 @@
                 }
             }
 
+            // ============ ① 主副图 ============
             let images = [];
             if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
                 const prompts = state.carouselPrompts.slice(0, state.imageCount);
-                updateProgress(15, `正在调用 Agnes Image（${state.imageCount} 张 · ${imageRatio}）...`);
+                updateProgress(12, `正在生成主副图（${state.imageCount} 张 · ${imageRatio}）...`);
                 let successCount = 0, failCount = 0;
 
                 for (let i = 0; i < prompts.length; i++) {
@@ -2745,7 +2740,7 @@
                         });
                         successCount++;
                     } catch (imgErr) {
-                        console.error(`❌ 第 ${i+1} 张图片生成失败:`, imgErr);
+                        console.error(`❌ 第 ${i+1} 张主副图失败:`, imgErr);
                         images.push({
                             url: '', style, score: 0, ctr: '0',
                             prompt: prompts[i],
@@ -2754,22 +2749,67 @@
                         });
                         failCount++;
                     }
-                    updateProgress(15 + (i + 1) / prompts.length * 40, `图片 ${i + 1}/${prompts.length} 已处理（成功 ${successCount}，失败 ${failCount}）`);
+                    updateProgress(12 + (i + 1) / prompts.length * 30,
+                        `主副图 ${i + 1}/${prompts.length}（成功 ${successCount}，失败 ${failCount}）`);
                 }
 
-                // ★ 图片全部失败时，提前提示
                 if (successCount === 0) {
-                    console.error('❌ 所有图片生成失败');
-                    showToast(`❌ 所有图片生成失败，请检查网络或稍后重试`);
+                    console.error('❌ 所有主副图生成失败');
+                    showToast(`❌ 所有主副图生成失败`);
                 } else if (failCount > 0) {
-                    showToast(`⚠️ ${failCount} 张图片生成失败（${successCount}/${prompts.length} 成功）`);
+                    showToast(`⚠️ ${failCount} 张主副图生成失败`);
                 }
             }
 
+            // ============ ② 宣传文案 ============
             const fallbackData = generateFallbackData(name, category, features, style, platforms);
             const copyVersions = fallbackData.copyVersions;
-            const detailHTML = fallbackData.detailHTML;
 
+            // ============ ③ 详情页（★ 真正调 AI 生成 8 张图） ============
+            let detailHTML = '';
+            if (state.selectedTypes.includes('detail')) {
+                const detailRatio = '3:4';
+                const detailImages = [];
+                updateProgress(45, `正在生成详情页（8 屏 · ${detailRatio}）...`);
+                let dSuccess = 0, dFail = 0;
+
+                for (let i = 0; i < state.detailPrompts.length; i++) {
+                    const d = state.detailPrompts[i];
+                    try {
+                        const url = await generateAgnesImage(d.prompt, '1K', detailRatio, refImages);
+                        detailImages.push({ url, step: d.step, moduleName: d.moduleName });
+                        dSuccess++;
+                    } catch (err) {
+                        console.error(`❌ 详情页第 ${i+1} 屏失败:`, err);
+                        detailImages.push({ url: '', step: d.step, moduleName: d.moduleName, error: err.message });
+                        dFail++;
+                    }
+                    updateProgress(45 + (i + 1) / state.detailPrompts.length * 30,
+                        `详情页 ${i + 1}/${state.detailPrompts.length}（成功 ${dSuccess}，失败 ${dFail}）`);
+                }
+
+                if (dSuccess === 0) {
+                    console.error('❌ 详情页所有图片生成失败');
+                    showToast('❌ 详情页所有图片生成失败');
+                } else if (dFail > 0) {
+                    showToast(`⚠️ 详情页 ${dFail} 屏失败`);
+                }
+
+                if (dSuccess > 0) {
+                    detailHTML = `<div style="max-width:100%;overflow:hidden;">` +
+                        detailImages.map(x => x.url
+                            ? `<img src="${x.url}" alt="第${x.step}屏 ${x.moduleName}" style="width:100%;display:block;margin:0;padding:0;" />`
+                            : `<div style="padding:20px;background:#f8fafc;color:#94a3b8;text-align:center;font-size:13px;border:1px dashed #e8edf4;margin:4px 0;">
+                                第${x.step}屏 · ${x.moduleName} — 生成失败
+                            </div>`
+                        ).join('') +
+                    `</div>`;
+                } else {
+                    detailHTML = `<div style="padding:40px;text-align:center;color:#b51a3f;">❌ 详情页生成失败</div>`;
+                }
+            }
+
+            // ============ ④ 短视频 ============
             let videoUrl = '';
             if (state.selectedTypes.includes('video')) {
                 const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
@@ -2794,14 +2834,14 @@
                 }
                 if (videoAnalysis?.prompt) videoPrompt = videoAnalysis.prompt;
 
-                updateProgress(60, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
+                updateProgress(78, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
                 try {
                     const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
                     videoUrl = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, (attempt, total, status, text) => {
-                        const pct = 60 + Math.min(35, (attempt / total) * 35);
+                        const pct = 78 + Math.min(20, (attempt / total) * 20);
                         updateProgress(pct, '视频：' + text);
                     });
-                    updateProgress(95, '视频生成完成');
+                    updateProgress(98, '视频生成完成');
                 } catch (vidErr) {
                     console.error('❌ 视频生成失败:', vidErr);
                     videoUrl = '';
@@ -2817,23 +2857,21 @@
                 const resultData = {
                     images, copyVersions, detailHTML, videoUrl,
                     platforms, imageRatio, videoRatio, videoAnalysis,
-                    productName: name,
-                    videoPrompt: state.selectedTypes.includes('video') ? '参考视频剧本' : ''
+                    productName: name
                 };
                 state.generatedData = resultData;
                 renderResults(resultData, name);
                 addHistory(name, state.selectedTypes, style, platforms);
 
-                // ★ 根据实际结果给不同提示
                 const validCount = images.filter(i => i.url).length;
+                const dValid = detailHTML && detailHTML.includes('<img');
                 if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
-                    if (validCount === 0) {
-                        showToast('❌ 图片生成失败，请检查后端服务');
-                    } else if (validCount < images.length) {
-                        showToast(`⚠️ 部分图片失败（${validCount}/${images.length} 成功）`);
-                    } else {
-                        showToast('✅ 素材生成完成');
-                    }
+                    if (validCount === 0) showToast('❌ 图片生成失败，请检查后端服务');
+                    else if (validCount < images.length) showToast(`⚠️ 部分图片失败（${validCount}/${images.length}）`);
+                    else if (state.selectedTypes.includes('detail') && !dValid) showToast('⚠️ 详情页生成失败');
+                    else showToast('✅ 素材生成完成');
+                } else if (state.selectedTypes.includes('detail') && !dValid) {
+                    showToast('❌ 详情页生成失败');
                 } else if (!videoUrl && state.selectedTypes.includes('video')) {
                     showToast('⚠️ 视频生成失败，可重试');
                 } else {
@@ -2853,6 +2891,7 @@
         }
     }
 
+    // ★ 只返回 copyVersions（不再写死 detailHTML）
     function generateFallbackData(name, category, features, style, platforms) {
         const copyVersions = [
             { name: '🌟 高端送礼版', conversion: '4.8%', content: `🌟 ${features[0] || '精选好物'} · ${features[1] || '品质保证'}\n"一份来自春天的礼物，礼遇最尊贵的您"` },
@@ -2861,36 +2900,14 @@
             { name: '💝 情感共鸣版', conversion: '4.2%', content: `💝 ${name}\n"把心意装进礼盒，送给最重要的人"` },
             { name: '🏆 专业推荐版', conversion: '3.5%', content: `🏆 专家推荐 · ${name}\n"${features.join(' · ')}"` }
         ];
-        const detailHTML = `
-            <div style="font-weight:600;font-size:16px;border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:12px;">🌟 ${escapeHtml(name)}</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:12px;">
-                <div><span style="color:var(--text-3);">类别：</span>${escapeHtml(category)}</div>
-                <div><span style="color:var(--text-3);">风格：</span>${escapeHtml(style)}</div>
-            </div>
-            <div style="margin-bottom:10px;">
-                <span style="font-weight:600;">✨ 核心卖点</span>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
-                    ${features.map(f => `<span style="background:var(--accent-soft);color:var(--accent);padding:2px 10px;border-radius:20px;font-size:12px;">✅ ${escapeHtml(f)}</span>`).join('')}
-                </div>
-            </div>
-            <div style="background:#f5f7fa;padding:12px;border-radius:8px;margin-bottom:10px;font-size:13px;">
-                <div style="font-weight:600;">📖 品牌故事</div>
-                <div style="color:var(--text-2);margin-top:4px;">云山品牌 · 20年匠心工艺，源自核心产区。</div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px;color:var(--text-2);background:#f8fafc;padding:10px;border-radius:8px;">
-                <div>📦 规格：标准装</div>
-                <div>⏳ 保质期：18个月</div>
-                <div>🛡️ 7天无理由退换</div>
-            </div>
-        `;
-        return { copyVersions, detailHTML };
+        return { copyVersions };
     }
 
     function renderResults(data, productName) {
         document.getElementById('cnt-images').textContent = (data.images || []).filter(i => i.url).length > 0 ? '1' : '0';
         document.getElementById('cnt-carousel').textContent = (data.images || []).filter(i => i.url).length;
         document.getElementById('cnt-copy').textContent = (data.copyVersions || []).length;
-        document.getElementById('cnt-detail').textContent = data.detailHTML ? '1' : '0';
+        document.getElementById('cnt-detail').textContent = data.detailHTML && data.detailHTML.includes('<img') ? '1' : '0';
         document.getElementById('cnt-video').textContent = data.videoUrl ? '1' : '0';
 
         if (state.selectedTypes.includes('images') && data.images && data.images.length > 0) {
@@ -2908,10 +2925,13 @@
         } else {
             document.getElementById('copyList').innerHTML = `<div class="empty-state"><i class="fas fa-pen-fancy"></i><p>未生成文案</p></div>`;
         }
+        // ★ 详情页：直接塞 HTML（里面是 img 标签）
         if (state.selectedTypes.includes('detail') && data.detailHTML) {
             document.getElementById('detailPreview').innerHTML = data.detailHTML;
+        } else if (state.selectedTypes.includes('detail')) {
+            document.getElementById('detailPreview').innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>详情页未生成</p></div>`;
         } else {
-            document.getElementById('detailPreview').innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>未生成详情页</p></div>`;
+            document.getElementById('detailPreview').innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>未选择生成详情页</p></div>`;
         }
         const videoContainer = document.getElementById('videoPreviewContainer');
         if (state.selectedTypes.includes('video')) {
@@ -2962,7 +2982,6 @@
         }).join('');
     }
 
-    // ★ 单张图片重试
     async function retrySingleImage(idx) {
         const r = state.generatedData;
         if (!r || !r.images[idx]) { showToast('⚠️ 数据已丢失'); return; }
@@ -2975,7 +2994,6 @@
         try {
             const url = await generateAgnesImage(r.images[idx].prompt, '1K', imageRatio, refImages);
             r.images[idx] = { ...r.images[idx], url, error: null };
-            // 刷新两个网格
             const pName = r.productName || '商品';
             if (state.selectedTypes.includes('images')) {
                 renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
@@ -2998,7 +3016,6 @@
         }
     }
 
-    // ★ 视频重试
     async function retryVideo() {
         const r = state.generatedData;
         if (!r) { showToast('⚠️ 数据已丢失，请重新生成'); return; }
@@ -3456,7 +3473,7 @@
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（走后端代理 · 支持失败重试）');
+        console.log('🎨 智能素材生成已就绪（详情页真实调 AI · 走后端代理）');
         console.log('💡 后端:', BACKEND_URL);
     });
 
@@ -3512,7 +3529,6 @@
     window.previewFullPrompt = previewFullPrompt;
     window.copyFullPrompt = copyFullPrompt;
     window.renderVideoScript = renderVideoScript;
-    // ★ 新增：重试
     window.retrySingleImage = retrySingleImage;
     window.retryVideo = retryVideo;
 </script>
