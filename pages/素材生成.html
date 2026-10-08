@@ -230,12 +230,7 @@
         .prompt-panel { display: none; }
         .prompt-panel.active { display: block; }
 
-        /* ============================================================
-           ★ 提示词列表（主副图 & 详情页共用）
-           修改：
-           1. 左侧序号 → 暗淡图片背景 + 大号数字
-           2. 文本输入 → textarea，可换行，不溢出
-           ============================================================ */
+        /* ====== 提示词列表（主副图 & 详情页共用） ====== */
         .detail-prompts { display: flex; flex-direction: column; gap: 8px; }
         .detail-prompt-item {
             display: grid;
@@ -259,7 +254,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* 暗淡图片背景（斜向渐变 + 网格纹理） */
             background:
                 linear-gradient(135deg, rgba(10,30,47,0.06) 0%, rgba(77,171,247,0.10) 100%),
                 repeating-linear-gradient(45deg,
@@ -269,7 +263,6 @@
                     transparent 12px);
             border: 1px solid rgba(10,30,47,0.08);
         }
-        /* 大号数字 */
         .detail-prompt-item .step::after {
             content: attr(data-num);
             position: relative;
@@ -286,15 +279,13 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            min-width: 0;   /* ★ 关键：防止 grid 子元素溢出 */
+            min-width: 0;
         }
         .detail-prompt-item .body .module-name {
             font-size: 12px;
             color: var(--accent);
             font-weight: 600;
         }
-
-        /* ★ textarea 替换 input：自动换行、不溢出 */
         .detail-prompt-item textarea {
             padding: 8px 12px;
             font-size: 13px;
@@ -319,13 +310,258 @@
             box-shadow: 0 0 0 3px var(--accent-soft);
         }
 
-        /* Placeholder 浅淡样式 */
         .detail-prompt-item textarea::placeholder,
         .video-shot .content textarea::placeholder {
             color: #c8d4e0;
             font-style: italic;
         }
 
+        /* ============================================================
+           ★ 短视频配置面板
+           ============================================================ */
+        .video-config-card {
+            background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
+            border: 1px solid #d8e8fb;
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+        }
+
+        .video-config-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .video-config-row:last-child { margin-bottom: 0; }
+
+        .video-config-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2a7faa;
+            min-width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pill-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pill-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #dce5ef;
+            background: white;
+            color: var(--text-2);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .pill-btn:hover {
+            border-color: var(--accent);
+            color: #2a7faa;
+            background: #f5f9fe;
+        }
+        .pill-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        .pill-btn.active::after {
+            content: '✓';
+            font-size: 10px;
+            margin-left: 2px;
+        }
+
+        .video-config-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px dashed #d8e8fb;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .video-script-preview {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+
+        .video-shot-item {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px dashed #f0f4f9;
+        }
+        .video-shot-item:last-child { border-bottom: none; }
+
+        .video-shot-item .shot-label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #b51a5a, #d94f7a);
+            color: white;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: fit-content;
+            align-self: flex-start;
+        }
+        .video-shot-item .shot-label .shot-num {
+            font-size: 11px;
+            opacity: 0.85;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .video-shot-item .shot-label .shot-time {
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .video-shot-item .shot-label .shot-tag {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        .video-shot-item .shot-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+        .video-shot-item .shot-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .video-shot-item .shot-title .shot-hint {
+            font-size: 10px;
+            color: var(--text-3);
+            font-weight: 400;
+            padding: 1px 8px;
+            background: #f0f4f9;
+            border-radius: 8px;
+        }
+        .video-shot-item textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            line-height: 1.6;
+            background: white;
+            resize: vertical;
+            min-height: 52px;
+            max-height: 180px;
+            font-family: inherit;
+            box-sizing: border-box;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        .video-shot-item textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+        .video-shot-item textarea::placeholder {
+            color: #c8d4e0;
+            font-style: italic;
+        }
+
+        .video-global-params {
+            background: #fafcfe;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+        .video-global-params .param-row {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            line-height: 1.7;
+            padding: 6px 0;
+            border-bottom: 1px solid #f5f8fc;
+        }
+        .video-global-params .param-row:last-child { border-bottom: none; }
+        .video-global-params .param-key {
+            color: #2a7faa;
+            font-weight: 600;
+            min-width: 72px;
+            flex-shrink: 0;
+        }
+        .video-global-params .param-val {
+            color: var(--text-2);
+            word-break: break-word;
+        }
+
+        .full-prompt-box {
+            background: #0a1e2f;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            max-height: 260px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-top: 10px;
+            display: none;
+        }
+        .full-prompt-box.show { display: block; }
+        .full-prompt-box::-webkit-scrollbar { width: 6px; }
+        .full-prompt-box::-webkit-scrollbar-thumb { background: #2a4a6a; border-radius: 10px; }
+
+        .btn-mini {
+            padding: 5px 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-2);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.15s;
+        }
+        .btn-mini:hover {
+            border-color: var(--accent);
+            color: #2a7faa;
+            background: #f5f9fe;
+        }
+        .btn-mini.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .btn-mini.primary:hover { background: var(--primary-hover); }
+
+        /* 旧版视频剧本样式（保留兼容） */
         .video-script { display: flex; flex-direction: column; gap: 8px; }
         .video-shot {
             display: grid; grid-template-columns: 60px 1fr;
@@ -813,10 +1049,12 @@
             .name-input-row .pick-btn span { display: none; }
             .name-input-row .pick-btn { padding: 0 14px; }
             .product-picker-box { max-width: 100%; }
-            /* 小屏序号缩小 */
             .detail-prompt-item { grid-template-columns: 56px 1fr; gap: 10px; }
             .detail-prompt-item .step { width: 56px; height: 56px; }
             .detail-prompt-item .step::after { font-size: 24px; }
+            .video-shot-item { grid-template-columns: 64px 1fr; gap: 10px; }
+            .video-config-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .video-config-label { min-width: 0; }
         }
         @media (max-width: 480px) {
             .type-pills { grid-template-columns: repeat(2, 1fr); }
@@ -999,7 +1237,7 @@
                     <div class="prompt-tabs" id="promptTabs">
                         <button class="prompt-tab active" data-tab="carousel" onclick="switchPromptTab('carousel')" id="tabCarousel">主副图（5）</button>
                         <button class="prompt-tab" data-tab="detail" onclick="switchPromptTab('detail')" id="tabDetail">详情页（8 屏）</button>
-                        <button class="prompt-tab" data-tab="video" onclick="switchPromptTab('video')" id="tabVideo">视频剧本（4 段）</button>
+                        <button class="prompt-tab" data-tab="video" onclick="switchPromptTab('video')" id="tabVideo">视频剧本</button>
                     </div>
                     <div class="prompt-panel active" id="prompt-carousel">
                         <div class="detail-prompts" id="carouselPrompts"></div>
@@ -1008,7 +1246,80 @@
                         <div class="detail-prompts" id="detailPrompts"></div>
                     </div>
                     <div class="prompt-panel" id="prompt-video">
-                        <div class="video-script" id="videoScript"></div>
+
+                        <!-- ★ 短视频配置面板 -->
+                        <div class="video-config-card">
+
+                            <!-- 平台自动适配 -->
+                            <div class="video-config-row">
+                                <span class="video-config-label"><i class="fas fa-globe"></i> 平台</span>
+                                <div class="pill-group" id="videoPlatformGroup">
+                                    <button class="pill-btn active" data-video-platform="抖音" onclick="selectVideoPlatform(this)">🎵 抖音 22s</button>
+                                    <button class="pill-btn" data-video-platform="TikTok Shop" onclick="selectVideoPlatform(this)">🌍 TikTok 20s</button>
+                                    <button class="pill-btn" data-video-platform="Temu" onclick="selectVideoPlatform(this)">✨ Temu 15s</button>
+                                </div>
+                            </div>
+
+                            <!-- 类目修饰 -->
+                            <div class="video-config-row">
+                                <span class="video-config-label"><i class="fas fa-tag"></i> 类目</span>
+                                <div class="pill-group" id="videoCategoryGroup">
+                                    <button class="pill-btn active" data-video-cat="生鲜" onclick="selectVideoCategory(this)">🥬 食品生鲜</button>
+                                    <button class="pill-btn" data-video-cat="礼盒" onclick="selectVideoCategory(this)">🎁 礼品礼盒</button>
+                                    <button class="pill-btn" data-video-cat="家居" onclick="selectVideoCategory(this)">🏠 家居日用</button>
+                                    <button class="pill-btn" data-video-cat="服饰" onclick="selectVideoCategory(this)">👗 服饰</button>
+                                </div>
+                            </div>
+
+                            <!-- 钩子类型 -->
+                            <div class="video-config-row">
+                                <span class="video-config-label"><i class="fas fa-fire"></i> 钩子</span>
+                                <div class="pill-group" id="videoHookGroup">
+                                    <button class="pill-btn active" data-video-hook="痛点" onclick="selectVideoHook(this)">🔥 痛点开场</button>
+                                    <button class="pill-btn" data-video-hook="惊艳" onclick="selectVideoHook(this)">✨ 惊艳瞬间</button>
+                                    <button class="pill-btn" data-video-hook="对比" onclick="selectVideoHook(this)">⚖️ 对比强化</button>
+                                    <button class="pill-btn" data-video-hook="开箱" onclick="selectVideoHook(this)">📦 开箱体验</button>
+                                </div>
+                            </div>
+
+                            <!-- ★ 出镜方式（新增 东方人物全景 / 海外人物全景） -->
+                            <div class="video-config-row">
+                                <span class="video-config-label"><i class="fas fa-hand-paper"></i> 出镜</span>
+                                <div class="pill-group" id="videoSceneGroup">
+                                    <button class="pill-btn active" data-video-scene="手部" onclick="selectVideoScene(this)">🙌 仅手部演示</button>
+                                    <button class="pill-btn" data-video-scene="无人物" onclick="selectVideoScene(this)">🚫 无人物</button>
+                                    <button class="pill-btn" data-video-scene="局部" onclick="selectVideoScene(this)">👤 局部特写</button>
+                                    <button class="pill-btn" data-video-scene="东方人物全景" onclick="selectVideoScene(this)">🇨🇳 东方人物全景</button>
+                                    <button class="pill-btn" data-video-scene="海外人物全景" onclick="selectVideoScene(this)">🌍 海外人物全景</button>
+                                </div>
+                            </div>
+
+                            <!-- 一键按钮 -->
+                            <div class="video-config-actions">
+                                <button class="one-click-btn" onclick="handleOneClickVideoScript()">
+                                    <i class="fas fa-magic"></i> 一键生成视频剧本
+                                </button>
+                                <button class="btn-mini" onclick="previewFullPrompt()">
+                                    <i class="fas fa-eye"></i> 预览完整 Prompt
+                                </button>
+                                <button class="btn-mini" onclick="copyFullPrompt()">
+                                    <i class="fas fa-copy"></i> 复制
+                                </button>
+                                <span style="font-size:11px; color:var(--text-3); margin-left:auto;" id="videoDurationHint">
+                                    当前：抖音 · 22s · 分镜 5 段
+                                </span>
+                            </div>
+
+                            <!-- 完整 Prompt 预览 -->
+                            <div class="full-prompt-box" id="fullPromptBox"></div>
+                        </div>
+
+                        <!-- ★ 分镜头剧本（5 段） -->
+                        <div class="video-script-preview" id="videoScript"></div>
+
+                        <!-- ★ 全局参数预览 -->
+                        <div class="video-global-params" id="videoGlobalParams"></div>
+
                     </div>
                 </div>
 
@@ -1429,15 +1740,6 @@
             `电商详情页行动引导图，3:4，${v.name}主图 + 行动按钮视觉设计，文案"立即下单 · 限时福利"，引导加购/下单，8K` }
     ];
 
-    function getVideoTemplates(v) {
-        return [
-            { time: '0-3s', type: '开场', prompt: `特写${v.name}细节慢动作，配合轻快音乐开场，字幕"${v.sell1}"` },
-            { time: '3-8s', type: '产品', prompt: `展示${v.name}外观与内部细节，突出${v.sell2}，360度环绕拍摄` },
-            { time: '8-12s', type: '场景', prompt: `展示${v.name}在${v.scene}的真实使用场景，突出${v.advantage}` },
-            { time: '12-15s', type: '收尾', prompt: `品牌 logo + 行动引导"点击下方链接购买"，商品整体展示` }
-        ];
-    }
-
     // ================================================================
     // 全局状态
     // ================================================================
@@ -1510,7 +1812,6 @@
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
         })[c]);
     }
-    // ★ 自动增高 textarea
     function autoGrowTextarea(el) {
         if (!el) return;
         el.style.height = 'auto';
@@ -1532,7 +1833,7 @@
         };
     }
 
-    // 一键生成提示词
+    // 一键生成提示词（主副图 + 详情页 + 视频剧本）
     function handleOneClickPrompts() {
         const v = collectVars();
         const platform = state.currentPlatform;
@@ -1547,15 +1848,15 @@
             prompt: s.tpl(v)
         }));
 
-        state.videoPrompts = getVideoTemplates(v);
-
         renderCarouselPrompts();
         renderDetailPrompts();
-        renderVideoScript();
+
+        // 视频剧本
+        handleOneClickVideoScript();
 
         updateTabCounts();
 
-        showToast(`⚡ 已根据「${v.name}」生成 ${count} 张主副图 + 8 屏详情 + 4 段视频剧本`);
+        showToast(`⚡ 已根据「${v.name}」生成 ${count} 张主副图 + 8 屏详情 + 视频剧本`);
     }
 
     function updateTabCounts() {
@@ -1564,7 +1865,7 @@
         const tabVideo = document.getElementById('tabVideo');
         if (tabCarousel) tabCarousel.textContent = `主副图（${state.imageCount}）`;
         if (tabDetail) tabDetail.textContent = `详情页（8 屏）`;
-        if (tabVideo) tabVideo.textContent = `视频剧本（4 段）`;
+        if (tabVideo) tabVideo.textContent = `视频剧本`;
     }
 
     function switchCount(n) {
@@ -2014,8 +2315,6 @@
     // ================================================================
     // 提示词渲染
     // ================================================================
-
-    // 主副图
     function renderCarouselPrompts() {
         const container = document.getElementById('carouselPrompts');
         const count = state.imageCount;
@@ -2049,7 +2348,6 @@
                 </div>
             `;
         }).join('');
-        // 挂载后自动增高
         requestAnimationFrame(() => {
             container.querySelectorAll('textarea').forEach(autoGrowTextarea);
         });
@@ -2060,7 +2358,6 @@
         return tpls[i]?.tag || `图${i+1}`;
     }
 
-    // 通用输入处理：写入 state + 自动增高
     function onPromptInput(el, type, idx) {
         autoGrowTextarea(el);
         const val = el.value;
@@ -2079,7 +2376,6 @@
         state.carouselPrompts[idx] = val;
     }
 
-    // 详情页
     function renderDetailPrompts() {
         const container = document.getElementById('detailPrompts');
         if (state.detailPrompts.length === 0) {
@@ -2106,36 +2402,6 @@
     }
     function updateDetailPrompt(idx, val) { state.detailPrompts[idx].prompt = val; }
 
-    // 视频剧本
-    function renderVideoScript() {
-        const container = document.getElementById('videoScript');
-        const defaultSegments = [
-            { time: '0-3s', type: '开场' },
-            { time: '3-8s', type: '产品' },
-            { time: '8-12s', type: '场景' },
-            { time: '12-15s', type: '收尾' }
-        ];
-        if (state.videoPrompts.length === 0) {
-            state.videoPrompts = defaultSegments.map(s => ({ time: s.time, type: s.type, prompt: '' }));
-        }
-        container.innerHTML = state.videoPrompts.map((v, i) => `
-            <div class="video-shot">
-                <div class="time-badge">
-                    <span class="sec">${v.time}</span>
-                    <span class="type">${v.type}</span>
-                </div>
-                <div class="content">
-                    <textarea placeholder="点击「⚡ 一键生成提示词」自动填充，或手动输入「${v.type}」镜头描述..."
-                        oninput="onPromptInput(this, 'video', ${i})">${escapeHtml(v.prompt)}</textarea>
-                </div>
-            </div>
-        `).join('');
-        requestAnimationFrame(() => {
-            container.querySelectorAll('textarea').forEach(autoGrowTextarea);
-        });
-    }
-    function updateVideoPrompt(idx, val) { state.videoPrompts[idx].prompt = val; }
-
     function resetAllPrompts() {
         if (!confirm('确定重置所有提示词为默认值？')) return;
         handleOneClickPrompts();
@@ -2145,6 +2411,348 @@
     function switchResultTab(tab) {
         document.querySelectorAll('.result-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
         document.querySelectorAll('.result-panel').forEach(p => p.classList.toggle('active', p.id === 'result-' + tab));
+    }
+
+    // ================================================================
+    // ★ 短视频配置系统
+    // ================================================================
+
+    const VIDEO_PLATFORM_CONFIG = {
+        '抖音': {
+            duration: 22,
+            timeline: [
+                { time: '0-3s',   type: '钩子',  tag: '钩子镜头',   hint: '前 3 秒定完播' },
+                { time: '3-8s',   type: '全景',  tag: '产品全景',   hint: '完整展示外观' },
+                { time: '8-14s',  type: '细节',  tag: '细节特写',   hint: '突出质感' },
+                { time: '14-22s', type: '场景',  tag: '场景演示',   hint: '真实使用' },
+                { time: '结尾',   type: '收尾',  tag: '效果+字幕',  hint: '引导下单' }
+            ]
+        },
+        'TikTok Shop': {
+            duration: 20,
+            timeline: [
+                { time: '0-3s',   type: 'Hook',  tag: 'Hook Shot',   hint: 'Eye-catching' },
+                { time: '3-8s',   type: 'Full',  tag: 'Full Display', hint: 'Product showcase' },
+                { time: '8-15s',  type: 'Detail',tag: 'Macro Detail', hint: 'Texture close-up' },
+                { time: '15-20s', type: 'Use',   tag: 'Usage Demo',   hint: 'Lifestyle' },
+                { time: 'End',    type: 'CTA',   tag: 'End Card',     hint: 'Call to action' }
+            ]
+        },
+        'Temu': {
+            duration: 15,
+            timeline: [
+                { time: '0-3s',  type: 'Hook',  tag: 'Hook Shot',  hint: 'Show effect' },
+                { time: '3-8s',  type: 'Full',  tag: 'Full View',   hint: 'Product display' },
+                { time: '8-15s', type: 'Use',   tag: 'Usage Demo',  hint: 'How to use' },
+                { time: 'End',   type: 'CTA',   tag: 'End Card',    hint: 'Guide to buy' }
+            ]
+        }
+    };
+
+    const VIDEO_CATEGORY_MODS = {
+        '生鲜': '有食欲，通透质感，真实食材光泽，自然光，不要过度饱和',
+        '礼盒': '电影感柔和暖光，开箱镜头，开箱瞬间特写，仪式感',
+        '家居': '居家真实环境，干净整洁，俯拍，功能演示为主',
+        '服饰': '自然面料特写，模特只拍局部/全身简约穿搭，柔和室内光'
+    };
+
+    const VIDEO_HOOK_TEMPLATES = {
+        '痛点': (v) => `微距特写，${v.sell1}，痛点瞬间引发共鸣，快速抓眼球`,
+        '惊艳': (v) => `微距特写，展示${v.name}最惊艳的瞬间，${v.advantage}，强视觉冲击`,
+        '对比': (v) => `对比镜头，普通款 vs ${v.name}，${v.advantage}优势一目了然`,
+        '开箱': (v) => `开箱瞬间特写，缓缓打开${v.name}包装，仪式感强，${v.sell1}`
+    };
+
+    // ★ 出镜方式修饰（新增 东方人物全景 / 海外人物全景）
+    const VIDEO_SCENE_MODS = {
+        '手部': '干净白皙的手演示产品，只拍手部，不露出人脸',
+        '无人物': '只拍摄产品，无任何人物出镜',
+        '局部': '仅拍摄局部特写，不露出完整人脸',
+        '东方人物全景': '东方面孔模特全景出镜，自然使用产品，五官清晰，亚洲面孔，全身或半身完整入镜，自然光',
+        '海外人物全景': '欧美面孔模特全景出镜，自然使用产品，五官清晰，欧美面孔，全身或半身完整入镜，自然光'
+    };
+
+    // 英文版出镜修饰
+    const VIDEO_SCENE_MODS_EN = {
+        '手部': 'Clean hands demo the product, only hands shown, no face',
+        '无人物': 'Product only, no human in frame',
+        '局部': 'Partial body shot only, no full face',
+        '东方人物全景': 'Asian model full-body shot, naturally using product, clear face, Asian features, whole body or half body fully in frame, natural light',
+        '海外人物全景': 'Caucasian model full-body shot, naturally using product, clear face, western features, whole body or half body fully in frame, natural light'
+    };
+
+    const VIDEO_REAL_SHOT_PREFIX = '真实商业实拍短视频，4K，60fps，无CG，无卡通，无3D建模';
+    const VIDEO_NEGATIVE_CN = '畸形，扭曲，变形，残缺，多余肢体，塑料质感，CG，3D渲染，动漫，卡通，水印，logo，文字错乱，杂乱背景，过度美颜，重滤镜，模糊，低分辨率，鬼影，物体漂浮';
+    const VIDEO_NEGATIVE_EN = 'deformed, distorted, plastic texture, CGI, cartoon, watermark, messy text, blurry, extra limbs, floating object';
+
+    const videoConfigState = {
+        platform: '抖音',
+        category: '生鲜',
+        hook: '痛点',
+        scene: '手部'
+    };
+
+    function selectVideoPlatform(el) {
+        document.querySelectorAll('#videoPlatformGroup .pill-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        videoConfigState.platform = el.dataset.videoPlatform;
+        updateVideoDurationHint();
+        rebuildVideoScript();
+    }
+
+    function selectVideoCategory(el) {
+        document.querySelectorAll('#videoCategoryGroup .pill-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        videoConfigState.category = el.dataset.videoCat;
+        if (state.videoPrompts.length > 0 && state.videoPrompts.some(v => v.prompt)) {
+            handleOneClickVideoScript();
+        }
+    }
+
+    function selectVideoHook(el) {
+        document.querySelectorAll('#videoHookGroup .pill-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        videoConfigState.hook = el.dataset.videoHook;
+        if (state.videoPrompts.length > 0 && state.videoPrompts.some(v => v.prompt)) {
+            handleOneClickVideoScript();
+        }
+    }
+
+    function selectVideoScene(el) {
+        document.querySelectorAll('#videoSceneGroup .pill-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        videoConfigState.scene = el.dataset.videoScene;
+        if (state.videoPrompts.length > 0 && state.videoPrompts.some(v => v.prompt)) {
+            handleOneClickVideoScript();
+        }
+    }
+
+    function updateVideoDurationHint() {
+        const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+        const hint = document.getElementById('videoDurationHint');
+        if (hint && cfg) {
+            hint.textContent = `当前：${videoConfigState.platform} · ${cfg.duration}s · 分镜 ${cfg.timeline.length} 段`;
+        }
+    }
+
+    function rebuildVideoScript() {
+        const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+        if (!cfg) return;
+        state.videoPrompts = cfg.timeline.map(t => ({
+            time: t.time,
+            type: t.type,
+            tag: t.tag,
+            hint: t.hint,
+            prompt: ''
+        }));
+        renderVideoScript();
+    }
+
+    function handleOneClickVideoScript() {
+        const v = collectVars();
+        const platform = videoConfigState.platform;
+        const category = videoConfigState.category;
+        const hook = videoConfigState.hook;
+        const scene = videoConfigState.scene;
+
+        const cfg = VIDEO_PLATFORM_CONFIG[platform];
+        if (!cfg) { showToast('⚠️ 平台配置缺失'); return; }
+
+        const isEN = platform === 'TikTok Shop' || platform === 'Temu';
+        const categoryMod = VIDEO_CATEGORY_MODS[category] || '';
+        const sceneMod = isEN ? (VIDEO_SCENE_MODS_EN[scene] || '') : (VIDEO_SCENE_MODS[scene] || '');
+
+        const prompts = [];
+
+        // ① 钩子
+        let hookText;
+        if (isEN) {
+            hookText = `Hook shot: macro close-up, ${v.sell1}, eye-catching opening`;
+        } else {
+            hookText = VIDEO_HOOK_TEMPLATES[hook] ? VIDEO_HOOK_TEMPLATES[hook](v) : `微距特写，${v.sell1}，快速抓眼球`;
+        }
+        prompts.push(hookText + (categoryMod ? `，${categoryMod}` : ''));
+
+        // ② 产品全景
+        let fullText;
+        if (isEN) {
+            fullText = `Top view full display of ${v.name}, complete product view, clean composition`;
+        } else {
+            fullText = `俯拍全景，${v.name}完整展示，干净构图`;
+        }
+        prompts.push(fullText);
+
+        // ③ 细节特写
+        let detailText;
+        if (isEN) {
+            detailText = `Macro close-up of ${v.name} texture detail, show ${v.advantage}`;
+        } else {
+            detailText = `特写细节，展示${v.name}的${v.advantage}质感，微距拍摄`;
+        }
+        prompts.push(detailText);
+
+        // ④ 场景演示（仅 5 段的平台）
+        if (cfg.timeline.length >= 5) {
+            let sceneText;
+            if (isEN) {
+                sceneText = `Usage demo in ${v.scene}, natural lifestyle scene, ${sceneMod}`;
+            } else {
+                sceneText = `${v.scene}实景使用演示，自然生活化，${sceneMod}`;
+            }
+            prompts.push(sceneText);
+        }
+
+        // ⑤ 结尾
+        let endText;
+        if (isEN) {
+            endText = `End card with product display and call-to-action text, guide to purchase`;
+        } else {
+            endText = `效果展示 + 字幕引导"点击下方链接购买"，商品整体展示，${v.sell2}`;
+        }
+        prompts.push(endText);
+
+        state.videoPrompts = cfg.timeline.map((t, i) => ({
+            time: t.time,
+            type: t.type,
+            tag: t.tag,
+            hint: t.hint,
+            prompt: prompts[i] || ''
+        }));
+
+        renderVideoScript();
+        renderVideoGlobalParams();
+        updateVideoDurationHint();
+
+        showToast(`⚡ 已生成「${platform} · ${cfg.duration}s」完整视频剧本（${cfg.timeline.length} 段）`);
+    }
+
+    function renderVideoScript() {
+        const container = document.getElementById('videoScript');
+        if (!container) return;
+
+        if (state.videoPrompts.length === 0) {
+            const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+            state.videoPrompts = cfg.timeline.map(t => ({
+                time: t.time,
+                type: t.type,
+                tag: t.tag,
+                hint: t.hint,
+                prompt: ''
+            }));
+        }
+
+        container.innerHTML = state.videoPrompts.map((v, i) => `
+            <div class="video-shot-item">
+                <div class="shot-label">
+                    <span class="shot-num">SHOT ${i + 1}</span>
+                    <span class="shot-time">${v.time}</span>
+                    <span class="shot-tag">${v.tag || v.type}</span>
+                </div>
+                <div class="shot-content">
+                    <div class="shot-title">
+                        <i class="fas fa-video"></i> ${v.tag || v.type}
+                        <span class="shot-hint">${v.hint || ''}</span>
+                    </div>
+                    <textarea rows="2"
+                        placeholder="点击「⚡ 一键生成视频剧本」自动填充，或手动输入「${v.tag || v.type}」镜头描述..."
+                        oninput="onPromptInput(this, 'video', ${i})">${escapeHtml(v.prompt)}</textarea>
+                </div>
+            </div>
+        `).join('');
+
+        requestAnimationFrame(() => {
+            container.querySelectorAll('textarea').forEach(autoGrowTextarea);
+        });
+    }
+
+    function renderVideoGlobalParams() {
+        const container = document.getElementById('videoGlobalParams');
+        if (!container) return;
+
+        const platform = videoConfigState.platform;
+        const category = videoConfigState.category;
+        const scene = videoConfigState.scene;
+        const isEN = platform === 'TikTok Shop' || platform === 'Temu';
+
+        const sceneMod = isEN ? (VIDEO_SCENE_MODS_EN[scene] || '') : (VIDEO_SCENE_MODS[scene] || '');
+
+        const rows = [
+            { key: '实拍约束', val: isEN ? 'Real commercial product video, 4K, 60fps, no CGI, no cartoon, no 3D modeling' : VIDEO_REAL_SHOT_PREFIX },
+            { key: '运镜', val: isEN ? 'Slow push/pull shot, slight natural handheld shake, stable' : '缓慢推拉镜头，轻微自然手持抖动，稳定不晃动' },
+            { key: '光影', val: isEN ? 'Soft studio natural light, real color, not over-saturated' : '柔和自然光，色彩真实，原生色彩，不饱和度拉高' },
+            { key: '画质', val: isEN ? 'Commercial product shooting, sharp details, no plastic texture' : '商业产品实拍，细节清晰，无过度磨皮，无塑料质感' },
+            { key: '类目修饰', val: VIDEO_CATEGORY_MODS[category] || '' },
+            { key: '出镜方式', val: sceneMod },
+            { key: '负面词', val: isEN ? VIDEO_NEGATIVE_EN : VIDEO_NEGATIVE_CN }
+        ];
+
+        container.innerHTML = rows.map(r => `
+            <div class="param-row">
+                <span class="param-key">${r.key}</span>
+                <span class="param-val">${escapeHtml(r.val)}</span>
+            </div>
+        `).join('');
+    }
+
+    function previewFullPrompt() {
+        const box = document.getElementById('fullPromptBox');
+        if (!box) return;
+
+        const v = collectVars();
+        const platform = videoConfigState.platform;
+        const cfg = VIDEO_PLATFORM_CONFIG[platform];
+        const isEN = platform === 'TikTok Shop' || platform === 'Temu';
+        const scene = videoConfigState.scene;
+
+        let prompt = '';
+        if (isEN) {
+            prompt = `Real commercial product video, 4K, 60fps, ${cfg.duration}s e-commerce selling short video\n\n`;
+            state.videoPrompts.forEach((s, i) => {
+                prompt += `Shot${i + 1} (${s.time} ${s.tag}): ${s.prompt}\n`;
+            });
+            prompt += `\nCamera movement: slow push shot, slight natural handheld\n`;
+            prompt += `Light: soft studio natural light, real color\n`;
+            prompt += `Category: ${VIDEO_CATEGORY_MODS[videoConfigState.category]}\n`;
+            prompt += `Scene: ${VIDEO_SCENE_MODS_EN[scene] || ''}\n`;
+            prompt += `\nNegative prompt: ${VIDEO_NEGATIVE_EN}`;
+        } else {
+            prompt = `真实商业实拍短视频，4K，60fps，时长${cfg.duration}秒，电商带货短视频\n\n`;
+            state.videoPrompts.forEach((s, i) => {
+                prompt += `镜头${i + 1}（${s.time} ${s.tag}）：${s.prompt}\n`;
+            });
+            prompt += `\n运镜：缓慢推拉镜头，轻微自然手持抖动，稳定不晃动\n`;
+            prompt += `光影：柔和自然光，色彩真实，原生色彩，不饱和度拉高\n`;
+            prompt += `画质：商业产品实拍，细节清晰，无过度磨皮，无塑料质感\n`;
+            prompt += `类目：${VIDEO_CATEGORY_MODS[videoConfigState.category]}\n`;
+            prompt += `出镜：${VIDEO_SCENE_MODS[scene] || ''}\n`;
+            prompt += `\n禁止：${VIDEO_NEGATIVE_CN}`;
+        }
+
+        box.textContent = prompt;
+        box.classList.toggle('show');
+    }
+
+    function copyFullPrompt() {
+        const box = document.getElementById('fullPromptBox');
+        if (!box || !box.textContent) {
+            previewFullPrompt();
+            setTimeout(() => {
+                const text = box.textContent;
+                if (text) {
+                    navigator.clipboard.writeText(text).then(() => showToast('📋 完整 Prompt 已复制'))
+                        .catch(() => showToast('⚠️ 复制失败'));
+                }
+            }, 100);
+            return;
+        }
+        navigator.clipboard.writeText(box.textContent).then(() => showToast('📋 完整 Prompt 已复制'))
+            .catch(() => showToast('⚠️ 复制失败'));
+    }
+
+    function initVideoConfig() {
+        rebuildVideoScript();
+        renderVideoGlobalParams();
+        updateVideoDurationHint();
     }
 
     // ================================================================
@@ -2345,12 +2953,33 @@
 
             let videoUrl = '';
             if (state.selectedTypes.includes('video')) {
-                let videoPrompt = state.videoPrompts.map(v => v.prompt).filter(Boolean).join('。') || `${name} 商品展示短视频`;
+                // 拼装完整视频 prompt
+                const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+                const isEN = videoConfigState.platform === 'TikTok Shop' || videoConfigState.platform === 'Temu';
+                let videoPrompt = '';
+                if (isEN) {
+                    videoPrompt = `Real commercial product video, 4K, 60fps, ${cfg.duration}s e-commerce selling short video. `;
+                    videoPrompt += state.videoPrompts.map((s, i) => `Shot${i+1}(${s.time} ${s.tag}): ${s.prompt}`).join('. ');
+                    videoPrompt += `. Camera: slow push shot, slight natural handheld. Light: soft studio natural light, real color. `;
+                    videoPrompt += `Category: ${VIDEO_CATEGORY_MODS[videoConfigState.category]}. `;
+                    videoPrompt += `Scene: ${VIDEO_SCENE_MODS_EN[videoConfigState.scene] || ''}. `;
+                    videoPrompt += `Negative prompt: ${VIDEO_NEGATIVE_EN}`;
+                } else {
+                    videoPrompt = `真实商业实拍短视频，4K，60fps，时长${cfg.duration}秒，电商带货短视频。`;
+                    videoPrompt += state.videoPrompts.map((s, i) => `镜头${i+1}（${s.time} ${s.tag}）：${s.prompt}`).join('。');
+                    videoPrompt += `。运镜：缓慢推拉镜头，轻微自然手持抖动，稳定不晃动。`;
+                    videoPrompt += `光影：柔和自然光，色彩真实，原生色彩，不饱和度拉高。`;
+                    videoPrompt += `画质：商业产品实拍，细节清晰，无过度磨皮，无塑料质感。`;
+                    videoPrompt += `类目：${VIDEO_CATEGORY_MODS[videoConfigState.category]}。`;
+                    videoPrompt += `出镜：${VIDEO_SCENE_MODS[videoConfigState.scene] || ''}。`;
+                    videoPrompt += `禁止：${VIDEO_NEGATIVE_CN}`;
+                }
                 if (videoAnalysis?.prompt) videoPrompt = videoAnalysis.prompt;
+
                 updateProgress(60, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
                 try {
                     const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
-                    videoUrl = await generateAgnesVideo(videoPrompt, '5', combinedRefs, videoRatio, (attempt, total, status, text) => {
+                    videoUrl = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, (attempt, total, status, text) => {
                         const pct = 60 + Math.min(35, (attempt / total) * 35);
                         updateProgress(pct, '视频：' + text);
                     });
@@ -2452,7 +3081,7 @@
             } else {
                 videoContainer.innerHTML = `
                     <i class="fas fa-play-circle placeholder-icon"></i>
-                    <div class="placeholder-text">${escapeHtml(productName)} · 5秒种草短视频</div>
+                    <div class="placeholder-text">${escapeHtml(productName)} · 视频</div>
                     <div class="placeholder-sub">🎵 轻快流行 · ${data.videoRatio || '9:16'}</div>
                     <div class="placeholder-warn"><i class="fas fa-exclamation-triangle"></i> 视频生成未完成或失败</div>
                 `;
@@ -2868,7 +3497,6 @@
 
         renderCarouselPrompts();
         renderDetailPrompts();
-        renderVideoScript();
         updateTabCounts();
         updateCountHint();
 
@@ -2878,6 +3506,9 @@
         updatePlatformToggleBtn();
         renderSyncRecords();
 
+        // ★ 初始化视频配置
+        initVideoConfig();
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const picker = document.getElementById('productPickerModal');
@@ -2885,7 +3516,7 @@
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（暗淡图片序号 · textarea 自动换行）');
+        console.log('🎨 智能素材生成已就绪（新增东方/海外人物全景选项）');
     });
 
     // 全局暴露
@@ -2934,8 +3565,16 @@
     window.pickProduct = pickProduct;
     window.handleOneClickPrompts = handleOneClickPrompts;
     window.switchCount = switchCount;
-    // ★ 新增
     window.onPromptInput = onPromptInput;
+    // ★ 视频配置
+    window.selectVideoPlatform = selectVideoPlatform;
+    window.selectVideoCategory = selectVideoCategory;
+    window.selectVideoHook = selectVideoHook;
+    window.selectVideoScene = selectVideoScene;
+    window.handleOneClickVideoScript = handleOneClickVideoScript;
+    window.previewFullPrompt = previewFullPrompt;
+    window.copyFullPrompt = copyFullPrompt;
+    window.renderVideoScript = renderVideoScript;
 </script>
 </body>
 </html>
