@@ -18,6 +18,8 @@
             darkBg: '#111827',
             panelBg: '#1F2937',
             cardBg: '#374151',
+            canvasBg: '#2b303b',
+            toolBg: '#383e4b',
           },
         }
       }
@@ -29,6 +31,9 @@
       .scrollbar-hide::-webkit-scrollbar { display: none; }
       .safe-area-border {
         background-image:repeating-linear-gradient(45deg, rgba(255,200,0,0.4),rgba(255,200,0,0.4) 4px,transparent 4px,transparent 8px);
+      }
+      .tool-btn {
+        @apply w-8 h-8 flex items-center justify-center rounded-md bg-toolBg text-gray-300 hover:bg-primary hover:text-white cursor-pointer transition-all;
       }
     }
   </style>
@@ -96,15 +101,64 @@
         <span class="text-sm text-gray-400">预览画布｜平台安全区校验</span>
         <span id="platformName" class="text-sm px-2 py-1 rounded bg-primary/20 text-primary">当前：抖音电商</span>
       </div>
-      <div class="relative w-[500px] h-[500px] bg-gray-800 rounded-lg overflow-hidden border border-gray-600">
+
+      <!-- ============ 画布容器（合并工具栏组件） ============ -->
+      <div id="canvasContainer" class="relative w-[500px] h-[500px] bg-canvasBg rounded-lg overflow-hidden border border-gray-600">
+
+        <!-- =====【画布右上角：水平4个按钮】===== -->
+        <div class="absolute top-3 right-14 flex gap-2 z-10">
+          <div class="tool-btn" id="btnCompare" title="原图/结果分屏对比">
+            <i class="fa fa-columns"></i>
+          </div>
+          <div class="tool-btn" id="btnStar" title="收藏当前素材">
+            <i class="fa fa-heart-o"></i>
+          </div>
+          <div class="tool-btn" id="btnSafeArea" title="平台安全区框 显示/隐藏">
+            <i class="fa fa-shield"></i>
+          </div>
+          <div class="tool-btn" id="btnSnapshot" title="保存画布版本快照">
+            <i class="fa fa-check-square-o"></i>
+          </div>
+        </div>
+
+        <!-- =====【画布右侧垂直：6个工具图标】===== -->
+        <div class="absolute top-12 right-3 flex flex-col gap-2 z-10">
+          <div class="tool-btn" id="btnResetView" title="重置画布视图">
+            <i class="fa fa-home"></i>
+          </div>
+          <div class="tool-btn" id="btnRotate" title="顺时针旋转90°">
+            <i class="fa fa-repeat"></i>
+          </div>
+          <div class="tool-btn" id="btnCrop" title="图片裁切">
+            <i class="fa fa-crop"></i>
+          </div>
+          <div class="tool-btn" id="btnLayerDown" title="图层向下">
+            <i class="fa fa-arrow-down"></i>
+          </div>
+          <div class="tool-btn" id="btnLayerUp" title="图层向上">
+            <i class="fa fa-arrow-up"></i>
+          </div>
+          <div class="tool-btn" id="btnCanvasSetting" title="画布设置">
+            <i class="fa fa-cog"></i>
+          </div>
+        </div>
+
         <!-- 安全区蒙版 -->
         <div id="safeMask" class="absolute inset-4 border-2 border-dashed border-yellow-400 pointer-events-none"></div>
-        <img id="previewImg" src="" class="w-full h-full object-contain hidden">
-        <div id="emptyTip" class="w-full h-full flex items-center justify-center text-gray-500">
-          <i class="fa fa-image text-4xl mb-2 block"></i>
-          <p>上传图片后预览</p>
+
+        <!-- 画布中间预览内容 -->
+        <div id="canvasStage" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-transform duration-300">
+          <div id="safeBox" class="w-56 h-56 border-2 border-yellow-400 border-dashed flex items-center justify-center">
+            <img id="previewImg" src="" class="w-full h-full object-contain hidden">
+            <div id="emptyTip" class="text-gray-500 text-center">
+              <i class="fa fa-image text-4xl mb-2 block"></i>
+              <p class="text-xs">上传图片后预览</p>
+            </div>
+          </div>
         </div>
       </div>
+      <!-- ============ 画布容器结束 ============ -->
+
       <div class="mt-4 flex gap-2 flex-wrap justify-center">
         <button class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-magic"></i> AI白底抠图</button>
         <button class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-crop"></i> 裁剪</button>
@@ -115,6 +169,7 @@
         <button id="genCopyBtn" class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-file-text"></i>生成多语言文案</button>
         <button id="openVideoPanelBtn" class="px-3 py-2 rounded bg-primary"><i class="fa fa-film"></i>图片生成短视频</button>
       </div>
+
       <div class="mt-4 w-full">
         <div class="flex justify-between items-center mb-2">
           <span class="text-sm text-gray-400">批量任务队列（可勾选多选批量生成视频/发布）</span>
@@ -127,6 +182,7 @@
           <!-- 任务卡片动态生成，增加勾选框 -->
         </div>
       </div>
+
       <!-- 合规检测结果面板 -->
       <div id="checkResultPanel" class="mt-4 w-full hidden">
         <div class="bg-cardBg p-3 rounded-lg">
@@ -141,6 +197,7 @@
           </div>
         </div>
       </div>
+
       <!-- 多语言文案生成面板 -->
       <div id="copyPanel" class="mt-4 w-full hidden">
         <div class="bg-cardBg p-3 rounded-lg">
@@ -155,7 +212,8 @@
           </div>
         </div>
       </div>
-      <!-- ===== AI视频生成面板【批量队列生成】===== -->
+
+      <!-- ===== AI视频生成面板 ===== -->
       <div id="videoGenPanel" class="mt-4 w-full hidden">
         <div class="bg-cardBg p-4 rounded-lg">
           <div class="flex justify-between items-center mb-3">
@@ -212,23 +270,20 @@
           <div class="mt-3">
             <button id="startBatchVideoGenBtn" class="px-4 py-2 rounded bg-primary text-white w-full"><i class="fa fa-play-circle mr-1"></i>开始批量生成短视频（选中图片）</button>
           </div>
-          <!-- 批量视频生成任务进度列表 -->
           <div id="batchVideoProgressWrap" class="mt-3 hidden">
             <p class="text-xs mb-2">批量生成任务队列</p>
-            <div id="batchVideoList" class="space-y-2 max-h-40 overflow-y-auto">
-              <!-- 动态生成每个视频任务进度 -->
-            </div>
+            <div id="batchVideoList" class="space-y-2 max-h-40 overflow-y-auto"></div>
           </div>
         </div>
       </div>
-      <!-- ===== 【新增】多平台一键发布面板 ===== -->
+
+      <!-- ===== 多平台一键发布面板 ===== -->
       <div id="publishPanel" class="mt-4 w-full hidden">
         <div class="bg-cardBg p-4 rounded-lg">
           <div class="flex justify-between items-center mb-3">
             <span class="font-medium text-sm"><i class="fa fa-paper-plane mr-1"></i>多平台素材发布｜图片+视频投递商品</span>
             <button id="closePublishPanelBtn" class="text-xs px-2 py-0.5 rounded bg-gray-600">关闭</button>
           </div>
-          <!-- 店铺选择区域 -->
           <div class="grid grid-cols-2 gap-3 text-sm mb-3">
             <div>
               <label class="block text-gray-300 text-xs mb-1">选择平台</label>
@@ -275,13 +330,10 @@
             </label>
           </div>
           <button id="startPublishBtn" class="px-4 py-2 rounded bg-primary text-white w-full"><i class="fa fa-rocket mr-1"></i>提交选中素材，批量发布到平台</button>
-          <!-- 发布任务进度面板 -->
           <div id="publishProgressWrap" class="mt-3 hidden">
             <p class="text-xs mb-2">发布任务队列</p>
-            <div id="publishTaskList" class="space-y-2 max-h-40 overflow-y-auto">
-            </div>
+            <div id="publishTaskList" class="space-y-2 max-h-40 overflow-y-auto"></div>
           </div>
-          <!-- 发布日志 -->
           <div class="mt-3 border-t border-gray-700 pt-3">
             <p class="text-xs mb-2">发布操作日志</p>
             <div id="publishLog" class="bg-gray-800 p-2 rounded max-h-20 overflow-y-auto text-xs text-gray-300">
@@ -350,7 +402,6 @@
             <button class="px-3 py-1 rounded bg-cardBg">WebP</button>
           </div>
         </div>
-        <!-- 新增：店铺授权管理 -->
         <div class="border-t border-gray-700 pt-4 mt-4">
           <h4 class="text-sm font-medium mb-2">店铺授权管理</h4>
           <div class="space-y-2 text-xs">
@@ -374,7 +425,7 @@
   </div>
 
 <script>
-// 平台配置数据 国内 + 跨境
+// ==================== 平台配置 ====================
 const platformConfig = {
   douyin:{w:1080,h:1440,name:"抖音电商",rule:"抖音电商：主图3:4，主体居中，文字不要超过图面积20%"},
   taobao:{w:800,h:800,name:"淘宝",rule:"淘宝主图1:1，白底，禁止过多装饰文字"},
@@ -383,7 +434,6 @@ const platformConfig = {
   tiktokshop:{w:1080,h:1080,name:"TikTok Shop",rule:"TikTok Shop：主图1:1，英文卖点，主体突出，无违规图案"},
   shein:{w:750,h:1000,name:"Shein",rule:"Shein产品图，场景+白底两套，注意版权，禁止侵权素材"}
 }
-// 违禁词库，区分国内广告法 / 跨境平台禁词
 const badWordLib = {
   domestic:["最","第一","顶级","绝对","永久","国家级","全网第一","最高级"],
   cross:["best","No.1","absolute","permanent","top1","#1"]
@@ -416,7 +466,6 @@ const enCopy = document.getElementById('enCopy');
 const esCopy = document.getElementById('esCopy');
 const copyClipBtn = document.getElementById('copyClipBtn');
 
-// 视频面板元素
 const videoGenPanel = document.getElementById('videoGenPanel');
 const openVideoPanelBtn = document.getElementById('openVideoPanelBtn');
 const closeVideoPanelBtn = document.getElementById('closeVideoPanelBtn');
@@ -427,7 +476,6 @@ const videoSubtitle = document.getElementById('videoSubtitle');
 const selectAllTask = document.getElementById("selectAllTask");
 const unSelectAllTask = document.getElementById("unSelectAllTask");
 
-// ========== 发布模块新增DOM ==========
 const publishOpenBtn = document.getElementById('publishOpenBtn');
 const publishPanel = document.getElementById('publishPanel');
 const closePublishPanelBtn = document.getElementById('closePublishPanelBtn');
@@ -442,7 +490,7 @@ let taskDataList = [];
 let currentMode = "domestic";
 let versionCount = 1;
 
-// 切换平台事件
+// ==================== 平台切换 ====================
 platformSelect.onchange = function(){
   const key = this.value;
   const cfg = platformConfig[key];
@@ -451,7 +499,6 @@ platformSelect.onchange = function(){
   platformName.innerText = `当前：${cfg.name}`;
 }
 
-// 国内/跨境模式切换
 btnDomestic.onclick = ()=>{
   btnDomestic.classList.add('bg-primary');
   btnCross.classList.remove('bg-primary');
@@ -467,7 +514,7 @@ btnCross.onclick = ()=>{
   currentMode = "cross";
 }
 
-// 图片上传预览
+// ==================== 图片上传 ====================
 fileInput.onchange = function(e){
   const files = e.target.files;
   for(let file of files){
@@ -482,7 +529,6 @@ fileInput.onchange = function(e){
   }
 }
 
-// 添加批量任务卡片【增加勾选框】
 function addTaskCard(filename, imgSrc){
   const taskId = Date.now() + Math.random();
   const div = document.createElement('div');
@@ -508,7 +554,6 @@ function addTaskCard(filename, imgSrc){
   })
 }
 
-// 全选 / 取消全选
 selectAllTask.onclick = ()=>{
   document.querySelectorAll(".task-checkbox").forEach(cb=>cb.checked=true);
 }
@@ -516,7 +561,7 @@ unSelectAllTask.onclick = ()=>{
   document.querySelectorAll(".task-checkbox").forEach(cb=>cb.checked=false);
 }
 
-// 单图合规检测
+// ==================== 合规检测 ====================
 singleCheckBtn.onclick = function(){
   checkResultPanel.classList.remove('hidden');
   const mockOcr = "优质，全网最好，性价比高";
@@ -539,12 +584,10 @@ singleCheckBtn.onclick = function(){
   }
 }
 
-// 批量合规检测
 batchCheckBtn.onclick = function(){
   alert(`开始批量检测，一共${taskDataList.length}张图片，自动扫描违禁词，标记违规任务卡片`);
 }
 
-// 批量打包ZIP下载
 batchZipBtn.onclick = async function(){
   if(taskDataList.length ===0){
     alert("任务队列为空，请先上传图片");
@@ -561,7 +604,6 @@ batchZipBtn.onclick = async function(){
   saveAs(blob, `素材包_${platformNameText}.zip`);
 }
 
-// 保存素材版本
 versionSaveBtn.onclick = function(){
   versionCount++;
   const date = new Date().toLocaleDateString();
@@ -572,7 +614,6 @@ versionSaveBtn.onclick = function(){
   alert(`已保存V${versionCount}版本，可随时切换回历史版本`);
 }
 
-// 生成多语言卖点文案
 genCopyBtn.onclick = function(){
   copyPanel.classList.remove('hidden');
   if(currentMode === "domestic"){
@@ -584,19 +625,17 @@ genCopyBtn.onclick = function(){
     enCopy.innerText = "High quality ceramic teacup, heat resistant, smooth glaze";
     esCopy.innerText = "Taza de cerámica de alta calidad, resistente al calor, esmalte suave";
   }
-  // 自动填充字幕框 + 发布标题
   videoSubtitle.value = zhCopy.innerText;
   publishTitle.value = enCopy.innerText;
   publishSkuCode.value = "SKU00128";
 }
-// 复制文案
 copyClipBtn.onclick = async function(){
   const text = `中文：${zhCopy.innerText}\nEN：${enCopy.innerText}\nES：${esCopy.innerText}`;
   await navigator.clipboard.writeText(text);
   alert("文案复制成功！");
 }
 
-// ========== AI视频面板交互 ==========
+// ==================== 视频生成 ====================
 openVideoPanelBtn.onclick = function(){
   videoGenPanel.classList.remove('hidden');
 }
@@ -604,9 +643,7 @@ closeVideoPanelBtn.onclick = function(){
   videoGenPanel.classList.add('hidden');
 }
 
-// 批量生成视频逻辑
 startBatchVideoGenBtn.onclick = async function(){
-  // 获取选中的图片
   const checkedBoxes = Array.from(document.querySelectorAll(".task-checkbox:checked"));
   if(checkedBoxes.length === 0){
     alert("请在任务队列勾选至少一张图片，用于批量生成短视频");
@@ -614,7 +651,6 @@ startBatchVideoGenBtn.onclick = async function(){
   }
   batchVideoProgressWrap.classList.remove('hidden');
   batchVideoList.innerHTML = "";
-  // 循环逐个模拟生成
   for(let i=0; i<checkedBoxes.length; i++){
     const card = checkedBoxes[i].closest(".shrink-0");
     const name = card.querySelector(".text-xs.truncate").innerText;
@@ -656,7 +692,7 @@ startBatchVideoGenBtn.onclick = async function(){
   alert("✅ 全部选中图片的短视频生成任务完成！");
 }
 
-// ========== 【新增】多平台发布交互 ==========
+// ==================== 多平台发布 ====================
 publishOpenBtn.onclick = function(){
   publishPanel.classList.remove('hidden');
 }
@@ -716,7 +752,221 @@ startPublishBtn.onclick = async function(){
   alert("✅ 批量素材投递到店铺后台完成！");
 }
 
-// 初始化
+// ================================================================
+// ★★★ 画布工具栏组件（新增合并）★★★
+// ================================================================
+const btnCompare = document.getElementById('btnCompare');
+const btnStar = document.getElementById('btnStar');
+const btnSafeArea = document.getElementById('btnSafeArea');
+const btnSnapshot = document.getElementById('btnSnapshot');
+const safeBox = document.getElementById('safeBox');
+const safeMask = document.getElementById('safeMask');
+const canvasStage = document.getElementById('canvasStage');
+
+const btnResetView = document.getElementById('btnResetView');
+const btnRotate = document.getElementById('btnRotate');
+const btnCrop = document.getElementById('btnCrop');
+const btnLayerDown = document.getElementById('btnLayerDown');
+const btnLayerUp = document.getElementById('btnLayerUp');
+const btnCanvasSetting = document.getElementById('btnCanvasSetting');
+
+// 画布状态
+const canvasState = {
+  compareMode: false,
+  starred: false,
+  safeAreaVisible: true,
+  rotation: 0,
+  scale: 1,
+  layerZ: 0,
+  hasImage: false
+};
+
+// ---------- 右上角 4 按钮 ----------
+
+// 1 分屏对比
+btnCompare.onclick = ()=>{
+  canvasState.compareMode = !canvasState.compareMode;
+  btnCompare.classList.toggle('bg-primary', canvasState.compareMode);
+  btnCompare.classList.toggle('text-white', canvasState.compareMode);
+  if(canvasState.compareMode){
+    // 简易对比：画布左半边显示原图，右半边显示当前
+    const stage = document.getElementById('canvasStage');
+    const img = document.getElementById('previewImg');
+    if(img && img.src){
+      // 记录原图（第一次开启时）
+      if(!stage.dataset.originalSrc){
+        stage.dataset.originalSrc = img.src;
+      }
+      // 用 clip-path 做左右对比
+      img.style.clipPath = 'inset(0 50% 0 0)';
+      // 右侧叠加一层相同图片
+      let clone = document.getElementById('compareClone');
+      if(!clone){
+        clone = document.createElement('img');
+        clone.id = 'compareClone';
+        clone.className = 'absolute inset-0 w-full h-full object-contain';
+        clone.style.clipPath = 'inset(0 0 0 50%)';
+        clone.style.filter = 'brightness(1.08) saturate(1.1)';
+        stage.appendChild(clone);
+      }
+      clone.src = img.src;
+      clone.style.display = 'block';
+      // 添加分割线
+      let divider = document.getElementById('compareDivider');
+      if(!divider){
+        divider = document.createElement('div');
+        divider.id = 'compareDivider';
+        divider.className = 'absolute top-0 bottom-0 left-1/2 w-0.5 bg-yellow-400 z-20';
+        divider.style.transform = 'translateX(-50%)';
+        stage.appendChild(divider);
+      }
+      divider.style.display = 'block';
+      alert('开启：原图｜处理后 左右分屏对比模式');
+    }else{
+      alert('请先上传图片后再开启对比');
+      canvasState.compareMode = false;
+      btnCompare.classList.remove('bg-primary','text-white');
+    }
+  }else{
+    // 关闭对比
+    const img = document.getElementById('previewImg');
+    if(img) img.style.clipPath = 'none';
+    const clone = document.getElementById('compareClone');
+    if(clone) clone.style.display = 'none';
+    const divider = document.getElementById('compareDivider');
+    if(divider) divider.style.display = 'none';
+  }
+}
+
+// 2 收藏
+btnStar.onclick = ()=>{
+  canvasState.starred = !canvasState.starred;
+  btnStar.innerHTML = canvasState.starred
+    ? `<i class="fa fa-heart text-red-400"></i>`
+    : `<i class="fa fa-heart-o"></i>`;
+  btnStar.classList.toggle('bg-primary', canvasState.starred);
+  alert(canvasState.starred ? "✅ 已收藏该素材" : "取消收藏");
+}
+
+// 3 安全区显隐
+btnSafeArea.onclick = ()=>{
+  canvasState.safeAreaVisible = !canvasState.safeAreaVisible;
+  safeBox.style.display = canvasState.safeAreaVisible ? 'flex' : 'none';
+  safeMask.style.display = canvasState.safeAreaVisible ? 'block' : 'none';
+  btnSafeArea.classList.toggle('bg-primary', !canvasState.safeAreaVisible);
+}
+
+// 4 保存版本快照
+btnSnapshot.onclick = ()=>{
+  versionCount++;
+  const date = new Date().toLocaleString('zh-CN', {hour12:false});
+  const div = document.createElement("div");
+  div.className = "p-1.5 rounded bg-cardBg cursor-pointer hover:bg-gray-600";
+  div.innerText = `V${versionCount} 画布快照 ${date}`;
+  versionList.appendChild(div);
+  alert(`💾 已保存画布快照 V${versionCount}，写入版本历史`);
+}
+
+// ---------- 右侧垂直 6 按钮 ----------
+
+// 1 重置视图
+btnResetView.onclick = ()=>{
+  canvasState.rotation = 0;
+  canvasState.scale = 1;
+  canvasStage.style.transform = 'translate(-50%, -50%) rotate(0deg) scale(1)';
+  alert("🔄 画布视图已重置：图片居中恢复原始缩放");
+}
+
+// 2 旋转
+btnRotate.onclick = ()=>{
+  canvasState.rotation = (canvasState.rotation + 90) % 360;
+  canvasStage.style.transform = `translate(-50%, -50%) rotate(${canvasState.rotation}deg) scale(${canvasState.scale})`;
+  alert(`🔃 图片已旋转至 ${canvasState.rotation}°`);
+}
+
+// 3 裁切
+btnCrop.onclick = ()=>{
+  const ratio = prompt(
+    "选择裁切比例：\n1 = 3:4（抖音/淘宝主图）\n2 = 1:1（Temu/淘宝）\n3 = 9:16（TikTok竖版）\n4 = 16:9（横版）",
+    "1"
+  );
+  if(!ratio) return;
+  const map = { "1":"3:4", "2":"1:1", "3":"9:16", "4":"16:9" };
+  alert(`✂️ 已进入裁切模式：${map[ratio] || '3:4'}\n拖动选框调整区域后确认`);
+}
+
+// 4 图层下移
+btnLayerDown.onclick = ()=>{
+  canvasState.layerZ = Math.max(-10, canvasState.layerZ - 1);
+  safeBox.style.zIndex = canvasState.layerZ;
+  alert("⬇️ 当前选中图层向下移动一层");
+}
+
+// 5 图层上移
+btnLayerUp.onclick = ()=>{
+  canvasState.layerZ = Math.min(10, canvasState.layerZ + 1);
+  safeBox.style.zIndex = canvasState.layerZ;
+  alert("⬆️ 当前选中图层向上移动一层");
+}
+
+// 6 画布设置
+btnCanvasSetting.onclick = ()=>{
+  const choice = prompt(
+    "画布设置：\n1 = 切换网格线\n2 = 切换辅助线\n3 = 切换画布背景色（深/浅）\n4 = 重置所有画布设置",
+    "1"
+  );
+  if(!choice) return;
+  const container = document.getElementById('canvasContainer');
+  if(choice === "1"){
+    // 切换网格线（用背景图模拟）
+    if(container.dataset.grid === "on"){
+      container.style.backgroundImage = '';
+      container.dataset.grid = "off";
+      alert("网格线：已关闭");
+    }else{
+      container.style.backgroundImage =
+        'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),' +
+        'linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)';
+      container.style.backgroundSize = '20px 20px';
+      container.dataset.grid = "on";
+      alert("网格线：已开启");
+    }
+  }else if(choice === "2"){
+    // 切换辅助线（画布中心十字线）
+    let guide = document.getElementById('guideLines');
+    if(guide){
+      guide.remove();
+      alert("辅助线：已关闭");
+    }else{
+      guide = document.createElement('div');
+      guide.id = 'guideLines';
+      guide.className = 'absolute inset-0 pointer-events-none z-20';
+      guide.innerHTML = `
+        <div class="absolute top-1/2 left-0 right-0 h-px bg-cyan-400/60"></div>
+        <div class="absolute left-1/2 top-0 bottom-0 w-px bg-cyan-400/60"></div>
+      `;
+      container.appendChild(guide);
+      alert("辅助线：已开启（中心十字）");
+    }
+  }else if(choice === "3"){
+    const isDark = container.dataset.bg !== "light";
+    container.style.background = isDark ? '#f3f4f6' : '';
+    container.dataset.bg = isDark ? "light" : "dark";
+    alert(isDark ? "画布背景：浅色" : "画布背景：深色");
+  }else if(choice === "4"){
+    canvasState.rotation = 0;
+    canvasState.scale = 1;
+    canvasState.layerZ = 0;
+    canvasStage.style.transform = 'translate(-50%, -50%)';
+    container.style.backgroundImage = '';
+    container.style.background = '';
+    const guide = document.getElementById('guideLines');
+    if(guide) guide.remove();
+    alert("画布设置已重置");
+  }
+}
+
+// ==================== 初始化 ====================
 platformSelect.dispatchEvent(new Event('change'));
 </script>
 </body>
