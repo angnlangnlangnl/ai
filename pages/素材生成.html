@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI素材运营中台｜素材数据看板</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            darkBg: '#111827',
+            panelBg: '#1F2937',
+            cardBg: '#374151',
+            success: '#22c55e',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+          },
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto { content-visibility: auto; }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+    }
+  </style>
+</head>
+<body class="bg-darkBg text-gray-100 h-screen overflow-hidden flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="h-14 bg-panelBg border-b border-gray-700 flex items-center px-4 justify-between shrink-0">
+    <div class="flex items-center gap-4">
+      <span class="text-xl font-bold text-primary">AI素材运营中台</span>
+      <div class="flex rounded-lg overflow-hidden border border-gray-600">
+        <button id="pageMaterial" class="px-4 py-1.5 bg-cardBg">素材生产</button>
+        <button id="pageDashboard" class="px-4 py-1.5 bg-primary text-white">数据看板</button>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <button id="timeFilterBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-calendar mr-1"></i>时间筛选：近30天</button>
+      <button id="exportReportBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-download mr-1"></i>导出报表</button>
+      <button id="aiAnalysisBtn" class="px-3 py-1 rounded bg-primary"><i class="fa fa-lightbulb-o mr-1"></i>AI素材诊断</button>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- 左侧：SKU筛选、平台筛选 -->
+    <aside class="w-72 bg-panelBg border-r border-gray-700 flex flex-col">
+      <div class="p-3 border-b border-gray-700">
+        <input type="text" placeholder="搜索SKU / 素材名称" class="w-full bg-cardBg rounded px-3 py-2 outline-none">
+      </div>
+      <div class="p-3 border-b border-gray-700">
+        <div class="text-sm font-medium mb-2">平台筛选</div>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input type="checkbox" checked class="accent-primary">Temu</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked class="accent-primary">TikTok Shop</label>
+          <label class="flex items-center gap-2"><input type="checkbox" class="accent-primary">Shein</label>
+          <label class="flex items-center gap-2"><input type="checkbox" class="accent-primary">抖音电商</label>
+        </div>
+      </div>
+      <div class="p-3 text-sm font-medium text-gray-300">SKU素材列表</div>
+      <div class="flex-1 overflow-y-auto p-2 space-y-2">
+        <div class="p-2 rounded bg-cardBg cursor-pointer border border-primary">
+          <div class="font-medium">SKU00128 - 陶瓷茶杯</div>
+          <div class="text-xs text-gray-400">Temu / TikTok Shop</div>
+          <div class="text-xs text-success">CTR:4.2% ✅优质</div>
+        </div>
+        <div class="p-2 rounded bg-cardBg cursor-pointer hover:border-gray-500 border border-transparent">
+          <div class="font-medium">SKU00129 - 运动跑鞋</div>
+          <div class="text-xs text-gray-400">Temu</div>
+          <div class="text-xs text-warning">CTR:2.1% ⚠待优化</div>
+        </div>
+        <div class="p-2 rounded bg-cardBg cursor-pointer hover:border-gray-500 border border-transparent">
+          <div class="font-medium">SKU00130 - 茶叶礼盒</div>
+          <div class="text-xs text-gray-400">抖音电商</div>
+          <div class="text-xs text-danger">CTR:0.8% ❌低转化</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 中间主看板区域 -->
+    <main class="flex-1 p-4 overflow-y-auto">
+      <!-- 核心指标卡片行 -->
+      <div class="grid grid-cols-4 gap-4 mb-4">
+        <div class="bg-cardBg p-4 rounded-lg">
+          <div class="text-gray-400 text-sm">总曝光</div>
+          <div class="text-2xl font-bold mt-1">1,286,540</div>
+          <div class="text-xs text-success mt-1"><i class="fa fa-arrow-up"></i> +18.6% 环比</div>
+        </div>
+        <div class="bg-cardBg p-4 rounded-lg">
+          <div class="text-gray-400 text-sm">总点击</div>
+          <div class="text-2xl font-bold mt-1">45,216</div>
+          <div class="text-xs text-success mt-1"><i class="fa fa-arrow-up"></i> +12.3% 环比</div>
+        </div>
+        <div class="bg-cardBg p-4 rounded-lg">
+          <div class="text-gray-400 text-sm">平均CTR点击率</div>
+          <div class="text-2xl font-bold mt-1">3.51%</div>
+          <div class="text-xs text-warning mt-1"><i class="fa fa-arrow-down"></i> -0.4% 环比</div>
+        </div>
+        <div class="bg-cardBg p-4 rounded-lg">
+          <div class="text-gray-400 text-sm">素材投产素材数</div>
+          <div class="text-2xl font-bold mt-1">36套</div>
+          <div class="text-xs text-success mt-1"><i class="fa fa-arrow-up"></i> +6套</div>
+        </div>
+      </div>
+
+      <!-- 图表区域 -->
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="bg-cardBg p-4 rounded-lg">
+          <div class="font-medium mb-2">素材曝光趋势</div>
+          <canvas id="trendChart" height="220"></canvas>
+        </div>
+        <div class="bg-cardBg p-4 rounded-lg">
+          <div class="font-medium mb-2">各平台素材CTR对比</div>
+          <canvas id="platformChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- 素材排行表格 -->
+      <div class="bg-cardBg p-4 rounded-lg mb-4">
+        <div class="flex justify-between items-center mb-3">
+          <div class="font-medium">素材效果排行（按点击率排序）</div>
+          <div class="text-xs text-gray-400">点击素材卡片可查看详情 & AI优化建议</div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-600 text-left text-gray-400">
+                <th class="pb-2">素材预览</th>
+                <th class="pb-2">SKU</th>
+                <th class="pb-2">平台</th>
+                <th class="pb-2">素材类型</th>
+                <th class="pb-2">曝光</th>
+                <th class="pb-2">点击</th>
+                <th class="pb-2">CTR</th>
+                <th class="pb-2">状态</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+              <tr class="hover:bg-gray-600/40 cursor-pointer">
+                <td class="py-2"><div class="w-12 h-12 bg-gray-700 rounded"></div></td>
+                <td>SKU00128</td>
+                <td>Temu</td>
+                <td>主图</td>
+                <td>326,000</td>
+                <td>13,700</td>
+                <td class="text-success">4.20%</td>
+                <td><span class="px-1.5 py-0.5 rounded bg-success/20 text-success">优质</span></td>
+              </tr>
+              <tr class="hover:bg-gray-600/40 cursor-pointer">
+                <td class="py-2"><div class="w-12 h-12 bg-gray-700 rounded"></div></td>
+                <td>SKU00128</td>
+                <td>TikTok Shop</td>
+                <td>短视频</td>
+                <td>284,000</td>
+                <td>9,650</td>
+                <td class="text-success">3.40%</td>
+                <td><span class="px-1.5 py-0.5 rounded bg-success/20 text-success">优质</span></td>
+              </tr>
+              <tr class="hover:bg-gray-600/40 cursor-pointer">
+                <td class="py-2"><div class="w-12 h-12 bg-gray-700 rounded"></div></td>
+                <td>SKU00129</td>
+                <td>Temu</td>
+                <td>主图</td>
+                <td>241,000</td>
+                <td>5,060</td>
+                <td class="text-warning">2.10%</td>
+                <td><span class="px-1.5 py-0.5 rounded bg-warning/20 text-warning">待优化</span></td>
+              </tr>
+              <tr class="hover:bg-gray-600/40 cursor-pointer">
+                <td class="py-2"><div class="w-12 h-12 bg-gray-700 rounded"></div></td>
+                <td>SKU00130</td>
+                <td>抖音电商</td>
+                <td>短视频</td>
+                <td>195,000</td>
+                <td>1,560</td>
+                <td class="text-danger">0.80%</td>
+                <td><span class="px-1.5 py-0.5 rounded bg-danger/20 text-danger">低转化</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- AI素材诊断面板 -->
+      <div id="aiDiagnosePanel" class="bg-cardBg p-4 rounded-lg hidden">
+        <div class="flex justify-between items-center mb-3">
+          <div class="font-medium"><i class="fa fa-lightbulb-o text-primary mr-2"></i>AI素材智能诊断报告</div>
+          <button id="closeAiDiagnose" class="text-xs px-2 py-0.5 rounded bg-gray-600">关闭</button>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <div class="text-gray-300 mb-2">📊 整体结论</div>
+            <p class="text-gray-300 text-xs leading-relaxed">
+              SKU00128陶瓷茶杯素材表现最优，纯白底主图产品主体突出，适合Temu流量；SKU00130茶叶短视频点击率偏低，画面文字过多，色调偏暗，建议重新生成高亮度场景图。
+            </p>
+          </div>
+          <div>
+            <div class="text-gray-300 mb-2">💡AI优化建议</div>
+            <ul class="text-xs space-y-1 text-gray-300">
+              <li>✅ 复制SKU00128的构图风格，批量生成同系列产品主图</li>
+              <li>⚠ 低点击率素材：减少画面文字，提升产品亮度</li>
+              <li>🎬 TikTok短视频：优先使用缓慢推镜，5-8秒短视频，开头3秒放大产品特写</li>
+              <li>🌐 Temu平台：不要添加多余装饰，纯白底素材点击率更高</li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-gray-700">
+          <div class="text-sm mb-2">一键生成优化提示词</div>
+          <textarea class="w-full bg-gray-800 p-2 rounded text-xs h-20" readonly>
+商业产品摄影，陶瓷茶杯，纯白背景，柔和柔光，产品居中，高清细节，电商主图，Temu平台，无多余文字，800x800，干净高级
+          </textarea>
+          <button id="copyPromptBtn" class="mt-2 px-3 py-1 rounded bg-primary text-xs">复制提示词，跳转素材生产页面</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+<script>
+// 图表初始化
+const trendCtx = document.getElementById('trendChart').getContext('2d');
+const trendChart = new Chart(trendCtx, {
+  type: 'line',
+  data: {
+    labels: ['1','5','10','15','20','25','30'],
+    datasets: [{
+      label: '曝光量',
+      data: [32000,48000,41000,55000,62000,58000,72000],
+      borderColor: '#4F46E5',
+      backgroundColor: 'rgba(79,70,229,0.15)',
+      fill:true,
+      tension:0.3
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:"#ccc"}}}
+  }
+});
+
+const platformCtx = document.getElementById('platformChart').getContext('2d');
+const platformChart = new Chart(platformCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Temu','TikTok Shop','Shein','抖音电商'],
+    datasets: [{
+      label: '平均CTR(%)',
+      data: [3.8,3.1,2.4,1.9],
+      backgroundColor: ['#4F46E5','#22c55e','#f59e0b','#ef4444']
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:"#ccc"}}}
+  }
+});
+
+// 页面切换
+const pageMaterial = document.getElementById('pageMaterial');
+const pageDashboard = document.getElementById('pageDashboard');
+pageMaterial.onclick = ()=>{
+  alert("切换到【素材生产工作台】页面（方案6页面）");
+}
+pageDashboard.onclick = ()=>{
+  pageDashboard.classList.add('bg-primary');
+  pageMaterial.classList.remove('bg-primary');
+}
+
+// AI诊断面板
+const aiAnalysisBtn = document.getElementById('aiAnalysisBtn');
+const aiDiagnosePanel = document.getElementById('aiDiagnosePanel');
+const closeAiDiagnose = document.getElementById('closeAiDiagnose');
+aiAnalysisBtn.onclick = ()=>{
+  aiDiagnosePanel.classList.remove('hidden');
+}
+closeAiDiagnose.onclick = ()=>{
+  aiDiagnosePanel.classList.add('hidden');
+}
+
+// 复制提示词
+const copyPromptBtn = document.getElementById('copyPromptBtn');
+copyPromptBtn.onclick = async ()=>{
+  const text = document.querySelector("textarea[readonly]").value;
+  await navigator.clipboard.writeText(text.trim());
+  alert("✅ 提示词已复制，可直接去素材生产页面生成图片");
+}
+
+// 导出报表
+const exportReportBtn = document.getElementById('exportReportBtn');
+exportReportBtn.onclick = ()=>{
+  alert("导出Excel报表：包含SKU、素材图片、曝光、点击、CTR、平台、素材类型，可直接下载");
+}
+</script>
+</body>
+</html>
