@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI素材运营中台｜素材数据看板</title>
+  <title>AI素材运营中台｜图片+批量AI视频生成+多平台一键发布</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
@@ -19,9 +18,6 @@
             darkBg: '#111827',
             panelBg: '#1F2937',
             cardBg: '#374151',
-            success: '#22c55e',
-            warning: '#f59e0b',
-            danger: '#ef4444',
           },
         }
       }
@@ -31,6 +27,9 @@
     @layer utilities {
       .content-auto { content-visibility: auto; }
       .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .safe-area-border {
+        background-image:repeating-linear-gradient(45deg, rgba(255,200,0,0.4),rgba(255,200,0,0.4) 4px,transparent 4px,transparent 8px);
+      }
     }
   </style>
 </head>
@@ -40,266 +39,685 @@
     <div class="flex items-center gap-4">
       <span class="text-xl font-bold text-primary">AI素材运营中台</span>
       <div class="flex rounded-lg overflow-hidden border border-gray-600">
-        <button id="pageMaterial" class="px-4 py-1.5 bg-cardBg">素材生产</button>
-        <button id="pageDashboard" class="px-4 py-1.5 bg-primary text-white">数据看板</button>
+        <button id="modeDomestic" class="px-4 py-1.5 bg-primary text-white">国内电商</button>
+        <button id="modeCross" class="px-4 py-1.5 bg-cardBg">跨境电商</button>
       </div>
     </div>
     <div class="flex gap-3">
-      <button id="timeFilterBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-calendar mr-1"></i>时间筛选：近30天</button>
-      <button id="exportReportBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-download mr-1"></i>导出报表</button>
-      <button id="aiAnalysisBtn" class="px-3 py-1 rounded bg-primary"><i class="fa fa-lightbulb-o mr-1"></i>AI素材诊断</button>
+      <button id="batchCheckBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-shield mr-1"></i>批量合规检测</button>
+      <button id="batchZipBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-download mr-1"></i>打包ZIP导出</button>
+      <button id="versionSaveBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-history mr-1"></i>保存版本</button>
+      <button id="videoGenOpenBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-film mr-1"></i>AI视频生成</button>
+      <button id="publishOpenBtn" class="px-3 py-1 rounded bg-cardBg"><i class="fa fa-paper-plane mr-1"></i>多平台发布</button>
+      <button class="px-3 py-1 rounded bg-primary"><i class="fa fa-cogs mr-1"></i>批量处理</button>
     </div>
   </header>
 
   <div class="flex flex-1 overflow-hidden">
-    <!-- 左侧：SKU筛选、平台筛选 -->
+    <!-- 左侧：SKU素材库 + 版本历史 -->
     <aside class="w-72 bg-panelBg border-r border-gray-700 flex flex-col">
       <div class="p-3 border-b border-gray-700">
         <input type="text" placeholder="搜索SKU / 素材名称" class="w-full bg-cardBg rounded px-3 py-2 outline-none">
-      </div>
-      <div class="p-3 border-b border-gray-700">
-        <div class="text-sm font-medium mb-2">平台筛选</div>
-        <div class="space-y-2 text-sm">
-          <label class="flex items-center gap-2"><input type="checkbox" checked class="accent-primary">Temu</label>
-          <label class="flex items-center gap-2"><input type="checkbox" checked class="accent-primary">TikTok Shop</label>
-          <label class="flex items-center gap-2"><input type="checkbox" class="accent-primary">Shein</label>
-          <label class="flex items-center gap-2"><input type="checkbox" class="accent-primary">抖音电商</label>
-        </div>
       </div>
       <div class="p-3 text-sm font-medium text-gray-300">SKU素材列表</div>
       <div class="flex-1 overflow-y-auto p-2 space-y-2">
         <div class="p-2 rounded bg-cardBg cursor-pointer border border-primary">
           <div class="font-medium">SKU00128 - 陶瓷茶杯</div>
-          <div class="text-xs text-gray-400">Temu / TikTok Shop</div>
-          <div class="text-xs text-success">CTR:4.2% ✅优质</div>
+          <div class="text-xs text-gray-400">国内+跨境两套素材</div>
         </div>
         <div class="p-2 rounded bg-cardBg cursor-pointer hover:border-gray-500 border border-transparent">
           <div class="font-medium">SKU00129 - 运动跑鞋</div>
-          <div class="text-xs text-gray-400">Temu</div>
-          <div class="text-xs text-warning">CTR:2.1% ⚠待优化</div>
+          <div class="text-xs text-gray-400">Temu / TikTok Shop</div>
         </div>
         <div class="p-2 rounded bg-cardBg cursor-pointer hover:border-gray-500 border border-transparent">
           <div class="font-medium">SKU00130 - 茶叶礼盒</div>
-          <div class="text-xs text-gray-400">抖音电商</div>
-          <div class="text-xs text-danger">CTR:0.8% ❌低转化</div>
+          <div class="text-xs text-gray-400">抖音电商 / 拼多多</div>
         </div>
+      </div>
+      <!-- 素材版本历史面板 -->
+      <div class="p-3 border-t border-gray-700">
+        <div class="text-sm font-medium mb-2">版本历史</div>
+        <div id="versionList" class="max-h-28 overflow-y-auto space-y-1 text-xs">
+          <div class="p-1.5 rounded bg-cardBg cursor-pointer hover:bg-gray-600">V1 原图 2026-10-10</div>
+        </div>
+        <label class="w-full block mt-3">
+          <div class="border-dashed border border-gray-500 rounded p-3 text-center cursor-pointer hover:border-primary">
+            <i class="fa fa-upload text-xl"></i>
+            <div class="text-sm mt-1">上传产品原图</div>
+          </div>
+          <input id="fileInput" type="file" multiple accept="image/*" class="hidden">
+        </label>
       </div>
     </aside>
 
-    <!-- 中间主看板区域 -->
-    <main class="flex-1 p-4 overflow-y-auto">
-      <!-- 核心指标卡片行 -->
-      <div class="grid grid-cols-4 gap-4 mb-4">
-        <div class="bg-cardBg p-4 rounded-lg">
-          <div class="text-gray-400 text-sm">总曝光</div>
-          <div class="text-2xl font-bold mt-1">1,286,540</div>
-          <div class="text-xs text-success mt-1"><i class="fa fa-arrow-up"></i> +18.6% 环比</div>
-        </div>
-        <div class="bg-cardBg p-4 rounded-lg">
-          <div class="text-gray-400 text-sm">总点击</div>
-          <div class="text-2xl font-bold mt-1">45,216</div>
-          <div class="text-xs text-success mt-1"><i class="fa fa-arrow-up"></i> +12.3% 环比</div>
-        </div>
-        <div class="bg-cardBg p-4 rounded-lg">
-          <div class="text-gray-400 text-sm">平均CTR点击率</div>
-          <div class="text-2xl font-bold mt-1">3.51%</div>
-          <div class="text-xs text-warning mt-1"><i class="fa fa-arrow-down"></i> -0.4% 环比</div>
-        </div>
-        <div class="bg-cardBg p-4 rounded-lg">
-          <div class="text-gray-400 text-sm">素材投产素材数</div>
-          <div class="text-2xl font-bold mt-1">36套</div>
-          <div class="text-xs text-success mt-1"><i class="fa fa-arrow-up"></i> +6套</div>
+    <!-- 中间预览画布区 -->
+    <main class="flex-1 bg-gray-900 p-4 overflow-auto flex flex-col items-center">
+      <div class="w-full flex justify-between items-center mb-3">
+        <span class="text-sm text-gray-400">预览画布｜平台安全区校验</span>
+        <span id="platformName" class="text-sm px-2 py-1 rounded bg-primary/20 text-primary">当前：抖音电商</span>
+      </div>
+      <div class="relative w-[500px] h-[500px] bg-gray-800 rounded-lg overflow-hidden border border-gray-600">
+        <!-- 安全区蒙版 -->
+        <div id="safeMask" class="absolute inset-4 border-2 border-dashed border-yellow-400 pointer-events-none"></div>
+        <img id="previewImg" src="" class="w-full h-full object-contain hidden">
+        <div id="emptyTip" class="w-full h-full flex items-center justify-center text-gray-500">
+          <i class="fa fa-image text-4xl mb-2 block"></i>
+          <p>上传图片后预览</p>
         </div>
       </div>
-
-      <!-- 图表区域 -->
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div class="bg-cardBg p-4 rounded-lg">
-          <div class="font-medium mb-2">素材曝光趋势</div>
-          <canvas id="trendChart" height="220"></canvas>
-        </div>
-        <div class="bg-cardBg p-4 rounded-lg">
-          <div class="font-medium mb-2">各平台素材CTR对比</div>
-          <canvas id="platformChart" height="220"></canvas>
-        </div>
+      <div class="mt-4 flex gap-2 flex-wrap justify-center">
+        <button class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-magic"></i> AI白底抠图</button>
+        <button class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-crop"></i> 裁剪</button>
+        <button class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-compress"></i> 画质压缩</button>
+        <button class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-font"></i> 添加卖点文字</button>
+        <button class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-refresh"></i> 替换背景</button>
+        <button id="singleCheckBtn" class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-search"></i>单图合规检测</button>
+        <button id="genCopyBtn" class="px-3 py-2 rounded bg-cardBg"><i class="fa fa-file-text"></i>生成多语言文案</button>
+        <button id="openVideoPanelBtn" class="px-3 py-2 rounded bg-primary"><i class="fa fa-film"></i>图片生成短视频</button>
       </div>
-
-      <!-- 素材排行表格 -->
-      <div class="bg-cardBg p-4 rounded-lg mb-4">
-        <div class="flex justify-between items-center mb-3">
-          <div class="font-medium">素材效果排行（按点击率排序）</div>
-          <div class="text-xs text-gray-400">点击素材卡片可查看详情 & AI优化建议</div>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-gray-600 text-left text-gray-400">
-                <th class="pb-2">素材预览</th>
-                <th class="pb-2">SKU</th>
-                <th class="pb-2">平台</th>
-                <th class="pb-2">素材类型</th>
-                <th class="pb-2">曝光</th>
-                <th class="pb-2">点击</th>
-                <th class="pb-2">CTR</th>
-                <th class="pb-2">状态</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-700">
-              <tr class="hover:bg-gray-600/40 cursor-pointer">
-                <td class="py-2"><div class="w-12 h-12 bg-gray-700 rounded"></div></td>
-                <td>SKU00128</td>
-                <td>Temu</td>
-                <td>主图</td>
-                <td>326,000</td>
-                <td>13,700</td>
-                <td class="text-success">4.20%</td>
-                <td><span class="px-1.5 py-0.5 rounded bg-success/20 text-success">优质</span></td>
-              </tr>
-              <tr class="hover:bg-gray-600/40 cursor-pointer">
-                <td class="py-2"><div class="w-12 h-12 bg-gray-700 rounded"></div></td>
-                <td>SKU00128</td>
-                <td>TikTok Shop</td>
-                <td>短视频</td>
-                <td>284,000</td>
-                <td>9,650</td>
-                <td class="text-success">3.40%</td>
-                <td><span class="px-1.5 py-0.5 rounded bg-success/20 text-success">优质</span></td>
-              </tr>
-              <tr class="hover:bg-gray-600/40 cursor-pointer">
-                <td class="py-2"><div class="w-12 h-12 bg-gray-700 rounded"></div></td>
-                <td>SKU00129</td>
-                <td>Temu</td>
-                <td>主图</td>
-                <td>241,000</td>
-                <td>5,060</td>
-                <td class="text-warning">2.10%</td>
-                <td><span class="px-1.5 py-0.5 rounded bg-warning/20 text-warning">待优化</span></td>
-              </tr>
-              <tr class="hover:bg-gray-600/40 cursor-pointer">
-                <td class="py-2"><div class="w-12 h-12 bg-gray-700 rounded"></div></td>
-                <td>SKU00130</td>
-                <td>抖音电商</td>
-                <td>短视频</td>
-                <td>195,000</td>
-                <td>1,560</td>
-                <td class="text-danger">0.80%</td>
-                <td><span class="px-1.5 py-0.5 rounded bg-danger/20 text-danger">低转化</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- AI素材诊断面板 -->
-      <div id="aiDiagnosePanel" class="bg-cardBg p-4 rounded-lg hidden">
-        <div class="flex justify-between items-center mb-3">
-          <div class="font-medium"><i class="fa fa-lightbulb-o text-primary mr-2"></i>AI素材智能诊断报告</div>
-          <button id="closeAiDiagnose" class="text-xs px-2 py-0.5 rounded bg-gray-600">关闭</button>
-        </div>
-        <div class="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <div class="text-gray-300 mb-2">📊 整体结论</div>
-            <p class="text-gray-300 text-xs leading-relaxed">
-              SKU00128陶瓷茶杯素材表现最优，纯白底主图产品主体突出，适合Temu流量；SKU00130茶叶短视频点击率偏低，画面文字过多，色调偏暗，建议重新生成高亮度场景图。
-            </p>
-          </div>
-          <div>
-            <div class="text-gray-300 mb-2">💡AI优化建议</div>
-            <ul class="text-xs space-y-1 text-gray-300">
-              <li>✅ 复制SKU00128的构图风格，批量生成同系列产品主图</li>
-              <li>⚠ 低点击率素材：减少画面文字，提升产品亮度</li>
-              <li>🎬 TikTok短视频：优先使用缓慢推镜，5-8秒短视频，开头3秒放大产品特写</li>
-              <li>🌐 Temu平台：不要添加多余装饰，纯白底素材点击率更高</li>
-            </ul>
+      <div class="mt-4 w-full">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm text-gray-400">批量任务队列（可勾选多选批量生成视频/发布）</span>
+          <div class="text-xs">
+            <button id="selectAllTask" class="text-primary">全选</button> /
+            <button id="unSelectAllTask" class="text-gray-400">取消全选</button>
           </div>
         </div>
-        <div class="mt-3 pt-3 border-t border-gray-700">
-          <div class="text-sm mb-2">一键生成优化提示词</div>
-          <textarea class="w-full bg-gray-800 p-2 rounded text-xs h-20" readonly>
-商业产品摄影，陶瓷茶杯，纯白背景，柔和柔光，产品居中，高清细节，电商主图，Temu平台，无多余文字，800x800，干净高级
-          </textarea>
-          <button id="copyPromptBtn" class="mt-2 px-3 py-1 rounded bg-primary text-xs">复制提示词，跳转素材生产页面</button>
+        <div id="taskList" class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          <!-- 任务卡片动态生成，增加勾选框 -->
+        </div>
+      </div>
+      <!-- 合规检测结果面板 -->
+      <div id="checkResultPanel" class="mt-4 w-full hidden">
+        <div class="bg-cardBg p-3 rounded-lg">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-medium text-sm"><i class="fa fa-file-text-o mr-1"></i>AI合规检测报告</span>
+            <span id="checkStatus" class="text-xs px-2 py-0.5 rounded bg-green-600">正常</span>
+          </div>
+          <div class="text-xs text-gray-300">
+            <p>识别文字：<span id="ocrText">暂无</span></p>
+            <p class="mt-1">违规词：<span id="badWords" class="text-red-400">无</span></p>
+            <p class="mt-1 text-amber-300">修改建议：<span id="checkSuggest">暂无</span></p>
+          </div>
+        </div>
+      </div>
+      <!-- 多语言文案生成面板 -->
+      <div id="copyPanel" class="mt-4 w-full hidden">
+        <div class="bg-cardBg p-3 rounded-lg">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-medium text-sm"><i class="fa fa-comment mr-1"></i>多语言AI卖点文案</span>
+            <button id="copyClipBtn" class="text-xs px-2 py-0.5 rounded bg-primary">复制文案</button>
+          </div>
+          <div class="grid grid-cols-1 gap-2 text-xs">
+            <div>中文卖点：<p id="zhCopy" class="text-gray-200">--</p></div>
+            <div>English：<p id="enCopy" class="text-gray-200">--</p></div>
+            <div>Español：<p id="esCopy" class="text-gray-200">--</p></div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== AI视频生成面板【批量队列生成】===== -->
+      <div id="videoGenPanel" class="mt-4 w-full hidden">
+        <div class="bg-cardBg p-4 rounded-lg">
+          <div class="flex justify-between items-center mb-3">
+            <span class="font-medium text-sm"><i class="fa fa-film mr-1"></i>AI短视频生成｜单图 / 批量队列生成</span>
+            <button id="closeVideoPanelBtn" class="text-xs px-2 py-0.5 rounded bg-gray-600">关闭</button>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <label class="block text-gray-300 text-xs mb-1">视频比例</label>
+              <select id="videoRatio" class="w-full bg-gray-800 rounded p-2">
+                <option value="9:16">9:16 竖版 TikTok/抖音</option>
+                <option value="1:1">1:1 正方形 Temu</option>
+                <option value="16:9">16:9 横版</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-300 text-xs mb-1">视频时长</label>
+              <select id="videoDuration" class="w-full bg-gray-800 rounded p-2">
+                <option value="5">5秒</option>
+                <option value="8" selected>8秒</option>
+                <option value="10">10秒</option>
+                <option value="15">15秒</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-300 text-xs mb-1">镜头运动</label>
+              <select id="videoMotion" class="w-full bg-gray-800 rounded p-2">
+                <option value="slowZoomIn">缓慢推镜</option>
+                <option value="slowPan">左右平移</option>
+                <option value="static">静态定格</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-300 text-xs mb-1">背景音乐BGM</label>
+              <select id="videoBgm" class="w-full bg-gray-800 rounded p-2">
+                <option value="soft">轻柔简约</option>
+                <option value="vibe">电商氛围感</option>
+                <option value="none">无BGM</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="block text-gray-300 text-xs mb-1">字幕文案（自动读取卖点文案，批量生成时统一套用）</label>
+            <textarea id="videoSubtitle" class="w-full bg-gray-800 rounded p-2 h-16 text-xs" placeholder="自动填充卖点文案，可手动修改"></textarea>
+          </div>
+          <div class="mt-3 flex items-center gap-4">
+            <label class="flex items-center gap-2 text-xs">
+              <input type="checkbox" checked class="accent-primary"> 自动生成字幕
+            </label>
+            <label class="flex items-center gap-2 text-xs">
+              <input type="checkbox" checked class="accent-primary"> 自动配音
+            </label>
+          </div>
+          <div class="mt-3">
+            <button id="startBatchVideoGenBtn" class="px-4 py-2 rounded bg-primary text-white w-full"><i class="fa fa-play-circle mr-1"></i>开始批量生成短视频（选中图片）</button>
+          </div>
+          <!-- 批量视频生成任务进度列表 -->
+          <div id="batchVideoProgressWrap" class="mt-3 hidden">
+            <p class="text-xs mb-2">批量生成任务队列</p>
+            <div id="batchVideoList" class="space-y-2 max-h-40 overflow-y-auto">
+              <!-- 动态生成每个视频任务进度 -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== 【新增】多平台一键发布面板 ===== -->
+      <div id="publishPanel" class="mt-4 w-full hidden">
+        <div class="bg-cardBg p-4 rounded-lg">
+          <div class="flex justify-between items-center mb-3">
+            <span class="font-medium text-sm"><i class="fa fa-paper-plane mr-1"></i>多平台素材发布｜图片+视频投递商品</span>
+            <button id="closePublishPanelBtn" class="text-xs px-2 py-0.5 rounded bg-gray-600">关闭</button>
+          </div>
+          <!-- 店铺选择区域 -->
+          <div class="grid grid-cols-2 gap-3 text-sm mb-3">
+            <div>
+              <label class="block text-gray-300 text-xs mb-1">选择平台</label>
+              <select id="publishPlatform" class="w-full bg-gray-800 rounded p-2">
+                <option value="temu">Temu</option>
+                <option value="tiktokshop">TikTok Shop</option>
+                <option value="shein">Shein</option>
+                <option value="douyin">抖音电商</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-300 text-xs mb-1">已授权店铺</label>
+              <select id="shopSelect" class="w-full bg-gray-800 rounded p-2">
+                <option>店铺A - 美国站</option>
+                <option>店铺B - 西班牙站</option>
+                <option>国内抖音店</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm mb-3">
+            <div>
+              <label class="block text-gray-300 text-xs mb-1">商品ID / SKU编码</label>
+              <input id="publishSkuCode" class="w-full bg-gray-800 rounded p-2" placeholder="SKU00128">
+            </div>
+            <div>
+              <label class="block text-gray-300 text-xs mb-1">素材类型投递</label>
+              <div class="flex gap-2">
+                <label class="text-xs flex items-center gap-1"><input type="checkbox" checked class="accent-primary">主图</label>
+                <label class="text-xs flex items-center gap-1"><input type="checkbox" checked class="accent-primary">副图</label>
+                <label class="text-xs flex items-center gap-1"><input type="checkbox" class="accent-primary">短视频</label>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="block text-gray-300 text-xs mb-1">商品标题（自动带入AI文案）</label>
+            <textarea id="publishTitle" class="w-full bg-gray-800 rounded p-2 h-12 text-xs" placeholder="自动填充多语言标题"></textarea>
+          </div>
+          <div class="mb-3 flex gap-4 text-xs">
+            <label class="flex items-center gap-2">
+              <input type="checkbox" class="accent-primary"> 发布前自动再执行平台合规校验
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" class="accent-primary"> 失败自动重试（最多3次）
+            </label>
+          </div>
+          <button id="startPublishBtn" class="px-4 py-2 rounded bg-primary text-white w-full"><i class="fa fa-rocket mr-1"></i>提交选中素材，批量发布到平台</button>
+          <!-- 发布任务进度面板 -->
+          <div id="publishProgressWrap" class="mt-3 hidden">
+            <p class="text-xs mb-2">发布任务队列</p>
+            <div id="publishTaskList" class="space-y-2 max-h-40 overflow-y-auto">
+            </div>
+          </div>
+          <!-- 发布日志 -->
+          <div class="mt-3 border-t border-gray-700 pt-3">
+            <p class="text-xs mb-2">发布操作日志</p>
+            <div id="publishLog" class="bg-gray-800 p-2 rounded max-h-20 overflow-y-auto text-xs text-gray-300">
+              等待发布任务启动
+            </div>
+          </div>
         </div>
       </div>
     </main>
+
+    <!-- 右侧：平台参数面板 -->
+    <aside class="w-80 bg-panelBg border-l border-gray-700 p-4 overflow-y-auto">
+      <h3 class="text-lg font-semibold mb-4">平台参数配置</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm text-gray-300 block mb-1">选择平台</label>
+          <select id="platformSelect" class="w-full bg-cardBg rounded p-2">
+            <optgroup label="国内电商">
+              <option value="douyin">抖音电商主图 3:4</option>
+              <option value="taobao">淘宝主图 1:1</option>
+              <option value="pdd">拼多多主图 1:1</option>
+            </optgroup>
+            <optgroup label="跨境电商">
+              <option value="temu">Temu 主图 1:1</option>
+              <option value="tiktokshop">TikTok Shop 9:16 /1:1</option>
+              <option value="shein">Shein 产品图</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-gray-300 block mb-1">尺寸预设</label>
+          <input id="sizeInfo" type="text" readonly class="w-full bg-cardBg p-2 text-gray-400" value="1080 × 1440">
+        </div>
+        <div>
+          <label class="text-sm text-gray-300 block mb-1">图片质量压缩</label>
+          <input type="range" min="0.3" max="0.9" step="0.1" value="0.7" class="w-full">
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>更小体积</span><span>高清</span>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="text-sm text-gray-300">自动处理选项</div>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked class="accent-primary"> 自动白底抠图
+          </label>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked class="accent-primary"> 平台安全区校验
+          </label>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" class="accent-primary"> 自动去除水印
+          </label>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked class="accent-primary"> 批量重命名（SKU_平台_序号）
+          </label>
+        </div>
+        <div class="bg-gray-800 p-3 rounded">
+          <div class="text-sm text-amber-400 mb-1"><i class="fa fa-exclamation-triangle"></i>平台规则提示</div>
+          <p id="ruleText" class="text-xs text-gray-300">抖音电商：主图3:4，主体居中，文字不要超过图面积20%</p>
+        </div>
+        <div class="border-t border-gray-700 pt-4 mt-4">
+          <h4 class="text-sm font-medium mb-2">导出设置</h4>
+          <label class="text-sm block mb-1">图片格式</label>
+          <div class="flex gap-2">
+            <button class="px-3 py-1 rounded bg-primary">JPG</button>
+            <button class="px-3 py-1 rounded bg-cardBg">PNG</button>
+            <button class="px-3 py-1 rounded bg-cardBg">WebP</button>
+          </div>
+        </div>
+        <!-- 新增：店铺授权管理 -->
+        <div class="border-t border-gray-700 pt-4 mt-4">
+          <h4 class="text-sm font-medium mb-2">店铺授权管理</h4>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between items-center bg-gray-800 p-2 rounded">
+              <span>Temu 美国店</span>
+              <span class="text-green-400">已授权</span>
+            </div>
+            <div class="flex justify-between items-center bg-gray-800 p-2 rounded">
+              <span>TikTok Shop 西班牙</span>
+              <span class="text-green-400">已授权</span>
+            </div>
+            <div class="flex justify-between items-center bg-gray-800 p-2 rounded">
+              <span>Shein 店铺</span>
+              <span class="text-amber-400">待授权</span>
+            </div>
+            <button class="w-full mt-2 p-1.5 rounded bg-cardBg">+ 添加新店铺授权</button>
+          </div>
+        </div>
+      </div>
+    </aside>
   </div>
 
 <script>
-// 图表初始化
-const trendCtx = document.getElementById('trendChart').getContext('2d');
-const trendChart = new Chart(trendCtx, {
-  type: 'line',
-  data: {
-    labels: ['1','5','10','15','20','25','30'],
-    datasets: [{
-      label: '曝光量',
-      data: [32000,48000,41000,55000,62000,58000,72000],
-      borderColor: '#4F46E5',
-      backgroundColor: 'rgba(79,70,229,0.15)',
-      fill:true,
-      tension:0.3
-    }]
-  },
-  options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:"#ccc"}}}
+// 平台配置数据 国内 + 跨境
+const platformConfig = {
+  douyin:{w:1080,h:1440,name:"抖音电商",rule:"抖音电商：主图3:4，主体居中，文字不要超过图面积20%"},
+  taobao:{w:800,h:800,name:"淘宝",rule:"淘宝主图1:1，白底，禁止过多装饰文字"},
+  pdd:{w:750,h:750,name:"拼多多",rule:"拼多多主图1:1，简洁卖点，避免夸大宣传"},
+  temu:{w:800,h:800,name:"Temu",rule:"Temu：纯白底，产品完整，禁止多余水印，禁止夸张标语"},
+  tiktokshop:{w:1080,h:1080,name:"TikTok Shop",rule:"TikTok Shop：主图1:1，英文卖点，主体突出，无违规图案"},
+  shein:{w:750,h:1000,name:"Shein",rule:"Shein产品图，场景+白底两套，注意版权，禁止侵权素材"}
+}
+// 违禁词库，区分国内广告法 / 跨境平台禁词
+const badWordLib = {
+  domestic:["最","第一","顶级","绝对","永久","国家级","全网第一","最高级"],
+  cross:["best","No.1","absolute","permanent","top1","#1"]
+}
+
+const platformSelect = document.getElementById('platformSelect');
+const sizeInfo = document.getElementById('sizeInfo');
+const ruleText = document.getElementById('ruleText');
+const platformName = document.getElementById('platformName');
+const previewImg = document.getElementById('previewImg');
+const emptyTip = document.getElementById('emptyTip');
+const fileInput = document.getElementById('fileInput');
+const taskList = document.getElementById('taskList');
+const btnDomestic = document.getElementById('modeDomestic');
+const btnCross = document.getElementById('modeCross');
+const checkResultPanel = document.getElementById('checkResultPanel');
+const ocrText = document.getElementById('ocrText');
+const badWords = document.getElementById('badWords');
+const checkSuggest = document.getElementById('checkSuggest');
+const checkStatus = document.getElementById('checkStatus');
+const singleCheckBtn = document.getElementById('singleCheckBtn');
+const batchCheckBtn = document.getElementById('batchCheckBtn');
+const batchZipBtn = document.getElementById('batchZipBtn');
+const versionSaveBtn = document.getElementById('versionSaveBtn');
+const versionList = document.getElementById('versionList');
+const genCopyBtn = document.getElementById('genCopyBtn');
+const copyPanel = document.getElementById('copyPanel');
+const zhCopy = document.getElementById('zhCopy');
+const enCopy = document.getElementById('enCopy');
+const esCopy = document.getElementById('esCopy');
+const copyClipBtn = document.getElementById('copyClipBtn');
+
+// 视频面板元素
+const videoGenPanel = document.getElementById('videoGenPanel');
+const openVideoPanelBtn = document.getElementById('openVideoPanelBtn');
+const closeVideoPanelBtn = document.getElementById('closeVideoPanelBtn');
+const startBatchVideoGenBtn = document.getElementById('startBatchVideoGenBtn');
+const batchVideoProgressWrap = document.getElementById('batchVideoProgressWrap');
+const batchVideoList = document.getElementById('batchVideoList');
+const videoSubtitle = document.getElementById('videoSubtitle');
+const selectAllTask = document.getElementById("selectAllTask");
+const unSelectAllTask = document.getElementById("unSelectAllTask");
+
+// ========== 发布模块新增DOM ==========
+const publishOpenBtn = document.getElementById('publishOpenBtn');
+const publishPanel = document.getElementById('publishPanel');
+const closePublishPanelBtn = document.getElementById('closePublishPanelBtn');
+const startPublishBtn = document.getElementById('startPublishBtn');
+const publishProgressWrap = document.getElementById('publishProgressWrap');
+const publishTaskList = document.getElementById('publishTaskList');
+const publishLog = document.getElementById('publishLog');
+const publishTitle = document.getElementById('publishTitle');
+const publishSkuCode = document.getElementById('publishSkuCode');
+
+let taskDataList = [];
+let currentMode = "domestic";
+let versionCount = 1;
+
+// 切换平台事件
+platformSelect.onchange = function(){
+  const key = this.value;
+  const cfg = platformConfig[key];
+  sizeInfo.value = `${cfg.w} × ${cfg.h}`;
+  ruleText.innerText = cfg.rule;
+  platformName.innerText = `当前：${cfg.name}`;
+}
+
+// 国内/跨境模式切换
+btnDomestic.onclick = ()=>{
+  btnDomestic.classList.add('bg-primary');
+  btnCross.classList.remove('bg-primary');
+  platformSelect.value="douyin";
+  platformSelect.dispatchEvent(new Event('change'));
+  currentMode = "domestic";
+}
+btnCross.onclick = ()=>{
+  btnCross.classList.add('bg-primary');
+  btnDomestic.classList.remove('bg-primary');
+  platformSelect.value="temu";
+  platformSelect.dispatchEvent(new Event('change'));
+  currentMode = "cross";
+}
+
+// 图片上传预览
+fileInput.onchange = function(e){
+  const files = e.target.files;
+  for(let file of files){
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      previewImg.src = ev.target.result;
+      previewImg.classList.remove('hidden');
+      emptyTip.classList.add('hidden');
+      addTaskCard(file.name, ev.target.result);
+    }
+    reader.readAsDataURL(file);
   }
-});
+}
 
-const platformCtx = document.getElementById('platformChart').getContext('2d');
-const platformChart = new Chart(platformCtx, {
-  type: 'bar',
-  data: {
-    labels: ['Temu','TikTok Shop','Shein','抖音电商'],
-    datasets: [{
-      label: '平均CTR(%)',
-      data: [3.8,3.1,2.4,1.9],
-      backgroundColor: ['#4F46E5','#22c55e','#f59e0b','#ef4444']
-    }]
-  },
-  options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:"#ccc"}}}
+// 添加批量任务卡片【增加勾选框】
+function addTaskCard(filename, imgSrc){
+  const taskId = Date.now() + Math.random();
+  const div = document.createElement('div');
+  div.className = "shrink-0 w-28 bg-cardBg rounded p-2 relative";
+  div.dataset.taskId = taskId;
+  div.innerHTML = `
+    <label class="absolute top-1 left-1">
+      <input type="checkbox" class="task-checkbox accent-primary">
+    </label>
+    <div class="h-20 bg-gray-700 rounded mb-2 flex items-center justify-center overflow-hidden">
+        <img src="${imgSrc}" class="w-full h-full object-cover">
+    </div>
+    <div class="text-xs truncate">${filename}</div>
+    <div class="task-status text-xs text-green-400">待处理</div>
+  `
+  taskList.appendChild(div);
+  taskDataList.push({
+    id:taskId,
+    name:filename,
+    src:imgSrc,
+    status:"pending",
+    checked:false
+  })
+}
+
+// 全选 / 取消全选
+selectAllTask.onclick = ()=>{
+  document.querySelectorAll(".task-checkbox").forEach(cb=>cb.checked=true);
+}
+unSelectAllTask.onclick = ()=>{
+  document.querySelectorAll(".task-checkbox").forEach(cb=>cb.checked=false);
+}
+
+// 单图合规检测
+singleCheckBtn.onclick = function(){
+  checkResultPanel.classList.remove('hidden');
+  const mockOcr = "优质，全网最好，性价比高";
+  ocrText.innerText = mockOcr;
+  let hitWords = [];
+  const lib = currentMode === "domestic" ? badWordLib.domestic : badWordLib.cross;
+  lib.forEach(w=>{
+    if(mockOcr.includes(w)) hitWords.push(w);
+  })
+  if(hitWords.length>0){
+    badWords.innerText = hitWords.join("、");
+    checkStatus.innerText = "存在违规";
+    checkStatus.className = "text-xs px-2 py-0.5 rounded bg-red-600";
+    checkSuggest.innerText = `请删除极限词【${hitWords.join(",")}】，国内广告法/跨境平台禁止使用`;
+  }else{
+    badWords.innerText = "无";
+    checkStatus.innerText = "正常";
+    checkStatus.className = "text-xs px-2 py-0.5 rounded bg-green-600";
+    checkSuggest.innerText = "文字合规，可以直接上架";
   }
-});
-
-// 页面切换
-const pageMaterial = document.getElementById('pageMaterial');
-const pageDashboard = document.getElementById('pageDashboard');
-pageMaterial.onclick = ()=>{
-  alert("切换到【素材生产工作台】页面（方案6页面）");
-}
-pageDashboard.onclick = ()=>{
-  pageDashboard.classList.add('bg-primary');
-  pageMaterial.classList.remove('bg-primary');
 }
 
-// AI诊断面板
-const aiAnalysisBtn = document.getElementById('aiAnalysisBtn');
-const aiDiagnosePanel = document.getElementById('aiDiagnosePanel');
-const closeAiDiagnose = document.getElementById('closeAiDiagnose');
-aiAnalysisBtn.onclick = ()=>{
-  aiDiagnosePanel.classList.remove('hidden');
-}
-closeAiDiagnose.onclick = ()=>{
-  aiDiagnosePanel.classList.add('hidden');
+// 批量合规检测
+batchCheckBtn.onclick = function(){
+  alert(`开始批量检测，一共${taskDataList.length}张图片，自动扫描违禁词，标记违规任务卡片`);
 }
 
-// 复制提示词
-const copyPromptBtn = document.getElementById('copyPromptBtn');
-copyPromptBtn.onclick = async ()=>{
-  const text = document.querySelector("textarea[readonly]").value;
-  await navigator.clipboard.writeText(text.trim());
-  alert("✅ 提示词已复制，可直接去素材生产页面生成图片");
+// 批量打包ZIP下载
+batchZipBtn.onclick = async function(){
+  if(taskDataList.length ===0){
+    alert("任务队列为空，请先上传图片");
+    return;
+  }
+  const zip = new JSZip();
+  const platformKey = platformSelect.value;
+  const platformNameText = platformConfig[platformKey].name;
+  for(let item of taskDataList){
+    const base64 = item.src.split(",")[1];
+    zip.file(`${platformNameText}_${item.name}`, base64, {base64:true});
+  }
+  const blob = await zip.generateAsync({type:"blob"});
+  saveAs(blob, `素材包_${platformNameText}.zip`);
 }
 
-// 导出报表
-const exportReportBtn = document.getElementById('exportReportBtn');
-exportReportBtn.onclick = ()=>{
-  alert("导出Excel报表：包含SKU、素材图片、曝光、点击、CTR、平台、素材类型，可直接下载");
+// 保存素材版本
+versionSaveBtn.onclick = function(){
+  versionCount++;
+  const date = new Date().toLocaleDateString();
+  const div = document.createElement("div");
+  div.className = "p-1.5 rounded bg-cardBg cursor-pointer hover:bg-gray-600";
+  div.innerText = `V${versionCount} 修改版 ${date}`;
+  versionList.appendChild(div);
+  alert(`已保存V${versionCount}版本，可随时切换回历史版本`);
 }
+
+// 生成多语言卖点文案
+genCopyBtn.onclick = function(){
+  copyPanel.classList.remove('hidden');
+  if(currentMode === "domestic"){
+    zhCopy.innerText = "高质感陶瓷茶杯，耐高温，细腻釉面，家用待客优选";
+    enCopy.innerText = "";
+    esCopy.innerText = "";
+  }else{
+    zhCopy.innerText = "高质感陶瓷茶杯，耐高温，细腻釉面";
+    enCopy.innerText = "High quality ceramic teacup, heat resistant, smooth glaze";
+    esCopy.innerText = "Taza de cerámica de alta calidad, resistente al calor, esmalte suave";
+  }
+  // 自动填充字幕框 + 发布标题
+  videoSubtitle.value = zhCopy.innerText;
+  publishTitle.value = enCopy.innerText;
+  publishSkuCode.value = "SKU00128";
+}
+// 复制文案
+copyClipBtn.onclick = async function(){
+  const text = `中文：${zhCopy.innerText}\nEN：${enCopy.innerText}\nES：${esCopy.innerText}`;
+  await navigator.clipboard.writeText(text);
+  alert("文案复制成功！");
+}
+
+// ========== AI视频面板交互 ==========
+openVideoPanelBtn.onclick = function(){
+  videoGenPanel.classList.remove('hidden');
+}
+closeVideoPanelBtn.onclick = function(){
+  videoGenPanel.classList.add('hidden');
+}
+
+// 批量生成视频逻辑
+startBatchVideoGenBtn.onclick = async function(){
+  // 获取选中的图片
+  const checkedBoxes = Array.from(document.querySelectorAll(".task-checkbox:checked"));
+  if(checkedBoxes.length === 0){
+    alert("请在任务队列勾选至少一张图片，用于批量生成短视频");
+    return;
+  }
+  batchVideoProgressWrap.classList.remove('hidden');
+  batchVideoList.innerHTML = "";
+  // 循环逐个模拟生成
+  for(let i=0; i<checkedBoxes.length; i++){
+    const card = checkedBoxes[i].closest(".shrink-0");
+    const name = card.querySelector(".text-xs.truncate").innerText;
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "bg-gray-800 p-2 rounded";
+    itemDiv.innerHTML = `
+      <div class="flex justify-between text-xs mb-1">
+        <span>${name}</span>
+        <span class="video-pct">0%</span>
+      </div>
+      <div class="w-full h-1.5 bg-gray-700 rounded overflow-hidden">
+        <div class="video-bar h-full bg-primary w-0 transition-all"></div>
+      </div>
+      <div class="video-status text-xs mt-1 text-gray-400">排队中</div>
+    `
+    batchVideoList.appendChild(itemDiv);
+    const bar = itemDiv.querySelector(".video-bar");
+    const pctText = itemDiv.querySelector(".video-pct");
+    const statusText = itemDiv.querySelector(".video-status");
+    let p = 0;
+    await new Promise(resolve=>{
+      const timer = setInterval(()=>{
+        p += 4;
+        bar.style.width = p+"%";
+        pctText.innerText = p+"%";
+        if(p<100){
+          statusText.innerText = "生成中";
+        }
+        if(p>=100){
+          clearInterval(timer);
+          statusText.innerText = "✅ 生成完成";
+          statusText.classList.remove("text-gray-400");
+          statusText.classList.add("text-green-400");
+          resolve();
+        }
+      },120)
+    })
+  }
+  alert("✅ 全部选中图片的短视频生成任务完成！");
+}
+
+// ========== 【新增】多平台发布交互 ==========
+publishOpenBtn.onclick = function(){
+  publishPanel.classList.remove('hidden');
+}
+closePublishPanelBtn.onclick = function(){
+  publishPanel.classList.add('hidden');
+}
+
+startPublishBtn.onclick = async function(){
+  const checkedBoxes = Array.from(document.querySelectorAll(".task-checkbox:checked"));
+  if(checkedBoxes.length ===0){
+    alert("请勾选素材队列图片/视频，用于发布投递");
+    return;
+  }
+  publishProgressWrap.classList.remove('hidden');
+  publishTaskList.innerHTML = "";
+  publishLog.innerText = "开始执行批量发布任务...\n";
+  for(let i=0; i<checkedBoxes.length; i++){
+    const card = checkedBoxes[i].closest(".shrink-0");
+    const name = card.querySelector(".text-xs.truncate").innerText;
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "bg-gray-800 p-2 rounded";
+    itemDiv.innerHTML = `
+      <div class="flex justify-between text-xs mb-1">
+        <span>${name}</span>
+        <span class="pub-pct">0%</span>
+      </div>
+      <div class="w-full h-1.5 bg-gray-700 rounded overflow-hidden">
+        <div class="pub-bar h-full bg-primary w-0 transition-all"></div>
+      </div>
+      <div class="pub-status text-xs mt-1 text-gray-400">等待投递</div>
+    `
+    publishTaskList.appendChild(itemDiv);
+    const bar = itemDiv.querySelector(".pub-bar");
+    const pctText = itemDiv.querySelector(".pub-pct");
+    const statusText = itemDiv.querySelector(".pub-status");
+    let p = 0;
+    await new Promise(resolve=>{
+      const timer = setInterval(()=>{
+        p += 5;
+        bar.style.width = p+"%";
+        pctText.innerText = p+"%";
+        if(p<100){
+          statusText.innerText = "素材上传中";
+        }
+        if(p>=100){
+          clearInterval(timer);
+          statusText.innerText = "✅ 素材投递成功";
+          statusText.classList.remove("text-gray-400");
+          statusText.classList.add("text-green-400");
+          publishLog.innerText += `${new Date().toLocaleTimeString()} 【${name}】投递成功\n`;
+          resolve();
+        }
+      },100)
+    })
+  }
+  publishLog.innerText += `${new Date().toLocaleTimeString()} ✅ 全部素材发布任务执行完毕\n`;
+  alert("✅ 批量素材投递到店铺后台完成！");
+}
+
+// 初始化
+platformSelect.dispatchEvent(new Event('change'));
 </script>
 </body>
 </html>
