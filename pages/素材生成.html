@@ -9,6 +9,8 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/file-saver.min.js"></script>
+  <!-- ★ 新增：前端 AI 抠图库 -->
+  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/browser/index.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -1453,6 +1455,300 @@
       flex-shrink: 0;
     }
     .panel-close-btn:hover { background: #ef4444; color: #fff; }
+
+    /* ============================================================
+       ★★★ 新增：商品图层 overlay ★★★
+       ============================================================ */
+    .overlay-img {
+      position: absolute;
+      top: 0; left: 0;
+      display: block;
+      transform-origin: top left;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      z-index: 60;
+    }
+    .overlay-img.hidden { display: none; }
+    .overlay-hit {
+      position: absolute;
+      top: 0; left: 0;
+      cursor: move;
+      z-index: 61;
+      background: transparent;
+      border: 1.5px dashed rgba(34,211,238,0.85);
+      box-sizing: border-box;
+    }
+    .overlay-hit.hidden { display: none; }
+    .overlay-hit.active {
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 2px rgba(79,70,229,0.4);
+    }
+    .overlay-handle {
+      position: absolute;
+      width: 14px; height: 14px;
+      background: #22d3ee;
+      border: 2px solid #1f2937;
+      border-radius: 50%;
+      z-index: 62;
+      box-shadow: 0 0 6px rgba(0,0,0,0.5);
+    }
+    .overlay-handle[data-oh="nw"] { top: -7px; left: -7px; cursor: nw-resize; }
+    .overlay-handle[data-oh="ne"] { top: -7px; right: -7px; cursor: ne-resize; }
+    .overlay-handle[data-oh="sw"] { bottom: -7px; left: -7px; cursor: sw-resize; }
+    .overlay-handle[data-oh="se"] { bottom: -7px; right: -7px; cursor: se-resize; }
+
+    .overlay-badge {
+      position: absolute;
+      top: -26px; left: 0;
+      background: rgba(17,24,39,0.95);
+      border: 1px solid #22d3ee;
+      color: #22d3ee;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* 棋盘格（抠图透明底显示） */
+    .checker-overlay-bg {
+      background-image:
+        linear-gradient(45deg, #4b5563 25%, transparent 25%),
+        linear-gradient(-45deg, #4b5563 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #4b5563 75%),
+        linear-gradient(-45deg, transparent 75%, #4b5563 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+      background-color: #374151;
+    }
+
+    /* ============================================================
+       ★★★ 新增：通用弹窗（商品图选择 / 素材库） ★★★
+       ============================================================ */
+    .modal-mask {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 8000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInViewer 0.15s ease;
+    }
+    .modal-mask.show { display: flex; }
+    .modal-box {
+      width: 880px;
+      max-width: 94vw;
+      max-height: 86vh;
+      background: #1F2937;
+      border: 1px solid #4F46E5;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid #374151;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-title i { color: #4F46E5; }
+    .modal-close {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: #374151;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      transition: 0.15s;
+    }
+    .modal-close:hover { background: #ef4444; color: #fff; }
+    .modal-tabs {
+      display: flex;
+      border-bottom: 1px solid #374151;
+      flex-shrink: 0;
+      padding: 0 8px;
+    }
+    .modal-tab {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #9ca3af;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: 0.15s;
+      display: flex; align-items: center; gap: 6px;
+      font-family: inherit;
+      background: transparent;
+    }
+    .modal-tab:hover { color: #fff; }
+    .modal-tab.active {
+      color: #4F46E5;
+      border-bottom-color: #4F46E5;
+    }
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 18px;
+    }
+    .modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid #374151;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      background: rgba(31,41,55,0.6);
+    }
+    .modal-tab-panel { display: none; }
+    .modal-tab-panel.active { display: block; }
+
+    /* 素材网格 */
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+    .asset-card {
+      position: relative;
+      background: #111827;
+      border: 2px solid #374151;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .asset-card:hover {
+      border-color: #4F46E5;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(79,70,229,0.3);
+    }
+    .asset-card.selected {
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.35);
+    }
+    .asset-card .ac-thumb {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #1f2937;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .asset-card .ac-thumb img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .asset-card .ac-thumb i {
+      color: #4b5563; font-size: 28px;
+    }
+    .asset-card .ac-info {
+      padding: 6px 8px;
+    }
+    .asset-card .ac-name {
+      font-size: 11px;
+      color: #e5e7eb;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .asset-card .ac-meta {
+      font-size: 10px;
+      color: #6b7280;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .asset-card .ac-type {
+      position: absolute;
+      top: 4px; left: 4px;
+      background: rgba(10,30,47,0.85);
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .asset-card .ac-video-badge {
+      position: absolute;
+      top: 4px; right: 4px;
+      background: rgba(79,70,229,0.9);
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    /* 分页 */
+    .pager {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .pager button {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #374151;
+      background: #1f2937;
+      color: #d1d5db;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+    }
+    .pager button:hover:not(:disabled) {
+      border-color: #4F46E5; color: #fff;
+    }
+    .pager button:disabled {
+      opacity: 0.4; cursor: not-allowed;
+    }
+
+    /* 上传区（商品图选择-本地上传 tab） */
+    .upload-drop {
+      border: 2px dashed #4b5563;
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.15s;
+      background: rgba(31,41,55,0.4);
+    }
+    .upload-drop:hover {
+      border-color: #4F46E5;
+      background: rgba(79,70,229,0.08);
+    }
+    .upload-drop i {
+      font-size: 36px;
+      color: #4b5563;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .upload-drop:hover i { color: #4F46E5; }
+
+    /* 处理中 loading */
+    .loading-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #22d3ee;
+      font-size: 12px;
+    }
+    .loading-inline i { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="bg-darkBg text-gray-100 h-screen overflow-hidden flex flex-col">
@@ -1522,6 +1818,10 @@
         <div id="toolRotate" class="canvas-tool-icon" title="顺时针旋转90°"><i class="fa fa-repeat"></i></div>
         <div id="toolCrop" class="canvas-tool-icon" title="裁切图片"><i class="fa fa-crop"></i></div>
         <div id="toolMask" class="canvas-tool-icon" title="局部重绘（框选+AI修改）"><i class="fa fa-magic"></i></div>
+        <!-- ★ 新增：插入商品图 -->
+        <div id="toolOverlay" class="canvas-tool-icon" title="插入商品图（用于背景合成）"><i class="fa fa-clone"></i></div>
+        <!-- ★ 新增：抠图 -->
+        <div id="toolRemoveBg" class="canvas-tool-icon" title="AI抠图（提取主体，透明底）"><i class="fa fa-scissors"></i></div>
         <div id="toolZoomIn" class="canvas-tool-icon" title="放大 (Ctrl +)"><i class="fa fa-plus"></i></div>
         <div id="toolZoomOut" class="canvas-tool-icon" title="缩小 (Ctrl -)"><i class="fa fa-minus"></i></div>
         <div id="toolLayerDown" class="canvas-tool-icon" title="图层下移"><i class="fa fa-arrow-down"></i></div>
@@ -1606,6 +1906,15 @@
           <div id="safeMask" class="safe-frame"></div>
           <div id="guideLines" class="guide-lines hidden"></div>
           <img id="previewImg" class="preview hidden" src="" alt="">
+          <!-- ★ 新增：商品图层 -->
+          <img id="overlayImg" class="overlay-img hidden" src="" alt="">
+          <div id="overlayHit" class="overlay-hit hidden">
+            <div class="overlay-badge" id="overlayBadge">商品图</div>
+            <div class="overlay-handle" data-oh="nw"></div>
+            <div class="overlay-handle" data-oh="ne"></div>
+            <div class="overlay-handle" data-oh="sw"></div>
+            <div class="overlay-handle" data-oh="se"></div>
+          </div>
           <div id="emptyTip" class="w-full h-full flex flex-col items-center justify-center text-gray-500">
             <i class="fa fa-image text-4xl mb-2"></i>
             <p class="text-xs">上传图片后预览</p>
@@ -1911,6 +2220,10 @@
             <button data-action="addText" class="ai-edit-btn"><i class="fa fa-font"></i> 加卖点字</button>
             <button data-action="styleTransfer" class="ai-edit-btn"><i class="fa fa-paint-brush"></i> 换风格</button>
             <button data-action="outpainting" class="ai-edit-btn"><i class="fa fa-expand"></i> 扩图</button>
+            <!-- ★ 新增：AI 融合合成 -->
+            <button data-action="aiComposite" class="ai-edit-btn"><i class="fa fa-object-group"></i> AI融合合成</button>
+            <!-- ★ 新增：AI 抠图 -->
+            <button data-action="removeBg" class="ai-edit-btn"><i class="fa fa-scissors"></i> AI抠图</button>
             <button data-action="genCopy" class="ai-edit-btn" style="grid-column: span 2;"><i class="fa fa-language"></i> 生成多语言文案</button>
           </div>
           <details class="mb-3" id="aiEditAdvanced">
@@ -2024,6 +2337,79 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       ★★★ 新增：商品图选择弹窗（3 tab：本地上传 / 任务队列 / 素材库） ★★★
+       ============================================================ -->
+  <div id="overlayPickerModal" class="modal-mask">
+    <div class="modal-box" style="width: 760px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa fa-clone"></i> 插入商品图
+        </div>
+        <button class="modal-close" id="overlayPickerClose"><i class="fa fa-times"></i></button>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-op-tab="local"><i class="fa fa-upload"></i> 本地上传</button>
+        <button class="modal-tab" data-op-tab="queue"><i class="fa fa-tasks"></i> 任务队列</button>
+        <button class="modal-tab" data-op-tab="asset"><i class="fa fa-folder-open"></i> 素材库</button>
+      </div>
+      <div class="modal-body">
+        <!-- tab: 本地上传 -->
+        <div class="modal-tab-panel active" data-op-panel="local">
+          <div class="upload-drop" id="overlayLocalDrop">
+            <i class="fa fa-cloud-upload"></i>
+            <div style="font-size:14px;color:#e5e7eb;margin-bottom:4px;">点击或拖拽上传商品图</div>
+            <div style="font-size:11px;color:#6b7280;">建议商品主体清晰、背景简单，用于叠加到背景图</div>
+            <input type="file" id="overlayLocalInput" accept="image/*" class="hidden">
+          </div>
+        </div>
+        <!-- tab: 任务队列 -->
+        <div class="modal-tab-panel" data-op-panel="queue">
+          <div id="overlayQueueGrid" class="asset-grid">
+            <div class="edit-history-empty" style="grid-column: 1 / -1;">
+              <i class="fa fa-tasks"></i>
+              任务队列暂无图片
+            </div>
+          </div>
+        </div>
+        <!-- tab: 素材库 -->
+        <div class="modal-tab-panel" data-op-panel="asset">
+          <div class="flex gap-2 mb-3">
+            <input type="text" id="overlayAssetSearch" placeholder="搜索素材名称/标签/商品" class="flex-1 bg-cardBg rounded px-3 py-2 text-xs outline-none">
+            <select id="overlayAssetType" class="bg-cardBg rounded px-2 py-2 text-xs outline-none">
+              <option value="all">全部</option>
+              <option value="image">图片</option>
+              <option value="video">视频</option>
+            </select>
+          </div>
+          <div id="overlayAssetGrid" class="asset-grid">
+            <div class="edit-history-empty" style="grid-column: 1 / -1;">
+              <i class="fa fa-folder-open"></i>
+              加载中...
+            </div>
+          </div>
+          <div class="flex justify-between items-center mt-3">
+            <div class="pager">
+              <button id="overlayAssetPrev" disabled><i class="fa fa-chevron-left"></i> 上一页</button>
+              <span id="overlayAssetPageInfo">1 / 1</span>
+              <button id="overlayAssetNext" disabled>下一页 <i class="fa fa-chevron-right"></i></button>
+            </div>
+            <div style="font-size:11px;color:#6b7280;" id="overlayAssetTotal">共 0 项</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div style="font-size:11px;color:#6b7280;">
+          <i class="fa fa-info-circle"></i> 选中后会自动插入到画布中央，可拖动/缩放
+        </div>
+        <div class="flex gap-2">
+          <button class="px-4 py-1.5 rounded bg-gray-700 text-xs" id="overlayPickerCancel">取消</button>
+          <button class="px-4 py-1.5 rounded bg-primary text-white text-xs font-semibold" id="overlayPickerConfirm" disabled>插入画布</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
 /* ================================================================
    平台配置
@@ -2090,6 +2476,29 @@ const toolZoomOut = $('toolZoomOut');
 const toolLayerDown = $('toolLayerDown');
 const toolLayerUp = $('toolLayerUp');
 const toolCanvasSetting = $('toolCanvasSetting');
+
+/* ★ 新增：overlay + 抠图 */
+const toolOverlay = $('toolOverlay');
+const toolRemoveBg = $('toolRemoveBg');
+const overlayImg = $('overlayImg');
+const overlayHit = $('overlayHit');
+const overlayBadge = $('overlayBadge');
+
+/* ★ 新增：商品图选择弹窗 */
+const overlayPickerModal = $('overlayPickerModal');
+const overlayPickerClose = $('overlayPickerClose');
+const overlayPickerCancel = $('overlayPickerCancel');
+const overlayPickerConfirm = $('overlayPickerConfirm');
+const overlayLocalDrop = $('overlayLocalDrop');
+const overlayLocalInput = $('overlayLocalInput');
+const overlayQueueGrid = $('overlayQueueGrid');
+const overlayAssetGrid = $('overlayAssetGrid');
+const overlayAssetSearch = $('overlayAssetSearch');
+const overlayAssetType = $('overlayAssetType');
+const overlayAssetPrev = $('overlayAssetPrev');
+const overlayAssetNext = $('overlayAssetNext');
+const overlayAssetPageInfo = $('overlayAssetPageInfo');
+const overlayAssetTotal = $('overlayAssetTotal');
 
 const videoGenPanel = $('videoGenPanel');
 const openVideoPanelBtn = $('openVideoPanelBtn');
@@ -2193,9 +2602,44 @@ let editHistory = [];
 /* ★ 批量编辑状态 */
 const batchEditState = {
   enabled: false,
-  selectedIds: [],   // 勾选的 taskId 列表
-  currentId: null    // 当前编辑的 taskId
+  selectedIds: [],
+  currentId: null
 };
+
+/* ================================================================
+   ★★★ 新增：商品图 overlay 状态 ★★★
+   ================================================================ */
+const overlayState = {
+  active: false,
+  src: '',
+  x: 0, y: 0,          // 相对画布左上角的像素坐标（屏幕像素）
+  w: 0, h: 0,          // 当前宽高（屏幕像素）
+  naturalW: 0, naturalH: 0,
+  dragging: null,
+  startX: 0, startY: 0,
+  startMouseX: 0, startMouseY: 0
+};
+
+/* ================================================================
+   ★★★ 新增：商品图选择弹窗状态 ★★★
+   ================================================================ */
+const overlayPickerState = {
+  activeTab: 'local',
+  selectedUrl: '',
+  selectedName: '',
+  selectedType: 'image',
+  queueItems: [],
+  assetItems: [],
+  assetPage: 1,
+  assetPageSize: 24,
+  assetTotalPages: 1,
+  assetTotal: 0,
+  assetSearch: '',
+  assetTypeFilter: 'all'
+};
+
+/* ★ 抠图后透明底标记（用于棋盘格显示） */
+let canvasHasAlpha = false;
 
 /* ================================================================
    右侧 Tab 切换
@@ -2244,10 +2688,9 @@ function updateMaskTabBadge() {
 }
 
 /* ================================================================
-   ★★★ 批量编辑：勾选联动 ★★★
+   批量编辑：勾选联动
    ================================================================ */
 function updateBatchEditFromSelection() {
-  // 读取当前勾选的 checkbox
   const checked = Array.from(document.querySelectorAll('.task-checkbox:checked'));
   const selectedIds = checked.map(cb => {
     const card = cb.closest('.task-card');
@@ -2257,13 +2700,11 @@ function updateBatchEditFromSelection() {
   batchEditState.selectedIds = selectedIds;
   batchEditState.currentId = activeTaskId;
 
-  // 更新卡片视觉
   document.querySelectorAll('.task-card').forEach(el => {
     const cb = el.querySelector('.task-checkbox');
     el.classList.toggle('checked', cb && cb.checked);
   });
 
-  // 勾选 > 1 → 进入批量模式
   if (selectedIds.length > 1) {
     batchEditState.enabled = true;
     batchEditBar.classList.add('show');
@@ -2297,7 +2738,6 @@ function renderBatchThumbs() {
     `;
   }).join('');
 
-  // 绑定点击
   batchThumbs.querySelectorAll('.batch-thumb').forEach(thumb => {
     thumb.onclick = () => {
       const id = thumb.dataset.taskId;
@@ -2308,22 +2748,18 @@ function renderBatchThumbs() {
     };
   });
 
-  // 自动滚动到当前卡片
   const activeThumb = batchThumbs.querySelector('.batch-thumb.active');
   if (activeThumb) {
     activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   }
 }
 
-/* 退出批量模式 */
 batchEditClose.onclick = () => {
-  // 取消所有勾选
   document.querySelectorAll('.task-checkbox').forEach(cb => cb.checked = false);
   updateBatchEditFromSelection();
   showToast('已退出批量编辑模式', 'fa-times');
 };
 
-/* 批量应用：对勾选的所有图应用当前 prompt + 当前功能 */
 batchApplyBtn.onclick = async () => {
   if (!aiEditState.currentAction) {
     showToast('请先选择 AI 编辑功能', 'fa-exclamation-triangle');
@@ -2331,6 +2767,10 @@ batchApplyBtn.onclick = async () => {
   }
   const action = aiEditState.currentAction;
   if (action === 'genCopy') { genCopyBtn.click(); return; }
+  if (action === 'aiComposite' || action === 'removeBg') {
+    showToast('该功能仅支持单张（批量请逐张处理）', 'fa-info-circle');
+    return;
+  }
   const prompt = $('aiEditPrompt').value.trim();
   if (!prompt) {
     showToast('提示词不能为空', 'fa-exclamation-triangle');
@@ -2353,7 +2793,6 @@ batchApplyBtn.onclick = async () => {
     const task = taskDataList.find(t => t.id === taskId);
     if (!task) continue;
 
-    // 更新状态
     task.batchStatus = 'processing';
     renderBatchThumbs();
     batchApplyBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> 处理中 ${i+1}/${ids.length}`;
@@ -2368,7 +2807,6 @@ batchApplyBtn.onclick = async () => {
       });
       task.src = newUrl;
       task.batchStatus = 'done';
-      // 更新队列卡片缩略图
       const card = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
       if (card) {
         const thumb = card.querySelector('img');
@@ -2383,11 +2821,9 @@ batchApplyBtn.onclick = async () => {
     renderBatchThumbs();
   }
 
-  // 恢复按钮
   batchApplyBtn.disabled = false;
   batchApplyBtn.innerHTML = originalHTML;
 
-  // 如果当前画布对应的图也被处理了，更新画布
   if (ids.includes(activeTaskId)) {
     const task = taskDataList.find(t => t.id === activeTaskId);
     if (task && task.batchStatus === 'done') {
@@ -2395,7 +2831,6 @@ batchApplyBtn.onclick = async () => {
     }
   }
 
-  // 记录到修改记录
   addEditHistoryRecord({
     type: action,
     label: `批量${getActionLabel(action)}(${ids.length}张)`,
@@ -2412,7 +2847,6 @@ batchApplyBtn.onclick = async () => {
     showToast(`⚠️ 成功 ${successCount}，失败 ${failCount}`, 'fa-exclamation-triangle');
   }
 
-  // 清除状态
   setTimeout(() => {
     taskDataList.forEach(t => { if (t.batchStatus) t.batchStatus = ''; });
     renderBatchThumbs();
@@ -2467,6 +2901,13 @@ function showZoomIndicator() {
 canvasStage.addEventListener('wheel', (e) => {
   if (!canvasState.hasImage) return;
   if (maskState.active || cropState.active) return;
+  // ★ overlay 编辑模式下，滚轮优先缩放 overlay
+  if (overlayState.active && e.target.closest('.overlay-hit')) {
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.08 : 1/1.08;
+    scaleOverlay(factor);
+    return;
+  }
   e.preventDefault();
   const baseFactor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
   const factor = e.ctrlKey ? (e.deltaY < 0 ? 1.03 : 1 / 1.03) : baseFactor;
@@ -2519,6 +2960,7 @@ document.addEventListener('mouseup', () => {
 canvasStage.addEventListener('dblclick', (e) => {
   if (!canvasState.hasImage) return;
   if (maskState.active || cropState.active) return;
+  if (overlayState.active && e.target.closest('.overlay-hit')) return;
   resetZoom();
   showToast('已重置到 100% 居中', 'fa-search');
 });
@@ -3008,6 +3450,13 @@ fileInput.onchange = function(e){
 }
 
 function loadToCanvas(src, actionName) {
+  // ★ 切换画布时清掉 overlay（避免残留）
+  if (overlayState.active) {
+    clearOverlay(false);
+  }
+  // ★ 清掉透明底标记
+  canvasHasAlpha = false;
+  canvasStage.classList.remove('checker-overlay-bg');
   previewImg.src = src;
   previewImg.classList.remove('hidden');
   emptyTip.classList.add('hidden');
@@ -3042,7 +3491,6 @@ function addTaskCard(filename, imgSrc){
     if (e.target.classList.contains('task-checkbox')) return;
     switchActiveTask(taskId);
   });
-  // ★ 勾选变化时更新批量编辑
   const cb = div.querySelector('.task-checkbox');
   cb.addEventListener('change', () => {
     updateBatchEditFromSelection();
@@ -3065,7 +3513,6 @@ function switchActiveTask(taskId) {
   if (!maskState.active && panelAiEdit.classList.contains('hidden') && panelPlatform.classList.contains('hidden')) {
     switchAsideTab('aiEdit');
   }
-  // 更新批量缩略图高亮
   if (batchEditState.enabled) renderBatchThumbs();
   showToast(`已切换到：${task.name}`, 'fa-image');
 }
@@ -3403,7 +3850,9 @@ document.addEventListener('click', (e) => {
   closeCanvasSettings();
 });
 
-/* 裁剪 */
+/* ================================================================
+   裁剪
+   ================================================================ */
 const cropState = {
   active: false, x: 0, y: 0, w: 0, h: 0,
   ratio: null, minSize: 30,
@@ -3624,7 +4073,343 @@ function doCrop() {
   exitCropMode();
   showToast(`✅ 已裁切为 ${sw} × ${sh}`, 'fa-crop');
 }
-function updateCanvasImage(dataUrl, label) {
+
+/* ================================================================
+   ★★★ 新增：商品图 overlay 拖动/缩放 ★★★
+   ================================================================ */
+function showOverlay() {
+  if (!overlayState.src) return;
+  overlayImg.src = overlayState.src;
+  overlayImg.classList.remove('hidden');
+  overlayHit.classList.remove('hidden');
+  overlayHit.classList.add('active');
+  updateOverlayPosition();
+}
+function hideOverlay() {
+  overlayImg.classList.add('hidden');
+  overlayHit.classList.add('hidden');
+}
+function updateOverlayPosition() {
+  overlayImg.style.left = overlayState.x + 'px';
+  overlayImg.style.top = overlayState.y + 'px';
+  overlayImg.style.width = overlayState.w + 'px';
+  overlayImg.style.height = overlayState.h + 'px';
+  overlayHit.style.left = overlayState.x + 'px';
+  overlayHit.style.top = overlayState.y + 'px';
+  overlayHit.style.width = overlayState.w + 'px';
+  overlayHit.style.height = overlayState.h + 'px';
+}
+function insertOverlayFromUrl(url, name) {
+  // 先加载图片拿原始尺寸
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    const cw = canvasStage.clientWidth;
+    const ch = canvasStage.clientHeight;
+    const nw = img.naturalWidth;
+    const nh = img.naturalHeight;
+    // 默认占画布 60%
+    const targetW = cw * 0.6;
+    const targetH = targetW * (nh / nw);
+    overlayState.active = true;
+    overlayState.src = url;
+    overlayState.naturalW = nw;
+    overlayState.naturalH = nh;
+    overlayState.w = targetW;
+    overlayState.h = targetH;
+    overlayState.x = (cw - targetW) / 2;
+    overlayState.y = (ch - targetH) / 2;
+    overlayBadge.textContent = (name || '商品图').slice(0, 16);
+    showOverlay();
+    showToast('商品图已插入，拖动/缩放调整位置后点「AI融合合成」', 'fa-clone');
+  };
+  img.onerror = () => {
+    showToast('❌ 商品图加载失败', 'fa-exclamation-triangle');
+  };
+  img.src = url;
+}
+function scaleOverlay(factor) {
+  if (!overlayState.active) return;
+  const cx = overlayState.x + overlayState.w / 2;
+  const cy = overlayState.y + overlayState.h / 2;
+  let newW = overlayState.w * factor;
+  let newH = overlayState.h * factor;
+  if (newW < 20 || newH < 20) return;
+  overlayState.w = newW;
+  overlayState.h = newH;
+  overlayState.x = cx - newW / 2;
+  overlayState.y = cy - newH / 2;
+  updateOverlayPosition();
+}
+function clearOverlay(showMsg = true) {
+  overlayState.active = false;
+  overlayState.src = '';
+  overlayState.x = 0; overlayState.y = 0;
+  overlayState.w = 0; overlayState.h = 0;
+  hideOverlay();
+  if (showMsg) showToast('已移除商品图', 'fa-times');
+}
+function bindOverlayDrag() {
+  overlayHit.addEventListener('mousedown', (e) => {
+    if (!overlayState.active) return;
+    const handle = e.target.dataset.oh;
+    overlayState.dragging = handle || 'move';
+    overlayState.startMouseX = e.clientX;
+    overlayState.startMouseY = e.clientY;
+    overlayState.startX = overlayState.x;
+    overlayState.startY = overlayState.y;
+    overlayState.startW = overlayState.w;
+    overlayState.startH = overlayState.h;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!overlayState.dragging) return;
+    const rect = canvasStage.getBoundingClientRect();
+    const dx = e.clientX - overlayState.startMouseX;
+    const dy = e.clientY - overlayState.startMouseY;
+    const mode = overlayState.dragging;
+
+    if (mode === 'move') {
+      overlayState.x = overlayState.startX + dx;
+      overlayState.y = overlayState.startY + dy;
+    } else {
+      let newW = overlayState.startW;
+      let newH = overlayState.startH;
+      let newX = overlayState.startX;
+      let newY = overlayState.startY;
+      const ratio = overlayState.naturalW / overlayState.naturalH;
+
+      if (mode.includes('e')) newW = Math.max(20, overlayState.startW + dx);
+      if (mode.includes('s')) newH = Math.max(20, overlayState.startH + dy);
+      if (mode.includes('w')) {
+        newW = Math.max(20, overlayState.startW - dx);
+        newX = overlayState.startX + (overlayState.startW - newW);
+      }
+      if (mode.includes('n')) {
+        newH = Math.max(20, overlayState.startH - dy);
+        newY = overlayState.startY + (overlayState.startH - newH);
+      }
+      // 保持宽高比
+      if (mode === 'e' || mode === 'w') newH = newW / ratio;
+      else if (mode === 'n' || mode === 's') newW = newH * ratio;
+      else {
+        const r = newW / newH;
+        if (r > ratio) newW = newH * ratio; else newH = newW / ratio;
+        if (mode.includes('w')) newX = overlayState.startX + (overlayState.startW - newW);
+        if (mode.includes('n')) newY = overlayState.startY + (overlayState.startH - newH);
+      }
+      overlayState.w = newW;
+      overlayState.h = newH;
+      overlayState.x = newX;
+      overlayState.y = newY;
+    }
+    updateOverlayPosition();
+  });
+
+  document.addEventListener('mouseup', () => {
+    overlayState.dragging = null;
+  });
+}
+
+/* ================================================================
+   ★★★ 新增：前端预合成（背景 + 商品按位置） ★★★
+   ================================================================ */
+function compositeCanvasToDataURL() {
+  return new Promise((resolve, reject) => {
+    const bgImg = new Image();
+    bgImg.crossOrigin = 'anonymous';
+    bgImg.onload = () => {
+      // 以背景图原始尺寸为画布（不缩）
+      const cw = bgImg.naturalWidth;
+      const ch = bgImg.naturalHeight;
+      const canvas = document.createElement('canvas');
+      canvas.width = cw;
+      canvas.height = ch;
+      const ctx = canvas.getContext('2d');
+
+      // 1. 画背景（按画布变换：旋转/缩放/平移）
+      ctx.save();
+      ctx.translate(cw / 2, ch / 2);
+      ctx.rotate((canvasState.rotation || 0) * Math.PI / 180);
+      ctx.scale(canvasState.scale || 1, canvasState.scale || 1);
+      ctx.translate(-cw / 2, -ch / 2);
+      ctx.drawImage(bgImg, 0, 0, cw, ch);
+      ctx.restore();
+
+      // 2. 画商品图（按 overlay 相对位置，映射到背景原尺寸）
+      if (overlayState.active && overlayState.src) {
+        const stageW = canvasStage.clientWidth;
+        const stageH = canvasStage.clientHeight;
+        const scaleX = cw / stageW;
+        const scaleY = ch / stageH;
+        const prodImg = new Image();
+        prodImg.crossOrigin = 'anonymous';
+        prodImg.onload = () => {
+          ctx.drawImage(
+            prodImg,
+            overlayState.x * scaleX,
+            overlayState.y * scaleY,
+            overlayState.w * scaleX,
+            overlayState.h * scaleY
+          );
+          try {
+            resolve(canvas.toDataURL('image/jpeg', 0.95));
+          } catch (err) {
+            reject(err);
+          }
+        };
+        prodImg.onerror = () => reject(new Error('商品图加载失败'));
+        prodImg.src = overlayState.src;
+      } else {
+        try {
+          resolve(canvas.toDataURL('image/jpeg', 0.95));
+        } catch (err) {
+          reject(err);
+        }
+      }
+    };
+    bgImg.onerror = () => reject(new Error('背景图加载失败'));
+    bgImg.src = previewImg.src;
+  });
+}
+
+/* 把任意图片缩到 maxSize 以内（返回 dataURL） */
+function shrinkImageToMax(dataUrl, maxSize) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const nw = img.naturalWidth;
+      const nh = img.naturalHeight;
+      const maxSide = Math.max(nw, nh);
+      if (maxSide <= maxSize) { resolve(dataUrl); return; }
+      const ratio = maxSize / maxSide;
+      const nw2 = Math.round(nw * ratio);
+      const nh2 = Math.round(nh * ratio);
+      const canvas = document.createElement('canvas');
+      canvas.width = nw2;
+      canvas.height = nh2;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, nw2, nh2);
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
+    };
+    img.onerror = () => reject(new Error('图片加载失败'));
+    img.src = dataUrl;
+  });
+}
+
+/* 调 Agnes 图生图（多图合成） */
+async function callAgnesFusion(precomposedDataUrl) {
+  // 缩到 ≤2048
+  const shrunk = await shrinkImageToMax(precomposedDataUrl, 2048);
+
+  // 后端 /api/agnes/generate-image
+  const body = {
+    prompt: '保持画面中商品的主体形状、颜色、材质和位置完全不变，自然融入背景环境，添加真实的光影、阴影和反射，商业摄影风格，高清细节，电商主图',
+    size: '2K',
+    ratio: '1:1',
+    reference_images: [shrunk]
+  };
+  const res = await fetch(BACKEND_URL + '/api/agnes/generate-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message || 'AI 融合失败');
+  return data.url;
+}
+
+/* AI 融合合成主流程 */
+async function runAiComposite() {
+  if (!canvasState.hasImage) { showToast('请先上传背景图'); return; }
+  if (!overlayState.active) { showToast('请先插入商品图', 'fa-exclamation-triangle'); return; }
+
+  const btn = toolOverlay;
+  showToast('正在预合成...', 'fa-spinner fa-spin');
+
+  try {
+    // 1. 前端预合成
+    const precomposed = await compositeCanvasToDataURL();
+
+    // 2. 调 Agnes 融合
+    showToast('AI 融合中（约 10-30 秒）...', 'fa-spinner fa-spin');
+    const fusedUrl = await callAgnesFusion(precomposed);
+
+    // 3. 替换画布 + 拍平
+    clearOverlay(false);
+    updateCanvasImage(fusedUrl, 'AI融合合成');
+    addEditHistoryRecord({
+      type: 'aiComposite',
+      label: 'AI融合合成',
+      detail: '背景 + 商品图 → AI 融合',
+      thumb: fusedUrl
+    });
+    showToast('✅ AI融合合成完成', 'fa-magic');
+  } catch (err) {
+    console.error('AI融合失败:', err);
+    showToast('❌ ' + err.message, 'fa-exclamation-triangle');
+  }
+}
+
+/* ================================================================
+   ★★★ 新增：前端 AI 抠图（imgly） ★★★
+   ================================================================ */
+async function removeBackgroundFrontend() {
+  if (!canvasState.hasImage || !previewImg.src) {
+    showToast('请先上传图片', 'fa-exclamation-triangle');
+    return;
+  }
+
+  // 检查 imgly 是否加载
+  const removerFn = window.imglyRemoveBackground
+    || (window.imgly && window.imgly.removeBackground)
+    || (window.IMG_LY && window.IMG_LY.removeBackground);
+
+  if (typeof removerFn !== 'function') {
+    showToast('❌ 抠图库加载失败，请刷新页面重试', 'fa-exclamation-triangle');
+    return;
+  }
+
+  showToast('AI抠图中（首次约 20-40 秒）...', 'fa-spinner fa-spin');
+
+  try {
+    // 1. 先把当前图缩到 ≤1024
+    const shrunk = await shrinkImageToMax(previewImg.src, 1024);
+
+    // 2. 调 imgly
+    const blob = await removerFn(shrunk);
+
+    // 3. blob → dataURL
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    // 4. 替换画布 + 透明底标记
+    canvasHasAlpha = true;
+    canvasStage.classList.add('checker-overlay-bg');
+    updateCanvasImageAlpha(dataUrl, 'AI抠图');
+    addEditHistoryRecord({
+      type: 'removeBg',
+      label: 'AI抠图',
+      detail: '提取主体，透明底',
+      thumb: dataUrl
+    });
+    showToast('✅ 抠图完成（透明底）', 'fa-scissors');
+  } catch (err) {
+    console.error('抠图失败:', err);
+    showToast('❌ 抠图失败：' + err.message, 'fa-exclamation-triangle');
+  }
+}
+
+/* ★ 保留透明通道的 updateCanvasImage */
+function updateCanvasImageAlpha(dataUrl, label) {
   previewImg.src = dataUrl;
   canvasState.rotation = 0; canvasState.scale = 1;
   canvasState.offsetX = 0; canvasState.offsetY = 0;
@@ -3646,7 +4431,276 @@ function updateCanvasImage(dataUrl, label) {
   updateSnapshotButton();
 }
 
-/* 局部重绘（多选区） */
+/* ================================================================
+   ★★★ 新增：商品图选择弹窗 ★★★
+   ================================================================ */
+function openOverlayPicker() {
+  if (!canvasState.hasImage) {
+    showToast('请先上传背景图', 'fa-exclamation-triangle');
+    return;
+  }
+  overlayPickerState.selectedUrl = '';
+  overlayPickerState.selectedName = '';
+  overlayPickerState.selectedType = 'image';
+  overlayPickerConfirm.disabled = true;
+  overlayPickerModal.classList.add('show');
+  // 默认 tab = local
+  switchOverlayPickerTab('local');
+}
+function closeOverlayPicker() {
+  overlayPickerModal.classList.remove('show');
+  // 清掉选中态
+  document.querySelectorAll('#overlayQueueGrid .asset-card').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('#overlayAssetGrid .asset-card').forEach(el => el.classList.remove('selected'));
+}
+function switchOverlayPickerTab(tab) {
+  overlayPickerState.activeTab = tab;
+  document.querySelectorAll('#overlayPickerModal .modal-tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.opTab === tab);
+  });
+  document.querySelectorAll('#overlayPickerModal .modal-tab-panel').forEach(el => {
+    el.classList.toggle('active', el.dataset.opPanel === tab);
+  });
+  if (tab === 'queue') renderOverlayQueue();
+  if (tab === 'asset') fetchAndRenderOverlayAssets(true);
+}
+
+/* tab: 任务队列 */
+function renderOverlayQueue() {
+  const items = taskDataList.filter(t => t.src);
+  if (items.length === 0) {
+    overlayQueueGrid.innerHTML = `<div class="edit-history-empty" style="grid-column:1/-1;">
+      <i class="fa fa-tasks"></i> 任务队列暂无图片
+    </div>`;
+    return;
+  }
+  overlayQueueGrid.innerHTML = items.map(t => `
+    <div class="asset-card" data-url="${t.src}" data-name="${escapeHtml(t.name)}">
+      <div class="ac-thumb"><img src="${t.src}" alt=""></div>
+      <div class="ac-info">
+        <div class="ac-name">${escapeHtml(t.name)}</div>
+        <div class="ac-meta">任务队列</div>
+      </div>
+    </div>
+  `).join('');
+  overlayQueueGrid.querySelectorAll('.asset-card').forEach(el => {
+    el.onclick = () => {
+      overlayQueueGrid.querySelectorAll('.asset-card').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+      overlayPickerState.selectedUrl = el.dataset.url;
+      overlayPickerState.selectedName = el.dataset.name;
+      overlayPickerState.selectedType = 'image';
+      overlayPickerConfirm.disabled = false;
+    };
+  });
+}
+
+/* tab: 素材库（图片+视频、分页、搜索、素材库+商品库合并） */
+async function fetchAndRenderOverlayAssets(resetPage = false) {
+  if (resetPage) overlayPickerState.assetPage = 1;
+  overlayAssetGrid.innerHTML = `<div class="edit-history-empty" style="grid-column:1/-1;">
+    <i class="fa fa-spinner fa-spin"></i> 加载中...
+  </div>`;
+
+  let all = [];
+
+  // 1. 素材库
+  try {
+    const res = await fetch(BACKEND_URL + '/api/assets/list?asset_type=all');
+    const data = await res.json();
+    if (data.success && Array.isArray(data.items)) {
+      all = all.concat(data.items.map(it => ({
+        url: it.url,
+        name: it.name || '素材',
+        type: it.type === 'video' ? 'video' : 'image',
+        source: '素材库',
+        tags: it.tags || [],
+        product_name: it.product_name || ''
+      })));
+    }
+  } catch (e) {
+    console.warn('素材库加载失败:', e);
+  }
+
+  // 2. 商品库图（main_image + sub_images）
+  try {
+    const res = await fetch(BACKEND_URL + '/api/products');
+    const data = await res.json();
+    const products = data.products || [];
+    products.forEach(p => {
+      if (p.main_image) {
+        all.push({
+          url: p.main_image,
+          name: p.name + '（主图）',
+          type: 'image',
+          source: '商品库',
+          tags: p.tags || [],
+          product_name: p.name
+        });
+      }
+      (p.sub_images || []).forEach((u, i) => {
+        all.push({
+          url: u,
+          name: `${p.name}（副图${i + 1}）`,
+          type: 'image',
+          source: '商品库',
+          tags: p.tags || [],
+          product_name: p.name
+        });
+      });
+    });
+  } catch (e) {
+    console.warn('商品库加载失败:', e);
+  }
+
+  // 3. 过滤（搜索 + 类型）
+  let filtered = all;
+  const kw = (overlayPickerState.assetSearch || '').trim().toLowerCase();
+  if (kw) {
+    filtered = filtered.filter(it => {
+      const hay = (it.name + ' ' + (it.tags || []).join(' ') + ' ' + (it.product_name || '')).toLowerCase();
+      return hay.includes(kw);
+    });
+  }
+  if (overlayPickerState.assetTypeFilter !== 'all') {
+    filtered = filtered.filter(it => it.type === overlayPickerState.assetTypeFilter);
+  }
+
+  // 4. 分页
+  const pageSize = overlayPickerState.assetPageSize;
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  overlayPickerState.assetTotal = total;
+  overlayPickerState.assetTotalPages = totalPages;
+  if (overlayPickerState.assetPage > totalPages) overlayPickerState.assetPage = totalPages;
+  const start = (overlayPickerState.assetPage - 1) * pageSize;
+  const pageItems = filtered.slice(start, start + pageSize);
+  overlayPickerState.assetItems = pageItems;
+
+  // 5. 渲染
+  if (pageItems.length === 0) {
+    overlayAssetGrid.innerHTML = `<div class="edit-history-empty" style="grid-column:1/-1;">
+      <i class="fa fa-folder-open"></i> 没有匹配的素材
+    </div>`;
+  } else {
+    overlayAssetGrid.innerHTML = pageItems.map((it, i) => {
+      const isVideo = it.type === 'video';
+      return `
+        <div class="asset-card" data-idx="${i}">
+          <div class="ac-thumb">
+            ${isVideo
+              ? `<i class="fa fa-video-camera"></i>`
+              : `<img src="${it.url}" alt="">`
+            }
+          </div>
+          ${isVideo ? `<span class="ac-video-badge">视频</span>` : ''}
+          <span class="ac-type">${it.source}</span>
+          <div class="ac-info">
+            <div class="ac-name" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</div>
+            <div class="ac-meta">${escapeHtml((it.tags || []).slice(0, 2).join(' / ') || '—')}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    overlayAssetGrid.querySelectorAll('.asset-card').forEach(el => {
+      el.onclick = () => {
+        const idx = parseInt(el.dataset.idx);
+        const item = pageItems[idx];
+        if (!item) return;
+        if (item.type === 'video') {
+          showToast('⚠️ 视频暂不支持插入画布', 'fa-video-camera');
+          return;
+        }
+        overlayAssetGrid.querySelectorAll('.asset-card').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+        overlayPickerState.selectedUrl = item.url;
+        overlayPickerState.selectedName = item.name;
+        overlayPickerState.selectedType = 'image';
+        overlayPickerConfirm.disabled = false;
+      };
+    });
+  }
+
+  // 6. 分页按钮
+  overlayAssetPageInfo.textContent = `${overlayPickerState.assetPage} / ${totalPages}`;
+  overlayAssetPrev.disabled = overlayPickerState.assetPage <= 1;
+  overlayAssetNext.disabled = overlayPickerState.assetPage >= totalPages;
+  overlayAssetTotal.textContent = `共 ${total} 项`;
+}
+
+/* 弹窗事件绑定 */
+overlayPickerClose.onclick = closeOverlayPicker;
+overlayPickerCancel.onclick = closeOverlayPicker;
+overlayPickerModal.addEventListener('click', (e) => {
+  if (e.target === overlayPickerModal) closeOverlayPicker();
+});
+document.querySelectorAll('#overlayPickerModal .modal-tab').forEach(el => {
+  el.onclick = () => switchOverlayPickerTab(el.dataset.opTab);
+});
+overlayLocalDrop.onclick = () => overlayLocalInput.click();
+overlayLocalInput.onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    // 直接插入
+    closeOverlayPicker();
+    insertOverlayFromUrl(ev.target.result, file.name);
+  };
+  reader.readAsDataURL(file);
+};
+overlayPickerConfirm.onclick = () => {
+  if (!overlayPickerState.selectedUrl) return;
+  const url = overlayPickerState.selectedUrl;
+  const name = overlayPickerState.selectedName;
+  closeOverlayPicker();
+  insertOverlayFromUrl(url, name);
+};
+
+/* 素材库分页/搜索/筛选 */
+overlayAssetPrev.onclick = () => {
+  if (overlayPickerState.assetPage > 1) {
+    overlayPickerState.assetPage--;
+    fetchAndRenderOverlayAssets(false);
+  }
+};
+overlayAssetNext.onclick = () => {
+  if (overlayPickerState.assetPage < overlayPickerState.assetTotalPages) {
+    overlayPickerState.assetPage++;
+    fetchAndRenderOverlayAssets(false);
+  }
+};
+let overlaySearchTimer = null;
+overlayAssetSearch.oninput = (e) => {
+  overlayPickerState.assetSearch = e.target.value;
+  clearTimeout(overlaySearchTimer);
+  overlaySearchTimer = setTimeout(() => fetchAndRenderOverlayAssets(true), 300);
+};
+overlayAssetType.onchange = (e) => {
+  overlayPickerState.assetTypeFilter = e.target.value;
+  fetchAndRenderOverlayAssets(true);
+};
+
+/* 工具栏图标事件 */
+toolOverlay.onclick = () => {
+  if (overlayState.active) {
+    // 已激活 → 再点一次弹出选择器（换图）
+    openOverlayPicker();
+  } else {
+    openOverlayPicker();
+  }
+};
+toolRemoveBg.onclick = () => {
+  removeBackgroundFrontend();
+};
+
+/* 绑定 overlay 拖动 */
+bindOverlayDrag();
+
+/* ================================================================
+   局部重绘（多选区）
+   ================================================================ */
 const maskState = {
   active: false,
   regions: [],
@@ -3672,6 +4726,7 @@ let regionCounter = 0;
 function enterMaskMode() {
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   if (cropState.active) exitCropMode();
+  if (overlayState.active) clearOverlay(false);
   maskState.active = true;
   maskState.regions = [];
   maskState.activeRegionId = null;
@@ -4228,7 +5283,9 @@ $('openMaskBtn').onclick = () => {
   else enterMaskMode();
 };
 
-/* 修改记录 */
+/* ================================================================
+   修改记录
+   ================================================================ */
 function addEditHistoryRecord({ type, label, detail, thumb, regionCount }) {
   const record = {
     id: 'eh_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
@@ -4262,6 +5319,8 @@ function renderEditHistory() {
       'addText': 'fa-font',
       'styleTransfer': 'fa-paint-brush',
       'outpainting': 'fa-expand',
+      'aiComposite': 'fa-object-group',
+      'removeBg': 'fa-scissors',
       'crop': 'fa-crop',
       'rotate': 'fa-repeat',
       'reset': 'fa-home'
@@ -4303,7 +5362,9 @@ editHistoryClear.onclick = () => {
   showToast('🗑️ 修改记录已清空', 'fa-trash');
 };
 
-/* AI 编辑 */
+/* ================================================================
+   AI 编辑
+   ================================================================ */
 const aiEditState = {
   currentAction: null, strength: 0.7, ratio: '3:4', keepSubject: true, running: false
 };
@@ -4313,7 +5374,9 @@ const AI_EDIT_PRESETS = {
   replaceBg: (name, scene) => `保持${name}主体不变，将背景替换为${scene}，商业实拍，柔和自然光`,
   addText: (name, sell) => `在${name}图片上添加简洁卖点文字"${sell}"，不遮挡主体，电商风格`,
   styleTransfer: (name, style) => `${name}，${style}风格，商业电商图，高清`,
-  outpainting: (name) => `${name}向外扩展画布，保持商品完整性，自然延伸背景`
+  outpainting: (name) => `${name}向外扩展画布，保持商品完整性，自然延伸背景`,
+  aiComposite: (name) => `保持商品主体形状、颜色、材质、位置完全不变，自然融入背景环境，添加真实光影和阴影，商业摄影风格，高清细节，电商主图`,
+  removeBg: (name) => `提取${name}的商品主体，去除背景，保留透明通道`
 };
 function syncAiEditPanel() {
   const nameEl = $('aiEditCurrentName');
@@ -4348,7 +5411,9 @@ function selectAiEditAction(action) {
     replaceBg: AI_EDIT_PRESETS.replaceBg(name, scene),
     addText: AI_EDIT_PRESETS.addText(name, sell),
     styleTransfer: AI_EDIT_PRESETS.styleTransfer(name, style),
-    outpainting: AI_EDIT_PRESETS.outpainting(name)
+    outpainting: AI_EDIT_PRESETS.outpainting(name),
+    aiComposite: AI_EDIT_PRESETS.aiComposite(name),
+    removeBg: AI_EDIT_PRESETS.removeBg(name)
   };
   $('aiEditPrompt').value = presetMap[action] || '';
   $('aiEditAdvanced').open = true;
@@ -4359,6 +5424,18 @@ async function applyAiEdit() {
   if (!canvasState.hasImage) return;
   if (!aiEditState.currentAction) { showToast('请选择功能'); return; }
   const action = aiEditState.currentAction;
+
+  // ★ AI融合合成：走 overlay 流程
+  if (action === 'aiComposite') {
+    await runAiComposite();
+    return;
+  }
+  // ★ AI抠图：走 imgly 流程
+  if (action === 'removeBg') {
+    await removeBackgroundFrontend();
+    return;
+  }
+
   const prompt = $('aiEditPrompt').value.trim();
   if (action === 'genCopy') { genCopyBtn.click(); return; }
   if (!prompt) { showToast('提示词不能为空'); return; }
@@ -4409,7 +5486,8 @@ async function applyAiEdit() {
 function getActionLabel(action) {
   return {
     regenerate: '重生成', whiteBg: '白底抠图', replaceBg: '替换背景',
-    addText: '添加卖点', styleTransfer: '换风格', outpainting: '扩图', genCopy: '生成文案'
+    addText: '添加卖点', styleTransfer: '换风格', outpainting: '扩图', genCopy: '生成文案',
+    aiComposite: 'AI融合合成', removeBg: 'AI抠图'
   }[action] || action;
 }
 async function callAiEditApi(params) {
@@ -4487,7 +5565,9 @@ function bindAiEdit() {
   $('aiEditApplyBtn').addEventListener('click', applyAiEdit);
 }
 
-/* 合规检测 */
+/* ================================================================
+   合规检测
+   ================================================================ */
 singleCheckBtn.onclick = function(){
   checkResultPanel.classList.remove('hidden');
   const mockOcr = "优质，全网最好，性价比高";
@@ -4546,7 +5626,7 @@ copyClipBtn.onclick = async function(){
   showToast('文案复制成功', 'fa-copy');
 }
 
-/* ★ 新增：两个面板的关闭逻辑 */
+/* 两个面板的关闭逻辑 */
 $('checkResultCloseBtn').onclick = () => {
   checkResultPanel.classList.add('hidden');
 };
@@ -4671,6 +5751,9 @@ document.addEventListener('mousedown', (e) => {
   }
 });
 
+/* ================================================================
+   初始化
+   ================================================================ */
 platformSelect.dispatchEvent(new Event('change'));
 bindCanvasSettings();
 bindAiEdit();
