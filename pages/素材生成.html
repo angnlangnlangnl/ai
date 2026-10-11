@@ -84,9 +84,7 @@
     }
     .canvas-stage img.preview.fading { opacity: 0.35; }
     .canvas-stage img.preview.panning,
-    .canvas-stage img.preview.zooming {
-      transition: none;
-    }
+    .canvas-stage img.preview.zooming { transition: none; }
     .canvas-stage.grid-on {
       background-image:
         linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
@@ -183,7 +181,6 @@
     }
     .split-divider:hover .split-badge,
     .split-divider.dragging .split-badge { opacity: 1; }
-
     .compare-tag-left,
     .compare-tag-right {
       position: absolute; top: 8px;
@@ -485,91 +482,308 @@
     }
     .canvas-coord.show { display: block; }
 
-    /* ============ ★ 缩放指示器（画布内右下角，保留） ============ */
+    /* ============ ★ 缩放指示器：缩放时显示，停止时隐藏 ============ */
     .zoom-indicator {
       position: absolute;
       bottom: 8px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(17,24,39,0.9);
+      background: rgba(17,24,39,0.95);
       border: 1px solid #374151;
       border-radius: 6px;
-      padding: 3px 10px;
-      font-size: 11px;
+      padding: 4px 12px;
+      font-size: 12px;
       color: #9ca3af;
       font-family: ui-monospace, monospace;
       z-index: 25;
       pointer-events: none;
-      transition: all 0.2s;
       opacity: 0;
+      transition: opacity 0.3s ease, transform 0.2s ease, border-color 0.2s, color 0.2s;
+      transform: translateX(-50%) translateY(8px);
     }
-    .zoom-indicator.show { opacity: 1; }
-    .zoom-indicator.highlight {
+    .zoom-indicator.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
       border-color: #22d3ee;
       color: #22d3ee;
-      transform: translateX(-50%) scale(1.15);
-      box-shadow: 0 0 12px rgba(34,211,238,0.5);
+      box-shadow: 0 0 12px rgba(34,211,238,0.4);
     }
 
-    /* ============ ★ 缩放控制条（外部顶部） ============ */
-    .zoom-control-bar-external {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      background: rgba(31, 41, 55, 0.8);
-      border: 1px solid #374151;
-      border-radius: 8px;
-      padding: 3px;
-      user-select: none;
-      backdrop-filter: blur(4px);
-      transition: all 0.2s;
-    }
-    .zoom-control-bar-external:hover {
-      border-color: #4F46E5;
-      background: rgba(31, 41, 55, 0.95);
-    }
-    .zoom-control-bar-external button {
-      width: 26px; height: 26px;
+    /* ============ ★ 全屏预览按钮（画布右下角） ============ */
+    .fullscreen-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
       border-radius: 6px;
-      border: none;
-      background: transparent;
+      background: rgba(17,24,39,0.85);
+      border: 1px solid #374151;
       color: #9ca3af;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: inherit;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: 0.15s;
-    }
-    .zoom-control-bar-external button:hover {
-      background: rgba(79,70,229,0.3);
-      color: #fff;
-    }
-    .zoom-control-bar-external .zoom-value {
-      padding: 0 10px;
-      font-size: 11px;
-      color: #d1d5db;
-      font-family: ui-monospace, monospace;
       cursor: pointer;
-      border-radius: 6px;
-      line-height: 26px;
-      min-width: 52px;
-      text-align: center;
-      transition: 0.15s;
+      z-index: 26;
+      opacity: 0;
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
     }
-    .zoom-control-bar-external .zoom-value:hover {
-      background: rgba(79,70,229,0.2);
+    .canvas-stage:hover .fullscreen-btn { opacity: 1; }
+    .fullscreen-btn:hover {
+      background: #4F46E5;
+      border-color: #4F46E5;
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    /* ============ ★ 全屏预览遮罩 ============ */
+    .fullscreen-viewer {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.96);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      animation: fadeInViewer 0.2s ease;
+    }
+    .fullscreen-viewer.show { display: flex; }
+    @keyframes fadeInViewer {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* 图片容器 */
+    .fullscreen-viewer .fs-img-wrap {
+      position: relative;
+      max-width: 85vw;
+      max-height: 82vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      overflow: hidden;
+    }
+    .fullscreen-viewer .fs-img-wrap img {
+      max-width: 100%;
+      max-height: 82vh;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.25s ease;
+      transform-origin: center center;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+      border-radius: 6px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    }
+    .fullscreen-viewer .fs-img-wrap img.zooming { transition: none; }
+
+    /* 左右切换箭头 */
+    .fs-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(17,24,39,0.85);
+      border: 1px solid #374151;
+      color: #d1d5db;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10000;
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .fs-arrow:hover {
+      background: #4F46E5;
+      border-color: #4F46E5;
+      color: #fff;
+      transform: translateY(-50%) scale(1.1);
+    }
+    .fs-arrow:active { transform: translateY(-50%) scale(0.95); }
+    .fs-arrow.disabled {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+    .fs-arrow.left  { left: 24px; }
+    .fs-arrow.right { right: 24px; }
+
+    /* 顶部工具栏 */
+    .fs-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10001;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+      pointer-events: none;
+    }
+    .fs-header > * { pointer-events: auto; }
+
+    .fs-title {
+      font-size: 14px;
+      color: #d1d5db;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 60%;
+    }
+    .fs-title .fs-index {
+      background: rgba(79,70,229,0.3);
+      color: #a5b4fc;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-family: ui-monospace, monospace;
+    }
+    .fs-title .fs-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fs-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .fs-action-btn {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: rgba(17,24,39,0.85);
+      border: 1px solid #374151;
+      color: #d1d5db;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .fs-action-btn:hover {
+      background: #4F46E5;
+      border-color: #4F46E5;
       color: #fff;
     }
-    .zoom-control-bar-external .zoom-fit-btn {
-      width: auto;
-      padding: 0 10px;
-      font-size: 11px;
-      gap: 4px;
+
+    /* 底部信息栏 */
+    .fs-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 16px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      z-index: 10001;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      pointer-events: none;
     }
-    .zoom-control-bar-external .zoom-fit-btn i {
-      font-size: 10px;
+    .fs-footer > * { pointer-events: auto; }
+
+    /* 圆点指示器 */
+    .fs-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      max-width: 80vw;
+      justify-content: center;
+    }
+    .fs-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .fs-dot:hover {
+      background: rgba(255,255,255,0.6);
+      transform: scale(1.2);
+    }
+    .fs-dot.active {
+      background: #4F46E5;
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    /* 底部分页文字 */
+    .fs-counter {
+      font-size: 12px;
+      color: #9ca3af;
+      font-family: ui-monospace, monospace;
+    }
+
+    /* 缩略图条 */
+    .fs-thumbnails {
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      background: rgba(17,24,39,0.7);
+      border-radius: 10px;
+      border: 1px solid rgba(55,65,81,0.6);
+      max-width: 80vw;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .fs-thumbnails::-webkit-scrollbar { display: none; }
+    .fs-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      background: #1f2937;
+    }
+    .fs-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .fs-thumb:hover {
+      border-color: #6b7280;
+      transform: translateY(-2px);
+    }
+    .fs-thumb.active {
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 2px rgba(79,70,229,0.4);
+    }
+
+    /* 全屏右下角缩放指示 */
+    .fs-zoom-badge {
+      position: absolute;
+      bottom: 100px;
+      right: 24px;
+      background: rgba(17,24,39,0.9);
+      border: 1px solid #374151;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #9ca3af;
+      font-family: ui-monospace, monospace;
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .fs-zoom-badge.show {
+      opacity: 1;
+      border-color: #22d3ee;
+      color: #22d3ee;
     }
 
     /* ============ 任务队列 ============ */
@@ -611,7 +825,6 @@
       background: linear-gradient(to left, #111827 0%, transparent 100%);
     }
     .tray-fade.hidden { opacity: 0; }
-
     .task-card {
       transition: border-color 0.15s, box-shadow 0.15s;
       border: 2px solid transparent;
@@ -658,7 +871,6 @@
       background: #4F46E5; border-color: #4F46E5; color: #fff;
     }
     .ai-edit-btn i { font-size: 12px; }
-
     .ratio-btn {
       flex: 1;
       padding: 4px 8px;
@@ -672,7 +884,6 @@
     }
     .ratio-btn:hover { border-color: #4F46E5; color: #fff; }
     .ratio-btn.active { background: #4F46E5; border-color: #4F46E5; color: #fff; }
-
     #aiEditAdvanced summary::-webkit-details-marker { display: none; }
     #aiEditAdvanced summary::before {
       content: '▶';
@@ -721,30 +932,20 @@
       font-size: 11px;
       position: relative;
     }
-    .version-item:hover {
-      background: #4F46E5;
-      color: #fff;
-    }
+    .version-item:hover { background: #4F46E5; color: #fff; }
     .version-item.current {
       background: #4F46E5;
       color: #fff;
       border-left: 3px solid #22d3ee;
     }
-    .version-item .v-time {
-      color: #9ca3af;
-      font-size: 10px;
-    }
+    .version-item .v-time { color: #9ca3af; font-size: 10px; }
     .version-item:hover .v-time,
     .version-item.current .v-time { color: rgba(255,255,255,0.7); }
-
     @keyframes versionHighlight {
       0% { background: #22d3ee; transform: scale(1.03); }
       100% { background: #4F46E5; transform: scale(1); }
     }
-    .version-item.highlight {
-      animation: versionHighlight 0.6s ease-out;
-    }
-
+    .version-item.highlight { animation: versionHighlight 0.6s ease-out; }
     .clear-history-btn {
       font-size: 10px;
       color: #9ca3af;
@@ -753,11 +954,7 @@
       border-radius: 4px;
       transition: 0.15s;
     }
-    .clear-history-btn:hover {
-      background: #ef4444;
-      color: #fff;
-    }
-
+    .clear-history-btn:hover { background: #ef4444; color: #fff; }
     .history-counter {
       font-size: 10px;
       color: #22d3ee;
@@ -921,7 +1118,6 @@
         </div>
       </div>
 
-      <!-- 标题行 -->
       <div class="flex justify-between items-center px-4 pt-4 pb-3 shrink-0">
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium text-gray-200">预览画布 | 平台安全区校验</span>
@@ -954,23 +1150,8 @@
         </select>
       </div>
 
-      <!-- ★ 平台名标签 + 缩放控制条（同一行） -->
-      <div class="px-4 pb-3 shrink-0 flex items-center justify-between gap-3 flex-wrap">
+      <div class="px-4 pb-3 shrink-0">
         <span id="platformName" class="text-sm px-3 py-1 rounded bg-primary/25 text-primary font-medium">当前：抖音电商</span>
-
-        <!-- ★ 缩放控制条（外部顶部） -->
-        <div id="zoomControlBar" class="zoom-control-bar-external" style="display:none;">
-          <button id="zoomOutBtn" title="缩小 (Ctrl -)">
-            <i class="fa fa-minus"></i>
-          </button>
-          <div id="zoomValueBtn" class="zoom-value" title="点击重置 100%">100%</div>
-          <button id="zoomInBtn" title="放大 (Ctrl +)">
-            <i class="fa fa-plus"></i>
-          </button>
-          <button id="zoomFitBtn" class="zoom-fit-btn" title="适应窗口">
-            <i class="fa fa-expand"></i> 适应
-          </button>
-        </div>
       </div>
 
       <!-- 画布 -->
@@ -985,8 +1166,13 @@
           </div>
           <div id="canvasCoord" class="canvas-coord">0, 0</div>
 
-          <!-- 缩放指示器（画布内右下角保留，缩放时高亮） -->
+          <!-- ★ 缩放指示器：缩放时显示，停止 1 秒后隐藏 -->
           <div id="zoomIndicator" class="zoom-indicator">100%</div>
+
+          <!-- ★ 全屏预览按钮（画布右上角） -->
+          <div id="fullscreenBtn" class="fullscreen-btn" title="全屏预览 (F)">
+            <i class="fa fa-expand"></i>
+          </div>
         </div>
       </div>
 
@@ -1292,6 +1478,57 @@
 
   <div id="toastTip" class="toast-tip"><i class="fa fa-check-circle"></i><span id="toastText"></span></div>
 
+  <!-- ============ ★ 全屏预览层 ============ -->
+  <div id="fullscreenViewer" class="fullscreen-viewer">
+    <!-- 顶部工具栏 -->
+    <div class="fs-header">
+      <div class="fs-title">
+        <span class="fs-index" id="fsIndex">1 / 1</span>
+        <span class="fs-name" id="fsName">未命名</span>
+      </div>
+      <div class="fs-actions">
+        <div class="fs-action-btn" id="fsZoomOutBtn" title="缩小">
+          <i class="fa fa-minus"></i>
+        </div>
+        <div class="fs-action-btn" id="fsZoomResetBtn" title="重置 100%">
+          <i class="fa fa-search"></i>
+        </div>
+        <div class="fs-action-btn" id="fsZoomInBtn" title="放大">
+          <i class="fa fa-plus"></i>
+        </div>
+        <div class="fs-action-btn" id="fsDownloadBtn" title="下载">
+          <i class="fa fa-download"></i>
+        </div>
+        <div class="fs-action-btn" id="fsCloseBtn" title="关闭 (Esc)">
+          <i class="fa fa-times"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 左右切换 -->
+    <div id="fsArrowLeft" class="fs-arrow left" title="上一张 (←)">
+      <i class="fa fa-chevron-left"></i>
+    </div>
+    <div id="fsArrowRight" class="fs-arrow right" title="下一张 (→)">
+      <i class="fa fa-chevron-right"></i>
+    </div>
+
+    <!-- 图片 -->
+    <div class="fs-img-wrap">
+      <img id="fsImg" src="" alt="">
+    </div>
+
+    <!-- 缩放指示 -->
+    <div id="fsZoomBadge" class="fs-zoom-badge">100%</div>
+
+    <!-- 底部 -->
+    <div class="fs-footer">
+      <div class="fs-dots" id="fsDots"></div>
+      <div class="fs-thumbnails" id="fsThumbnails"></div>
+      <div class="fs-counter" id="fsCounter">1 / 1</div>
+    </div>
+  </div>
+
 <script>
 /* ================================================================
    平台配置
@@ -1392,13 +1629,23 @@ const tabAiEdit = $('tabAiEdit');
 const panelPlatform = $('panelPlatform');
 const panelAiEdit = $('panelAiEdit');
 
-/* ★ 缩放相关（画布内指示器 + 外部控制条） */
 const zoomIndicator = $('zoomIndicator');
-const zoomControlBar = $('zoomControlBar');
-const zoomValueBtn = $('zoomValueBtn');
-const zoomInBtn = $('zoomInBtn');
-const zoomOutBtn = $('zoomOutBtn');
-const zoomFitBtn = $('zoomFitBtn');
+const fullscreenBtn = $('fullscreenBtn');
+const fullscreenViewer = $('fullscreenViewer');
+const fsImg = $('fsImg');
+const fsIndex = $('fsIndex');
+const fsName = $('fsName');
+const fsCounter = $('fsCounter');
+const fsDots = $('fsDots');
+const fsThumbnails = $('fsThumbnails');
+const fsArrowLeft = $('fsArrowLeft');
+const fsArrowRight = $('fsArrowRight');
+const fsCloseBtn = $('fsCloseBtn');
+const fsZoomInBtn = $('fsZoomInBtn');
+const fsZoomOutBtn = $('fsZoomOutBtn');
+const fsZoomResetBtn = $('fsZoomResetBtn');
+const fsDownloadBtn = $('fsDownloadBtn');
+const fsZoomBadge = $('fsZoomBadge');
 
 let taskDataList = [];
 let currentMode = "domestic";
@@ -1416,18 +1663,20 @@ const canvasSettings = {
   grid: false, guides: false, thirds: false, safe: true, bg: 'dark', coord: false
 };
 
-/* ================================================================
-   缩放 / 平移 状态与逻辑
-   ================================================================ */
+/* ★ 缩放状态 */
 const zoomState = {
   MIN: 0.1, MAX: 5,
   isPanning: false,
   spacePressed: false,
   panStartX: 0, panStartY: 0,
   panStartOffsetX: 0, panStartOffsetY: 0,
-  lastTouchDist: 0
+  lastTouchDist: 0,
+  hideTimer: null
 };
 
+/* ================================================================
+   ★ 缩放指示器：缩放时显示，停止 1 秒后隐藏
+   ================================================================ */
 function applyCanvasTransform() {
   const t = `translate(${canvasState.offsetX}px, ${canvasState.offsetY}px) rotate(${canvasState.rotation}deg) scale(${canvasState.scale})`;
   previewImg.style.transform = t;
@@ -1457,7 +1706,7 @@ function zoomAt(clientX, clientY, factor) {
   clearTimeout(zoomState._zoomTimer);
   zoomState._zoomTimer = setTimeout(() => previewImg.classList.remove('zooming'), 100);
 
-  updateZoomUI();
+  showZoomIndicator();
 }
 
 function resetZoom() {
@@ -1465,48 +1714,23 @@ function resetZoom() {
   canvasState.offsetX = 0;
   canvasState.offsetY = 0;
   applyCanvasTransform();
-  updateZoomUI();
+  showZoomIndicator();
 }
 
-/* ★ 更新缩放 UI（外部控制条 + 画布内指示器） */
-function updateZoomUI(highlight) {
+/* ★ 显示缩放参数，1 秒后自动隐藏 */
+function showZoomIndicator() {
   const pct = Math.round(canvasState.scale * 100);
-
-  // 外部顶部控制条
-  if (zoomValueBtn) {
-    zoomValueBtn.textContent = pct + '%';
-    if (highlight !== false) {
-      zoomValueBtn.style.background = 'rgba(34,211,238,0.2)';
-      zoomValueBtn.style.color = '#22d3ee';
-      clearTimeout(zoomValueBtn._timer);
-      zoomValueBtn._timer = setTimeout(() => {
-        zoomValueBtn.style.background = '';
-        zoomValueBtn.style.color = '';
-      }, 600);
-    }
-  }
-
-  // 画布内右下角指示器
-  if (zoomIndicator) {
-    zoomIndicator.textContent = pct + '%';
-    zoomIndicator.classList.add('show');
-    if (highlight !== false) {
-      zoomIndicator.classList.add('highlight');
-      clearTimeout(zoomIndicator._timer);
-      zoomIndicator._timer = setTimeout(() => {
-        zoomIndicator.classList.remove('highlight');
-      }, 600);
-    }
-  }
-}
-
-function updateZoomBarVisibility() {
-  if (!zoomControlBar) return;
-  zoomControlBar.style.display = canvasState.hasImage ? 'flex' : 'none';
+  if (!zoomIndicator) return;
+  zoomIndicator.textContent = pct + '%';
+  zoomIndicator.classList.add('show');
+  clearTimeout(zoomState.hideTimer);
+  zoomState.hideTimer = setTimeout(() => {
+    zoomIndicator.classList.remove('show');
+  }, 1000);
 }
 
 /* ================================================================
-   鼠标滚轮缩放
+   ★ 画布滚轮缩放
    ================================================================ */
 canvasStage.addEventListener('wheel', (e) => {
   if (!canvasState.hasImage) return;
@@ -1518,7 +1742,7 @@ canvasStage.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 /* ================================================================
-   空格 + 拖拽 / 中键拖拽 平移
+   ★ 空格 + 拖拽 / 中键拖拽 平移
    ================================================================ */
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space' && !zoomState.spacePressed && canvasState.hasImage) {
@@ -1566,7 +1790,7 @@ document.addEventListener('mouseup', () => {
 });
 
 /* ================================================================
-   双击 100% / 适应窗口 切换
+   ★ 双击复位
    ================================================================ */
 canvasStage.addEventListener('dblclick', (e) => {
   if (!canvasState.hasImage) return;
@@ -1576,7 +1800,7 @@ canvasStage.addEventListener('dblclick', (e) => {
 });
 
 /* ================================================================
-   触摸双指捏合
+   ★ 触摸双指捏合
    ================================================================ */
 canvasStage.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2 && canvasState.hasImage) {
@@ -1603,7 +1827,7 @@ canvasStage.addEventListener('touchend', () => {
 });
 
 /* ================================================================
-   ★ 缩放按钮（右侧 + 外部控制条）
+   ★ 缩放按钮
    ================================================================ */
 toolZoomIn.onclick = () => {
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
@@ -1616,19 +1840,8 @@ toolZoomOut.onclick = () => {
   zoomAt(rect.left + rect.width/2, rect.top + rect.height/2, 1/1.2);
 };
 
-zoomInBtn.onclick = () => toolZoomIn.click();
-zoomOutBtn.onclick = () => toolZoomOut.click();
-zoomFitBtn.onclick = () => {
-  resetZoom();
-  showToast('已适应窗口', 'fa-expand');
-};
-zoomValueBtn.onclick = () => {
-  resetZoom();
-  showToast('已重置到 100%', 'fa-search');
-};
-
 /* ================================================================
-   Ctrl + / - / 0 快捷键
+   ★ Ctrl + / - / 0 快捷键
    ================================================================ */
 document.addEventListener('keydown', (e) => {
   const tag = document.activeElement?.tagName;
@@ -1648,7 +1861,254 @@ document.addEventListener('keydown', (e) => {
     if (!canvasState.hasImage) return;
     e.preventDefault();
     resetZoom();
-    showToast('已重置到 100%', 'fa-search');
+  }
+});
+
+/* ================================================================
+   ★ 全屏预览器
+   ================================================================ */
+const fsState = {
+  active: false,
+  index: 0,
+  scale: 1,
+  offsetX: 0, offsetY: 0,
+  isPanning: false,
+  panStartX: 0, panStartY: 0,
+  panStartOffsetX: 0, panStartOffsetY: 0,
+  lastTouchDist: 0,
+  hideTimer: null
+};
+
+function openFullscreen() {
+  if (!canvasState.hasImage || taskDataList.length === 0) {
+    showToast('⚠️ 请先上传图片', 'fa-exclamation-triangle');
+    return;
+  }
+  fsState.active = true;
+  fsState.scale = 1;
+  fsState.offsetX = 0; fsState.offsetY = 0;
+  // 找到当前 activeTaskId 在列表里的位置
+  const idx = taskDataList.findIndex(t => t.id === activeTaskId);
+  fsState.index = idx >= 0 ? idx : 0;
+  fullscreenViewer.classList.add('show');
+  renderFullscreen();
+  // 禁用页面滚动
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFullscreen() {
+  fsState.active = false;
+  fullscreenViewer.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function renderFullscreen() {
+  if (!fsState.active || taskDataList.length === 0) return;
+  const task = taskDataList[fsState.index];
+  if (!task) return;
+
+  fsImg.src = task.src;
+  fsImg.style.transform = `translate(0, 0) scale(1)`;
+  fsState.scale = 1;
+  fsState.offsetX = 0; fsState.offsetY = 0;
+
+  fsIndex.textContent = `${fsState.index + 1} / ${taskDataList.length}`;
+  fsCounter.textContent = `${fsState.index + 1} / ${taskDataList.length}`;
+  fsName.textContent = task.name;
+
+  // 左右箭头状态
+  fsArrowLeft.classList.toggle('disabled', fsState.index === 0);
+  fsArrowRight.classList.toggle('disabled', fsState.index === taskDataList.length - 1);
+
+  // 圆点
+  fsDots.innerHTML = taskDataList.map((t, i) =>
+    `<div class="fs-dot ${i === fsState.index ? 'active' : ''}" data-idx="${i}"></div>`
+  ).join('');
+  fsDots.querySelectorAll('.fs-dot').forEach(dot => {
+    dot.onclick = () => { fsState.index = parseInt(dot.dataset.idx); renderFullscreen(); };
+  });
+
+  // 缩略图
+  fsThumbnails.innerHTML = taskDataList.map((t, i) =>
+    `<div class="fs-thumb ${i === fsState.index ? 'active' : ''}" data-idx="${i}">
+      <img src="${t.src}" alt="">
+    </div>`
+  ).join('');
+  fsThumbnails.querySelectorAll('.fs-thumb').forEach(thumb => {
+    thumb.onclick = () => {
+      fsState.index = parseInt(thumb.dataset.idx);
+      renderFullscreen();
+    };
+    // 自动滚动到当前缩略图
+  });
+  // 自动滚动当前缩略图到可见
+  const activeThumb = fsThumbnails.querySelector('.fs-thumb.active');
+  if (activeThumb) {
+    activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  updateFsZoomBadge();
+}
+
+function fsPrev() {
+  if (fsState.index <= 0) return;
+  fsState.index--;
+  renderFullscreen();
+}
+function fsNext() {
+  if (fsState.index >= taskDataList.length - 1) return;
+  fsState.index++;
+  renderFullscreen();
+}
+
+/* 全屏图片变换 */
+function applyFsTransform() {
+  fsImg.style.transform = `translate(${fsState.offsetX}px, ${fsState.offsetY}px) scale(${fsState.scale})`;
+}
+
+function fsZoomAt(clientX, clientY, factor) {
+  const rect = fullscreenViewer.getBoundingClientRect();
+  const cx = rect.width / 2;
+  const cy = rect.height / 2;
+  const mx = clientX - cx;
+  const my = clientY - cy;
+
+  const oldScale = fsState.scale;
+  let newScale = oldScale * factor;
+  newScale = Math.max(0.2, Math.min(8, newScale));
+  if (Math.abs(newScale - oldScale) < 0.0001) return;
+
+  const ratio = newScale / oldScale;
+  fsState.offsetX = mx - (mx - fsState.offsetX) * ratio;
+  fsState.offsetY = my - (my - fsState.offsetY) * ratio;
+  fsState.scale = newScale;
+
+  fsImg.classList.add('zooming');
+  applyFsTransform();
+  clearTimeout(fsState._zoomTimer);
+  fsState._zoomTimer = setTimeout(() => fsImg.classList.remove('zooming'), 100);
+
+  updateFsZoomBadge();
+}
+
+function updateFsZoomBadge() {
+  const pct = Math.round(fsState.scale * 100);
+  fsZoomBadge.textContent = pct + '%';
+  fsZoomBadge.classList.add('show');
+  clearTimeout(fsState.hideTimer);
+  fsState.hideTimer = setTimeout(() => {
+    fsZoomBadge.classList.remove('show');
+  }, 1000);
+}
+
+/* 全屏按钮 */
+fullscreenBtn.onclick = openFullscreen;
+fsCloseBtn.onclick = closeFullscreen;
+fsArrowLeft.onclick = fsPrev;
+fsArrowRight.onclick = fsNext;
+
+fsZoomInBtn.onclick = () => {
+  const rect = fullscreenViewer.getBoundingClientRect();
+  fsZoomAt(rect.width / 2, rect.height / 2, 1.2);
+};
+fsZoomOutBtn.onclick = () => {
+  const rect = fullscreenViewer.getBoundingClientRect();
+  fsZoomAt(rect.width / 2, rect.height / 2, 1/1.2);
+};
+fsZoomResetBtn.onclick = () => {
+  fsState.scale = 1;
+  fsState.offsetX = 0; fsState.offsetY = 0;
+  applyFsTransform();
+  updateFsZoomBadge();
+};
+fsDownloadBtn.onclick = () => {
+  const task = taskDataList[fsState.index];
+  if (!task) return;
+  const a = document.createElement('a');
+  a.href = task.src;
+  a.download = task.name || 'image.jpg';
+  a.click();
+  showToast('⬇️ 开始下载', 'fa-download');
+};
+
+/* 全屏滚轮缩放 */
+fullscreenViewer.addEventListener('wheel', (e) => {
+  if (!fsState.active) return;
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+  fsZoomAt(e.clientX, e.clientY, factor);
+}, { passive: false });
+
+/* 全屏拖拽平移 */
+fullscreenViewer.addEventListener('mousedown', (e) => {
+  if (!fsState.active) return;
+  if (e.target.closest('.fs-arrow') || e.target.closest('.fs-header') || e.target.closest('.fs-footer')) return;
+  fsState.isPanning = true;
+  fsState.panStartX = e.clientX;
+  fsState.panStartY = e.clientY;
+  fsState.panStartOffsetX = fsState.offsetX;
+  fsState.panStartOffsetY = fsState.offsetY;
+  fullscreenViewer.style.cursor = 'grabbing';
+  e.preventDefault();
+});
+document.addEventListener('mousemove', (e) => {
+  if (!fsState.isPanning) return;
+  fsState.offsetX = fsState.panStartOffsetX + (e.clientX - fsState.panStartX);
+  fsState.offsetY = fsState.panStartOffsetY + (e.clientY - fsState.panStartY);
+  applyFsTransform();
+});
+document.addEventListener('mouseup', () => {
+  if (fsState.isPanning) {
+    fsState.isPanning = false;
+    fullscreenViewer.style.cursor = '';
+  }
+});
+
+/* 全屏双击复位 */
+fullscreenViewer.addEventListener('dblclick', (e) => {
+  if (!fsState.active) return;
+  if (e.target.closest('.fs-arrow') || e.target.closest('.fs-header') || e.target.closest('.fs-footer')) return;
+  fsState.scale = 1;
+  fsState.offsetX = 0; fsState.offsetY = 0;
+  applyFsTransform();
+  updateFsZoomBadge();
+});
+
+/* 全屏触摸双指捏合 */
+fullscreenViewer.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    const t1 = e.touches[0], t2 = e.touches[1];
+    fsState.lastTouchDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+  }
+}, { passive: true });
+fullscreenViewer.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2 && fsState.lastTouchDist > 0) {
+    e.preventDefault();
+    const t1 = e.touches[0], t2 = e.touches[1];
+    const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    const factor = dist / fsState.lastTouchDist;
+    const cx = (t1.clientX + t2.clientX) / 2;
+    const cy = (t1.clientY + t2.clientY) / 2;
+    fsZoomAt(cx, cy, factor);
+    fsState.lastTouchDist = dist;
+  }
+}, { passive: false });
+fullscreenViewer.addEventListener('touchend', () => {
+  fsState.lastTouchDist = 0;
+});
+
+/* 全屏键盘快捷键 */
+document.addEventListener('keydown', (e) => {
+  if (!fsState.active) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeFullscreen();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    fsPrev();
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    fsNext();
   }
 });
 
@@ -1799,7 +2259,6 @@ function applyHistoryState(state) {
     }
     syncAiEditPanel();
     updateSnapshotButton();
-    updateZoomUI(false);
     setTimeout(() => previewImg.classList.remove('fading'), 30);
   }, 120);
 }
@@ -1972,8 +2431,6 @@ function loadToCanvas(src, actionName) {
   if (canvasState.compareMode) syncCompareImages();
   syncAiEditPanel();
   updateSnapshotButton();
-  updateZoomUI(false);
-  updateZoomBarVisibility();
   pushHistory(actionName || '加载图片');
 }
 
@@ -2239,7 +2696,7 @@ toolResetView.onclick = ()=>{
   canvasState.rotation = 0; canvasState.scale = 1;
   canvasState.offsetX = 0; canvasState.offsetY = 0;
   applyCanvasTransform();
-  updateZoomUI();
+  showZoomIndicator();
   pushHistory('重置视图');
   showToast('画布视图已重置（含缩放）', 'fa-home');
 }
@@ -2599,7 +3056,7 @@ function doCrop() {
   showToast(`✅ 已裁切为 ${sw} × ${sh}`, 'fa-crop');
 }
 
-/* ★ 通用：更新画布图片 + 同步卡片 + 版本历史 */
+/* ★ 通用：更新画布图片 */
 function updateCanvasImage(dataUrl, label) {
   previewImg.src = dataUrl;
   canvasState.rotation = 0; canvasState.scale = 1;
@@ -2621,7 +3078,6 @@ function updateCanvasImage(dataUrl, label) {
   pushHistory(label || '编辑');
   syncAiEditPanel();
   updateSnapshotButton();
-  updateZoomUI();
 }
 
 /* ================================================================
@@ -3293,6 +3749,18 @@ document.addEventListener('keydown', (e) => {
   const tag = document.activeElement?.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA') return;
 
+  // 全屏模式下不响应画布快捷键
+  if (fsState.active) return;
+
+  // F 进入全屏
+  if (e.key === 'f' || e.key === 'F') {
+    if (canvasState.hasImage && !maskState.active && !cropState.active) {
+      e.preventDefault();
+      openFullscreen();
+    }
+    return;
+  }
+
   if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
     e.preventDefault();
     undo();
@@ -3313,7 +3781,6 @@ loadHistoryFromStorage();
 renderVersionList();
 updateUndoRedoButtons();
 updateSnapshotButton();
-updateZoomBarVisibility();
 autoPickAsideTab();
 </script>
 </body>
