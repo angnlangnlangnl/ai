@@ -1436,6 +1436,23 @@
       align-items: center;
       justify-content: center;
     }
+
+    /* ★ 面板关闭按钮 */
+    .panel-close-btn {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: #374151;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.15s;
+      flex-shrink: 0;
+    }
+    .panel-close-btn:hover { background: #ef4444; color: #fff; }
   </style>
 </head>
 <body class="bg-darkBg text-gray-100 h-screen overflow-hidden flex flex-col">
@@ -1642,12 +1659,18 @@
         <div class="bg-cardBg p-3 rounded-lg">
           <div class="flex justify-between items-center mb-2">
             <span class="font-medium text-sm"><i class="fa fa-file-text-o mr-1"></i>AI合规检测报告</span>
-            <span id="checkStatus" class="text-xs px-2 py-0.5 rounded bg-green-600">正常</span>
+            <button class="panel-close-btn" id="checkResultCloseBtn" title="关闭">
+              <i class="fa fa-times"></i>
+            </button>
           </div>
           <div class="text-xs text-gray-300">
             <p>识别文字：<span id="ocrText">暂无</span></p>
             <p class="mt-1">违规词：<span id="badWords" class="text-red-400">无</span></p>
             <p class="mt-1 text-amber-300">修改建议：<span id="checkSuggest">暂无</span></p>
+          </div>
+          <!-- 状态移到右下方 -->
+          <div class="flex justify-end mt-2">
+            <span id="checkStatus" class="text-xs px-2 py-0.5 rounded bg-green-600">正常</span>
           </div>
         </div>
       </div>
@@ -1657,12 +1680,18 @@
         <div class="bg-cardBg p-3 rounded-lg">
           <div class="flex justify-between items-center mb-2">
             <span class="font-medium text-sm"><i class="fa fa-comment mr-1"></i>多语言AI卖点文案</span>
-            <button id="copyClipBtn" class="text-xs px-2 py-0.5 rounded bg-primary">复制文案</button>
+            <button class="panel-close-btn" id="copyPanelCloseBtn" title="关闭">
+              <i class="fa fa-times"></i>
+            </button>
           </div>
           <div class="grid grid-cols-1 gap-2 text-xs">
             <div>中文卖点：<p id="zhCopy" class="text-gray-200">--</p></div>
             <div>English：<p id="enCopy" class="text-gray-200">--</p></div>
             <div>Español：<p id="esCopy" class="text-gray-200">--</p></div>
+          </div>
+          <!-- 复制按钮移到右下方 -->
+          <div class="flex justify-end mt-2">
+            <button id="copyClipBtn" class="text-xs px-2 py-0.5 rounded bg-primary">复制文案</button>
           </div>
         </div>
       </div>
@@ -4520,6 +4549,15 @@ copyClipBtn.onclick = async function(){
   await navigator.clipboard.writeText(text);
   showToast('文案复制成功', 'fa-copy');
 }
+
+/* ★ 新增：两个面板的关闭逻辑 */
+$('checkResultCloseBtn').onclick = () => {
+  checkResultPanel.classList.add('hidden');
+};
+$('copyPanelCloseBtn').onclick = () => {
+  copyPanel.classList.add('hidden');
+};
+
 openVideoPanelBtn.onclick = ()=>{ videoGenPanel.classList.remove('hidden'); }
 closeVideoPanelBtn.onclick = ()=>{ videoGenPanel.classList.add('hidden'); }
 startBatchVideoGenBtn.onclick = async function(){
