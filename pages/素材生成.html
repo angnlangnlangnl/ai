@@ -50,7 +50,7 @@
     }
     .canvas-tool-icon.has-badge .tool-badge { display: block; }
 
-    /* ★ 撤销/重做按钮：键盘快捷键提示气泡 */
+    /* 快捷键气泡 */
     .shortcut-bubble {
       position: absolute;
       bottom: -22px;
@@ -71,14 +71,11 @@
     #btnUndo:hover .shortcut-bubble,
     #btnRedo:hover .shortcut-bubble { opacity: 1; }
 
-    /* ★ 撤销/重做触发时的闪烁反馈 */
     @keyframes flashPulse {
       0% { box-shadow: 0 0 0 0 rgba(79,70,229,0.9); }
       100% { box-shadow: 0 0 0 12px rgba(79,70,229,0); }
     }
-    .flash-active {
-      animation: flashPulse 0.5s ease-out;
-    }
+    .flash-active { animation: flashPulse 0.5s ease-out; }
 
     /* ============ 画布舞台 ============ */
     .canvas-stage {
@@ -94,10 +91,7 @@
       display: block; transition: transform 0.3s ease, opacity 0.25s ease;
       transform-origin: center center;
     }
-    /* ★ 图片切换时的淡入动画 */
-    .canvas-stage img.preview.fading {
-      opacity: 0.35;
-    }
+    .canvas-stage img.preview.fading { opacity: 0.35; }
     .canvas-stage.grid-on {
       background-image:
         linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
@@ -162,39 +156,27 @@
       z-index: 3;
     }
     .compare-img-right { filter: brightness(1.08) saturate(1.15) contrast(1.05); }
-
     .split-divider {
       position: absolute; top: 0; bottom: 0;
-      width: 2px;
-      background: #facc15;
-      cursor: ew-resize;
-      z-index: 20;
+      width: 2px; background: #facc15; cursor: ew-resize; z-index: 20;
       box-shadow: 0 0 0 1px rgba(0,0,0,0.3), 0 0 8px rgba(250,204,21,0.6);
       outline: none;
     }
-    .split-divider:hover { width: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 0 14px rgba(250,204,21,0.95); }
-    .split-divider.dragging { width: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 0 18px rgba(250,204,21,1); }
     .split-divider::before {
-      content: '';
-      position: absolute; top: 50%; left: 50%;
+      content: ''; position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       width: 26px; height: 26px;
-      background: #facc15;
-      border-radius: 50%;
+      background: #facc15; border-radius: 50%;
       border: 2px solid #111827;
     }
     .split-divider::after {
-      content: '⇔';
-      position: absolute; top: 50%; left: 50%;
+      content: '⇔'; position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      color: #111827;
-      font-size: 13px;
-      font-weight: bold;
+      color: #111827; font-size: 13px; font-weight: bold;
       pointer-events: none;
     }
     .split-badge {
-      position: absolute;
-      top: 12px; left: 50%;
+      position: absolute; top: 12px; left: 50%;
       transform: translateX(-50%);
       background: #facc15; color: #111827;
       font-size: 11px; font-weight: 700;
@@ -222,33 +204,27 @@
       position: absolute;
       border: 2px solid #22d3ee;
       box-shadow: 0 0 0 9999px rgba(0,0,0,0.55);
-      cursor: move;
-      pointer-events: auto;
-      box-sizing: border-box;
-      z-index: 15;
+      cursor: move; pointer-events: auto;
+      box-sizing: border-box; z-index: 15;
     }
     .crop-grid { position: absolute; inset: 0; pointer-events: none; }
-    .crop-grid::before,
-    .crop-grid::after {
+    .crop-grid::before, .crop-grid::after {
       content: ''; position: absolute; background: rgba(255,255,255,0.25);
     }
     .crop-grid::before { top: 33.33%; left: 0; right: 0; height: 1px; box-shadow: 0 66.66% 0 0 rgba(255,255,255,0.25); }
     .crop-grid::after { left: 33.33%; top: 0; bottom: 0; width: 1px; box-shadow: 66.66% 0 0 0 rgba(255,255,255,0.25); }
-
     .crop-handle {
       position: absolute;
       width: 12px; height: 12px;
-      background: #22d3ee;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      z-index: 16;
+      background: #22d3ee; border: 2px solid #fff;
+      border-radius: 50%; z-index: 16;
       box-shadow: 0 0 6px rgba(0,0,0,0.5);
     }
-    .crop-handle[data-handle="nw"] { top: -6px;  left: -6px;  cursor: nw-resize; }
-    .crop-handle[data-handle="n"]  { top: -6px;  left: 50%;   margin-left: -6px; cursor: n-resize; }
-    .crop-handle[data-handle="ne"] { top: -6px;  right: -6px; cursor: ne-resize; }
-    .crop-handle[data-handle="w"]  { top: 50%;   left: -6px;  margin-top: -6px; cursor: w-resize; }
-    .crop-handle[data-handle="e"]  { top: 50%;   right: -6px; margin-top: -6px; cursor: e-resize; }
+    .crop-handle[data-handle="nw"] { top: -6px; left: -6px; cursor: nw-resize; }
+    .crop-handle[data-handle="n"]  { top: -6px; left: 50%; margin-left: -6px; cursor: n-resize; }
+    .crop-handle[data-handle="ne"] { top: -6px; right: -6px; cursor: ne-resize; }
+    .crop-handle[data-handle="w"]  { top: 50%; left: -6px; margin-top: -6px; cursor: w-resize; }
+    .crop-handle[data-handle="e"]  { top: 50%; right: -6px; margin-top: -6px; cursor: e-resize; }
     .crop-handle[data-handle="sw"] { bottom: -6px; left: -6px; cursor: sw-resize; }
     .crop-handle[data-handle="s"]  { bottom: -6px; left: 50%; margin-left: -6px; cursor: s-resize; }
     .crop-handle[data-handle="se"] { bottom: -6px; right: -6px; cursor: se-resize; }
@@ -268,7 +244,6 @@
       border: 1px solid #374151; background: transparent;
       color: #9ca3af; font-size: 11px;
       cursor: pointer; font-family: inherit;
-      transition: 0.15s;
     }
     .crop-toolbar button:hover { border-color: #22d3ee; color: #22d3ee; }
     .crop-toolbar button.active { background: #4F46E5; border-color: #4F46E5; color: #fff; }
@@ -300,26 +275,22 @@
       white-space: nowrap;
     }
 
-    /* ============ 局部重绘框选 ============ */
+    /* ============ 局部重绘 ============ */
     .canvas-stage.mask-mode { cursor: crosshair; }
     .mask-box {
       position: absolute;
       border: 2px dashed #22d3ee;
       background: rgba(34, 211, 238, 0.12);
-      z-index: 40;
-      cursor: move;
+      z-index: 40; cursor: move;
       box-shadow: 0 0 0 9999px rgba(0,0,0,0.35);
-      box-sizing: border-box;
-      display: none;
+      box-sizing: border-box; display: none;
     }
     .mask-box.show { display: block; }
     .mask-box .mask-handle {
       position: absolute;
       width: 12px; height: 12px;
-      background: #22d3ee;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      z-index: 41;
+      background: #22d3ee; border: 2px solid #fff;
+      border-radius: 50%; z-index: 41;
       box-shadow: 0 0 6px rgba(0,0,0,0.5);
     }
     .mask-box .mask-handle[data-handle="nw"] { top: -6px; left: -6px; cursor: nw-resize; }
@@ -335,21 +306,17 @@
       padding: 2px 8px; border-radius: 8px;
       white-space: nowrap; pointer-events: none;
     }
-
     .mask-command-bar {
       position: absolute;
       bottom: 12px; left: 50%;
       transform: translateX(-50%);
-      width: 80%;
-      max-width: 540px;
+      width: 80%; max-width: 540px;
       background: rgba(17,24,39,0.98);
       border: 1px solid #4F46E5;
       border-radius: 12px;
       padding: 10px 12px;
-      z-index: 50;
-      display: none;
-      gap: 8px;
-      align-items: center;
+      z-index: 50; display: none;
+      gap: 8px; align-items: center;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
     .mask-command-bar.show { display: flex; }
@@ -366,31 +333,22 @@
     }
     .mask-command-bar input:focus { border-color: #4F46E5; }
     .mask-command-bar button {
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
+      padding: 8px 14px; border-radius: 8px;
+      border: none; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
       white-space: nowrap;
     }
     .mask-command-bar .btn-clear { background: #374151; color: #e5e7eb; }
     .mask-command-bar .btn-cancel { background: #4b5563; color: #e5e7eb; }
     .mask-command-bar .btn-apply { background: #4F46E5; color: #fff; }
     .mask-command-bar .btn-apply:disabled { opacity: 0.5; cursor: not-allowed; }
-
     .mask-presets {
       position: absolute;
       bottom: 74px; left: 50%;
       transform: translateX(-50%);
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 80%;
-      z-index: 49;
-      display: none;
+      display: flex; gap: 6px; flex-wrap: wrap;
+      justify-content: center; max-width: 80%;
+      z-index: 49; display: none;
     }
     .mask-presets.show { display: flex; }
     .mask-presets .preset-chip {
@@ -406,9 +364,7 @@
       white-space: nowrap;
     }
     .mask-presets .preset-chip:hover {
-      background: #4F46E5;
-      border-color: #4F46E5;
-      color: #fff;
+      background: #4F46E5; border-color: #4F46E5; color: #fff;
     }
 
     /* ============ 画布设置面板 ============ */
@@ -472,9 +428,7 @@
       aspect-ratio: 1;
       border-radius: 6px;
       border: 2px solid transparent;
-      cursor: pointer;
-      transition: 0.15s;
-      position: relative;
+      cursor: pointer; transition: 0.15s; position: relative;
     }
     .canvas-settings-panel .cs-bg-item:hover { border-color: #4F46E5; }
     .canvas-settings-panel .cs-bg-item.active {
@@ -482,8 +436,7 @@
       box-shadow: 0 0 0 2px rgba(79,70,229,0.3);
     }
     .canvas-settings-panel .cs-bg-item.active::after {
-      content: '✓';
-      position: absolute; inset: 0;
+      content: '✓'; position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
       color: #fff; font-size: 14px;
       text-shadow: 0 0 4px rgba(0,0,0,0.8);
@@ -673,10 +626,7 @@
       width: 30px; height: 30px; font-size: 14px;
     }
 
-    /* ============ 版本历史项 ============ */
-    .version-list-wrap {
-      position: relative;
-    }
+    /* ============ 版本历史 ============ */
     .version-item {
       padding: 6px 8px;
       border-radius: 6px;
@@ -705,7 +655,6 @@
     .version-item:hover .v-time,
     .version-item.current .v-time { color: rgba(255,255,255,0.7); }
 
-    /* ★ 版本项高亮闪烁（撤销时） */
     @keyframes versionHighlight {
       0% { background: #22d3ee; transform: scale(1.03); }
       100% { background: #4F46E5; transform: scale(1); }
@@ -714,7 +663,6 @@
       animation: versionHighlight 0.6s ease-out;
     }
 
-    /* ★ 清空历史按钮 */
     .clear-history-btn {
       font-size: 10px;
       color: #9ca3af;
@@ -728,7 +676,6 @@
       color: #fff;
     }
 
-    /* ★ 历史栈计数器 */
     .history-counter {
       font-size: 10px;
       color: #22d3ee;
@@ -736,6 +683,30 @@
       padding: 1px 6px;
       border-radius: 8px;
       margin-left: 4px;
+    }
+
+    /* ★ 右侧 Tab 切换 */
+    .aside-tab {
+      flex: 1;
+      padding: 12px 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      color: #9ca3af;
+      transition: 0.15s;
+      background: transparent;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .aside-tab:hover { color: #fff; }
+    .aside-tab.active {
+      color: #4F46E5;
+      border-bottom-color: #4F46E5;
+      background: rgba(79,70,229,0.05);
     }
   </style>
 </head>
@@ -790,7 +761,7 @@
             <i class="fa fa-trash-o"></i> 清空
           </span>
         </div>
-        <div id="versionList" class="version-list-wrap max-h-32 overflow-y-auto space-y-1 text-xs"></div>
+        <div id="versionList" class="max-h-32 overflow-y-auto space-y-1 text-xs"></div>
         <label class="w-full block mt-3">
           <div class="border-dashed border border-gray-500 rounded p-3 text-center cursor-pointer hover:border-primary transition">
             <i class="fa fa-upload text-xl"></i>
@@ -869,12 +840,10 @@
           <span class="text-sm font-medium text-gray-200">预览画布 | 平台安全区校验</span>
         </div>
         <div class="flex gap-1">
-          <!-- ★ 撤销 -->
           <div id="btnUndo" class="canvas-tool-icon disabled" title="撤销 (Ctrl+Z)">
             <i class="fa fa-undo"></i>
             <span class="shortcut-bubble">Ctrl+Z</span>
           </div>
-          <!-- ★ 重做 -->
           <div id="btnRedo" class="canvas-tool-icon disabled" title="重做 (Ctrl+Y)">
             <i class="fa fa-redo"></i>
             <span class="shortcut-bubble">Ctrl+Y</span>
@@ -882,7 +851,7 @@
           <div id="btnViewCompare" class="canvas-tool-icon" title="分屏对比"><i class="fa fa-columns"></i><span class="tool-badge">ON</span></div>
           <div id="btnCollect" class="canvas-tool-icon" title="收藏"><i class="fa fa-heart-o"></i><span class="tool-badge">★</span></div>
           <div id="btnSafeToggle" class="canvas-tool-icon active" title="安全区"><i class="fa fa-shield"></i></div>
-          <div id="btnSnapshot" class="canvas-tool-icon" title="保存快照"><i class="fa fa-bookmark-o"></i></div>
+          <div id="btnSnapshot" class="canvas-tool-icon disabled" title="保存快照（需先上传图片）"><i class="fa fa-bookmark-o"></i></div>
         </div>
       </div>
 
@@ -1090,69 +1059,82 @@
       </div>
     </main>
 
-    <!-- ========== 右侧：平台参数面板 ========== -->
-    <aside class="w-80 bg-panelBg border-l border-gray-700 p-4 overflow-y-auto">
-      <h3 class="text-lg font-semibold mb-4">平台参数配置</h3>
-      <div class="space-y-4">
-        <div>
-          <label class="text-sm text-gray-300 block mb-1">选择平台</label>
-          <select id="platformSelect" class="w-full bg-cardBg rounded p-2">
-            <optgroup label="国内电商">
-              <option value="douyin">抖音电商主图 3:4</option>
-              <option value="taobao">淘宝主图 1:1</option>
-              <option value="pdd">拼多多主图 1:1</option>
-            </optgroup>
-            <optgroup label="跨境电商">
-              <option value="temu">Temu 主图 1:1</option>
-              <option value="tiktokshop">TikTok Shop 9:16 /1:1</option>
-              <option value="shein">Shein 产品图</option>
-            </optgroup>
-          </select>
-        </div>
-        <div>
-          <label class="text-sm text-gray-300 block mb-1">尺寸预设</label>
-          <input id="sizeInfo" type="text" readonly class="w-full bg-cardBg p-2 text-gray-400" value="1080 × 1440">
-        </div>
-        <div>
-          <label class="text-sm text-gray-300 block mb-1">图片质量压缩</label>
-          <input type="range" min="0.3" max="0.9" step="0.1" value="0.7" class="w-full accent-primary">
-        </div>
-        <div class="space-y-2">
-          <div class="text-sm text-gray-300">自动处理选项</div>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" checked class="accent-primary"> 自动白底抠图</label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" checked class="accent-primary"> 平台安全区校验</label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="accent-primary"> 自动去除水印</label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" checked class="accent-primary"> 批量重命名</label>
-        </div>
-        <div class="bg-gray-800 p-3 rounded">
-          <div class="text-sm text-amber-400 mb-1"><i class="fa fa-exclamation-triangle"></i>平台规则提示</div>
-          <p id="ruleText" class="text-xs text-gray-300">抖音电商：主图3:4，主体居中，文字不要超过图面积20%</p>
-        </div>
-        <div class="border-t border-gray-700 pt-4 mt-4">
-          <h4 class="text-sm font-medium mb-2">导出设置</h4>
-          <div class="flex gap-2">
-            <button class="px-3 py-1 rounded bg-primary text-xs">JPG</button>
-            <button class="px-3 py-1 rounded bg-cardBg text-xs">PNG</button>
-            <button class="px-3 py-1 rounded bg-cardBg text-xs">WebP</button>
+    <!-- ========== 右侧：Tab 切换面板 ========== -->
+    <aside class="w-80 bg-panelBg border-l border-gray-700 flex flex-col shrink-0">
+      <!-- ★ Tab 头 -->
+      <div class="flex border-b border-gray-700 shrink-0">
+        <button id="tabPlatform" class="aside-tab active">
+          <i class="fa fa-sliders"></i> 平台参数
+        </button>
+        <button id="tabAiEdit" class="aside-tab">
+          <i class="fa fa-magic"></i> AI 编辑
+        </button>
+      </div>
+
+      <!-- 内容区 -->
+      <div class="flex-1 overflow-y-auto p-4">
+        <!-- 平台参数面板 -->
+        <div id="panelPlatform" class="space-y-4">
+          <div>
+            <label class="text-sm text-gray-300 block mb-1">选择平台</label>
+            <select id="platformSelect" class="w-full bg-cardBg rounded p-2">
+              <optgroup label="国内电商">
+                <option value="douyin">抖音电商主图 3:4</option>
+                <option value="taobao">淘宝主图 1:1</option>
+                <option value="pdd">拼多多主图 1:1</option>
+              </optgroup>
+              <optgroup label="跨境电商">
+                <option value="temu">Temu 主图 1:1</option>
+                <option value="tiktokshop">TikTok Shop 9:16 /1:1</option>
+                <option value="shein">Shein 产品图</option>
+              </optgroup>
+            </select>
           </div>
-        </div>
-        <div class="border-t border-gray-700 pt-4 mt-4">
-          <h4 class="text-sm font-medium mb-2">店铺授权管理</h4>
-          <div class="space-y-2 text-xs">
-            <div class="flex justify-between items-center bg-gray-800 p-2 rounded"><span>Temu 美国店</span><span class="text-green-400">已授权</span></div>
-            <div class="flex justify-between items-center bg-gray-800 p-2 rounded"><span>TikTok Shop 西班牙</span><span class="text-green-400">已授权</span></div>
-            <div class="flex justify-between items-center bg-gray-800 p-2 rounded"><span>Shein 店铺</span><span class="text-amber-400">待授权</span></div>
-            <button class="w-full mt-2 p-1.5 rounded bg-cardBg">+ 添加新店铺授权</button>
+          <div>
+            <label class="text-sm text-gray-300 block mb-1">尺寸预设</label>
+            <input id="sizeInfo" type="text" readonly class="w-full bg-cardBg p-2 text-gray-400" value="1080 × 1440">
+          </div>
+          <div>
+            <label class="text-sm text-gray-300 block mb-1">图片质量压缩</label>
+            <input type="range" min="0.3" max="0.9" step="0.1" value="0.7" class="w-full accent-primary">
+          </div>
+          <div class="space-y-2">
+            <div class="text-sm text-gray-300">自动处理选项</div>
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" checked class="accent-primary"> 自动白底抠图</label>
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" checked class="accent-primary"> 平台安全区校验</label>
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="accent-primary"> 自动去除水印</label>
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" checked class="accent-primary"> 批量重命名</label>
+          </div>
+          <div class="bg-gray-800 p-3 rounded">
+            <div class="text-sm text-amber-400 mb-1"><i class="fa fa-exclamation-triangle"></i>平台规则提示</div>
+            <p id="ruleText" class="text-xs text-gray-300">抖音电商：主图3:4，主体居中，文字不要超过图面积20%</p>
+          </div>
+          <div class="border-t border-gray-700 pt-4">
+            <h4 class="text-sm font-medium mb-2">导出设置</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1 rounded bg-primary text-xs">JPG</button>
+              <button class="px-3 py-1 rounded bg-cardBg text-xs">PNG</button>
+              <button class="px-3 py-1 rounded bg-cardBg text-xs">WebP</button>
+            </div>
+          </div>
+          <div class="border-t border-gray-700 pt-4">
+            <h4 class="text-sm font-medium mb-2">店铺授权管理</h4>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between items-center bg-gray-800 p-2 rounded"><span>Temu 美国店</span><span class="text-green-400">已授权</span></div>
+              <div class="flex justify-between items-center bg-gray-800 p-2 rounded"><span>TikTok Shop 西班牙</span><span class="text-green-400">已授权</span></div>
+              <div class="flex justify-between items-center bg-gray-800 p-2 rounded"><span>Shein 店铺</span><span class="text-amber-400">待授权</span></div>
+              <button class="w-full mt-2 p-1.5 rounded bg-cardBg">+ 添加新店铺授权</button>
+            </div>
           </div>
         </div>
 
         <!-- AI 编辑面板 -->
-        <div class="border-t border-gray-700 pt-4 mt-4">
-          <h4 class="text-sm font-medium mb-2 flex items-center justify-between">
+        <div id="panelAiEdit" class="hidden">
+          <h4 class="text-sm font-medium mb-3 flex items-center justify-between">
             <span><i class="fa fa-magic mr-1 text-primary"></i>AI 编辑（当前画布）</span>
             <span class="text-xs text-gray-500" id="aiEditCurrentName">未选择</span>
           </h4>
-          <div id="aiEditThumb" class="w-full rounded bg-gray-800 flex items-center justify-center mb-3 overflow-hidden" style="height:100px;">
+          <div id="aiEditThumb" class="w-full rounded bg-gray-800 flex items-center justify-center mb-3 overflow-hidden" style="height:140px;">
             <img id="aiEditThumbImg" class="w-full h-full object-contain" style="display:none;">
             <span class="text-xs text-gray-500" id="aiEditThumbHint">上传图片后可用</span>
           </div>
@@ -1302,6 +1284,11 @@ const trayFadeRight = $('trayFadeRight');
 const historyCounter = $('historyCounter');
 const clearHistoryBtn = $('clearHistoryBtn');
 
+const tabPlatform = $('tabPlatform');
+const tabAiEdit = $('tabAiEdit');
+const panelPlatform = $('panelPlatform');
+const panelAiEdit = $('panelAiEdit');
+
 let taskDataList = [];
 let currentMode = "domestic";
 let activeTaskId = null;
@@ -1319,7 +1306,31 @@ const canvasSettings = {
 };
 
 /* ================================================================
-   ★ 历史栈（撤销/重做）—— 含持久化
+   ★ 右侧 Tab 切换
+   ================================================================ */
+function switchAsideTab(tab) {
+  const isPlatform = tab === 'platform';
+  tabPlatform.classList.toggle('active', isPlatform);
+  tabAiEdit.classList.toggle('active', !isPlatform);
+  panelPlatform.classList.toggle('hidden', !isPlatform);
+  panelAiEdit.classList.toggle('hidden', isPlatform);
+  // 切到 AI 编辑时，刷新缩略图
+  if (!isPlatform) syncAiEditPanel();
+}
+tabPlatform.onclick = () => switchAsideTab('platform');
+tabAiEdit.onclick = () => switchAsideTab('aiEdit');
+
+/* ★ 智能默认 Tab：有图 → AI编辑；无图 → 平台参数 */
+function autoPickAsideTab() {
+  if (canvasState.hasImage) {
+    switchAsideTab('aiEdit');
+  } else {
+    switchAsideTab('platform');
+  }
+}
+
+/* ================================================================
+   历史栈
    ================================================================ */
 const HISTORY_KEY = 'canvas_history_v1';
 const historyState = {
@@ -1328,25 +1339,15 @@ const historyState = {
   maxSize: 30
 };
 
-/* 序列化历史（去掉可能的循环引用） */
-function serializeHistory() {
+function persistHistory() {
   try {
-    return JSON.stringify({
+    localStorage.setItem(HISTORY_KEY, JSON.stringify({
       stack: historyState.stack,
       currentIndex: historyState.currentIndex
-    });
-  } catch (e) { return null; }
+    }));
+  } catch (e) {}
 }
 
-/* 保存到 localStorage */
-function persistHistory() {
-  const data = serializeHistory();
-  if (data) {
-    try { localStorage.setItem(HISTORY_KEY, data); } catch (e) {}
-  }
-}
-
-/* 从 localStorage 加载 */
 function loadHistoryFromStorage() {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
@@ -1396,7 +1397,6 @@ function undo() {
   updateUndoRedoButtons();
   renderVersionList();
   persistHistory();
-  // ★ 按钮闪烁
   flashToolIcon(btnUndo);
   showToast(`↶ 已撤销到「${state.action}」 (${state.time})`, 'fa-undo');
 }
@@ -1416,18 +1416,15 @@ function redo() {
   showToast(`↷ 已重做到「${state.action}」 (${state.time})`, 'fa-redo');
 }
 
-/* ★ 按钮闪烁反馈 */
 function flashToolIcon(el) {
   if (!el) return;
   el.classList.remove('flash-active');
-  void el.offsetWidth;  // 强制重排，重启动画
+  void el.offsetWidth;
   el.classList.add('flash-active');
   setTimeout(() => el.classList.remove('flash-active'), 600);
 }
 
-/* ★ 图片淡入切换 */
 function applyHistoryState(state) {
-  // 先淡出
   previewImg.classList.add('fading');
   setTimeout(() => {
     previewImg.src = state.src;
@@ -1459,7 +1456,11 @@ function applyHistoryState(state) {
       }
     }
     syncAiEditPanel();
-    // 淡入
+    updateSnapshotButton();
+    // ★ 有图后自动切到 AI 编辑 Tab
+    if (!panelAiEdit.classList.contains('hidden') === false) {
+      // 如果当前是平台 Tab，保持不动；如果之前是空的，切过来
+    }
     setTimeout(() => previewImg.classList.remove('fading'), 30);
   }, 120);
 }
@@ -1471,17 +1472,23 @@ function updateUndoRedoButtons() {
   if (btnRedo) btnRedo.classList.toggle('disabled', !canRedo);
 }
 
+/* ★ 更新快照按钮的可用状态 */
+function updateSnapshotButton() {
+  if (!btnSnapshot) return;
+  btnSnapshot.classList.toggle('disabled', !canvasState.hasImage);
+  btnSnapshot.title = canvasState.hasImage ? '保存快照' : '保存快照（需先上传图片）';
+}
+
 function renderVersionList() {
   if (!versionList) return;
   historyCounter.textContent = historyState.stack.length;
   if (historyState.stack.length === 0) {
-    versionList.innerHTML = '<div class="text-gray-500 text-xs p-2">暂无历史</div>';
+    versionList.innerHTML = '<div class="text-gray-500 text-xs p-2 text-center">暂无历史</div>';
     versionCountLabel.innerText = '0 条';
     return;
   }
   versionCountLabel.innerText = historyState.stack.length + ' 条';
 
-  // 从最新到最旧显示
   const items = historyState.stack.map((s, i) => {
     const isCurrent = i === historyState.currentIndex;
     return `
@@ -1494,7 +1501,6 @@ function renderVersionList() {
 
   versionList.innerHTML = items;
 
-  // 绑定点击
   versionList.querySelectorAll('.version-item').forEach(el => {
     el.addEventListener('click', () => {
       const idx = parseInt(el.dataset.versionIdx);
@@ -1505,7 +1511,6 @@ function renderVersionList() {
       updateUndoRedoButtons();
       renderVersionList();
       persistHistory();
-      // 高亮闪烁
       const target = versionList.querySelector(`[data-version-idx="${idx}"]`);
       if (target) {
         target.classList.add('highlight');
@@ -1516,14 +1521,12 @@ function renderVersionList() {
   });
 }
 
-/* ★ 清空历史 */
 clearHistoryBtn.onclick = () => {
   if (historyState.stack.length === 0) {
     showToast('暂无历史可清空', 'fa-info-circle');
     return;
   }
   if (!confirm(`确定清空所有历史记录？\n共 ${historyState.stack.length} 条\n（不会删除当前画布图片）`)) return;
-  // 保留当前状态为 V1
   const current = historyState.stack[historyState.currentIndex];
   historyState.stack = [current];
   historyState.currentIndex = 0;
@@ -1598,10 +1601,16 @@ btnCross.onclick = ()=>{
    ================================================================ */
 fileInput.onchange = function(e){
   const files = e.target.files;
+  let firstLoaded = false;
   for(let file of files){
     const reader = new FileReader();
     reader.onload = function(ev){
-      if (!canvasState.hasImage) loadToCanvas(ev.target.result);
+      if (!canvasState.hasImage && !firstLoaded) {
+        firstLoaded = true;
+        loadToCanvas(ev.target.result);
+        // ★ 上传后自动切到 AI 编辑 Tab
+        switchAsideTab('aiEdit');
+      }
       addTaskCard(file.name, ev.target.result);
     }
     reader.readAsDataURL(file);
@@ -1625,6 +1634,7 @@ function loadToCanvas(src, actionName) {
   applyCanvasTransform();
   if (canvasState.compareMode) syncCompareImages();
   syncAiEditPanel();
+  updateSnapshotButton();   // ★ 启用快照按钮
   pushHistory(actionName || '加载图片');
 }
 
@@ -1661,6 +1671,10 @@ function switchActiveTask(taskId) {
     el.classList.toggle('active', el.dataset.taskId === taskId);
   });
   loadToCanvas(task.src, `切换 ${task.name.slice(0, 8)}`);
+  // ★ 切换有图后，自动切到 AI 编辑 Tab
+  if (panelAiEdit.classList.contains('hidden')) {
+    switchAsideTab('aiEdit');
+  }
   showToast(`已切换到：${task.name}`, 'fa-image');
 }
 
@@ -1832,7 +1846,7 @@ function bindSplitDrag(divider) {
 }
 
 /* ================================================================
-   ★ 撤销/重做按钮
+   撤销/重做按钮
    ================================================================ */
 btnUndo.onclick = undo;
 btnRedo.onclick = redo;
@@ -1878,10 +1892,15 @@ btnSafeToggle.onclick = ()=>{
   const csSafe = $('csSafe'); if (csSafe) csSafe.checked = canvasState.safeAreaVisible;
 }
 
+/* ★ 保存快照：无图提示，有图保存 */
 btnSnapshot.onclick = ()=>{
+  if (!canvasState.hasImage || !previewImg.src) {
+    showToast('⚠️ 请先上传图片再保存快照', 'fa-exclamation-triangle');
+    return;
+  }
   pushHistory('手动快照');
-  showToast(`已保存快照 V${historyState.stack.length}`, 'fa-bookmark');
-}
+  showToast(`✅ 已保存快照 V${historyState.stack.length}`, 'fa-bookmark');
+};
 
 /* ================================================================
    右侧垂直按钮
@@ -2270,6 +2289,7 @@ function updateCanvasImage(dataUrl, label) {
   }
   pushHistory(label || '编辑');
   syncAiEditPanel();
+  updateSnapshotButton();
 }
 
 /* ================================================================
@@ -2812,6 +2832,10 @@ batchZipBtn.onclick = async function(){
 }
 
 versionSaveBtn.onclick = function(){
+  if (!canvasState.hasImage) {
+    showToast('⚠️ 请先上传图片', 'fa-exclamation-triangle');
+    return;
+  }
   pushHistory('手动保存版本');
   showToast(`已保存 V${historyState.stack.length}`, 'fa-history');
 }
@@ -2925,14 +2949,13 @@ startPublishBtn.onclick = async function(){
   showToast('批量素材投递完成', 'fa-rocket');
 }
 
-/* 底部"局部重绘"按钮 */
 $('openMaskBtn').onclick = () => {
   if (maskState.active) exitMaskMode();
   else enterMaskMode();
 };
 
 /* ================================================================
-   ★ 键盘快捷键
+   键盘快捷键
    ================================================================ */
 document.addEventListener('keydown', (e) => {
   const tag = document.activeElement?.tagName;
@@ -2954,9 +2977,11 @@ platformSelect.dispatchEvent(new Event('change'));
 bindCanvasSettings();
 bindAiEdit();
 initTaskTray();
-loadHistoryFromStorage();   // ★ 从 localStorage 恢复历史
+loadHistoryFromStorage();
 renderVersionList();
 updateUndoRedoButtons();
+updateSnapshotButton();       // ★ 初始化快照按钮状态
+autoPickAsideTab();           // ★ 智能选择默认 Tab
 </script>
 </body>
 </html>
