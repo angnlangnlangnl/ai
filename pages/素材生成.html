@@ -9,8 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/file-saver.min.js"></script>
-  <!-- ★ 新增：前端 AI 抠图库 -->
-  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/browser/index.js"></script>
+    <!-- ★ 前端 AI 抠图库：改用 JS 动态 import（见 getImglyRemover），不再用 <script> 引入 -->
   <script>
     tailwind.config = {
       theme: {
@@ -4358,32 +4357,49 @@ async function runAiComposite() {
 /* ================================================================
    ★★★ 新增：前端 AI 抠图（imgly） ★★★
    ================================================================ */
-async function removeBackgroundFrontend() {
+  /* ★ 动态加载 imgly 抠图库（+esm 是 jsdelivr 的 ESM 转译版，兼容性最好） */
+async function getImglyRemover() {
+  if (window.__imglyRemover) return window.__imglyRemover;
+  try {
+    const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
+    // 兼容三种导出形态
+    const fn = mod.removeBackground
+            || (mod.default && mod.default.removeBackground)
+            || mod.default;
+    if (typeof fn === 'function') {
+      window.__imglyRemover = fn;
+      console.log('[imgly] 抠图库加载成功');
+      return fn;
+    }
+    console.warn('[imgly] 模块加载成功但未找到 removeBackground 函数', mod);
+  } catch (e) {
+    console.warn('[imgly] ESM 加载失败:', e);
+  }
+  return null;
+}
+  async function removeBackgroundFrontend() {
   if (!canvasState.hasImage || !previewImg.src) {
     showToast('请先上传图片', 'fa-exclamation-triangle');
     return;
   }
 
-  // 检查 imgly 是否加载
-  const removerFn = window.imglyRemoveBackground
-    || (window.imgly && window.imgly.removeBackground)
-    || (window.IMG_LY && window.IMG_LY.removeBackground);
-
-  if (typeof removerFn !== 'function') {
-    showToast('❌ 抠图库加载失败，请刷新页面重试', 'fa-exclamation-triangle');
-    return;
-  }
-
-  showToast('AI抠图中（首次约 20-40 秒）...', 'fa-spinner fa-spin');
+  showToast('AI抠图中（首次需下载模型，约 20-40 秒）...', 'fa-spinner fa-spin');
 
   try {
-    // 1. 先把当前图缩到 ≤1024
+    // 1. 动态加载抠图库
+    const removerFn = await getImglyRemover();
+    if (typeof removerFn !== 'function') {
+      showToast('❌ 抠图库加载失败，请检查网络或稍后重试', 'fa-exclamation-triangle');
+      return;
+    }
+
+    // 2. 先把当前图缩到 ≤1024
     const shrunk = await shrinkImageToMax(previewImg.src, 1024);
 
-    // 2. 调 imgly
+    // 3. 调 imgly
     const blob = await removerFn(shrunk);
 
-    // 3. blob → dataURL
+    // 4. blob → dataURL
     const dataUrl = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
@@ -4391,7 +4407,7 @@ async function removeBackgroundFrontend() {
       reader.readAsDataURL(blob);
     });
 
-    // 4. 替换画布 + 透明底标记
+    // 5. 替换画布 + 透明底标记
     canvasHasAlpha = true;
     canvasStage.classList.add('checker-overlay-bg');
     updateCanvasImageAlpha(dataUrl, 'AI抠图');
