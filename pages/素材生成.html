@@ -30,113 +30,39 @@
     }
   </style>
   <style>
-    /* ============================================================
-       ★ 全局深色滚动条
-       ============================================================ */
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: #4b5563 #1f2937;
-    }
-    *::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    *::-webkit-scrollbar-track {
-      background: #1f2937;
-      border-radius: 10px;
-    }
-    *::-webkit-scrollbar-thumb {
-      background: #4b5563;
-      border-radius: 10px;
-      border: 2px solid #1f2937;
-      transition: background 0.15s;
-    }
-    *::-webkit-scrollbar-thumb:hover {
-      background: #6b7280;
-    }
-    *::-webkit-scrollbar-thumb:active {
-      background: #4F46E5;
-    }
-    *::-webkit-scrollbar-corner {
-      background: #1f2937;
-    }
-    /* 更细的滚动条（局部） */
-    .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
-    .scrollbar-thin::-webkit-scrollbar-thumb { background: #4b5563; border: none; }
-    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #4F46E5; }
+    /* ============ 全局深色滚动条 ============ */
+    * { scrollbar-width: thin; scrollbar-color: #4b5563 #1f2937; }
+    *::-webkit-scrollbar { width: 8px; height: 8px; }
+    *::-webkit-scrollbar-track { background: #1f2937; border-radius: 10px; }
+    *::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; border: 2px solid #1f2937; }
+    *::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    *::-webkit-scrollbar-thumb:active { background: #4F46E5; }
+    *::-webkit-scrollbar-corner { background: #1f2937; }
 
-    /* ============================================================
-       ★ 全局 input 类型深色
-       ============================================================ */
     input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
-      background: #374151;
-      border-radius: 4px;
-      outline: none;
+      -webkit-appearance: none; appearance: none;
+      height: 4px; background: #374151; border-radius: 4px; outline: none;
       accent-color: #4F46E5;
-    }
-    input[type="range"]::-webkit-slider-runnable-track {
-      height: 4px;
-      background: #374151;
-      border-radius: 4px;
     }
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #4F46E5;
-      cursor: pointer;
-      margin-top: -5px;
-      border: 2px solid #1f2937;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      -webkit-appearance: none; appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #4F46E5; cursor: pointer;
+      margin-top: -5px; border: 2px solid #1f2937;
     }
-    input[type="range"]::-moz-range-track {
-      height: 4px;
-      background: #374151;
-      border-radius: 4px;
+    input[type="checkbox"], input[type="radio"] { accent-color: #4F46E5; }
+    select { background-color: #374151; color: #e5e7eb; }
+    select option { background-color: #1f2937; color: #e5e7eb; }
+    input[type="text"], input[type="password"], input[type="number"], textarea {
+      background-color: #1f2937; color: #e5e7eb;
+      border: 1px solid #374151; border-radius: 8px;
+      outline: none; color-scheme: dark;
     }
-    input[type="range"]::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #4F46E5;
-      cursor: pointer;
-      border: 2px solid #1f2937;
-    }
-    input[type="checkbox"] {
-      accent-color: #4F46E5;
-    }
-    input[type="radio"] {
-      accent-color: #4F46E5;
+    input[type="text"]:focus, textarea:focus {
+      border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
     }
 
-    /* ============================================================
-       ★ select / option 深色
-       ============================================================ */
-    select {
-      background-color: #374151;
-      color: #e5e7eb;
-      border-color: #4b5563;
-    }
-    select option {
-      background-color: #1f2937;
-      color: #e5e7eb;
-    }
-
-    /* ============================================================
-       ★ textarea / input text 深色
-       ============================================================ */
-    textarea, input[type="text"] {
-      color-scheme: dark;
-    }
-
-    /* ============================================================
-       ★ 画布工具图标
-       ============================================================ */
+    /* ============ 画布工具图标 ============ */
     .canvas-tool-icon {
       width: 32px; height: 32px;
       display: flex; align-items: center; justify-content: center;
@@ -378,12 +304,33 @@
     .mask-box {
       position: absolute;
       border: 2px dashed #22d3ee;
-      background: rgba(34, 211, 238, 0.12);
-      z-index: 40; cursor: move;
-      box-shadow: 0 0 0 9999px rgba(0,0,0,0.35);
-      box-sizing: border-box; display: none;
+      background: rgba(34, 211, 238, 0.10);
+      cursor: move;
+      box-sizing: border-box;
+      z-index: 40;
+      transition: border-color 0.15s, background 0.15s;
     }
-    .mask-box.show { display: block; }
+    .mask-box:hover { background: rgba(34, 211, 238, 0.18); }
+    .mask-box.active {
+      border-color: #4F46E5;
+      background: rgba(79, 70, 229, 0.15);
+      box-shadow: 0 0 0 2px rgba(79,70,229,0.4);
+    }
+    .mask-box .mask-number {
+      position: absolute;
+      top: -12px; left: -12px;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #22d3ee;
+      color: #111827;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #1f2937;
+      pointer-events: none;
+      z-index: 42;
+    }
+    .mask-box.active .mask-number { background: #4F46E5; color: #fff; }
     .mask-box .mask-handle {
       position: absolute;
       width: 12px; height: 12px;
@@ -395,75 +342,109 @@
     .mask-box .mask-handle[data-handle="ne"] { top: -6px; right: -6px; cursor: ne-resize; }
     .mask-box .mask-handle[data-handle="sw"] { bottom: -6px; left: -6px; cursor: sw-resize; }
     .mask-box .mask-handle[data-handle="se"] { bottom: -6px; right: -6px; cursor: se-resize; }
-    .mask-box .mask-hint {
+
+    .mask-canvas-hint {
       position: absolute;
-      bottom: -26px; left: 50%;
+      top: 8px; left: 50%;
       transform: translateX(-50%);
-      background: rgba(17,24,39,0.95);
-      color: #d1d5db; font-size: 10px;
-      padding: 2px 8px; border-radius: 8px;
-      white-space: nowrap; pointer-events: none;
-      border: 1px solid #374151;
-    }
-    .mask-command-bar {
-      position: absolute;
-      bottom: 12px; left: 50%;
-      transform: translateX(-50%);
-      width: 80%; max-width: 540px;
-      background: rgba(17,24,39,0.98);
-      border: 1px solid #4F46E5;
-      border-radius: 12px;
-      padding: 10px 12px;
-      z-index: 50; display: none;
-      gap: 8px; align-items: center;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
-    .mask-command-bar.show { display: flex; }
-    .mask-command-bar input {
-      flex: 1;
-      background: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 13px;
-      color: #e5e7eb;
-      outline: none;
-      font-family: inherit;
-    }
-    .mask-command-bar input:focus { border-color: #4F46E5; }
-    .mask-command-bar button {
-      padding: 8px 14px; border-radius: 8px;
-      border: none; font-size: 12px; font-weight: 600;
-      cursor: pointer; font-family: inherit;
+      background: rgba(17,24,39,0.9);
+      border: 1px solid #22d3ee;
+      color: #22d3ee;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      z-index: 45;
+      pointer-events: none;
+      display: none;
       white-space: nowrap;
     }
-    .mask-command-bar .btn-clear { background: #374151; color: #e5e7eb; }
-    .mask-command-bar .btn-cancel { background: #4b5563; color: #e5e7eb; }
-    .mask-command-bar .btn-apply { background: #4F46E5; color: #fff; }
-    .mask-command-bar .btn-apply:disabled { opacity: 0.5; cursor: not-allowed; }
-    .mask-presets {
-      position: absolute;
-      bottom: 74px; left: 50%;
-      transform: translateX(-50%);
-      display: flex; gap: 6px; flex-wrap: wrap;
-      justify-content: center; max-width: 80%;
-      z-index: 49; display: none;
+    .mask-canvas-hint.show { display: block; }
+
+    /* ★ 预设提示词浮层 */
+    .preset-popup {
+      position: fixed;
+      z-index: 500;
+      width: 280px;
+      background: rgba(17,24,39,0.98);
+      border: 1px solid #4F46E5;
+      border-radius: 10px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      padding: 10px;
+      animation: popupIn 0.18s ease-out;
+      backdrop-filter: blur(8px);
     }
-    .mask-presets.show { display: flex; }
-    .mask-presets .preset-chip {
-      padding: 5px 12px;
-      background: rgba(31,41,55,0.95);
+    @keyframes popupIn {
+      from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .preset-popup .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #22d3ee;
+      font-weight: 600;
+      margin-bottom: 8px;
+      padding: 0 2px;
+    }
+    .preset-popup .popup-close {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: #374151;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.15s;
+    }
+    .preset-popup .popup-close:hover { background: #ef4444; color: #fff; }
+    .preset-popup .popup-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .preset-popup .popup-chip {
+      padding: 5px 10px;
+      background: #1f2937;
       border: 1px solid #374151;
       border-radius: 14px;
       color: #d1d5db;
       font-size: 11px;
       cursor: pointer;
       transition: 0.15s;
-      user-select: none;
       white-space: nowrap;
+      font-family: inherit;
     }
-    .mask-presets .preset-chip:hover {
-      background: #4F46E5; border-color: #4F46E5; color: #fff;
+    .preset-popup .popup-chip:hover {
+      background: #4F46E5;
+      border-color: #4F46E5;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .preset-popup .popup-custom-btn {
+      width: 100%;
+      padding: 7px 10px;
+      background: transparent;
+      border: 1px dashed #374151;
+      border-radius: 8px;
+      color: #9ca3af;
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.15s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .preset-popup .popup-custom-btn:hover {
+      border-color: #4F46E5;
+      color: #22d3ee;
+      background: rgba(34,211,238,0.05);
     }
 
     /* ============ 画布设置面板 ============ */
@@ -573,7 +554,6 @@
     .canvas-settings-panel .cs-btn-reset { background: #374151; color: #d1d5db; }
     .canvas-settings-panel .cs-btn-done { background: #4F46E5; color: #fff; }
 
-    /* 鼠标坐标 */
     .canvas-coord {
       position: absolute; bottom: 8px; right: 8px;
       background: rgba(17,24,39,0.9);
@@ -589,7 +569,6 @@
     }
     .canvas-coord.show { display: block; }
 
-    /* ============ 缩放指示器：深色 ============ */
     .zoom-indicator {
       position: absolute;
       bottom: 8px;
@@ -605,7 +584,7 @@
       z-index: 25;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.3s ease, transform 0.2s ease, border-color 0.2s, color 0.2s;
+      transition: opacity 0.3s ease, transform 0.2s ease;
       transform: translateX(-50%) translateY(8px);
     }
     .zoom-indicator.show {
@@ -616,21 +595,16 @@
       box-shadow: 0 0 12px rgba(34,211,238,0.4);
     }
 
-    /* ============ 全屏预览按钮 ============ */
     .fullscreen-btn {
       position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 30px;
-      height: 30px;
+      top: 8px; right: 8px;
+      width: 30px; height: 30px;
       border-radius: 6px;
       background: rgba(17,24,39,0.9);
       border: 1px solid #374151;
       color: #9ca3af;
       font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       z-index: 26;
       opacity: 0;
@@ -638,10 +612,8 @@
     }
     .canvas-stage:hover .fullscreen-btn { opacity: 1; }
     .fullscreen-btn:hover {
-      background: #4F46E5;
-      border-color: #4F46E5;
-      color: #fff;
-      transform: scale(1.1);
+      background: #4F46E5; border-color: #4F46E5;
+      color: #fff; transform: scale(1.1);
     }
 
     /* ============ 全屏预览层 ============ */
@@ -656,102 +628,67 @@
       animation: fadeInViewer 0.2s ease;
     }
     .fullscreen-viewer.show { display: flex; }
-    @keyframes fadeInViewer {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    @keyframes fadeInViewer { from { opacity: 0; } to { opacity: 1; } }
     .fullscreen-viewer .fs-img-wrap {
       position: relative;
-      max-width: 85vw;
-      max-height: 82vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      overflow: hidden;
+      max-width: 85vw; max-height: 82vh;
+      display: flex; align-items: center; justify-content: center;
+      user-select: none; overflow: hidden;
     }
     .fullscreen-viewer .fs-img-wrap img {
-      max-width: 100%;
-      max-height: 82vh;
-      object-fit: contain;
-      display: block;
+      max-width: 100%; max-height: 82vh;
+      object-fit: contain; display: block;
       transition: transform 0.25s ease;
       transform-origin: center center;
-      user-select: none;
-      -webkit-user-drag: none;
+      user-select: none; -webkit-user-drag: none;
       pointer-events: none;
       border-radius: 6px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.7);
     }
     .fullscreen-viewer .fs-img-wrap img.zooming { transition: none; }
-
     .fs-arrow {
-      position: absolute;
-      top: 50%;
+      position: absolute; top: 50%;
       transform: translateY(-50%);
-      width: 56px;
-      height: 56px;
+      width: 56px; height: 56px;
       border-radius: 50%;
       background: rgba(17,24,39,0.85);
       border: 1px solid #374151;
       color: #d1d5db;
       font-size: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 10000;
       transition: all 0.2s;
     }
     .fs-arrow:hover {
-      background: #4F46E5;
-      border-color: #4F46E5;
-      color: #fff;
+      background: #4F46E5; border-color: #4F46E5; color: #fff;
       transform: translateY(-50%) scale(1.1);
     }
-    .fs-arrow:active { transform: translateY(-50%) scale(0.95); }
     .fs-arrow.disabled { opacity: 0.2; pointer-events: none; }
     .fs-arrow.left  { left: 24px; }
     .fs-arrow.right { right: 24px; }
-
     .fs-header {
-      position: absolute;
-      top: 0; left: 0; right: 0;
+      position: absolute; top: 0; left: 0; right: 0;
       padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
       z-index: 10001;
       background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
       pointer-events: none;
     }
     .fs-header > * { pointer-events: auto; }
     .fs-title {
-      font-size: 14px;
-      color: #d1d5db;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 14px; color: #d1d5db;
+      display: flex; align-items: center; gap: 8px;
       max-width: 60%;
     }
     .fs-title .fs-index {
-      background: rgba(79,70,229,0.3);
-      color: #a5b4fc;
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 10px;
+      background: rgba(79,70,229,0.3); color: #a5b4fc;
+      font-size: 12px; padding: 2px 8px; border-radius: 10px;
       font-family: ui-monospace, monospace;
     }
     .fs-title .fs-name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .fs-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+    .fs-actions { display: flex; gap: 8px; align-items: center; }
     .fs-action-btn {
       width: 34px; height: 34px;
       border-radius: 8px;
@@ -759,37 +696,25 @@
       border: 1px solid #374151;
       color: #d1d5db;
       font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
     }
     .fs-action-btn:hover {
-      background: #4F46E5;
-      border-color: #4F46E5;
-      color: #fff;
+      background: #4F46E5; border-color: #4F46E5; color: #fff;
     }
     .fs-footer {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
+      position: absolute; bottom: 0; left: 0; right: 0;
       padding: 16px 20px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
       z-index: 10001;
       background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
       pointer-events: none;
     }
     .fs-footer > * { pointer-events: auto; }
     .fs-dots {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      flex-wrap: wrap;
-      max-width: 80vw;
-      justify-content: center;
+      display: flex; gap: 6px; align-items: center;
+      flex-wrap: wrap; max-width: 80vw; justify-content: center;
     }
     .fs-dot {
       width: 8px; height: 8px;
@@ -798,37 +723,24 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .fs-dot:hover {
-      background: rgba(255,255,255,0.6);
-      transform: scale(1.2);
-    }
-    .fs-dot.active {
-      background: #4F46E5;
-      width: 24px;
-      border-radius: 4px;
-    }
+    .fs-dot:hover { background: rgba(255,255,255,0.6); transform: scale(1.2); }
+    .fs-dot.active { background: #4F46E5; width: 24px; border-radius: 4px; }
     .fs-counter {
-      font-size: 12px;
-      color: #9ca3af;
+      font-size: 12px; color: #9ca3af;
       font-family: ui-monospace, monospace;
     }
     .fs-thumbnails {
-      display: flex;
-      gap: 6px;
-      padding: 6px;
+      display: flex; gap: 6px; padding: 6px;
       background: rgba(17,24,39,0.7);
       border-radius: 10px;
       border: 1px solid rgba(55,65,81,0.6);
-      max-width: 80vw;
-      overflow-x: auto;
+      max-width: 80vw; overflow-x: auto;
       scrollbar-width: none;
     }
     .fs-thumbnails::-webkit-scrollbar { display: none; }
     .fs-thumb {
-      width: 44px;
-      height: 44px;
-      border-radius: 6px;
-      overflow: hidden;
+      width: 44px; height: 44px;
+      border-radius: 6px; overflow: hidden;
       cursor: pointer;
       border: 2px solid transparent;
       flex-shrink: 0;
@@ -836,29 +748,21 @@
       background: #1f2937;
     }
     .fs-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
     }
-    .fs-thumb:hover {
-      border-color: #6b7280;
-      transform: translateY(-2px);
-    }
+    .fs-thumb:hover { border-color: #6b7280; transform: translateY(-2px); }
     .fs-thumb.active {
       border-color: #4F46E5;
       box-shadow: 0 0 0 2px rgba(79,70,229,0.4);
     }
     .fs-zoom-badge {
-      position: absolute;
-      bottom: 100px;
-      right: 24px;
+      position: absolute; bottom: 100px; right: 24px;
       background: rgba(17,24,39,0.9);
       border: 1px solid #374151;
       border-radius: 6px;
       padding: 4px 10px;
-      font-size: 11px;
-      color: #9ca3af;
+      font-size: 11px; color: #9ca3af;
       font-family: ui-monospace, monospace;
       z-index: 10000;
       opacity: 0;
@@ -866,9 +770,7 @@
       pointer-events: none;
     }
     .fs-zoom-badge.show {
-      opacity: 1;
-      border-color: #22d3ee;
-      color: #22d3ee;
+      opacity: 1; border-color: #22d3ee; color: #22d3ee;
     }
 
     /* ============ 任务队列 ============ */
@@ -930,8 +832,13 @@
       padding: 2px;
       border: 2px solid #4F46E5;
     }
+    /* ★ 勾选状态视觉 */
+    .task-card.checked {
+      border-color: #22d3ee;
+      box-shadow: 0 0 0 3px rgba(34,211,238,0.25);
+    }
 
-    /* ============ AI 编辑面板 ============ */
+    /* ============ AI 编辑面板按钮 ============ */
     .ai-edit-btn {
       padding: 8px 10px;
       border-radius: 8px;
@@ -978,6 +885,441 @@
       font-size: 9px;
     }
     #aiEditAdvanced[open] summary::before { transform: rotate(90deg); }
+
+    /* ============================================================
+       ★★★ 批量编辑：横向卡片条 ★★★
+       ============================================================ */
+    .batch-edit-bar {
+      margin-bottom: 12px;
+      padding: 10px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(79,70,229,0.10), rgba(34,211,238,0.05));
+      border: 1px solid rgba(79,70,229,0.35);
+      display: none;
+    }
+    .batch-edit-bar.show { display: block; }
+
+    .batch-edit-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .batch-edit-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #a5b4fc;
+    }
+    .batch-edit-title i { color: #4F46E5; }
+    .batch-edit-title .batch-count {
+      background: #4F46E5;
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .batch-edit-close {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      transition: 0.15s;
+    }
+    .batch-edit-close:hover { background: #ef4444; color: #fff; }
+
+    /* 横向滚动卡片条 */
+    .batch-thumbs-wrap {
+      position: relative;
+    }
+    .batch-thumbs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 2px;
+      scrollbar-width: thin;
+      scroll-behavior: smooth;
+    }
+    .batch-thumbs::-webkit-scrollbar { height: 4px; }
+    .batch-thumbs::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+    .batch-thumbs::-webkit-scrollbar-thumb:hover { background: #4F46E5; }
+
+    .batch-thumb {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: 0.15s;
+      background: #1f2937;
+    }
+    .batch-thumb:hover {
+      border-color: #6b7280;
+      transform: translateY(-1px);
+    }
+    .batch-thumb.active {
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 2px rgba(79,70,229,0.4);
+    }
+    .batch-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+    .batch-thumb .bt-index {
+      position: absolute;
+      top: 2px; left: 2px;
+      background: rgba(10,30,47,0.85);
+      color: #fff;
+      font-size: 9px;
+      padding: 0 4px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .batch-thumb.active .bt-index {
+      background: #4F46E5;
+    }
+    /* 状态小圆点 */
+    .batch-thumb .bt-status {
+      position: absolute;
+      bottom: 3px; right: 3px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #6b7280;
+      border: 1.5px solid #111827;
+    }
+    .batch-thumb .bt-status.pending { background: #6b7280; }
+    .batch-thumb .bt-status.processing { background: #f59e0b; animation: pulse 1.2s infinite; }
+    .batch-thumb .bt-status.done { background: #10b981; }
+    .batch-thumb .bt-status.fail { background: #ef4444; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* 批量应用按钮 */
+    .batch-apply-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid #4F46E5;
+      background: rgba(79,70,229,0.15);
+      color: #a5b4fc;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: 0.15s;
+    }
+    .batch-apply-btn:hover {
+      background: #4F46E5;
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    }
+    .batch-apply-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ============================================================
+       局部重绘 Tab 面板
+       ============================================================ */
+    .mask-tab-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mask-tab-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(34,211,238,0.08);
+      border: 1px solid rgba(34,211,238,0.3);
+      font-size: 12px;
+      color: #22d3ee;
+      line-height: 1.5;
+    }
+    .mask-tab-status i { font-size: 14px; flex-shrink: 0; }
+    .mask-tab-status.no-selection {
+      background: rgba(148,163,184,0.08);
+      border-color: rgba(148,163,184,0.3);
+      color: #94a3b8;
+    }
+    .region-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .region-card {
+      padding: 10px;
+      border-radius: 8px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+    }
+    .region-card:hover { border-color: #6b7280; }
+    .region-card.active {
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
+    }
+    .region-card .region-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .region-card .region-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+    .region-card .region-num {
+      display: inline-flex;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #22d3ee;
+      color: #111827;
+      font-size: 11px;
+      font-weight: 700;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .region-card .region-size {
+      font-size: 10px;
+      color: #6b7280;
+      font-family: ui-monospace, monospace;
+    }
+    .region-card .region-del {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.15s;
+    }
+    .region-card .region-del:hover { background: #ef4444; color: #fff; }
+    .region-card .region-prompt {
+      width: 100%;
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 12px;
+      color: #e5e7eb;
+      outline: none;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 36px;
+      max-height: 80px;
+      line-height: 1.4;
+      box-sizing: border-box;
+    }
+    .region-card .region-prompt:focus {
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 2px rgba(79,70,229,0.15);
+    }
+    .region-card .region-prompt::placeholder { color: #6b7280; font-style: italic; }
+
+    .mask-tab-actions {
+      display: flex;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #374151;
+    }
+    .mask-tab-actions button {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: 0.15s;
+    }
+    .mask-tab-actions .btn-clear {
+      flex: 0 0 auto;
+      background: #374151;
+      color: #e5e7eb;
+    }
+    .mask-tab-actions .btn-clear:hover { background: #4b5563; }
+    .mask-tab-actions .btn-cancel {
+      flex: 1;
+      background: #374151;
+      color: #e5e7eb;
+    }
+    .mask-tab-actions .btn-cancel:hover { background: #4b5563; }
+    .mask-tab-actions .btn-apply {
+      flex: 1.4;
+      background: #4F46E5;
+      color: #fff;
+    }
+    .mask-tab-actions .btn-apply:hover { background: #6366f1; }
+    .mask-tab-actions .btn-apply:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .mask-tab-progress {
+      margin-top: 8px;
+      display: none;
+    }
+    .mask-tab-progress.show { display: block; }
+    .mask-tab-progress .bar-wrap {
+      width: 100%; height: 4px;
+      background: #374151;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .mask-tab-progress .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4F46E5, #22d3ee);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .mask-tab-progress .bar-text {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* ============================================================
+       修改记录
+       ============================================================ */
+    .edit-history-section {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #374151;
+    }
+    .edit-history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .edit-history-title {
+      font-size: 11px;
+      color: #6b7280;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .edit-history-clear {
+      font-size: 10px;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: 0.15s;
+    }
+    .edit-history-clear:hover { background: #ef4444; color: #fff; }
+    .edit-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .edit-history-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .edit-history-item:hover {
+      border-color: #4F46E5;
+      background: rgba(79,70,229,0.08);
+    }
+    .edit-history-item .eh-thumb {
+      width: 40px; height: 40px;
+      border-radius: 6px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .edit-history-item .eh-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .edit-history-item .eh-thumb i { color: #4b5563; font-size: 14px; }
+    .edit-history-item .eh-main { flex: 1; min-width: 0; }
+    .edit-history-item .eh-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .edit-history-item .eh-title .eh-icon { color: #4F46E5; font-size: 11px; }
+    .edit-history-item .eh-detail {
+      font-size: 10px;
+      color: #9ca3af;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .edit-history-item .eh-time {
+      font-size: 10px;
+      color: #6b7280;
+      font-family: ui-monospace, monospace;
+      flex-shrink: 0;
+    }
+    .edit-history-empty {
+      padding: 16px 8px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 11px;
+    }
+    .edit-history-empty i {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 6px;
+      opacity: 0.4;
+    }
 
     /* ============ Toast ============ */
     .toast-tip {
@@ -1064,6 +1406,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      position: relative;
     }
     .aside-tab:hover { color: #fff; }
     .aside-tab.active {
@@ -1071,60 +1414,27 @@
       border-bottom-color: #4F46E5;
       background: rgba(79,70,229,0.05);
     }
-
-    /* ============================================================
-       ★ 原生 input[type=text] / textarea 深色
-       ============================================================ */
-    input[type="text"],
-    input[type="password"],
-    input[type="number"],
-    textarea {
-      background-color: #1f2937;
-      color: #e5e7eb;
-      border: 1px solid #374151;
+    .aside-tab[data-tab="mask"].highlight-tab {
+      animation: tabPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes tabPulse {
+      0%, 100% { color: #4F46E5; }
+      50% { color: #22d3ee; }
+    }
+    .aside-tab .tab-badge {
+      position: absolute;
+      top: 6px; right: 6px;
+      background: #22d3ee;
+      color: #111827;
+      font-size: 9px;
+      font-weight: bold;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
       border-radius: 8px;
-      outline: none;
-      color-scheme: dark;
-    }
-    input[type="text"]::placeholder,
-    input[type="password"]::placeholder,
-    textarea::placeholder {
-      color: #6b7280;
-    }
-    input[type="text"]:focus,
-    input[type="password"]:focus,
-    input[type="number"]:focus,
-    textarea:focus {
-      border-color: #4F46E5;
-      box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
-    }
-
-    /* ============================================================
-       ★ 顶部工具栏中所有按钮统一深色
-       ============================================================ */
-    .bg-cardBg {
-      background-color: #374151;
-    }
-    .bg-panelBg {
-      background-color: #1F2937;
-    }
-    .bg-darkBg {
-      background-color: #111827;
-    }
-
-    /* ============================================================
-       ★ 表单元素统一深色（避免浏览器默认白底）
-       ============================================================ */
-    input[type="file"] {
-      color-scheme: dark;
-    }
-
-    /* ============================================================
-       ★ 滚动容器都统一深色
-       ============================================================ */
-    .overflow-y-auto,
-    .overflow-auto {
-      color-scheme: dark;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -1171,10 +1481,7 @@
       </div>
       <div class="p-3 border-t border-gray-700">
         <div class="text-sm font-medium mb-2 flex justify-between items-center">
-          <span>
-            版本历史
-            <span class="history-counter" id="historyCounter">0</span>
-          </span>
+          <span>版本历史<span class="history-counter" id="historyCounter">0</span></span>
           <span class="clear-history-btn" id="clearHistoryBtn" title="清空所有历史">
             <i class="fa fa-trash-o"></i> 清空
           </span>
@@ -1194,33 +1501,15 @@
     <main class="flex-1 bg-gray-900 overflow-auto flex flex-col relative">
 
       <div class="canvas-vertical-toolbar-float">
-        <div id="toolResetView" class="canvas-tool-icon" title="重置画布视图（含缩放）">
-          <i class="fa fa-home"></i>
-        </div>
-        <div id="toolRotate" class="canvas-tool-icon" title="顺时针旋转90°">
-          <i class="fa fa-repeat"></i>
-        </div>
-        <div id="toolCrop" class="canvas-tool-icon" title="裁切图片">
-          <i class="fa fa-crop"></i>
-        </div>
-        <div id="toolMask" class="canvas-tool-icon" title="局部重绘（框选+AI修改）">
-          <i class="fa fa-magic"></i>
-        </div>
-        <div id="toolZoomIn" class="canvas-tool-icon" title="放大 (Ctrl +)">
-          <i class="fa fa-plus"></i>
-        </div>
-        <div id="toolZoomOut" class="canvas-tool-icon" title="缩小 (Ctrl -)">
-          <i class="fa fa-minus"></i>
-        </div>
-        <div id="toolLayerDown" class="canvas-tool-icon" title="图层下移">
-          <i class="fa fa-arrow-down"></i>
-        </div>
-        <div id="toolLayerUp" class="canvas-tool-icon" title="图层上移">
-          <i class="fa fa-arrow-up"></i>
-        </div>
-        <div id="toolCanvasSetting" class="canvas-tool-icon" title="画布设置">
-          <i class="fa fa-cog"></i>
-        </div>
+        <div id="toolResetView" class="canvas-tool-icon" title="重置画布视图（含缩放）"><i class="fa fa-home"></i></div>
+        <div id="toolRotate" class="canvas-tool-icon" title="顺时针旋转90°"><i class="fa fa-repeat"></i></div>
+        <div id="toolCrop" class="canvas-tool-icon" title="裁切图片"><i class="fa fa-crop"></i></div>
+        <div id="toolMask" class="canvas-tool-icon" title="局部重绘（框选+AI修改）"><i class="fa fa-magic"></i></div>
+        <div id="toolZoomIn" class="canvas-tool-icon" title="放大 (Ctrl +)"><i class="fa fa-plus"></i></div>
+        <div id="toolZoomOut" class="canvas-tool-icon" title="缩小 (Ctrl -)"><i class="fa fa-minus"></i></div>
+        <div id="toolLayerDown" class="canvas-tool-icon" title="图层下移"><i class="fa fa-arrow-down"></i></div>
+        <div id="toolLayerUp" class="canvas-tool-icon" title="图层上移"><i class="fa fa-arrow-up"></i></div>
+        <div id="toolCanvasSetting" class="canvas-tool-icon" title="画布设置"><i class="fa fa-cog"></i></div>
       </div>
 
       <div id="canvasSettingsPanel" class="canvas-settings-panel">
@@ -1305,11 +1594,12 @@
             <p class="text-xs">上传图片后预览</p>
           </div>
           <div id="canvasCoord" class="canvas-coord">0, 0</div>
-
           <div id="zoomIndicator" class="zoom-indicator">100%</div>
-
           <div id="fullscreenBtn" class="fullscreen-btn" title="全屏预览 (F)">
             <i class="fa fa-expand"></i>
+          </div>
+          <div id="maskCanvasHint" class="mask-canvas-hint">
+            <i class="fa fa-object-group"></i> 拖动框选要修改的区域（可框选多个）
           </div>
         </div>
       </div>
@@ -1491,16 +1781,21 @@
     <!-- ========== 右侧：Tab 切换面板 ========== -->
     <aside class="w-80 bg-panelBg border-l border-gray-700 flex flex-col shrink-0">
       <div class="flex border-b border-gray-700 shrink-0">
-        <button id="tabPlatform" class="aside-tab active">
-          <i class="fa fa-sliders"></i> 平台参数
+        <button id="tabPlatform" class="aside-tab" data-tab="platform">
+          <i class="fa fa-sliders"></i> 平台
         </button>
-        <button id="tabAiEdit" class="aside-tab">
-          <i class="fa fa-magic"></i> AI 编辑
+        <button id="tabAiEdit" class="aside-tab active" data-tab="aiEdit">
+          <i class="fa fa-magic"></i> AI
+        </button>
+        <button id="tabMask" class="aside-tab" data-tab="mask" style="display:none;">
+          <i class="fa fa-object-group"></i> 重绘
+          <span class="tab-badge" id="tabMaskBadge" style="display:none;">0</span>
         </button>
       </div>
 
       <div class="flex-1 overflow-y-auto p-4">
-        <div id="panelPlatform" class="space-y-4">
+        <!-- 平台参数 -->
+        <div id="panelPlatform" class="space-y-4 hidden">
           <div>
             <label class="text-sm text-gray-300 block mb-1">选择平台</label>
             <select id="platformSelect" class="w-full bg-cardBg rounded p-2">
@@ -1554,7 +1849,28 @@
           </div>
         </div>
 
+        <!-- AI 编辑 -->
         <div id="panelAiEdit" class="hidden">
+          <!-- ★ 批量编辑栏（勾选 > 1 时显示） -->
+          <div id="batchEditBar" class="batch-edit-bar">
+            <div class="batch-edit-header">
+              <div class="batch-edit-title">
+                <i class="fa fa-layer-group"></i>
+                <span>批量编辑</span>
+                <span class="batch-count" id="batchCount">0</span>
+              </div>
+              <button class="batch-edit-close" id="batchEditClose" title="退出批量模式">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <div class="batch-thumbs-wrap">
+              <div class="batch-thumbs" id="batchThumbs"></div>
+            </div>
+            <button class="batch-apply-btn" id="batchApplyBtn" disabled>
+              <i class="fa fa-magic"></i> 批量应用（<span id="batchApplyCount">0</span> 张）
+            </button>
+          </div>
+
           <h4 class="text-sm font-medium mb-3 flex items-center justify-between">
             <span><i class="fa fa-magic mr-1 text-primary"></i>AI 编辑（当前画布）</span>
             <span class="text-xs text-gray-500" id="aiEditCurrentName">未选择</span>
@@ -1609,6 +1925,47 @@
             </div>
             <div class="text-xs text-gray-400 mt-1" id="aiEditProgressText">正在生成...</div>
           </div>
+
+          <!-- 修改记录 -->
+          <div class="edit-history-section">
+            <div class="edit-history-header">
+              <span class="edit-history-title">修改记录</span>
+              <span class="edit-history-clear" id="editHistoryClear">
+                <i class="fa fa-trash-o"></i> 清空
+              </span>
+            </div>
+            <div class="edit-history-list" id="editHistoryList">
+              <div class="edit-history-empty">
+                <i class="fa fa-history"></i>
+                本次会话暂无修改记录
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 局部重绘 -->
+        <div id="panelMask" class="mask-tab-content hidden">
+          <div id="maskTabStatus" class="mask-tab-status no-selection">
+            <i class="fa fa-info-circle"></i>
+            <span id="maskTabStatusText">在画布上拖动鼠标，框选要修改的区域（可多次框选）</span>
+          </div>
+          <div class="region-list" id="regionList">
+            <div class="edit-history-empty" style="padding:12px 8px;">
+              <i class="fa fa-object-group"></i>
+              还没有选区，请在画布上拖动框选
+            </div>
+          </div>
+          <div id="maskTabProgress" class="mask-tab-progress">
+            <div class="bar-wrap"><div id="maskTabProgressBar" class="bar-fill"></div></div>
+            <div class="bar-text" id="maskTabProgressText">正在生成...</div>
+          </div>
+          <div class="mask-tab-actions">
+            <button class="btn-clear" id="maskClearBtn" title="清除所有选区"><i class="fa fa-eraser"></i></button>
+            <button class="btn-cancel" id="maskCancelBtn">取消</button>
+            <button class="btn-apply" id="maskApplyBtn" disabled>
+              <i class="fa fa-magic"></i> 应用重生成(<span id="regionCount">0</span>)
+            </button>
+          </div>
         </div>
       </div>
     </aside>
@@ -1616,7 +1973,7 @@
 
   <div id="toastTip" class="toast-tip"><i class="fa fa-check-circle"></i><span id="toastText"></span></div>
 
-  <!-- ============ 全屏预览层 ============ -->
+  <!-- 全屏预览层 -->
   <div id="fullscreenViewer" class="fullscreen-viewer">
     <div class="fs-header">
       <div class="fs-title">
@@ -1624,37 +1981,17 @@
         <span class="fs-name" id="fsName">未命名</span>
       </div>
       <div class="fs-actions">
-        <div class="fs-action-btn" id="fsZoomOutBtn" title="缩小">
-          <i class="fa fa-minus"></i>
-        </div>
-        <div class="fs-action-btn" id="fsZoomResetBtn" title="重置 100%">
-          <i class="fa fa-search"></i>
-        </div>
-        <div class="fs-action-btn" id="fsZoomInBtn" title="放大">
-          <i class="fa fa-plus"></i>
-        </div>
-        <div class="fs-action-btn" id="fsDownloadBtn" title="下载">
-          <i class="fa fa-download"></i>
-        </div>
-        <div class="fs-action-btn" id="fsCloseBtn" title="关闭 (Esc)">
-          <i class="fa fa-times"></i>
-        </div>
+        <div class="fs-action-btn" id="fsZoomOutBtn" title="缩小"><i class="fa fa-minus"></i></div>
+        <div class="fs-action-btn" id="fsZoomResetBtn" title="重置 100%"><i class="fa fa-search"></i></div>
+        <div class="fs-action-btn" id="fsZoomInBtn" title="放大"><i class="fa fa-plus"></i></div>
+        <div class="fs-action-btn" id="fsDownloadBtn" title="下载"><i class="fa fa-download"></i></div>
+        <div class="fs-action-btn" id="fsCloseBtn" title="关闭 (Esc)"><i class="fa fa-times"></i></div>
       </div>
     </div>
-
-    <div id="fsArrowLeft" class="fs-arrow left" title="上一张 (←)">
-      <i class="fa fa-chevron-left"></i>
-    </div>
-    <div id="fsArrowRight" class="fs-arrow right" title="下一张 (→)">
-      <i class="fa fa-chevron-right"></i>
-    </div>
-
-    <div class="fs-img-wrap">
-      <img id="fsImg" src="" alt="">
-    </div>
-
+    <div id="fsArrowLeft" class="fs-arrow left" title="上一张 (←)"><i class="fa fa-chevron-left"></i></div>
+    <div id="fsArrowRight" class="fs-arrow right" title="下一张 (→)"><i class="fa fa-chevron-right"></i></div>
+    <div class="fs-img-wrap"><img id="fsImg" src="" alt=""></div>
     <div id="fsZoomBadge" class="fs-zoom-badge">100%</div>
-
     <div class="fs-footer">
       <div class="fs-dots" id="fsDots"></div>
       <div class="fs-thumbnails" id="fsThumbnails"></div>
@@ -1759,8 +2096,30 @@ const clearHistoryBtn = $('clearHistoryBtn');
 
 const tabPlatform = $('tabPlatform');
 const tabAiEdit = $('tabAiEdit');
+const tabMask = $('tabMask');
+const tabMaskBadge = $('tabMaskBadge');
 const panelPlatform = $('panelPlatform');
 const panelAiEdit = $('panelAiEdit');
+const panelMask = $('panelMask');
+
+const batchEditBar = $('batchEditBar');
+const batchCount = $('batchCount');
+const batchThumbs = $('batchThumbs');
+const batchApplyBtn = $('batchApplyBtn');
+const batchApplyCount = $('batchApplyCount');
+const batchEditClose = $('batchEditClose');
+
+const maskCanvasHint = $('maskCanvasHint');
+const maskTabStatus = $('maskTabStatus');
+const maskTabStatusText = $('maskTabStatusText');
+const regionList = $('regionList');
+const regionCount = $('regionCount');
+const maskTabProgress = $('maskTabProgress');
+const maskTabProgressBar = $('maskTabProgressBar');
+const maskTabProgressText = $('maskTabProgressText');
+
+const editHistoryList = $('editHistoryList');
+const editHistoryClear = $('editHistoryClear');
 
 const zoomIndicator = $('zoomIndicator');
 const fullscreenBtn = $('fullscreenBtn');
@@ -1798,16 +2157,245 @@ const canvasSettings = {
 
 const zoomState = {
   MIN: 0.1, MAX: 5,
-  isPanning: false,
-  spacePressed: false,
+  isPanning: false, spacePressed: false,
   panStartX: 0, panStartY: 0,
   panStartOffsetX: 0, panStartOffsetY: 0,
-  lastTouchDist: 0,
-  hideTimer: null
+  lastTouchDist: 0, hideTimer: null
+};
+
+let editHistory = [];
+
+/* ★ 批量编辑状态 */
+const batchEditState = {
+  enabled: false,
+  selectedIds: [],   // 勾选的 taskId 列表
+  currentId: null    // 当前编辑的 taskId
 };
 
 /* ================================================================
-   缩放指示器：缩放时显示，停止 1 秒后隐藏
+   右侧 Tab 切换
+   ================================================================ */
+function switchAsideTab(tab) {
+  const tabs = ['platform', 'aiEdit', 'mask'];
+  tabs.forEach(t => {
+    const btn = t === 'platform' ? tabPlatform : t === 'aiEdit' ? tabAiEdit : tabMask;
+    const panel = t === 'platform' ? panelPlatform : t === 'aiEdit' ? panelAiEdit : panelMask;
+    btn.classList.toggle('active', t === tab);
+    panel.classList.toggle('hidden', t !== tab);
+  });
+  if (tab === 'aiEdit') syncAiEditPanel();
+}
+
+tabPlatform.onclick = () => switchAsideTab('platform');
+tabAiEdit.onclick = () => switchAsideTab('aiEdit');
+tabMask.onclick = () => switchAsideTab('mask');
+
+function autoPickAsideTab() {
+  if (maskState.active) switchAsideTab('mask');
+  else if (canvasState.hasImage) switchAsideTab('aiEdit');
+  else switchAsideTab('platform');
+}
+
+function showMaskTab() {
+  tabMask.style.display = 'flex';
+  tabMask.classList.add('highlight-tab');
+}
+function hideMaskTab() {
+  tabMask.style.display = 'none';
+  tabMask.classList.remove('highlight-tab');
+  if (tabMask.classList.contains('active')) {
+    switchAsideTab(canvasState.hasImage ? 'aiEdit' : 'platform');
+  }
+}
+
+function updateMaskTabBadge() {
+  const count = maskState.regions.length;
+  if (count > 0) {
+    tabMaskBadge.textContent = count;
+    tabMaskBadge.style.display = 'flex';
+  } else {
+    tabMaskBadge.style.display = 'none';
+  }
+}
+
+/* ================================================================
+   ★★★ 批量编辑：勾选联动 ★★★
+   ================================================================ */
+function updateBatchEditFromSelection() {
+  // 读取当前勾选的 checkbox
+  const checked = Array.from(document.querySelectorAll('.task-checkbox:checked'));
+  const selectedIds = checked.map(cb => {
+    const card = cb.closest('.task-card');
+    return card ? card.dataset.taskId : null;
+  }).filter(Boolean);
+
+  batchEditState.selectedIds = selectedIds;
+  batchEditState.currentId = activeTaskId;
+
+  // 更新卡片视觉
+  document.querySelectorAll('.task-card').forEach(el => {
+    const cb = el.querySelector('.task-checkbox');
+    el.classList.toggle('checked', cb && cb.checked);
+  });
+
+  // 勾选 > 1 → 进入批量模式
+  if (selectedIds.length > 1) {
+    batchEditState.enabled = true;
+    batchEditBar.classList.add('show');
+    renderBatchThumbs();
+  } else {
+    batchEditState.enabled = false;
+    batchEditBar.classList.remove('show');
+  }
+}
+
+function renderBatchThumbs() {
+  const ids = batchEditState.selectedIds;
+  batchCount.textContent = ids.length;
+  batchApplyCount.textContent = ids.length;
+
+  if (ids.length === 0) {
+    batchThumbs.innerHTML = '';
+    return;
+  }
+
+  batchThumbs.innerHTML = ids.map((id, i) => {
+    const task = taskDataList.find(t => t.id === id);
+    if (!task) return '';
+    const isActive = id === batchEditState.currentId;
+    return `
+      <div class="batch-thumb ${isActive ? 'active' : ''}" data-task-id="${id}" title="${escapeHtml(task.name)}">
+        <img src="${task.src}" alt="">
+        <span class="bt-index">${i + 1}</span>
+        <span class="bt-status ${task.batchStatus || 'pending'}"></span>
+      </div>
+    `;
+  }).join('');
+
+  // 绑定点击
+  batchThumbs.querySelectorAll('.batch-thumb').forEach(thumb => {
+    thumb.onclick = () => {
+      const id = thumb.dataset.taskId;
+      if (id === activeTaskId) return;
+      switchActiveTask(id);
+      batchEditState.currentId = id;
+      renderBatchThumbs();
+    };
+  });
+
+  // 自动滚动到当前卡片
+  const activeThumb = batchThumbs.querySelector('.batch-thumb.active');
+  if (activeThumb) {
+    activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+}
+
+/* 退出批量模式 */
+batchEditClose.onclick = () => {
+  // 取消所有勾选
+  document.querySelectorAll('.task-checkbox').forEach(cb => cb.checked = false);
+  updateBatchEditFromSelection();
+  showToast('已退出批量编辑模式', 'fa-times');
+};
+
+/* 批量应用：对勾选的所有图应用当前 prompt + 当前功能 */
+batchApplyBtn.onclick = async () => {
+  if (!aiEditState.currentAction) {
+    showToast('请先选择 AI 编辑功能', 'fa-exclamation-triangle');
+    return;
+  }
+  const action = aiEditState.currentAction;
+  if (action === 'genCopy') { genCopyBtn.click(); return; }
+  const prompt = $('aiEditPrompt').value.trim();
+  if (!prompt) {
+    showToast('提示词不能为空', 'fa-exclamation-triangle');
+    return;
+  }
+  const ids = batchEditState.selectedIds;
+  if (ids.length === 0) { showToast('没有勾选任何图片'); return; }
+
+  if (!confirm(`确定对勾选的 ${ids.length} 张图应用「${getActionLabel(action)}」？\n（会逐张处理，耗时较长）`)) return;
+
+  batchApplyBtn.disabled = true;
+  const originalHTML = batchApplyBtn.innerHTML;
+  batchApplyBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> 处理中 0/${ids.length}`;
+
+  let successCount = 0;
+  let failCount = 0;
+
+  for (let i = 0; i < ids.length; i++) {
+    const taskId = ids[i];
+    const task = taskDataList.find(t => t.id === taskId);
+    if (!task) continue;
+
+    // 更新状态
+    task.batchStatus = 'processing';
+    renderBatchThumbs();
+    batchApplyBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> 处理中 ${i+1}/${ids.length}`;
+
+    try {
+      const newUrl = await callAiEditApi({
+        action, prompt,
+        strength: aiEditState.strength,
+        ratio: aiEditState.ratio,
+        keepSubject: aiEditState.keepSubject,
+        referenceImage: task.src
+      });
+      task.src = newUrl;
+      task.batchStatus = 'done';
+      // 更新队列卡片缩略图
+      const card = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+      if (card) {
+        const thumb = card.querySelector('img');
+        if (thumb) thumb.src = newUrl;
+      }
+      successCount++;
+    } catch (err) {
+      console.error(`批量处理 ${task.name} 失败:`, err);
+      task.batchStatus = 'fail';
+      failCount++;
+    }
+    renderBatchThumbs();
+  }
+
+  // 恢复按钮
+  batchApplyBtn.disabled = false;
+  batchApplyBtn.innerHTML = originalHTML;
+
+  // 如果当前画布对应的图也被处理了，更新画布
+  if (ids.includes(activeTaskId)) {
+    const task = taskDataList.find(t => t.id === activeTaskId);
+    if (task && task.batchStatus === 'done') {
+      previewImg.src = task.src;
+    }
+  }
+
+  // 记录到修改记录
+  addEditHistoryRecord({
+    type: action,
+    label: `批量${getActionLabel(action)}(${ids.length}张)`,
+    detail: `成功 ${successCount} · 失败 ${failCount} · ${prompt.slice(0, 40)}`,
+    thumb: previewImg.src,
+    regionCount: ids.length
+  });
+
+  if (failCount === 0) {
+    showToast(`✅ 批量${getActionLabel(action)}完成（${successCount} 张）`, 'fa-magic');
+  } else if (successCount === 0) {
+    showToast(`❌ 批量处理全部失败（${failCount} 张）`, 'fa-exclamation-triangle');
+  } else {
+    showToast(`⚠️ 成功 ${successCount}，失败 ${failCount}`, 'fa-exclamation-triangle');
+  }
+
+  // 清除状态
+  setTimeout(() => {
+    taskDataList.forEach(t => { if (t.batchStatus) t.batchStatus = ''; });
+    renderBatchThumbs();
+  }, 3000);
+};
+
+/* ================================================================
+   缩放指示器
    ================================================================ */
 function applyCanvasTransform() {
   const t = `translate(${canvasState.offsetX}px, ${canvasState.offsetY}px) rotate(${canvasState.rotation}deg) scale(${canvasState.scale})`;
@@ -1816,31 +2404,25 @@ function applyCanvasTransform() {
     el.style.transform = t;
   });
 }
-
 function zoomAt(clientX, clientY, factor) {
   if (!canvasState.hasImage) return;
   const rect = canvasStage.getBoundingClientRect();
   const mx = clientX - rect.left - rect.width / 2;
   const my = clientY - rect.top - rect.height / 2;
-
   const oldScale = canvasState.scale;
   let newScale = oldScale * factor;
   newScale = Math.max(zoomState.MIN, Math.min(zoomState.MAX, newScale));
   if (Math.abs(newScale - oldScale) < 0.0001) return;
-
   const ratio = newScale / oldScale;
   canvasState.offsetX = mx - (mx - canvasState.offsetX) * ratio;
   canvasState.offsetY = my - (my - canvasState.offsetY) * ratio;
   canvasState.scale = newScale;
-
   previewImg.classList.add('zooming');
   applyCanvasTransform();
   clearTimeout(zoomState._zoomTimer);
   zoomState._zoomTimer = setTimeout(() => previewImg.classList.remove('zooming'), 100);
-
   showZoomIndicator();
 }
-
 function resetZoom() {
   canvasState.scale = 1;
   canvasState.offsetX = 0;
@@ -1848,19 +2430,15 @@ function resetZoom() {
   applyCanvasTransform();
   showZoomIndicator();
 }
-
 function showZoomIndicator() {
   const pct = Math.round(canvasState.scale * 100);
   if (!zoomIndicator) return;
   zoomIndicator.textContent = pct + '%';
   zoomIndicator.classList.add('show');
   clearTimeout(zoomState.hideTimer);
-  zoomState.hideTimer = setTimeout(() => {
-    zoomIndicator.classList.remove('show');
-  }, 1000);
+  zoomState.hideTimer = setTimeout(() => zoomIndicator.classList.remove('show'), 1000);
 }
 
-/* 滚轮缩放 */
 canvasStage.addEventListener('wheel', (e) => {
   if (!canvasState.hasImage) return;
   if (maskState.active || cropState.active) return;
@@ -1870,7 +2448,6 @@ canvasStage.addEventListener('wheel', (e) => {
   zoomAt(e.clientX, e.clientY, factor);
 }, { passive: false });
 
-/* 空格 + 拖拽平移 */
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space' && !zoomState.spacePressed && canvasState.hasImage) {
     const tag = document.activeElement?.tagName;
@@ -1887,7 +2464,6 @@ document.addEventListener('keyup', (e) => {
     canvasStage.classList.remove('active-pan');
   }
 });
-
 canvasStage.addEventListener('mousedown', (e) => {
   if (!canvasState.hasImage) return;
   if (maskState.active || cropState.active) return;
@@ -1915,14 +2491,12 @@ document.addEventListener('mouseup', () => {
     previewImg.classList.remove('panning');
   }
 });
-
 canvasStage.addEventListener('dblclick', (e) => {
   if (!canvasState.hasImage) return;
   if (maskState.active || cropState.active) return;
   resetZoom();
   showToast('已重置到 100% 居中', 'fa-search');
 });
-
 canvasStage.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2 && canvasState.hasImage) {
     const t1 = e.touches[0], t2 = e.touches[1];
@@ -1941,9 +2515,7 @@ canvasStage.addEventListener('touchmove', (e) => {
     zoomState.lastTouchDist = dist;
   }
 }, { passive: false });
-canvasStage.addEventListener('touchend', () => {
-  zoomState.lastTouchDist = 0;
-});
+canvasStage.addEventListener('touchend', () => { zoomState.lastTouchDist = 0; });
 
 toolZoomIn.onclick = () => {
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
@@ -1987,11 +2559,9 @@ const fsState = {
   panStartOffsetX: 0, panStartOffsetY: 0,
   lastTouchDist: 0, hideTimer: null
 };
-
 function openFullscreen() {
   if (!canvasState.hasImage || taskDataList.length === 0) {
-    showToast('⚠️ 请先上传图片', 'fa-exclamation-triangle');
-    return;
+    showToast('⚠️ 请先上传图片', 'fa-exclamation-triangle'); return;
   }
   fsState.active = true;
   fsState.scale = 1;
@@ -2071,9 +2641,7 @@ function updateFsZoomBadge() {
   fsZoomBadge.textContent = pct + '%';
   fsZoomBadge.classList.add('show');
   clearTimeout(fsState.hideTimer);
-  fsState.hideTimer = setTimeout(() => {
-    fsZoomBadge.classList.remove('show');
-  }, 1000);
+  fsState.hideTimer = setTimeout(() => fsZoomBadge.classList.remove('show'), 1000);
 }
 fullscreenBtn.onclick = openFullscreen;
 fsCloseBtn.onclick = closeFullscreen;
@@ -2154,9 +2722,7 @@ fullscreenViewer.addEventListener('touchmove', (e) => {
     fsState.lastTouchDist = dist;
   }
 }, { passive: false });
-fullscreenViewer.addEventListener('touchend', () => {
-  fsState.lastTouchDist = 0;
-});
+fullscreenViewer.addEventListener('touchend', () => { fsState.lastTouchDist = 0; });
 document.addEventListener('keydown', (e) => {
   if (!fsState.active) return;
   if (e.key === 'Escape') { e.preventDefault(); closeFullscreen(); }
@@ -2165,30 +2731,10 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ================================================================
-   右侧 Tab 切换
-   ================================================================ */
-function switchAsideTab(tab) {
-  const isPlatform = tab === 'platform';
-  tabPlatform.classList.toggle('active', isPlatform);
-  tabAiEdit.classList.toggle('active', !isPlatform);
-  panelPlatform.classList.toggle('hidden', !isPlatform);
-  panelAiEdit.classList.toggle('hidden', isPlatform);
-  if (!isPlatform) syncAiEditPanel();
-}
-tabPlatform.onclick = () => switchAsideTab('platform');
-tabAiEdit.onclick = () => switchAsideTab('aiEdit');
-
-function autoPickAsideTab() {
-  if (canvasState.hasImage) switchAsideTab('aiEdit');
-  else switchAsideTab('platform');
-}
-
-/* ================================================================
    历史栈
    ================================================================ */
 const HISTORY_KEY = 'canvas_history_v1';
 const historyState = { stack: [], currentIndex: -1, maxSize: 30 };
-
 function persistHistory() {
   try {
     localStorage.setItem(HISTORY_KEY, JSON.stringify({
@@ -2471,8 +3017,13 @@ function addTaskCard(filename, imgSrc){
     if (e.target.classList.contains('task-checkbox')) return;
     switchActiveTask(taskId);
   });
+  // ★ 勾选变化时更新批量编辑
+  const cb = div.querySelector('.task-checkbox');
+  cb.addEventListener('change', () => {
+    updateBatchEditFromSelection();
+  });
   taskList.appendChild(div);
-  taskDataList.push({ id: taskId, name: filename, src: imgSrc, status: "pending", checked: false });
+  taskDataList.push({ id: taskId, name: filename, src: imgSrc, status: "pending", checked: false, batchStatus: '' });
   if (taskDataList.length === 1) switchActiveTask(taskId);
   updateTrayArrows();
 }
@@ -2481,11 +3032,16 @@ function switchActiveTask(taskId) {
   const task = taskDataList.find(t => t.id === taskId);
   if (!task) return;
   activeTaskId = taskId;
+  batchEditState.currentId = taskId;
   document.querySelectorAll('.task-card').forEach(el => {
     el.classList.toggle('active', el.dataset.taskId === taskId);
   });
   loadToCanvas(task.src, `切换 ${task.name.slice(0, 8)}`);
-  if (panelAiEdit.classList.contains('hidden')) switchAsideTab('aiEdit');
+  if (!maskState.active && panelAiEdit.classList.contains('hidden') && panelPlatform.classList.contains('hidden')) {
+    switchAsideTab('aiEdit');
+  }
+  // 更新批量缩略图高亮
+  if (batchEditState.enabled) renderBatchThumbs();
   showToast(`已切换到：${task.name}`, 'fa-image');
 }
 
@@ -2541,8 +3097,14 @@ function initTaskTray() {
   window.addEventListener('resize', updateTrayArrows);
   updateTrayArrows();
 }
-selectAllTask.onclick = ()=>{ document.querySelectorAll(".task-checkbox").forEach(cb=>cb.checked=true); }
-unSelectAllTask.onclick = ()=>{ document.querySelectorAll(".task-checkbox").forEach(cb=>cb.checked=false); }
+selectAllTask.onclick = ()=>{
+  document.querySelectorAll(".task-checkbox").forEach(cb => cb.checked = true);
+  updateBatchEditFromSelection();
+}
+unSelectAllTask.onclick = ()=>{
+  document.querySelectorAll(".task-checkbox").forEach(cb => cb.checked = false);
+  updateBatchEditFromSelection();
+}
 
 /* 分屏 */
 function syncCompareImages() {
@@ -3059,16 +3621,18 @@ function updateCanvasImage(dataUrl, label) {
   updateSnapshotButton();
 }
 
-/* 局部重绘 */
+/* 局部重绘（多选区） */
 const maskState = {
-  active: false, hasSelection: false,
-  x: 0, y: 0, w: 0, h: 0,
+  active: false,
+  regions: [],
+  activeRegionId: null,
   dragging: null,
+  currentBox: null,
   startX: 0, startY: 0,
-  startW: 0, startH: 0,
   startMouseX: 0, startMouseY: 0,
   _onMouseDown: null, _onMouseMove: null, _onMouseUp: null
 };
+
 const MASK_PRESETS = [
   { label: '换成青花瓷', prompt: '把这个物体换成青花瓷材质，保持形状和位置不变' },
   { label: '修复瑕疵', prompt: '修复这个区域的瑕疵和破损，保持原有纹理和颜色' },
@@ -3077,164 +3641,162 @@ const MASK_PRESETS = [
   { label: '去水印', prompt: '移除这个区域的水印或文字，恢复自然背景' },
   { label: '去杂物', prompt: '移除这个区域的杂物，用周围纹理自然填充' }
 ];
+
+let regionCounter = 0;
+
 function enterMaskMode() {
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   if (cropState.active) exitCropMode();
   maskState.active = true;
-  maskState.hasSelection = false;
-  maskState.x = 0; maskState.y = 0; maskState.w = 0; maskState.h = 0;
+  maskState.regions = [];
+  maskState.activeRegionId = null;
+  maskState.dragging = null;
+  regionCounter = 0;
   canvasStage.classList.add('mask-mode');
   toolMask.classList.add('active');
-  createMaskBox();
-  createMaskCommandBar();
+  maskCanvasHint.classList.add('show');
+  showMaskTab();
+  switchAsideTab('mask');
+  renderRegionList();
+  updateMaskTabBadge();
+  updateMaskApplyBtn();
+  maskTabStatus.classList.add('no-selection');
+  maskTabStatusText.textContent = '在画布上拖动鼠标，框选要修改的区域（可多次框选）';
+  maskTabProgress.classList.remove('show');
+  maskTabProgressBar.style.width = '0%';
   bindMaskDrag();
-  showToast('拖动鼠标框选要修改的区域', 'fa-object-group');
+  showToast('✏️ 拖动鼠标框选，可框选多个区域', 'fa-object-group');
 }
-function createMaskBox() {
-  removeMaskBox();
-  const box = document.createElement('div');
-  box.id = 'maskBox';
-  box.className = 'mask-box';
-  box.innerHTML = `
-    <div class="mask-handle" data-handle="nw"></div>
-    <div class="mask-handle" data-handle="ne"></div>
-    <div class="mask-handle" data-handle="sw"></div>
-    <div class="mask-handle" data-handle="se"></div>
-    <div class="mask-hint">拖动调整 · 松开完成</div>
-  `;
-  canvasStage.appendChild(box);
+
+function exitMaskMode() {
+  maskState.active = false;
+  maskState.regions = [];
+  maskState.activeRegionId = null;
+  maskState.dragging = null;
+  maskState.currentBox = null;
+  canvasStage.classList.remove('mask-mode');
+  toolMask.classList.remove('active');
+  maskCanvasHint.classList.remove('show');
+  document.querySelectorAll('.mask-box').forEach(el => el.remove());
+  closePresetPopup();
+  hideMaskTab();
+  updateMaskTabBadge();
+  if (maskState._onMouseDown) canvasStage.removeEventListener('mousedown', maskState._onMouseDown);
+  if (maskState._onMouseMove) document.removeEventListener('mousemove', maskState._onMouseMove);
+  if (maskState._onMouseUp) document.removeEventListener('mouseup', maskState._onMouseUp);
 }
-function createMaskCommandBar() {
-  removeMaskCommandBar();
-  const presets = document.createElement('div');
-  presets.id = 'maskPresets';
-  presets.className = 'mask-presets show';
-  presets.innerHTML = MASK_PRESETS.map((p, i) =>
-    `<div class="preset-chip" data-preset-idx="${i}">${p.label}</div>`
-  ).join('');
-  presets.addEventListener('click', (e) => {
-    const chip = e.target.closest('.preset-chip');
-    if (!chip) return;
-    const idx = parseInt(chip.dataset.presetIdx);
-    const preset = MASK_PRESETS[idx];
-    if (preset) {
-      $('maskPrompt').value = preset.prompt;
-      $('maskPrompt').focus();
-      updateMaskApplyBtn();
-    }
-  });
-  canvasStage.appendChild(presets);
-  const bar = document.createElement('div');
-  bar.id = 'maskCommandBar';
-  bar.className = 'mask-command-bar show';
-  bar.innerHTML = `
-    <i class="fa fa-comment-dots text-primary"></i>
-    <input id="maskPrompt" type="text" placeholder="描述要修改的内容..." autocomplete="off">
-    <button class="btn-clear" id="maskClearBtn">清除</button>
-    <button class="btn-cancel" id="maskCancelBtn">取消</button>
-    <button class="btn-apply" id="maskApplyBtn" disabled>
-      <i class="fa fa-magic"></i> 确认重绘
-    </button>
-  `;
-  canvasStage.appendChild(bar);
-  $('maskClearBtn').onclick = () => {
-    maskState.hasSelection = false;
-    maskState.x = 0; maskState.y = 0; maskState.w = 0; maskState.h = 0;
-    const box = document.getElementById('maskBox');
-    if (box) box.style.display = 'none';
-    updateMaskApplyBtn();
-  };
-  $('maskCancelBtn').onclick = exitMaskMode;
-  $('maskApplyBtn').onclick = applyMaskInpaint;
-  $('maskPrompt').addEventListener('input', updateMaskApplyBtn);
-  $('maskPrompt').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !$('maskApplyBtn').disabled) applyMaskInpaint();
-  });
-}
-function updateMaskApplyBtn() {
-  const btn = $('maskApplyBtn');
-  const prompt = $('maskPrompt').value.trim();
-  btn.disabled = !maskState.hasSelection || !prompt;
-}
+
 function bindMaskDrag() {
   const onMouseDown = (e) => {
     if (!maskState.active) return;
-    const handle = e.target.dataset?.handle;
-    if (handle) {
-      maskState.dragging = handle;
-    } else if (e.target.id === 'maskBox') {
-      maskState.dragging = 'move';
-    } else if (e.target === canvasStage || e.target === previewImg || e.target.id === 'safeMask' || e.target.classList?.contains('preview')) {
-      maskState.dragging = 'new';
-      const rect = canvasStage.getBoundingClientRect();
-      maskState.startX = e.clientX - rect.left;
-      maskState.startY = e.clientY - rect.top;
-      maskState.x = maskState.startX;
-      maskState.y = maskState.startY;
-      maskState.w = 0;
-      maskState.h = 0;
-      maskState.hasSelection = true;
-      const box = document.getElementById('maskBox');
-      if (box) box.style.display = 'block';
-    } else {
-      return;
+    if (!e.target.closest('.preset-popup')) {
+      closePresetPopup();
     }
-    maskState.startMouseX = e.clientX;
-    maskState.startMouseY = e.clientY;
-    maskState.startW = maskState.w;
-    maskState.startH = maskState.h;
-    e.preventDefault();
+    const boxEl = e.target.closest('.mask-box');
+    const handle = e.target.dataset?.handle;
+    if (boxEl) {
+      const regionId = boxEl.dataset.regionId;
+      maskState.activeRegionId = regionId;
+      highlightRegion(regionId);
+      const region = maskState.regions.find(r => r.id === regionId);
+      if (!region) return;
+      maskState.startX = region.x;
+      maskState.startY = region.y;
+      maskState.startMouseX = e.clientX;
+      maskState.startMouseY = e.clientY;
+      if (handle) {
+        maskState.dragging = handle;
+        e.preventDefault(); e.stopPropagation();
+        return;
+      } else {
+        maskState.dragging = 'move';
+        e.preventDefault(); e.stopPropagation();
+        return;
+      }
+    }
+    if (e.target === canvasStage || e.target === previewImg || e.target.id === 'safeMask' || e.target.classList?.contains('preview')) {
+      const rect = canvasStage.getBoundingClientRect();
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      maskState.dragging = 'new';
+      maskState.startX = sx;
+      maskState.startY = sy;
+      maskState.startMouseX = e.clientX;
+      maskState.startMouseY = e.clientY;
+      maskState.currentBox = { x: sx, y: sy, w: 0, h: 0 };
+      e.preventDefault();
+    }
   };
   const onMouseMove = (e) => {
     if (!maskState.dragging) return;
     const rect = canvasStage.getBoundingClientRect();
-    const dx = e.clientX - maskState.startMouseX;
-    const dy = e.clientY - maskState.startMouseY;
-    let x = maskState.x, y = maskState.y, w = maskState.w, h = maskState.h;
     if (maskState.dragging === 'new') {
       const curX = e.clientX - rect.left;
       const curY = e.clientY - rect.top;
-      x = Math.min(maskState.startX, curX);
-      y = Math.min(maskState.startY, curY);
-      w = Math.abs(curX - maskState.startX);
-      h = Math.abs(curY - maskState.startY);
-    } else if (maskState.dragging === 'move') {
+      const x = Math.min(maskState.startX, curX);
+      const y = Math.min(maskState.startY, curY);
+      const w = Math.abs(curX - maskState.startX);
+      const h = Math.abs(curY - maskState.startY);
+      maskState.currentBox = { x, y, w, h };
+      renderTempBox(x, y, w, h);
+      return;
+    }
+    const region = maskState.regions.find(r => r.id === maskState.activeRegionId);
+    if (!region) return;
+    const dx = e.clientX - maskState.startMouseX;
+    const dy = e.clientY - maskState.startMouseY;
+    let x = maskState.startX, y = maskState.startY;
+    let w = region.w, h = region.h;
+    if (maskState.dragging === 'move') {
       x = maskState.startX + dx;
       y = maskState.startY + dy;
     } else {
-      if (maskState.dragging.includes('e')) w = Math.max(20, maskState.startW + dx);
-      if (maskState.dragging.includes('s')) h = Math.max(20, maskState.startH + dy);
+      if (maskState.dragging.includes('e')) w = Math.max(20, region.w + dx);
+      if (maskState.dragging.includes('s')) h = Math.max(20, region.h + dy);
       if (maskState.dragging.includes('w')) {
-        w = Math.max(20, maskState.startW - dx);
-        x = maskState.startX + (maskState.startW - w);
+        w = Math.max(20, region.w - dx);
+        x = maskState.startX + (region.w - w);
       }
       if (maskState.dragging.includes('n')) {
-        h = Math.max(20, maskState.startH - dy);
-        y = maskState.startY + (maskState.startH - h);
+        h = Math.max(20, region.h - dy);
+        y = maskState.startY + (region.h - h);
       }
     }
     x = Math.max(0, Math.min(rect.width - w, x));
     y = Math.max(0, Math.min(rect.height - h, y));
     if (x + w > rect.width) w = rect.width - x;
     if (y + h > rect.height) h = rect.height - y;
-    maskState.x = x; maskState.y = y; maskState.w = w; maskState.h = h;
-    const box = document.getElementById('maskBox');
-    if (box) {
-      box.style.left = x + 'px';
-      box.style.top = y + 'px';
-      box.style.width = w + 'px';
-      box.style.height = h + 'px';
-    }
-    updateMaskApplyBtn();
+    region.x = x; region.y = y; region.w = w; region.h = h;
+    updateRegionBox(region);
+    updateRegionCard(region);
   };
-  const onMouseUp = () => {
-    if (maskState.dragging === 'new' && (maskState.w < 20 || maskState.h < 20)) {
-      maskState.hasSelection = false;
-      const box = document.getElementById('maskBox');
-      if (box) box.style.display = 'none';
+  const onMouseUp = (e) => {
+    if (maskState.dragging === 'new' && maskState.currentBox) {
+      const { x, y, w, h } = maskState.currentBox;
+      removeTempBox();
+      if (w >= 20 && h >= 20) {
+        const region = {
+          id: 'region_' + (++regionCounter),
+          index: regionCounter,
+          x, y, w, h,
+          prompt: ''
+        };
+        maskState.regions.push(region);
+        maskState.activeRegionId = region.id;
+        createRegionBox(region);
+        renderRegionList();
+        updateMaskTabBadge();
+        updateMaskApplyBtn();
+        maskTabStatus.classList.remove('no-selection');
+        maskTabStatusText.textContent = `已框选 ${maskState.regions.length} 个区域，请为每个区域填写修改指令`;
+        setTimeout(() => {
+          const boxRect = getRegionScreenRect(region);
+          openPresetPopup(boxRect, region.id);
+        }, 50);
+      }
+      maskState.currentBox = null;
     }
     maskState.dragging = null;
-    updateMaskApplyBtn();
   };
   canvasStage.addEventListener('mousedown', onMouseDown);
   document.addEventListener('mousemove', onMouseMove);
@@ -3243,38 +3805,294 @@ function bindMaskDrag() {
   maskState._onMouseMove = onMouseMove;
   maskState._onMouseUp = onMouseUp;
 }
-function exitMaskMode() {
-  maskState.active = false;
-  maskState.hasSelection = false;
-  maskState.dragging = null;
-  canvasStage.classList.remove('mask-mode');
-  toolMask.classList.remove('active');
-  removeMaskBox();
-  removeMaskCommandBar();
-  if (maskState._onMouseDown) canvasStage.removeEventListener('mousedown', maskState._onMouseDown);
-  if (maskState._onMouseMove) document.removeEventListener('mousemove', maskState._onMouseMove);
-  if (maskState._onMouseUp) document.removeEventListener('mouseup', maskState._onMouseUp);
+
+function getRegionScreenRect(region) {
+  const canvasRect = canvasStage.getBoundingClientRect();
+  return {
+    left: canvasRect.left + region.x,
+    top: canvasRect.top + region.y,
+    right: canvasRect.left + region.x + region.w,
+    bottom: canvasRect.top + region.y + region.h,
+    width: region.w,
+    height: region.h
+  };
 }
-function removeMaskBox() {
-  const el = document.getElementById('maskBox');
+
+let presetPopupEl = null;
+function openPresetPopup(regionRect, regionId) {
+  closePresetPopup();
+  const popup = document.createElement('div');
+  popup.className = 'preset-popup';
+  popup.dataset.regionId = regionId;
+  popup.innerHTML = `
+    <div class="popup-header">
+      <span><i class="fa fa-bolt"></i> 常用指令</span>
+      <button class="popup-close" title="关闭">×</button>
+    </div>
+    <div class="popup-chips">
+      ${MASK_PRESETS.map((p, i) =>
+        `<div class="popup-chip" data-preset-idx="${i}">${p.label}</div>`
+      ).join('')}
+    </div>
+    <button class="popup-custom-btn">
+      <i class="fa fa-pencil"></i> 自定义输入...
+    </button>
+  `;
+  document.body.appendChild(popup);
+  presetPopupEl = popup;
+  const popupW = 280;
+  const popupH = popup.offsetHeight || 180;
+  const gap = 10;
+  const viewportW = window.innerWidth;
+  const viewportH = window.innerHeight;
+  let left, top;
+  if (regionRect.bottom + gap + popupH < viewportH) {
+    top = regionRect.bottom + gap;
+    left = regionRect.left + regionRect.width / 2 - popupW / 2;
+  } else if (regionRect.top - gap - popupH > 0) {
+    top = regionRect.top - gap - popupH;
+    left = regionRect.left + regionRect.width / 2 - popupW / 2;
+  } else if (regionRect.right + gap + popupW < viewportW) {
+    left = regionRect.right + gap;
+    top = regionRect.top + regionRect.height / 2 - popupH / 2;
+  } else {
+    left = regionRect.left - gap - popupW;
+    top = regionRect.top + regionRect.height / 2 - popupH / 2;
+  }
+  left = Math.max(10, Math.min(viewportW - popupW - 10, left));
+  top = Math.max(10, Math.min(viewportH - popupH - 10, top));
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+  popup.querySelector('.popup-close').onclick = () => closePresetPopup();
+  popup.querySelectorAll('.popup-chip').forEach(chip => {
+    chip.onclick = () => {
+      const idx = parseInt(chip.dataset.presetIdx);
+      const preset = MASK_PRESETS[idx];
+      if (preset) {
+        applyPresetToRegion(regionId, preset.prompt);
+        closePresetPopup();
+      }
+    };
+  });
+  popup.querySelector('.popup-custom-btn').onclick = () => {
+    closePresetPopup();
+    switchAsideTab('mask');
+    setTimeout(() => {
+      const input = document.querySelector(`.region-card[data-region-id="${regionId}"] .region-prompt`);
+      if (input) {
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+}
+function closePresetPopup() {
+  if (presetPopupEl) {
+    presetPopupEl.remove();
+    presetPopupEl = null;
+  }
+}
+function applyPresetToRegion(regionId, promptText) {
+  const region = maskState.regions.find(r => r.id === regionId);
+  if (!region) return;
+  region.prompt = promptText;
+  const input = document.querySelector(`.region-card[data-region-id="${regionId}"] .region-prompt`);
+  if (input) input.value = promptText;
+  updateMaskApplyBtn();
+  showToast(`已填入：${promptText.slice(0, 20)}...`, 'fa-check');
+}
+
+function renderTempBox(x, y, w, h) {
+  let el = document.getElementById('maskTempBox');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'maskTempBox';
+    el.className = 'mask-box';
+    el.style.pointerEvents = 'none';
+    canvasStage.appendChild(el);
+  }
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.width = w + 'px';
+  el.style.height = h + 'px';
+  el.style.display = 'block';
+}
+function removeTempBox() {
+  const el = document.getElementById('maskTempBox');
   if (el) el.remove();
 }
-function removeMaskCommandBar() {
-  const bar = document.getElementById('maskCommandBar');
-  if (bar) bar.remove();
-  const presets = document.getElementById('maskPresets');
-  if (presets) presets.remove();
+function createRegionBox(region) {
+  const box = document.createElement('div');
+  box.className = 'mask-box';
+  box.dataset.regionId = region.id;
+  box.style.left = region.x + 'px';
+  box.style.top = region.y + 'px';
+  box.style.width = region.w + 'px';
+  box.style.height = region.h + 'px';
+  box.innerHTML = `
+    <div class="mask-number">${region.index}</div>
+    <div class="mask-handle" data-handle="nw"></div>
+    <div class="mask-handle" data-handle="ne"></div>
+    <div class="mask-handle" data-handle="sw"></div>
+    <div class="mask-handle" data-handle="se"></div>
+  `;
+  canvasStage.appendChild(box);
 }
-function generateMaskImage() {
+function updateRegionBox(region) {
+  const box = document.querySelector(`.mask-box[data-region-id="${region.id}"]`);
+  if (!box) return;
+  box.style.left = region.x + 'px';
+  box.style.top = region.y + 'px';
+  box.style.width = region.w + 'px';
+  box.style.height = region.h + 'px';
+}
+function removeRegionBox(regionId) {
+  const box = document.querySelector(`.mask-box[data-region-id="${regionId}"]`);
+  if (box) box.remove();
+}
+function highlightRegion(regionId) {
+  document.querySelectorAll('.mask-box').forEach(el => {
+    el.classList.toggle('active', el.dataset.regionId === regionId);
+  });
+  document.querySelectorAll('.region-card').forEach(el => {
+    el.classList.toggle('active', el.dataset.regionId === regionId);
+  });
+}
+function renderRegionList() {
+  if (maskState.regions.length === 0) {
+    regionList.innerHTML = `
+      <div class="edit-history-empty" style="padding:12px 8px;">
+        <i class="fa fa-object-group"></i>
+        还没有选区，请在画布上拖动框选
+      </div>
+    `;
+    regionCount.textContent = '0';
+    return;
+  }
+  const rect = canvasStage.getBoundingClientRect();
+  const realW = platformConfig[platformSelect.value].w;
+  const realH = platformConfig[platformSelect.value].h;
+  regionList.innerHTML = maskState.regions.map(region => {
+    const pxW = Math.round(region.w / rect.width * realW);
+    const pxH = Math.round(region.h / rect.height * realH);
+    const isActive = region.id === maskState.activeRegionId;
+    return `
+      <div class="region-card ${isActive ? 'active' : ''}" data-region-id="${region.id}">
+        <div class="region-header">
+          <div class="region-title">
+            <span class="region-num">${region.index}</span>
+            <span>区域 ${region.index}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="region-size">${pxW}×${pxH}</span>
+            <button class="region-del" data-del="${region.id}" title="删除此选区">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <textarea class="region-prompt"
+          data-region-id="${region.id}"
+          placeholder="输入此区域的修改指令，如：换成青花瓷"
+          rows="2">${escapeHtml(region.prompt)}</textarea>
+      </div>
+    `;
+  }).join('');
+  regionCount.textContent = maskState.regions.length;
+  regionList.querySelectorAll('.region-card').forEach(card => {
+    const regionId = card.dataset.regionId;
+    card.addEventListener('click', (e) => {
+      if (e.target.tagName === 'TEXTAREA') return;
+      if (e.target.closest('[data-del]')) return;
+      maskState.activeRegionId = regionId;
+      highlightRegion(regionId);
+    });
+  });
+  regionList.querySelectorAll('.region-prompt').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const regionId = e.target.dataset.regionId;
+      const region = maskState.regions.find(r => r.id === regionId);
+      if (region) region.prompt = e.target.value;
+      updateMaskApplyBtn();
+    });
+  });
+  regionList.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const regionId = btn.dataset.del;
+      deleteRegion(regionId);
+    });
+  });
+}
+function updateRegionCard(region) {
+  const card = document.querySelector(`.region-card[data-region-id="${region.id}"]`);
+  if (!card) return;
+  const rect = canvasStage.getBoundingClientRect();
+  const realW = platformConfig[platformSelect.value].w;
+  const realH = platformConfig[platformSelect.value].h;
+  const pxW = Math.round(region.w / rect.width * realW);
+  const pxH = Math.round(region.h / rect.height * realH);
+  const sizeEl = card.querySelector('.region-size');
+  if (sizeEl) sizeEl.textContent = `${pxW}×${pxH}`;
+}
+function deleteRegion(regionId) {
+  const idx = maskState.regions.findIndex(r => r.id === regionId);
+  if (idx < 0) return;
+  maskState.regions.splice(idx, 1);
+  maskState.regions.forEach((r, i) => {
+    r.index = i + 1;
+    const box = document.querySelector(`.mask-box[data-region-id="${r.id}"]`);
+    if (box) {
+      const numEl = box.querySelector('.mask-number');
+      if (numEl) numEl.textContent = r.index;
+    }
+  });
+  removeRegionBox(regionId);
+  if (maskState.activeRegionId === regionId) {
+    maskState.activeRegionId = maskState.regions[0]?.id || null;
+  }
+  renderRegionList();
+  updateMaskTabBadge();
+  updateMaskApplyBtn();
+  if (maskState.regions.length === 0) {
+    maskTabStatus.classList.add('no-selection');
+    maskTabStatusText.textContent = '在画布上拖动鼠标，框选要修改的区域（可多次框选）';
+  }
+}
+function updateMaskApplyBtn() {
+  const btn = $('maskApplyBtn');
+  const valid = maskState.regions.length > 0 &&
+                maskState.regions.every(r => r.prompt && r.prompt.trim());
+  btn.disabled = !valid;
+  regionCount.textContent = maskState.regions.length;
+}
+
+$('maskClearBtn').onclick = () => {
+  if (maskState.regions.length === 0) { showToast('暂无选区'); return; }
+  if (!confirm(`确定清除全部 ${maskState.regions.length} 个选区？`)) return;
+  maskState.regions.forEach(r => removeRegionBox(r.id));
+  maskState.regions = [];
+  maskState.activeRegionId = null;
+  regionCounter = 0;
+  renderRegionList();
+  updateMaskTabBadge();
+  updateMaskApplyBtn();
+  maskTabStatus.classList.add('no-selection');
+  maskTabStatusText.textContent = '在画布上拖动鼠标，框选要修改的区域（可多次框选）';
+  showToast('已清除全部选区', 'fa-eraser');
+};
+$('maskCancelBtn').onclick = exitMaskMode;
+$('maskApplyBtn').onclick = applyMultiRegionInpaint;
+
+function generateMaskForRegion(region) {
   const naturalW = previewImg.naturalWidth;
   const naturalH = previewImg.naturalHeight;
   const rect = canvasStage.getBoundingClientRect();
   const scaleX = naturalW / rect.width;
   const scaleY = naturalH / rect.height;
-  const mx = maskState.x * scaleX;
-  const my = maskState.y * scaleY;
-  const mw = maskState.w * scaleX;
-  const mh = maskState.h * scaleY;
+  const mx = region.x * scaleX;
+  const my = region.y * scaleY;
+  const mw = region.w * scaleX;
+  const mh = region.h * scaleY;
   const mask = document.createElement('canvas');
   mask.width = naturalW;
   mask.height = naturalH;
@@ -3285,30 +4103,61 @@ function generateMaskImage() {
   ctx.fillRect(mx, my, mw, mh);
   return mask.toDataURL('image/png');
 }
-async function applyMaskInpaint() {
-  if (!maskState.hasSelection) { showToast('请先框选区域'); return; }
-  const prompt = $('maskPrompt').value.trim();
-  if (!prompt) { showToast('请输入修改指令'); return; }
+async function applyMultiRegionInpaint() {
+  if (maskState.regions.length === 0) { showToast('请先框选区域', 'fa-exclamation-triangle'); return; }
+  for (const r of maskState.regions) {
+    if (!r.prompt || !r.prompt.trim()) {
+      showToast(`区域 ${r.index} 未填写指令`, 'fa-exclamation-triangle');
+      return;
+    }
+  }
   const applyBtn = $('maskApplyBtn');
   applyBtn.disabled = true;
-  applyBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 生成中...';
-  showToast('⏳ AI 正在局部重绘...', 'fa-magic');
+  applyBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 处理中...';
+  maskTabProgress.classList.add('show');
+  maskTabProgressBar.style.width = '0%';
+  maskTabProgressText.textContent = `开始处理 ${maskState.regions.length} 个区域...`;
+  const totalSteps = maskState.regions.length;
+  let completedSteps = 0;
+  let currentImageUrl = previewImg.src;
   try {
-    const maskUrl = generateMaskImage();
-    const resultUrl = await callInpaintApi({
-      image: previewImg.src,
-      mask: maskUrl,
-      prompt: prompt,
-      strength: 0.85
+    for (let i = 0; i < maskState.regions.length; i++) {
+      const region = maskState.regions[i];
+      maskTabProgressText.textContent = `正在处理区域 ${region.index}/${totalSteps}：${region.prompt.slice(0, 20)}...`;
+      const maskUrl = generateMaskForRegion(region);
+      const resultUrl = await callInpaintApi({
+        image: currentImageUrl,
+        mask: maskUrl,
+        prompt: region.prompt,
+        strength: 0.85
+      });
+      currentImageUrl = resultUrl;
+      completedSteps++;
+      const pct = Math.round(completedSteps / totalSteps * 100);
+      maskTabProgressBar.style.width = pct + '%';
+      maskTabProgressText.textContent = `已完成 ${completedSteps}/${totalSteps}（${pct}%）`;
+    }
+    maskTabProgressBar.style.width = '100%';
+    maskTabProgressText.textContent = '全部完成！';
+    const label = `AI局部重绘(${maskState.regions.length}区)`;
+    updateCanvasImage(currentImageUrl, label);
+    addEditHistoryRecord({
+      type: 'inpaint-multi',
+      label,
+      detail: maskState.regions.map(r => `区域${r.index}: ${r.prompt.slice(0, 30)}`).join(' · '),
+      thumb: currentImageUrl,
+      regionCount: maskState.regions.length
     });
-    updateCanvasImage(resultUrl, 'AI局部重绘');
-    exitMaskMode();
-    showToast('✅ 局部重绘完成', 'fa-magic');
+    setTimeout(() => {
+      exitMaskMode();
+      showToast(`✅ 已完成 ${totalSteps} 个区域的局部重绘`, 'fa-magic');
+    }, 500);
   } catch (err) {
-    console.error('局部重绘失败:', err);
+    console.error('多选区重绘失败:', err);
     showToast('❌ ' + err.message, 'fa-exclamation-triangle');
     applyBtn.disabled = false;
-    applyBtn.innerHTML = '<i class="fa fa-magic"></i> 确认重绘';
+    applyBtn.innerHTML = `<i class="fa fa-magic"></i> 应用重生成(${maskState.regions.length})`;
+    maskTabProgress.classList.remove('show');
   }
 }
 async function callInpaintApi(params) {
@@ -3324,46 +4173,110 @@ async function callInpaintApi(params) {
     return data.url;
   } catch (err) {
     console.warn('后端 inpaint 不可用，降级模拟:', err.message);
-    await new Promise(r => setTimeout(r, 2500));
-    return await simulateInpaint(params);
+    await new Promise(r => setTimeout(r, 1500));
+    return await simulateInpaintForRegion(params);
   }
 }
-function simulateInpaint(params) {
+function simulateInpaintForRegion(params) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       const naturalW = img.naturalWidth;
       const naturalH = img.naturalHeight;
-      const rect = canvasStage.getBoundingClientRect();
-      const scaleX = naturalW / rect.width;
-      const scaleY = naturalH / rect.height;
       const canvas = document.createElement('canvas');
       canvas.width = naturalW;
       canvas.height = naturalH;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
-      const mx = maskState.x * scaleX;
-      const my = maskState.y * scaleY;
-      const mw = maskState.w * scaleX;
-      const mh = maskState.h * scaleY;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(mx, my, mw, mh);
-      ctx.clip();
-      ctx.filter = 'brightness(1.15) saturate(1.3) hue-rotate(15deg)';
+      ctx.filter = 'brightness(1.08) saturate(1.15) hue-rotate(8deg)';
       ctx.drawImage(img, 0, 0);
       ctx.filter = 'none';
-      ctx.strokeStyle = 'rgba(34,211,238,0.6)';
-      ctx.lineWidth = Math.max(2, naturalW * 0.005);
-      ctx.strokeRect(mx, my, mw, mh);
-      ctx.restore();
       resolve(canvas.toDataURL('image/jpeg', 0.95));
     };
     img.onerror = () => reject(new Error('图片加载失败'));
     img.src = params.image;
   });
 }
+$('openMaskBtn').onclick = () => {
+  if (maskState.active) exitMaskMode();
+  else enterMaskMode();
+};
+
+/* 修改记录 */
+function addEditHistoryRecord({ type, label, detail, thumb, regionCount }) {
+  const record = {
+    id: 'eh_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    type, label,
+    detail: detail || '',
+    thumb: thumb || '',
+    regionCount: regionCount || 0,
+    time: new Date().toLocaleTimeString('zh-CN', {hour12:false})
+  };
+  editHistory.unshift(record);
+  if (editHistory.length > 30) editHistory = editHistory.slice(0, 30);
+  renderEditHistory();
+}
+function renderEditHistory() {
+  if (editHistory.length === 0) {
+    editHistoryList.innerHTML = `
+      <div class="edit-history-empty">
+        <i class="fa fa-history"></i>
+        本次会话暂无修改记录
+      </div>
+    `;
+    return;
+  }
+  editHistoryList.innerHTML = editHistory.map(rec => {
+    const iconMap = {
+      'inpaint-multi': 'fa-object-group',
+      'inpaint': 'fa-magic',
+      'regenerate': 'fa-refresh',
+      'whiteBg': 'fa-square-o',
+      'replaceBg': 'fa-image',
+      'addText': 'fa-font',
+      'styleTransfer': 'fa-paint-brush',
+      'outpainting': 'fa-expand',
+      'crop': 'fa-crop',
+      'rotate': 'fa-repeat',
+      'reset': 'fa-home'
+    };
+    const icon = iconMap[rec.type] || 'fa-magic';
+    return `
+      <div class="edit-history-item" data-record-id="${rec.id}" title="点击可回退到该状态">
+        <div class="eh-thumb">
+          ${rec.thumb ? `<img src="${rec.thumb}" alt="">` : `<i class="fa ${icon}"></i>`}
+        </div>
+        <div class="eh-main">
+          <div class="eh-title">
+            <i class="fa ${icon} eh-icon"></i>
+            ${escapeHtml(rec.label)}
+            ${rec.regionCount > 0 ? `<span style="font-size:10px;color:#22d3ee;">· ${rec.regionCount}张/区</span>` : ''}
+          </div>
+          <div class="eh-detail">${escapeHtml(rec.detail || '—')}</div>
+        </div>
+        <div class="eh-time">${escapeHtml(rec.time)}</div>
+      </div>
+    `;
+  }).join('');
+  editHistoryList.querySelectorAll('.edit-history-item').forEach(el => {
+    el.onclick = () => {
+      const id = el.dataset.recordId;
+      const rec = editHistory.find(r => r.id === id);
+      if (!rec || !rec.thumb) { showToast('该记录无缩略图，无法回退', 'fa-info-circle'); return; }
+      if (!confirm(`回退到「${rec.label}」状态？\n（当前画布会被覆盖）`)) return;
+      updateCanvasImage(rec.thumb, `回退到「${rec.label}」`);
+      showToast(`已回退到「${rec.label}」`, 'fa-undo');
+    };
+  });
+}
+editHistoryClear.onclick = () => {
+  if (editHistory.length === 0) { showToast('暂无记录', 'fa-info-circle'); return; }
+  if (!confirm(`确定清空全部 ${editHistory.length} 条修改记录？`)) return;
+  editHistory = [];
+  renderEditHistory();
+  showToast('🗑️ 修改记录已清空', 'fa-trash');
+};
 
 /* AI 编辑 */
 const aiEditState = {
@@ -3450,6 +4363,12 @@ async function applyAiEdit() {
     progressBar.style.width = '100%';
     progressText.textContent = '生成完成';
     updateCanvasImage(newUrl, `AI${getActionLabel(action)}`);
+    addEditHistoryRecord({
+      type: action,
+      label: `AI${getActionLabel(action)}`,
+      detail: prompt.slice(0, 60),
+      thumb: newUrl
+    });
     showToast(`✅ ${getActionLabel(action)}完成`, 'fa-magic');
   } catch (err) {
     console.error(err);
@@ -3481,7 +4400,7 @@ async function callAiEditApi(params) {
     return data.url;
   } catch (err) {
     console.warn('后端 AI 编辑接口不可用，降级模拟:', err.message);
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 1500));
     return await simulateAiEdit(params);
   }
 }
@@ -3684,15 +4603,18 @@ startPublishBtn.onclick = async function(){
   publishLog.innerText += `${new Date().toLocaleTimeString()} ✅ 全部发布完毕\n`;
   showToast('批量素材投递完成', 'fa-rocket');
 }
-$('openMaskBtn').onclick = () => {
-  if (maskState.active) exitMaskMode();
-  else enterMaskMode();
-};
 
 document.addEventListener('keydown', (e) => {
   const tag = document.activeElement?.tagName;
-  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') {
+    if (e.key === 'Escape') closePresetPopup();
+    return;
+  }
   if (fsState.active) return;
+  if (e.key === 'Escape') {
+    closePresetPopup();
+    return;
+  }
   if (e.key === 'f' || e.key === 'F') {
     if (canvasState.hasImage && !maskState.active && !cropState.active) {
       e.preventDefault();
@@ -3709,6 +4631,12 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+document.addEventListener('mousedown', (e) => {
+  if (presetPopupEl && !e.target.closest('.preset-popup')) {
+    closePresetPopup();
+  }
+});
+
 platformSelect.dispatchEvent(new Event('change'));
 bindCanvasSettings();
 bindAiEdit();
@@ -3717,6 +4645,7 @@ loadHistoryFromStorage();
 renderVersionList();
 updateUndoRedoButtons();
 updateSnapshotButton();
+renderEditHistory();
 autoPickAsideTab();
 </script>
 </body>
