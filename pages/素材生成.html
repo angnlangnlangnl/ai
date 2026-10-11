@@ -30,7 +30,113 @@
     }
   </style>
   <style>
-    /* ============ 画布工具图标 ============ */
+    /* ============================================================
+       ★ 全局深色滚动条
+       ============================================================ */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #4b5563 #1f2937;
+    }
+    *::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    *::-webkit-scrollbar-track {
+      background: #1f2937;
+      border-radius: 10px;
+    }
+    *::-webkit-scrollbar-thumb {
+      background: #4b5563;
+      border-radius: 10px;
+      border: 2px solid #1f2937;
+      transition: background 0.15s;
+    }
+    *::-webkit-scrollbar-thumb:hover {
+      background: #6b7280;
+    }
+    *::-webkit-scrollbar-thumb:active {
+      background: #4F46E5;
+    }
+    *::-webkit-scrollbar-corner {
+      background: #1f2937;
+    }
+    /* 更细的滚动条（局部） */
+    .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #4b5563; border: none; }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #4F46E5; }
+
+    /* ============================================================
+       ★ 全局 input 类型深色
+       ============================================================ */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: #374151;
+      border-radius: 4px;
+      outline: none;
+      accent-color: #4F46E5;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 4px;
+      background: #374151;
+      border-radius: 4px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4F46E5;
+      cursor: pointer;
+      margin-top: -5px;
+      border: 2px solid #1f2937;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    input[type="range"]::-moz-range-track {
+      height: 4px;
+      background: #374151;
+      border-radius: 4px;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4F46E5;
+      cursor: pointer;
+      border: 2px solid #1f2937;
+    }
+    input[type="checkbox"] {
+      accent-color: #4F46E5;
+    }
+    input[type="radio"] {
+      accent-color: #4F46E5;
+    }
+
+    /* ============================================================
+       ★ select / option 深色
+       ============================================================ */
+    select {
+      background-color: #374151;
+      color: #e5e7eb;
+      border-color: #4b5563;
+    }
+    select option {
+      background-color: #1f2937;
+      color: #e5e7eb;
+    }
+
+    /* ============================================================
+       ★ textarea / input text 深色
+       ============================================================ */
+    textarea, input[type="text"] {
+      color-scheme: dark;
+    }
+
+    /* ============================================================
+       ★ 画布工具图标
+       ============================================================ */
     .canvas-tool-icon {
       width: 32px; height: 32px;
       display: flex; align-items: center; justify-content: center;
@@ -91,7 +197,7 @@
         linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
       background-size: 20px 20px;
     }
-    .canvas-stage.light-bg { background: #f3f4f6; }
+    .canvas-stage.light-bg { background: #e5e7eb; }
     .canvas-stage.black-bg { background: #000; }
     .canvas-stage.checker-bg {
       background-image:
@@ -101,7 +207,7 @@
         linear-gradient(-45deg, transparent 75%, #4b5563 75%);
       background-size: 20px 20px;
       background-position: 0 0, 0 10px, 10px -10px, -10px 0;
-      background-color: #e5e7eb;
+      background-color: #374151;
     }
     .canvas-stage.thirds-on::before,
     .canvas-stage.thirds-on::after {
@@ -211,7 +317,7 @@
     .crop-handle {
       position: absolute;
       width: 12px; height: 12px;
-      background: #22d3ee; border: 2px solid #fff;
+      background: #22d3ee; border: 2px solid #1f2937;
       border-radius: 50%; z-index: 16;
       box-shadow: 0 0 6px rgba(0,0,0,0.5);
     }
@@ -281,7 +387,7 @@
     .mask-box .mask-handle {
       position: absolute;
       width: 12px; height: 12px;
-      background: #22d3ee; border: 2px solid #fff;
+      background: #22d3ee; border: 2px solid #1f2937;
       border-radius: 50%; z-index: 41;
       box-shadow: 0 0 6px rgba(0,0,0,0.5);
     }
@@ -293,10 +399,11 @@
       position: absolute;
       bottom: -26px; left: 50%;
       transform: translateX(-50%);
-      background: rgba(10,30,47,0.9);
-      color: #fff; font-size: 10px;
+      background: rgba(17,24,39,0.95);
+      color: #d1d5db; font-size: 10px;
       padding: 2px 8px; border-radius: 8px;
       white-space: nowrap; pointer-events: none;
+      border: 1px solid #374151;
     }
     .mask-command-bar {
       position: absolute;
@@ -345,7 +452,7 @@
     .mask-presets.show { display: flex; }
     .mask-presets .preset-chip {
       padding: 5px 12px;
-      background: rgba(17,24,39,0.9);
+      background: rgba(31,41,55,0.95);
       border: 1px solid #374151;
       border-radius: 14px;
       color: #d1d5db;
@@ -434,7 +541,7 @@
       text-shadow: 0 0 4px rgba(0,0,0,0.8);
     }
     .canvas-settings-panel .cs-bg-item[data-bg="dark"]   { background: #2b303b; }
-    .canvas-settings-panel .cs-bg-item[data-bg="light"]  { background: #f3f4f6; }
+    .canvas-settings-panel .cs-bg-item[data-bg="light"]  { background: #6b7280; }
     .canvas-settings-panel .cs-bg-item[data-bg="checker"] {
       background:
         linear-gradient(45deg, #4b5563 25%, transparent 25%),
@@ -443,7 +550,7 @@
         linear-gradient(-45deg, transparent 75%, #4b5563 75%);
       background-size: 12px 12px;
       background-position: 0 0, 0 6px, 6px -6px, -6px 0;
-      background-color: #e5e7eb;
+      background-color: #374151;
     }
     .canvas-settings-panel .cs-bg-item[data-bg="black"]  { background: #000; }
     .canvas-settings-panel .cs-size {
@@ -482,7 +589,7 @@
     }
     .canvas-coord.show { display: block; }
 
-    /* ============ ★ 缩放指示器：缩放时显示，停止时隐藏 ============ */
+    /* ============ 缩放指示器：深色 ============ */
     .zoom-indicator {
       position: absolute;
       bottom: 8px;
@@ -509,7 +616,7 @@
       box-shadow: 0 0 12px rgba(34,211,238,0.4);
     }
 
-    /* ============ ★ 全屏预览按钮（画布右下角） ============ */
+    /* ============ 全屏预览按钮 ============ */
     .fullscreen-btn {
       position: absolute;
       top: 8px;
@@ -517,7 +624,7 @@
       width: 30px;
       height: 30px;
       border-radius: 6px;
-      background: rgba(17,24,39,0.85);
+      background: rgba(17,24,39,0.9);
       border: 1px solid #374151;
       color: #9ca3af;
       font-size: 14px;
@@ -528,7 +635,6 @@
       z-index: 26;
       opacity: 0;
       transition: all 0.2s;
-      backdrop-filter: blur(4px);
     }
     .canvas-stage:hover .fullscreen-btn { opacity: 1; }
     .fullscreen-btn:hover {
@@ -538,7 +644,7 @@
       transform: scale(1.1);
     }
 
-    /* ============ ★ 全屏预览遮罩 ============ */
+    /* ============ 全屏预览层 ============ */
     .fullscreen-viewer {
       position: fixed;
       inset: 0;
@@ -547,7 +653,6 @@
       display: none;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(8px);
       animation: fadeInViewer 0.2s ease;
     }
     .fullscreen-viewer.show { display: flex; }
@@ -555,8 +660,6 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
-
-    /* 图片容器 */
     .fullscreen-viewer .fs-img-wrap {
       position: relative;
       max-width: 85vw;
@@ -582,7 +685,6 @@
     }
     .fullscreen-viewer .fs-img-wrap img.zooming { transition: none; }
 
-    /* 左右切换箭头 */
     .fs-arrow {
       position: absolute;
       top: 50%;
@@ -600,7 +702,6 @@
       cursor: pointer;
       z-index: 10000;
       transition: all 0.2s;
-      backdrop-filter: blur(8px);
     }
     .fs-arrow:hover {
       background: #4F46E5;
@@ -609,14 +710,10 @@
       transform: translateY(-50%) scale(1.1);
     }
     .fs-arrow:active { transform: translateY(-50%) scale(0.95); }
-    .fs-arrow.disabled {
-      opacity: 0.2;
-      pointer-events: none;
-    }
+    .fs-arrow.disabled { opacity: 0.2; pointer-events: none; }
     .fs-arrow.left  { left: 24px; }
     .fs-arrow.right { right: 24px; }
 
-    /* 顶部工具栏 */
     .fs-header {
       position: absolute;
       top: 0; left: 0; right: 0;
@@ -629,7 +726,6 @@
       pointer-events: none;
     }
     .fs-header > * { pointer-events: auto; }
-
     .fs-title {
       font-size: 14px;
       color: #d1d5db;
@@ -651,7 +747,6 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-
     .fs-actions {
       display: flex;
       gap: 8px;
@@ -675,8 +770,6 @@
       border-color: #4F46E5;
       color: #fff;
     }
-
-    /* 底部信息栏 */
     .fs-footer {
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -690,8 +783,6 @@
       pointer-events: none;
     }
     .fs-footer > * { pointer-events: auto; }
-
-    /* 圆点指示器 */
     .fs-dots {
       display: flex;
       gap: 6px;
@@ -716,15 +807,11 @@
       width: 24px;
       border-radius: 4px;
     }
-
-    /* 底部分页文字 */
     .fs-counter {
       font-size: 12px;
       color: #9ca3af;
       font-family: ui-monospace, monospace;
     }
-
-    /* 缩略图条 */
     .fs-thumbnails {
       display: flex;
       gap: 6px;
@@ -762,8 +849,6 @@
       border-color: #4F46E5;
       box-shadow: 0 0 0 2px rgba(79,70,229,0.4);
     }
-
-    /* 全屏右下角缩放指示 */
     .fs-zoom-badge {
       position: absolute;
       bottom: 100px;
@@ -897,10 +982,10 @@
     /* ============ Toast ============ */
     .toast-tip {
       position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-      background: rgba(17,24,39,0.95); color: #fff;
+      background: rgba(17,24,39,0.95); color: #e5e7eb;
       padding: 10px 20px; border-radius: 20px;
       font-size: 13px; z-index: 9999;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       border: 1px solid #4F46E5;
       opacity: 0; transition: opacity 0.25s, transform 0.25s;
       pointer-events: none;
@@ -985,6 +1070,61 @@
       color: #4F46E5;
       border-bottom-color: #4F46E5;
       background: rgba(79,70,229,0.05);
+    }
+
+    /* ============================================================
+       ★ 原生 input[type=text] / textarea 深色
+       ============================================================ */
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    textarea {
+      background-color: #1f2937;
+      color: #e5e7eb;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      outline: none;
+      color-scheme: dark;
+    }
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="number"]:focus,
+    textarea:focus {
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+    }
+
+    /* ============================================================
+       ★ 顶部工具栏中所有按钮统一深色
+       ============================================================ */
+    .bg-cardBg {
+      background-color: #374151;
+    }
+    .bg-panelBg {
+      background-color: #1F2937;
+    }
+    .bg-darkBg {
+      background-color: #111827;
+    }
+
+    /* ============================================================
+       ★ 表单元素统一深色（避免浏览器默认白底）
+       ============================================================ */
+    input[type="file"] {
+      color-scheme: dark;
+    }
+
+    /* ============================================================
+       ★ 滚动容器都统一深色
+       ============================================================ */
+    .overflow-y-auto,
+    .overflow-auto {
+      color-scheme: dark;
     }
   </style>
 </head>
@@ -1166,10 +1306,8 @@
           </div>
           <div id="canvasCoord" class="canvas-coord">0, 0</div>
 
-          <!-- ★ 缩放指示器：缩放时显示，停止 1 秒后隐藏 -->
           <div id="zoomIndicator" class="zoom-indicator">100%</div>
 
-          <!-- ★ 全屏预览按钮（画布右上角） -->
           <div id="fullscreenBtn" class="fullscreen-btn" title="全屏预览 (F)">
             <i class="fa fa-expand"></i>
           </div>
@@ -1478,9 +1616,8 @@
 
   <div id="toastTip" class="toast-tip"><i class="fa fa-check-circle"></i><span id="toastText"></span></div>
 
-  <!-- ============ ★ 全屏预览层 ============ -->
+  <!-- ============ 全屏预览层 ============ -->
   <div id="fullscreenViewer" class="fullscreen-viewer">
-    <!-- 顶部工具栏 -->
     <div class="fs-header">
       <div class="fs-title">
         <span class="fs-index" id="fsIndex">1 / 1</span>
@@ -1505,7 +1642,6 @@
       </div>
     </div>
 
-    <!-- 左右切换 -->
     <div id="fsArrowLeft" class="fs-arrow left" title="上一张 (←)">
       <i class="fa fa-chevron-left"></i>
     </div>
@@ -1513,15 +1649,12 @@
       <i class="fa fa-chevron-right"></i>
     </div>
 
-    <!-- 图片 -->
     <div class="fs-img-wrap">
       <img id="fsImg" src="" alt="">
     </div>
 
-    <!-- 缩放指示 -->
     <div id="fsZoomBadge" class="fs-zoom-badge">100%</div>
 
-    <!-- 底部 -->
     <div class="fs-footer">
       <div class="fs-dots" id="fsDots"></div>
       <div class="fs-thumbnails" id="fsThumbnails"></div>
@@ -1663,7 +1796,6 @@ const canvasSettings = {
   grid: false, guides: false, thirds: false, safe: true, bg: 'dark', coord: false
 };
 
-/* ★ 缩放状态 */
 const zoomState = {
   MIN: 0.1, MAX: 5,
   isPanning: false,
@@ -1675,7 +1807,7 @@ const zoomState = {
 };
 
 /* ================================================================
-   ★ 缩放指示器：缩放时显示，停止 1 秒后隐藏
+   缩放指示器：缩放时显示，停止 1 秒后隐藏
    ================================================================ */
 function applyCanvasTransform() {
   const t = `translate(${canvasState.offsetX}px, ${canvasState.offsetY}px) rotate(${canvasState.rotation}deg) scale(${canvasState.scale})`;
@@ -1717,7 +1849,6 @@ function resetZoom() {
   showZoomIndicator();
 }
 
-/* ★ 显示缩放参数，1 秒后自动隐藏 */
 function showZoomIndicator() {
   const pct = Math.round(canvasState.scale * 100);
   if (!zoomIndicator) return;
@@ -1729,9 +1860,7 @@ function showZoomIndicator() {
   }, 1000);
 }
 
-/* ================================================================
-   ★ 画布滚轮缩放
-   ================================================================ */
+/* 滚轮缩放 */
 canvasStage.addEventListener('wheel', (e) => {
   if (!canvasState.hasImage) return;
   if (maskState.active || cropState.active) return;
@@ -1741,9 +1870,7 @@ canvasStage.addEventListener('wheel', (e) => {
   zoomAt(e.clientX, e.clientY, factor);
 }, { passive: false });
 
-/* ================================================================
-   ★ 空格 + 拖拽 / 中键拖拽 平移
-   ================================================================ */
+/* 空格 + 拖拽平移 */
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space' && !zoomState.spacePressed && canvasState.hasImage) {
     const tag = document.activeElement?.tagName;
@@ -1789,9 +1916,6 @@ document.addEventListener('mouseup', () => {
   }
 });
 
-/* ================================================================
-   ★ 双击复位
-   ================================================================ */
 canvasStage.addEventListener('dblclick', (e) => {
   if (!canvasState.hasImage) return;
   if (maskState.active || cropState.active) return;
@@ -1799,16 +1923,12 @@ canvasStage.addEventListener('dblclick', (e) => {
   showToast('已重置到 100% 居中', 'fa-search');
 });
 
-/* ================================================================
-   ★ 触摸双指捏合
-   ================================================================ */
 canvasStage.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2 && canvasState.hasImage) {
     const t1 = e.touches[0], t2 = e.touches[1];
     zoomState.lastTouchDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
   }
 }, { passive: true });
-
 canvasStage.addEventListener('touchmove', (e) => {
   if (e.touches.length === 2 && zoomState.lastTouchDist > 0 && canvasState.hasImage) {
     e.preventDefault();
@@ -1821,14 +1941,10 @@ canvasStage.addEventListener('touchmove', (e) => {
     zoomState.lastTouchDist = dist;
   }
 }, { passive: false });
-
 canvasStage.addEventListener('touchend', () => {
   zoomState.lastTouchDist = 0;
 });
 
-/* ================================================================
-   ★ 缩放按钮
-   ================================================================ */
 toolZoomIn.onclick = () => {
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   const rect = canvasStage.getBoundingClientRect();
@@ -1840,13 +1956,9 @@ toolZoomOut.onclick = () => {
   zoomAt(rect.left + rect.width/2, rect.top + rect.height/2, 1/1.2);
 };
 
-/* ================================================================
-   ★ Ctrl + / - / 0 快捷键
-   ================================================================ */
 document.addEventListener('keydown', (e) => {
   const tag = document.activeElement?.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-
   if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) {
     if (!canvasState.hasImage) return;
     e.preventDefault();
@@ -1865,18 +1977,15 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ================================================================
-   ★ 全屏预览器
+   全屏预览器
    ================================================================ */
 const fsState = {
-  active: false,
-  index: 0,
-  scale: 1,
+  active: false, index: 0, scale: 1,
   offsetX: 0, offsetY: 0,
   isPanning: false,
   panStartX: 0, panStartY: 0,
   panStartOffsetX: 0, panStartOffsetY: 0,
-  lastTouchDist: 0,
-  hideTimer: null
+  lastTouchDist: 0, hideTimer: null
 };
 
 function openFullscreen() {
@@ -1887,48 +1996,36 @@ function openFullscreen() {
   fsState.active = true;
   fsState.scale = 1;
   fsState.offsetX = 0; fsState.offsetY = 0;
-  // 找到当前 activeTaskId 在列表里的位置
   const idx = taskDataList.findIndex(t => t.id === activeTaskId);
   fsState.index = idx >= 0 ? idx : 0;
   fullscreenViewer.classList.add('show');
   renderFullscreen();
-  // 禁用页面滚动
   document.body.style.overflow = 'hidden';
 }
-
 function closeFullscreen() {
   fsState.active = false;
   fullscreenViewer.classList.remove('show');
   document.body.style.overflow = '';
 }
-
 function renderFullscreen() {
   if (!fsState.active || taskDataList.length === 0) return;
   const task = taskDataList[fsState.index];
   if (!task) return;
-
   fsImg.src = task.src;
   fsImg.style.transform = `translate(0, 0) scale(1)`;
   fsState.scale = 1;
   fsState.offsetX = 0; fsState.offsetY = 0;
-
   fsIndex.textContent = `${fsState.index + 1} / ${taskDataList.length}`;
   fsCounter.textContent = `${fsState.index + 1} / ${taskDataList.length}`;
   fsName.textContent = task.name;
-
-  // 左右箭头状态
   fsArrowLeft.classList.toggle('disabled', fsState.index === 0);
   fsArrowRight.classList.toggle('disabled', fsState.index === taskDataList.length - 1);
-
-  // 圆点
   fsDots.innerHTML = taskDataList.map((t, i) =>
     `<div class="fs-dot ${i === fsState.index ? 'active' : ''}" data-idx="${i}"></div>`
   ).join('');
   fsDots.querySelectorAll('.fs-dot').forEach(dot => {
     dot.onclick = () => { fsState.index = parseInt(dot.dataset.idx); renderFullscreen(); };
   });
-
-  // 缩略图
   fsThumbnails.innerHTML = taskDataList.map((t, i) =>
     `<div class="fs-thumb ${i === fsState.index ? 'active' : ''}" data-idx="${i}">
       <img src="${t.src}" alt="">
@@ -1939,58 +2036,36 @@ function renderFullscreen() {
       fsState.index = parseInt(thumb.dataset.idx);
       renderFullscreen();
     };
-    // 自动滚动到当前缩略图
   });
-  // 自动滚动当前缩略图到可见
   const activeThumb = fsThumbnails.querySelector('.fs-thumb.active');
-  if (activeThumb) {
-    activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }
-
+  if (activeThumb) activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   updateFsZoomBadge();
 }
-
-function fsPrev() {
-  if (fsState.index <= 0) return;
-  fsState.index--;
-  renderFullscreen();
-}
-function fsNext() {
-  if (fsState.index >= taskDataList.length - 1) return;
-  fsState.index++;
-  renderFullscreen();
-}
-
-/* 全屏图片变换 */
+function fsPrev() { if (fsState.index <= 0) return; fsState.index--; renderFullscreen(); }
+function fsNext() { if (fsState.index >= taskDataList.length - 1) return; fsState.index++; renderFullscreen(); }
 function applyFsTransform() {
   fsImg.style.transform = `translate(${fsState.offsetX}px, ${fsState.offsetY}px) scale(${fsState.scale})`;
 }
-
 function fsZoomAt(clientX, clientY, factor) {
   const rect = fullscreenViewer.getBoundingClientRect();
   const cx = rect.width / 2;
   const cy = rect.height / 2;
   const mx = clientX - cx;
   const my = clientY - cy;
-
   const oldScale = fsState.scale;
   let newScale = oldScale * factor;
   newScale = Math.max(0.2, Math.min(8, newScale));
   if (Math.abs(newScale - oldScale) < 0.0001) return;
-
   const ratio = newScale / oldScale;
   fsState.offsetX = mx - (mx - fsState.offsetX) * ratio;
   fsState.offsetY = my - (my - fsState.offsetY) * ratio;
   fsState.scale = newScale;
-
   fsImg.classList.add('zooming');
   applyFsTransform();
   clearTimeout(fsState._zoomTimer);
   fsState._zoomTimer = setTimeout(() => fsImg.classList.remove('zooming'), 100);
-
   updateFsZoomBadge();
 }
-
 function updateFsZoomBadge() {
   const pct = Math.round(fsState.scale * 100);
   fsZoomBadge.textContent = pct + '%';
@@ -2000,13 +2075,10 @@ function updateFsZoomBadge() {
     fsZoomBadge.classList.remove('show');
   }, 1000);
 }
-
-/* 全屏按钮 */
 fullscreenBtn.onclick = openFullscreen;
 fsCloseBtn.onclick = closeFullscreen;
 fsArrowLeft.onclick = fsPrev;
 fsArrowRight.onclick = fsNext;
-
 fsZoomInBtn.onclick = () => {
   const rect = fullscreenViewer.getBoundingClientRect();
   fsZoomAt(rect.width / 2, rect.height / 2, 1.2);
@@ -2030,16 +2102,12 @@ fsDownloadBtn.onclick = () => {
   a.click();
   showToast('⬇️ 开始下载', 'fa-download');
 };
-
-/* 全屏滚轮缩放 */
 fullscreenViewer.addEventListener('wheel', (e) => {
   if (!fsState.active) return;
   e.preventDefault();
   const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
   fsZoomAt(e.clientX, e.clientY, factor);
 }, { passive: false });
-
-/* 全屏拖拽平移 */
 fullscreenViewer.addEventListener('mousedown', (e) => {
   if (!fsState.active) return;
   if (e.target.closest('.fs-arrow') || e.target.closest('.fs-header') || e.target.closest('.fs-footer')) return;
@@ -2058,13 +2126,8 @@ document.addEventListener('mousemove', (e) => {
   applyFsTransform();
 });
 document.addEventListener('mouseup', () => {
-  if (fsState.isPanning) {
-    fsState.isPanning = false;
-    fullscreenViewer.style.cursor = '';
-  }
+  if (fsState.isPanning) { fsState.isPanning = false; fullscreenViewer.style.cursor = ''; }
 });
-
-/* 全屏双击复位 */
 fullscreenViewer.addEventListener('dblclick', (e) => {
   if (!fsState.active) return;
   if (e.target.closest('.fs-arrow') || e.target.closest('.fs-header') || e.target.closest('.fs-footer')) return;
@@ -2073,8 +2136,6 @@ fullscreenViewer.addEventListener('dblclick', (e) => {
   applyFsTransform();
   updateFsZoomBadge();
 });
-
-/* 全屏触摸双指捏合 */
 fullscreenViewer.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     const t1 = e.touches[0], t2 = e.touches[1];
@@ -2096,20 +2157,11 @@ fullscreenViewer.addEventListener('touchmove', (e) => {
 fullscreenViewer.addEventListener('touchend', () => {
   fsState.lastTouchDist = 0;
 });
-
-/* 全屏键盘快捷键 */
 document.addEventListener('keydown', (e) => {
   if (!fsState.active) return;
-  if (e.key === 'Escape') {
-    e.preventDefault();
-    closeFullscreen();
-  } else if (e.key === 'ArrowLeft') {
-    e.preventDefault();
-    fsPrev();
-  } else if (e.key === 'ArrowRight') {
-    e.preventDefault();
-    fsNext();
-  }
+  if (e.key === 'Escape') { e.preventDefault(); closeFullscreen(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); fsPrev(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); fsNext(); }
 });
 
 /* ================================================================
@@ -2135,11 +2187,7 @@ function autoPickAsideTab() {
    历史栈
    ================================================================ */
 const HISTORY_KEY = 'canvas_history_v1';
-const historyState = {
-  stack: [],
-  currentIndex: -1,
-  maxSize: 30
-};
+const historyState = { stack: [], currentIndex: -1, maxSize: 30 };
 
 function persistHistory() {
   try {
@@ -2149,7 +2197,6 @@ function persistHistory() {
     }));
   } catch (e) {}
 }
-
 function loadHistoryFromStorage() {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
@@ -2161,7 +2208,6 @@ function loadHistoryFromStorage() {
     }
   } catch (e) {}
 }
-
 function pushHistory(actionName) {
   if (!canvasState.hasImage || !previewImg.src) return;
   if (historyState.currentIndex < historyState.stack.length - 1) {
@@ -2179,20 +2225,14 @@ function pushHistory(actionName) {
     time: new Date().toLocaleTimeString('zh-CN', {hour12:false})
   };
   historyState.stack.push(snapshot);
-  if (historyState.stack.length > historyState.maxSize) {
-    historyState.stack.shift();
-  }
+  if (historyState.stack.length > historyState.maxSize) historyState.stack.shift();
   historyState.currentIndex = historyState.stack.length - 1;
   updateUndoRedoButtons();
   renderVersionList();
   persistHistory();
 }
-
 function undo() {
-  if (historyState.currentIndex <= 0) {
-    showToast('已经是最早的版本了', 'fa-info-circle');
-    return;
-  }
+  if (historyState.currentIndex <= 0) { showToast('已经是最早的版本了', 'fa-info-circle'); return; }
   historyState.currentIndex--;
   const state = historyState.stack[historyState.currentIndex];
   applyHistoryState(state);
@@ -2202,12 +2242,8 @@ function undo() {
   flashToolIcon(btnUndo);
   showToast(`↶ 已撤销到「${state.action}」 (${state.time})`, 'fa-undo');
 }
-
 function redo() {
-  if (historyState.currentIndex >= historyState.stack.length - 1) {
-    showToast('已经是最新的版本了', 'fa-info-circle');
-    return;
-  }
+  if (historyState.currentIndex >= historyState.stack.length - 1) { showToast('已经是最新的版本了', 'fa-info-circle'); return; }
   historyState.currentIndex++;
   const state = historyState.stack[historyState.currentIndex];
   applyHistoryState(state);
@@ -2217,7 +2253,6 @@ function redo() {
   flashToolIcon(btnRedo);
   showToast(`↷ 已重做到「${state.action}」 (${state.time})`, 'fa-redo');
 }
-
 function flashToolIcon(el) {
   if (!el) return;
   el.classList.remove('flash-active');
@@ -2225,7 +2260,6 @@ function flashToolIcon(el) {
   el.classList.add('flash-active');
   setTimeout(() => el.classList.remove('flash-active'), 600);
 }
-
 function applyHistoryState(state) {
   previewImg.classList.add('fading');
   setTimeout(() => {
@@ -2241,7 +2275,6 @@ function applyHistoryState(state) {
     previewImg.style.zIndex = canvasState.layerZ;
     applyCanvasTransform();
     if (canvasState.compareMode) syncCompareImages();
-
     if (state.taskId) {
       const task = taskDataList.find(t => t.id === state.taskId);
       if (task) {
@@ -2262,20 +2295,17 @@ function applyHistoryState(state) {
     setTimeout(() => previewImg.classList.remove('fading'), 30);
   }, 120);
 }
-
 function updateUndoRedoButtons() {
   const canUndo = historyState.currentIndex > 0;
   const canRedo = historyState.currentIndex < historyState.stack.length - 1;
   if (btnUndo) btnUndo.classList.toggle('disabled', !canUndo);
   if (btnRedo) btnRedo.classList.toggle('disabled', !canRedo);
 }
-
 function updateSnapshotButton() {
   if (!btnSnapshot) return;
   btnSnapshot.classList.toggle('disabled', !canvasState.hasImage);
   btnSnapshot.title = canvasState.hasImage ? '保存快照' : '保存快照（需先上传图片）';
 }
-
 function renderVersionList() {
   if (!versionList) return;
   historyCounter.textContent = historyState.stack.length;
@@ -2285,7 +2315,6 @@ function renderVersionList() {
     return;
   }
   versionCountLabel.innerText = historyState.stack.length + ' 条';
-
   const items = historyState.stack.map((s, i) => {
     const isCurrent = i === historyState.currentIndex;
     return `
@@ -2295,9 +2324,7 @@ function renderVersionList() {
       </div>
     `;
   }).reverse().join('');
-
   versionList.innerHTML = items;
-
   versionList.querySelectorAll('.version-item').forEach(el => {
     el.addEventListener('click', () => {
       const idx = parseInt(el.dataset.versionIdx);
@@ -2317,12 +2344,8 @@ function renderVersionList() {
     });
   });
 }
-
 clearHistoryBtn.onclick = () => {
-  if (historyState.stack.length === 0) {
-    showToast('暂无历史可清空', 'fa-info-circle');
-    return;
-  }
+  if (historyState.stack.length === 0) { showToast('暂无历史可清空', 'fa-info-circle'); return; }
   if (!confirm(`确定清空所有历史记录？\n共 ${historyState.stack.length} 条\n（不会删除当前画布图片）`)) return;
   const current = historyState.stack[historyState.currentIndex];
   historyState.stack = [current];
@@ -2332,16 +2355,13 @@ clearHistoryBtn.onclick = () => {
   persistHistory();
   showToast('🗑️ 历史已清空（保留当前状态）', 'fa-trash');
 };
-
 function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[c]);
 }
 
-/* ================================================================
-   Toast
-   ================================================================ */
+/* Toast */
 function showToast(msg, iconClass = 'fa-check-circle') {
   const tip = $('toastTip');
   $('toastText').innerHTML = msg;
@@ -2393,9 +2413,7 @@ btnCross.onclick = ()=>{
   currentMode = "cross";
 }
 
-/* ================================================================
-   图片上传
-   ================================================================ */
+/* 图片上传 */
 fileInput.onchange = function(e){
   const files = e.target.files;
   let firstLoaded = false;
@@ -2467,15 +2485,11 @@ function switchActiveTask(taskId) {
     el.classList.toggle('active', el.dataset.taskId === taskId);
   });
   loadToCanvas(task.src, `切换 ${task.name.slice(0, 8)}`);
-  if (panelAiEdit.classList.contains('hidden')) {
-    switchAsideTab('aiEdit');
-  }
+  if (panelAiEdit.classList.contains('hidden')) switchAsideTab('aiEdit');
   showToast(`已切换到：${task.name}`, 'fa-image');
 }
 
-/* ================================================================
-   任务队列滚动
-   ================================================================ */
+/* 任务队列滚动 */
 function updateTrayArrows() {
   if (!taskList || !trayArrowLeft || !trayArrowRight) return;
   const scrollLeft = taskList.scrollLeft;
@@ -2488,14 +2502,12 @@ function updateTrayArrows() {
   trayFadeLeft.classList.toggle('hidden', !canLeft);
   trayFadeRight.classList.toggle('hidden', !canRight);
 }
-
 function scrollTray(direction) {
   if (!taskList) return;
   const step = taskList.clientWidth * 0.7;
   taskList.scrollBy({ left: direction * step, behavior: 'smooth' });
   setTimeout(updateTrayArrows, 350);
 }
-
 function bindTrayArrow(el, direction) {
   let holdTimer = null;
   let repeatTimer = null;
@@ -2519,7 +2531,6 @@ function bindTrayArrow(el, direction) {
   el.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); }, { passive: false });
   el.addEventListener('touchend', () => { stopHold(); scrollTray(direction); });
 }
-
 function initTaskTray() {
   if (!taskList || !trayArrowLeft || !trayArrowRight) return;
   bindTrayArrow(trayArrowLeft, -1);
@@ -2530,13 +2541,10 @@ function initTaskTray() {
   window.addEventListener('resize', updateTrayArrows);
   updateTrayArrows();
 }
-
 selectAllTask.onclick = ()=>{ document.querySelectorAll(".task-checkbox").forEach(cb=>cb.checked=true); }
 unSelectAllTask.onclick = ()=>{ document.querySelectorAll(".task-checkbox").forEach(cb=>cb.checked=false); }
 
-/* ================================================================
-   分屏 + 二分频
-   ================================================================ */
+/* 分屏 */
 function syncCompareImages() {
   const leftImg = document.getElementById('compareImgLeft');
   const rightImg = document.getElementById('compareImgRight');
@@ -2633,15 +2641,9 @@ function bindSplitDrag(divider) {
   });
 }
 
-/* ================================================================
-   撤销/重做按钮
-   ================================================================ */
 btnUndo.onclick = undo;
 btnRedo.onclick = redo;
 
-/* ================================================================
-   右上角按钮
-   ================================================================ */
 btnViewCompare.onclick = ()=>{
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   canvasState.compareMode = !canvasState.compareMode;
@@ -2658,7 +2660,6 @@ btnViewCompare.onclick = ()=>{
     showToast('已关闭分屏对比', 'fa-columns');
   }
 }
-
 btnCollect.onclick = ()=>{
   canvasState.collectState = !canvasState.collectState;
   if (canvasState.collectState) {
@@ -2671,7 +2672,6 @@ btnCollect.onclick = ()=>{
     showToast('已取消收藏', 'fa-heart-o');
   }
 }
-
 btnSafeToggle.onclick = ()=>{
   canvasState.safeAreaVisible = !canvasState.safeAreaVisible;
   canvasSettings.safe = canvasState.safeAreaVisible;
@@ -2679,7 +2679,6 @@ btnSafeToggle.onclick = ()=>{
   btnSafeToggle.classList.toggle('active', canvasState.safeAreaVisible);
   const csSafe = $('csSafe'); if (csSafe) csSafe.checked = canvasState.safeAreaVisible;
 }
-
 btnSnapshot.onclick = ()=>{
   if (!canvasState.hasImage || !previewImg.src) {
     showToast('⚠️ 请先上传图片再保存快照', 'fa-exclamation-triangle');
@@ -2689,9 +2688,6 @@ btnSnapshot.onclick = ()=>{
   showToast(`✅ 已保存快照 V${historyState.stack.length}`, 'fa-bookmark');
 };
 
-/* ================================================================
-   右侧垂直按钮
-   ================================================================ */
 toolResetView.onclick = ()=>{
   canvasState.rotation = 0; canvasState.scale = 1;
   canvasState.offsetX = 0; canvasState.offsetY = 0;
@@ -2700,7 +2696,6 @@ toolResetView.onclick = ()=>{
   pushHistory('重置视图');
   showToast('画布视图已重置（含缩放）', 'fa-home');
 }
-
 toolRotate.onclick = ()=>{
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   canvasState.rotation = (canvasState.rotation + 90) % 360;
@@ -2708,17 +2703,8 @@ toolRotate.onclick = ()=>{
   pushHistory(`旋转 ${canvasState.rotation}°`);
   showToast(`旋转至 ${canvasState.rotation}°`, 'fa-repeat');
 }
-
-toolCrop.onclick = () => {
-  if (cropState.active) exitCropMode();
-  else enterCropMode();
-};
-
-toolMask.onclick = () => {
-  if (maskState.active) exitMaskMode();
-  else enterMaskMode();
-};
-
+toolCrop.onclick = () => { if (cropState.active) exitCropMode(); else enterCropMode(); };
+toolMask.onclick = () => { if (maskState.active) exitMaskMode(); else enterMaskMode(); };
 toolLayerDown.onclick = ()=>{
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   canvasState.layerZ = Math.max(-5, canvasState.layerZ - 1);
@@ -2726,7 +2712,6 @@ toolLayerDown.onclick = ()=>{
   pushHistory(`图层下移 z=${canvasState.layerZ}`);
   showToast(`图层下移（z: ${canvasState.layerZ}）`, 'fa-arrow-down');
 }
-
 toolLayerUp.onclick = ()=>{
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   canvasState.layerZ = Math.min(5, canvasState.layerZ + 1);
@@ -2734,7 +2719,6 @@ toolLayerUp.onclick = ()=>{
   pushHistory(`图层上移 z=${canvasState.layerZ}`);
   showToast(`图层上移（z: ${canvasState.layerZ}）`, 'fa-arrow-up');
 }
-
 toolCanvasSetting.onclick = () => {
   const panel = $('canvasSettingsPanel');
   if (!panel) return;
@@ -2832,9 +2816,7 @@ document.addEventListener('click', (e) => {
   closeCanvasSettings();
 });
 
-/* ================================================================
-   裁剪
-   ================================================================ */
+/* 裁剪 */
 const cropState = {
   active: false, x: 0, y: 0, w: 0, h: 0,
   ratio: null, minSize: 30,
@@ -3055,15 +3037,12 @@ function doCrop() {
   exitCropMode();
   showToast(`✅ 已裁切为 ${sw} × ${sh}`, 'fa-crop');
 }
-
-/* ★ 通用：更新画布图片 */
 function updateCanvasImage(dataUrl, label) {
   previewImg.src = dataUrl;
   canvasState.rotation = 0; canvasState.scale = 1;
   canvasState.offsetX = 0; canvasState.offsetY = 0;
   applyCanvasTransform();
   if (canvasState.compareMode) syncCompareImages();
-
   if (activeTaskId) {
     const task = taskDataList.find(t => t.id === activeTaskId);
     if (task) {
@@ -3080,9 +3059,7 @@ function updateCanvasImage(dataUrl, label) {
   updateSnapshotButton();
 }
 
-/* ================================================================
-   局部重绘
-   ================================================================ */
+/* 局部重绘 */
 const maskState = {
   active: false, hasSelection: false,
   x: 0, y: 0, w: 0, h: 0,
@@ -3092,7 +3069,6 @@ const maskState = {
   startMouseX: 0, startMouseY: 0,
   _onMouseDown: null, _onMouseMove: null, _onMouseUp: null
 };
-
 const MASK_PRESETS = [
   { label: '换成青花瓷', prompt: '把这个物体换成青花瓷材质，保持形状和位置不变' },
   { label: '修复瑕疵', prompt: '修复这个区域的瑕疵和破损，保持原有纹理和颜色' },
@@ -3101,7 +3077,6 @@ const MASK_PRESETS = [
   { label: '去水印', prompt: '移除这个区域的水印或文字，恢复自然背景' },
   { label: '去杂物', prompt: '移除这个区域的杂物，用周围纹理自然填充' }
 ];
-
 function enterMaskMode() {
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   if (cropState.active) exitCropMode();
@@ -3149,13 +3124,12 @@ function createMaskCommandBar() {
     }
   });
   canvasStage.appendChild(presets);
-
   const bar = document.createElement('div');
   bar.id = 'maskCommandBar';
   bar.className = 'mask-command-bar show';
   bar.innerHTML = `
     <i class="fa fa-comment-dots text-primary"></i>
-    <input id="maskPrompt" type="text" placeholder="描述要修改的内容，如：把这个杯子换成青花瓷..." autocomplete="off">
+    <input id="maskPrompt" type="text" placeholder="描述要修改的内容..." autocomplete="off">
     <button class="btn-clear" id="maskClearBtn">清除</button>
     <button class="btn-cancel" id="maskCancelBtn">取消</button>
     <button class="btn-apply" id="maskApplyBtn" disabled>
@@ -3163,7 +3137,6 @@ function createMaskCommandBar() {
     </button>
   `;
   canvasStage.appendChild(bar);
-
   $('maskClearBtn').onclick = () => {
     maskState.hasSelection = false;
     maskState.x = 0; maskState.y = 0; maskState.w = 0; maskState.h = 0;
@@ -3218,7 +3191,6 @@ function bindMaskDrag() {
     const dx = e.clientX - maskState.startMouseX;
     const dy = e.clientY - maskState.startMouseY;
     let x = maskState.x, y = maskState.y, w = maskState.w, h = maskState.h;
-
     if (maskState.dragging === 'new') {
       const curX = e.clientX - rect.left;
       const curY = e.clientY - rect.top;
@@ -3393,13 +3365,10 @@ function simulateInpaint(params) {
   });
 }
 
-/* ================================================================
-   AI 编辑面板
-   ================================================================ */
+/* AI 编辑 */
 const aiEditState = {
   currentAction: null, strength: 0.7, ratio: '3:4', keepSubject: true, running: false
 };
-
 const AI_EDIT_PRESETS = {
   regenerate: (name) => `保持${name}主体不变，重新生成一张电商商品图，高清商业摄影，自然光，干净背景`,
   whiteBg: (name) => `将${name}放置于纯白色背景上，主体完整，边缘干净，无阴影，无水印，电商标准白底图`,
@@ -3408,7 +3377,6 @@ const AI_EDIT_PRESETS = {
   styleTransfer: (name, style) => `${name}，${style}风格，商业电商图，高清`,
   outpainting: (name) => `${name}向外扩展画布，保持商品完整性，自然延伸背景`
 };
-
 function syncAiEditPanel() {
   const nameEl = $('aiEditCurrentName');
   const thumbImg = $('aiEditThumbImg');
@@ -3426,7 +3394,6 @@ function syncAiEditPanel() {
   thumbImg.style.display = 'block';
   thumbHint.style.display = 'none';
 }
-
 function selectAiEditAction(action) {
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
   aiEditState.currentAction = action;
@@ -3449,7 +3416,6 @@ function selectAiEditAction(action) {
   $('aiEditAdvanced').open = true;
   $('aiEditApplyBtn').disabled = false;
 }
-
 async function applyAiEdit() {
   if (aiEditState.running) return;
   if (!canvasState.hasImage) return;
@@ -3496,14 +3462,12 @@ async function applyAiEdit() {
     setTimeout(() => { progressWrap.classList.add('hidden'); progressBar.style.width = '0%'; }, 800);
   }
 }
-
 function getActionLabel(action) {
   return {
     regenerate: '重生成', whiteBg: '白底抠图', replaceBg: '替换背景',
     addText: '添加卖点', styleTransfer: '换风格', outpainting: '扩图', genCopy: '生成文案'
   }[action] || action;
 }
-
 async function callAiEditApi(params) {
   try {
     const res = await fetch(BACKEND_URL + '/api/ai/edit-image', {
@@ -3521,7 +3485,6 @@ async function callAiEditApi(params) {
     return await simulateAiEdit(params);
   }
 }
-
 function simulateAiEdit(params) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -3548,7 +3511,6 @@ function simulateAiEdit(params) {
     img.src = params.referenceImage;
   });
 }
-
 function bindAiEdit() {
   document.querySelectorAll('.ai-edit-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -3581,9 +3543,7 @@ function bindAiEdit() {
   $('aiEditApplyBtn').addEventListener('click', applyAiEdit);
 }
 
-/* ================================================================
-   合规检测
-   ================================================================ */
+/* 合规检测 */
 singleCheckBtn.onclick = function(){
   checkResultPanel.classList.remove('hidden');
   const mockOcr = "优质，全网最好，性价比高";
@@ -3603,9 +3563,7 @@ singleCheckBtn.onclick = function(){
     checkSuggest.innerText = "文字合规，可直接上架";
   }
 }
-
 batchCheckBtn.onclick = function(){ showToast(`开始批量检测 ${taskDataList.length} 张图片`, 'fa-shield'); }
-
 batchZipBtn.onclick = async function(){
   if(taskDataList.length ===0){ showToast('任务队列为空'); return; }
   const zip = new JSZip();
@@ -3618,16 +3576,11 @@ batchZipBtn.onclick = async function(){
   saveAs(blob, `素材包_${platformNameText}.zip`);
   showToast('ZIP 打包完成', 'fa-download');
 }
-
 versionSaveBtn.onclick = function(){
-  if (!canvasState.hasImage) {
-    showToast('⚠️ 请先上传图片', 'fa-exclamation-triangle');
-    return;
-  }
+  if (!canvasState.hasImage) { showToast('⚠️ 请先上传图片', 'fa-exclamation-triangle'); return; }
   pushHistory('手动保存版本');
   showToast(`已保存 V${historyState.stack.length}`, 'fa-history');
 }
-
 genCopyBtn.onclick = function(){
   copyPanel.classList.remove('hidden');
   if(currentMode === "domestic"){
@@ -3643,16 +3596,13 @@ genCopyBtn.onclick = function(){
   publishSkuCode.value = "SKU00128";
   showToast('多语言文案已生成', 'fa-comment');
 }
-
 copyClipBtn.onclick = async function(){
   const text = `中文：${zhCopy.innerText}\nEN：${enCopy.innerText}\nES：${esCopy.innerText}`;
   await navigator.clipboard.writeText(text);
   showToast('文案复制成功', 'fa-copy');
 }
-
 openVideoPanelBtn.onclick = ()=>{ videoGenPanel.classList.remove('hidden'); }
 closeVideoPanelBtn.onclick = ()=>{ videoGenPanel.classList.add('hidden'); }
-
 startBatchVideoGenBtn.onclick = async function(){
   const checkedBoxes = Array.from(document.querySelectorAll(".task-checkbox:checked"));
   if(checkedBoxes.length === 0){ showToast('请勾选至少一张图片'); return; }
@@ -3691,10 +3641,8 @@ startBatchVideoGenBtn.onclick = async function(){
   }
   showToast('全部短视频生成完成', 'fa-film');
 }
-
 publishOpenBtn.onclick = ()=>{ publishPanel.classList.remove('hidden'); }
 closePublishPanelBtn.onclick = ()=>{ publishPanel.classList.add('hidden'); }
-
 startPublishBtn.onclick = async function(){
   const checkedBoxes = Array.from(document.querySelectorAll(".task-checkbox:checked"));
   if(checkedBoxes.length ===0){ showToast('请勾选素材'); return; }
@@ -3736,23 +3684,15 @@ startPublishBtn.onclick = async function(){
   publishLog.innerText += `${new Date().toLocaleTimeString()} ✅ 全部发布完毕\n`;
   showToast('批量素材投递完成', 'fa-rocket');
 }
-
 $('openMaskBtn').onclick = () => {
   if (maskState.active) exitMaskMode();
   else enterMaskMode();
 };
 
-/* ================================================================
-   键盘快捷键
-   ================================================================ */
 document.addEventListener('keydown', (e) => {
   const tag = document.activeElement?.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-
-  // 全屏模式下不响应画布快捷键
   if (fsState.active) return;
-
-  // F 进入全屏
   if (e.key === 'f' || e.key === 'F') {
     if (canvasState.hasImage && !maskState.active && !cropState.active) {
       e.preventDefault();
@@ -3760,7 +3700,6 @@ document.addEventListener('keydown', (e) => {
     }
     return;
   }
-
   if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
     e.preventDefault();
     undo();
@@ -3770,9 +3709,6 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-/* ================================================================
-   初始化
-   ================================================================ */
 platformSelect.dispatchEvent(new Event('change'));
 bindCanvasSettings();
 bindAiEdit();
