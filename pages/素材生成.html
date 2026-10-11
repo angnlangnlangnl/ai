@@ -83,7 +83,6 @@
       will-change: transform;
     }
     .canvas-stage img.preview.fading { opacity: 0.35; }
-    /* ★ 拖拽平移时禁用过渡 */
     .canvas-stage img.preview.panning,
     .canvas-stage img.preview.zooming {
       transition: none;
@@ -120,7 +119,6 @@
       background: rgba(34,211,238,0.4);
       box-shadow: 33.33% 0 0 0 rgba(34,211,238,0.4);
     }
-    /* ★ 空格按住时光标变手 */
     .canvas-stage.pan-cursor { cursor: grab; }
     .canvas-stage.pan-cursor.active-pan { cursor: grabbing; }
 
@@ -487,7 +485,7 @@
     }
     .canvas-coord.show { display: block; }
 
-    /* ============ ★ 缩放指示器 ============ */
+    /* ============ ★ 缩放指示器（画布内右下角，保留） ============ */
     .zoom-indicator {
       position: absolute;
       bottom: 8px;
@@ -513,23 +511,24 @@
       box-shadow: 0 0 12px rgba(34,211,238,0.5);
     }
 
-    /* ============ ★ 画布底部缩放控制条 ============ */
-    .zoom-control-bar {
-      position: absolute;
-      bottom: 8px;
-      left: 8px;
-      background: rgba(17,24,39,0.95);
-      border: 1px solid #374151;
-      border-radius: 8px;
-      padding: 4px;
+    /* ============ ★ 缩放控制条（外部顶部） ============ */
+    .zoom-control-bar-external {
       display: flex;
       align-items: center;
       gap: 2px;
-      z-index: 26;
+      background: rgba(31, 41, 55, 0.8);
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 3px;
       user-select: none;
       backdrop-filter: blur(4px);
+      transition: all 0.2s;
     }
-    .zoom-control-bar button {
+    .zoom-control-bar-external:hover {
+      border-color: #4F46E5;
+      background: rgba(31, 41, 55, 0.95);
+    }
+    .zoom-control-bar-external button {
       width: 26px; height: 26px;
       border-radius: 6px;
       border: none;
@@ -543,30 +542,34 @@
       justify-content: center;
       transition: 0.15s;
     }
-    .zoom-control-bar button:hover {
-      background: rgba(79,70,229,0.25);
+    .zoom-control-bar-external button:hover {
+      background: rgba(79,70,229,0.3);
       color: #fff;
     }
-    .zoom-control-bar .zoom-value {
-      padding: 0 8px;
+    .zoom-control-bar-external .zoom-value {
+      padding: 0 10px;
       font-size: 11px;
       color: #d1d5db;
       font-family: ui-monospace, monospace;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 6px;
       line-height: 26px;
-      min-width: 44px;
+      min-width: 52px;
       text-align: center;
       transition: 0.15s;
     }
-    .zoom-control-bar .zoom-value:hover {
+    .zoom-control-bar-external .zoom-value:hover {
       background: rgba(79,70,229,0.2);
       color: #fff;
     }
-    .zoom-control-bar .zoom-fit-btn {
-      font-size: 10px;
-      padding: 0 8px;
+    .zoom-control-bar-external .zoom-fit-btn {
       width: auto;
+      padding: 0 10px;
+      font-size: 11px;
+      gap: 4px;
+    }
+    .zoom-control-bar-external .zoom-fit-btn i {
+      font-size: 10px;
     }
 
     /* ============ 任务队列 ============ */
@@ -764,7 +767,6 @@
       margin-left: 4px;
     }
 
-    /* 右侧 Tab */
     .aside-tab {
       flex: 1;
       padding: 12px 8px;
@@ -867,7 +869,6 @@
         <div id="toolMask" class="canvas-tool-icon" title="局部重绘（框选+AI修改）">
           <i class="fa fa-magic"></i>
         </div>
-        <!-- ★ 缩放按钮 -->
         <div id="toolZoomIn" class="canvas-tool-icon" title="放大 (Ctrl +)">
           <i class="fa fa-plus"></i>
         </div>
@@ -953,8 +954,23 @@
         </select>
       </div>
 
-      <div class="px-4 pb-3 shrink-0">
+      <!-- ★ 平台名标签 + 缩放控制条（同一行） -->
+      <div class="px-4 pb-3 shrink-0 flex items-center justify-between gap-3 flex-wrap">
         <span id="platformName" class="text-sm px-3 py-1 rounded bg-primary/25 text-primary font-medium">当前：抖音电商</span>
+
+        <!-- ★ 缩放控制条（外部顶部） -->
+        <div id="zoomControlBar" class="zoom-control-bar-external" style="display:none;">
+          <button id="zoomOutBtn" title="缩小 (Ctrl -)">
+            <i class="fa fa-minus"></i>
+          </button>
+          <div id="zoomValueBtn" class="zoom-value" title="点击重置 100%">100%</div>
+          <button id="zoomInBtn" title="放大 (Ctrl +)">
+            <i class="fa fa-plus"></i>
+          </button>
+          <button id="zoomFitBtn" class="zoom-fit-btn" title="适应窗口">
+            <i class="fa fa-expand"></i> 适应
+          </button>
+        </div>
       </div>
 
       <!-- 画布 -->
@@ -969,16 +985,8 @@
           </div>
           <div id="canvasCoord" class="canvas-coord">0, 0</div>
 
-          <!-- ★ 缩放指示器（右下角） -->
+          <!-- 缩放指示器（画布内右下角保留，缩放时高亮） -->
           <div id="zoomIndicator" class="zoom-indicator">100%</div>
-
-          <!-- ★ 画布底部缩放控制条（左下角） -->
-          <div id="zoomControlBar" class="zoom-control-bar" style="display:none;">
-            <button id="zoomOutBtn" title="缩小"><i class="fa fa-minus"></i></button>
-            <div id="zoomValueBtn" class="zoom-value" title="点击重置 100%">100%</div>
-            <button id="zoomInBtn" title="放大"><i class="fa fa-plus"></i></button>
-            <button id="zoomFitBtn" class="zoom-fit-btn" title="适应窗口">适应</button>
-          </div>
         </div>
       </div>
 
@@ -1384,6 +1392,7 @@ const tabAiEdit = $('tabAiEdit');
 const panelPlatform = $('panelPlatform');
 const panelAiEdit = $('panelAiEdit');
 
+/* ★ 缩放相关（画布内指示器 + 外部控制条） */
 const zoomIndicator = $('zoomIndicator');
 const zoomControlBar = $('zoomControlBar');
 const zoomValueBtn = $('zoomValueBtn');
@@ -1408,21 +1417,17 @@ const canvasSettings = {
 };
 
 /* ================================================================
-   ★ 缩放 / 平移 状态与逻辑
+   缩放 / 平移 状态与逻辑
    ================================================================ */
 const zoomState = {
-  MIN: 0.1,           // 最小 10%
-  MAX: 5,             // 最大 500%
+  MIN: 0.1, MAX: 5,
   isPanning: false,
   spacePressed: false,
-  panStartX: 0,
-  panStartY: 0,
-  panStartOffsetX: 0,
-  panStartOffsetY: 0,
+  panStartX: 0, panStartY: 0,
+  panStartOffsetX: 0, panStartOffsetY: 0,
   lastTouchDist: 0
 };
 
-/* 应用变换（scale + translate + rotate） */
 function applyCanvasTransform() {
   const t = `translate(${canvasState.offsetX}px, ${canvasState.offsetY}px) rotate(${canvasState.rotation}deg) scale(${canvasState.scale})`;
   previewImg.style.transform = t;
@@ -1431,7 +1436,6 @@ function applyCanvasTransform() {
   });
 }
 
-/* ★ 以鼠标为中心缩放 */
 function zoomAt(clientX, clientY, factor) {
   if (!canvasState.hasImage) return;
   const rect = canvasStage.getBoundingClientRect();
@@ -1448,7 +1452,6 @@ function zoomAt(clientX, clientY, factor) {
   canvasState.offsetY = my - (my - canvasState.offsetY) * ratio;
   canvasState.scale = newScale;
 
-  // 缩放时短暂禁用 transition，避免拖沓
   previewImg.classList.add('zooming');
   applyCanvasTransform();
   clearTimeout(zoomState._zoomTimer);
@@ -1457,7 +1460,6 @@ function zoomAt(clientX, clientY, factor) {
   updateZoomUI();
 }
 
-/* ★ 重置缩放（回到 100% 居中） */
 function resetZoom() {
   canvasState.scale = 1;
   canvasState.offsetX = 0;
@@ -1466,9 +1468,25 @@ function resetZoom() {
   updateZoomUI();
 }
 
-/* ★ 更新缩放 UI（右下角指示器 + 左下角控制条） */
+/* ★ 更新缩放 UI（外部控制条 + 画布内指示器） */
 function updateZoomUI(highlight) {
   const pct = Math.round(canvasState.scale * 100);
+
+  // 外部顶部控制条
+  if (zoomValueBtn) {
+    zoomValueBtn.textContent = pct + '%';
+    if (highlight !== false) {
+      zoomValueBtn.style.background = 'rgba(34,211,238,0.2)';
+      zoomValueBtn.style.color = '#22d3ee';
+      clearTimeout(zoomValueBtn._timer);
+      zoomValueBtn._timer = setTimeout(() => {
+        zoomValueBtn.style.background = '';
+        zoomValueBtn.style.color = '';
+      }, 600);
+    }
+  }
+
+  // 画布内右下角指示器
   if (zoomIndicator) {
     zoomIndicator.textContent = pct + '%';
     zoomIndicator.classList.add('show');
@@ -1480,34 +1498,30 @@ function updateZoomUI(highlight) {
       }, 600);
     }
   }
-  if (zoomValueBtn) zoomValueBtn.textContent = pct + '%';
 }
 
-/* ★ 显示/隐藏缩放控制条 */
 function updateZoomBarVisibility() {
   if (!zoomControlBar) return;
   zoomControlBar.style.display = canvasState.hasImage ? 'flex' : 'none';
 }
 
 /* ================================================================
-   ★ 鼠标滚轮缩放
+   鼠标滚轮缩放
    ================================================================ */
 canvasStage.addEventListener('wheel', (e) => {
   if (!canvasState.hasImage) return;
-  if (maskState.active || cropState.active) return;  // 编辑模式下不缩放
+  if (maskState.active || cropState.active) return;
   e.preventDefault();
-  // Ctrl 精细缩放，普通滚轮 10%
   const baseFactor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
   const factor = e.ctrlKey ? (e.deltaY < 0 ? 1.03 : 1 / 1.03) : baseFactor;
   zoomAt(e.clientX, e.clientY, factor);
 }, { passive: false });
 
 /* ================================================================
-   ★ 空格 + 拖拽 / 中键拖拽 平移
+   空格 + 拖拽 / 中键拖拽 平移
    ================================================================ */
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space' && !zoomState.spacePressed && canvasState.hasImage) {
-    // 输入框内不触发
     const tag = document.activeElement?.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA') return;
     zoomState.spacePressed = true;
@@ -1552,27 +1566,17 @@ document.addEventListener('mouseup', () => {
 });
 
 /* ================================================================
-   ★ 双击 100% / 适应窗口 切换
+   双击 100% / 适应窗口 切换
    ================================================================ */
 canvasStage.addEventListener('dblclick', (e) => {
   if (!canvasState.hasImage) return;
   if (maskState.active || cropState.active) return;
-  const isDefault = Math.abs(canvasState.scale - 1) < 0.01
-                    && Math.abs(canvasState.offsetX) < 1
-                    && Math.abs(canvasState.offsetY) < 1;
-  if (isDefault) {
-    // 已经是默认 → 适应窗口（相当于重置）
-    resetZoom();
-    showToast('已重置到 100% 居中', 'fa-search');
-  } else {
-    // 其他 → 回到 100% 居中
-    resetZoom();
-    showToast('已重置到 100% 居中', 'fa-search');
-  }
+  resetZoom();
+  showToast('已重置到 100% 居中', 'fa-search');
 });
 
 /* ================================================================
-   ★ 触摸双指捏合
+   触摸双指捏合
    ================================================================ */
 canvasStage.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2 && canvasState.hasImage) {
@@ -1599,7 +1603,7 @@ canvasStage.addEventListener('touchend', () => {
 });
 
 /* ================================================================
-   ★ 缩放按钮（右侧 + 左下角控制条）
+   ★ 缩放按钮（右侧 + 外部控制条）
    ================================================================ */
 toolZoomIn.onclick = () => {
   if (!canvasState.hasImage) { showToast('请先上传图片'); return; }
@@ -1624,7 +1628,7 @@ zoomValueBtn.onclick = () => {
 };
 
 /* ================================================================
-   ★ Ctrl + / - / 0 快捷键
+   Ctrl + / - / 0 快捷键
    ================================================================ */
 document.addEventListener('keydown', (e) => {
   const tag = document.activeElement?.tagName;
@@ -3283,7 +3287,7 @@ $('openMaskBtn').onclick = () => {
 };
 
 /* ================================================================
-   键盘快捷键（撤销/重做）
+   键盘快捷键
    ================================================================ */
 document.addEventListener('keydown', (e) => {
   const tag = document.activeElement?.tagName;
