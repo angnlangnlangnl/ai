@@ -2192,7 +2192,6 @@
 </div>
 
 <div id="toast" class="toast"></div>
-
 <script>
     // ================================================================
     // 常量
@@ -2710,7 +2709,6 @@
     // ================================================================
         function handleFileUpload(event) {
         const files = event.target.files;
-        const preview = document.getElementById('uploadPreview');
         const hint = document.getElementById('uploadHint');
         if (!files || files.length === 0) return;
         const MAX_SIZE = 4 * 1024 * 1024;
@@ -3341,6 +3339,7 @@
 
     // ================================================================
     // Agnes 图片 / 视频生成（走后端代理）
+    // ⭐ 改动 1：generateAgnesImage 返回 {url, dataUrl} 对象
     // ================================================================
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const body = {
@@ -3366,13 +3365,14 @@
 
         const data = await res.json();
         if (data.success && data.url) {
-            console.log('✅ [图] 生成成功:', data.url);
-            return data.url;
+            console.log('✅ [图] 生成成功:', data.url, data.data_url ? '(含 base64 兜底)' : '');
+            return { url: data.url, dataUrl: data.data_url || '' };   // ⭐ 改动
         }
         console.error('❌ [图] 后端返回错误:', data);
         throw new Error(data.message || '图片生成失败');
     }
 
+    // ⭐ 改动 2：generateAgnesVideo 返回 {url, dataUrl} 对象
     async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', quality = '720P', onProgress) {
         console.log('📤 [视频] 调用后端代理:', prompt.slice(0, 60) + '...', 'ratio:', aspectRatio, 'quality:', quality);
 
@@ -3401,8 +3401,8 @@
 
         const data = await res.json();
         if (data.success && data.url) {
-            console.log('✅ [视频] 生成成功:', data.url);
-            return data.url;
+            console.log('✅ [视频] 生成成功:', data.url, data.data_url ? '(含 base64 兜底)' : '');
+            return { url: data.url, dataUrl: data.data_url || '' };   // ⭐ 改动
         }
         console.error('❌ [视频] 后端返回错误:', data);
         throw new Error(data.message || '视频生成失败');
@@ -3410,6 +3410,7 @@
 
     // ================================================================
     // 开始生成
+    // ⭐ 改动 3：三处用 res.dataUrl || res.url
     // ================================================================
     async function startGenerate() {
         if (state.isGenerating) { showToast('⏳ 正在生成中...'); return; }
@@ -3467,15 +3468,19 @@
 
                 for (let i = 0; i < prompts.length; i++) {
                     try {
-                        const url = await generateAgnesImage(prompts[i], '1K', imageRatio, refImages);
+                        const res = await generateAgnesImage(prompts[i], '1K', imageRatio, refImages);   // ⭐ 改动
+                        const finalUrl = res.dataUrl || res.url;                                        // ⭐ 优先 base64
                         images.push({
-                            url, style,
+                            url: finalUrl,
+                            remoteUrl: res.url,                                                         // ⭐ 保留远程 URL 备用
+                            style,
                             score: 90 + Math.floor(Math.random() * 10),
                             ctr: (3 + Math.random() * 3).toFixed(1),
                             prompt: prompts[i],
                             tag: getMainTag(i, state.imageCount)
                         });
                         successCount++;
+                        console.log(`📦 第 ${i+1} 张已存 ${res.dataUrl ? 'base64' : '远程 URL'}`);
                     } catch (imgErr) {
                         console.error(`❌ 第 ${i+1} 张主副图失败:`, imgErr);
                         images.push({
@@ -3512,8 +3517,14 @@
                 for (let i = 0; i < state.detailPrompts.length; i++) {
                     const d = state.detailPrompts[i];
                     try {
-                        const url = await generateAgnesImage(d.prompt, '1K', detailRatio, refImages);
-                        detailImages.push({ url, step: d.step, moduleName: d.moduleName, prompt: d.prompt });
+                        const res = await generateAgnesImage(d.prompt, '1K', detailRatio, refImages);   // ⭐ 改动
+                        detailImages.push({
+                            url: res.dataUrl || res.url,                                                // ⭐ 优先 base64
+                            remoteUrl: res.url,
+                            step: d.step,
+                            moduleName: d.moduleName,
+                            prompt: d.prompt
+                        });
                         dSuccess++;
                     } catch (err) {
                         console.error(`❌ 详情页第 ${i+1} 屏失败:`, err);
@@ -3555,10 +3566,12 @@
                 updateProgress(78, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
                 try {
                     const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
-                    videoUrl = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, '720P', (attempt, total, status, text) => {
+                    const videoRes = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, '720P', (attempt, total, status, text) => {   // ⭐ 改动
                         const pct = 78 + Math.min(20, (attempt / total) * 20);
                         updateProgress(pct, '视频：' + text);
                     });
+                    videoUrl = videoRes.dataUrl || videoRes.url;   // ⭐ 优先 base64
+                    state.videoRemoteUrl = videoRes.url;            // ⭐ 保留远程 URL 备用
                     updateProgress(98, '视频生成完成');
                 } catch (vidErr) {
                     console.error('❌ 视频生成失败:', vidErr);
@@ -3690,7 +3703,8 @@
                 <div class="image-item">
                     <div class="preview">
                         ${img.url
-                            ? `<img src="${img.url}" alt="${typeName}${i+1}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            ? `<img src="${img.url}" alt="${typeName}${i+1}"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.innerHTML='<i class=\\'fas fa-exclamation-triangle\\' style=\\'color:#b51a3f;font-size:24px;\\'></i><div style=\\'font-size:11px;color:#b51a3f;margin-top:4px;\\'>图片已失效</div>';">
                                <div class="placeholder-icon" style="display:none;"><i class="fas fa-image"></i></div>`
                             : `<div class="placeholder-icon" style="color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i></div>`
                         }
@@ -3765,10 +3779,11 @@
         const style = document.getElementById('designStyle').value;
 
         try {
-            const url = await generateAgnesImage(newPrompt, '1K', imageRatio, refImages);
+            const res = await generateAgnesImage(newPrompt, '1K', imageRatio, refImages);
             r.images[editImgIndex] = {
                 ...r.images[editImgIndex],
-                url,
+                url: res.dataUrl || res.url,   // ⭐ 优先 base64
+                remoteUrl: res.url,
                 prompt: newPrompt,
                 error: null,
                 style
@@ -3820,11 +3835,12 @@
 
         try {
             // ★ 关键：参考源 = 当前这张图的 URL（不是 state.referenceImages）
-            const url = await generateAgnesImage(newPrompt, '1K', imageRatio, [img.url]);
+            const res = await generateAgnesImage(newPrompt, '1K', imageRatio, [img.remoteUrl || img.url]);
 
             r.images[editImgIndex] = {
                 ...r.images[editImgIndex],
-                url,
+                url: res.dataUrl || res.url,   // ⭐ 优先 base64
+                remoteUrl: res.url,
                 prompt: newPrompt,
                 error: null,
                 style
@@ -3943,8 +3959,9 @@
         const refImages = state.referenceImages.slice();
 
         try {
-            const url = await generateAgnesImage(newPrompt, '1K', '3:4', refImages);
-            d.url = url;
+            const res = await generateAgnesImage(newPrompt, '1K', '3:4', refImages);
+            d.url = res.dataUrl || res.url;   // ⭐ 优先 base64
+            d.remoteUrl = res.url;
             d.error = null;
 
                         renderDetailSplit(r.detailImages);
@@ -4053,17 +4070,18 @@
         const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
 
         try {
-            const videoUrl = await generateAgnesVideo(
+            const videoRes = await generateAgnesVideo(
                 newPrompt,
                 seconds,
                 combinedRefs,
                 videoEditState.ratio,
                 videoEditState.quality
             );
-                        r.videoUrl = videoUrl;
+                        r.videoUrl = videoRes.dataUrl || videoRes.url;   // ⭐ 优先 base64
+            r.videoRemoteUrl = videoRes.url;
             saveGenSessionToBackend();
             document.getElementById('cnt-video').textContent = '1';
-            container.innerHTML = `<video src="${videoUrl}" controls preload="metadata"></video>`;
+            container.innerHTML = `<video src="${r.videoUrl}" controls preload="metadata"></video>`;
             showToast('✅ 视频已重新生成');
         } catch (err) {
             console.error('❌ 视频重生成失败:', err);
@@ -4100,7 +4118,7 @@
 
         try {
             // ① 下载当前视频 → 抽 3 帧（复用现有函数）
-            const resp = await fetch(r.videoUrl);
+            const resp = await fetch(r.videoRemoteUrl || r.videoUrl);
             if (!resp.ok) throw new Error(`下载当前视频失败：HTTP ${resp.status}`);
             const blob = await resp.blob();
             const file = new File([blob], 'current_video.mp4', { type: blob.type || 'video/mp4' });
@@ -4116,7 +4134,7 @@
             const seconds = String(cfg?.duration || 5);
 
             showToast('⏳ 正在基于当前视频修复（排队中，最长 10 分钟）...');
-            const videoUrl = await generateAgnesVideo(
+            const videoRes = await generateAgnesVideo(
                 newPrompt,
                 seconds,
                 frameUrls,                 // ← 参考源 = 当前视频的帧
@@ -4124,10 +4142,11 @@
                 videoEditState.quality
             );
 
-                        r.videoUrl = videoUrl;
+                        r.videoUrl = videoRes.dataUrl || videoRes.url;   // ⭐ 优先 base64
+            r.videoRemoteUrl = videoRes.url;
             saveGenSessionToBackend();
             document.getElementById('cnt-video').textContent = '1';
-            container.innerHTML = `<video src="${videoUrl}" controls preload="metadata"></video>`;
+            container.innerHTML = `<video src="${r.videoUrl}" controls preload="metadata"></video>`;
             showToast('✅ 视频已修复');
         } catch (err) {
             console.error('❌ 视频修复失败:', err);
@@ -4154,8 +4173,8 @@
 
         showToast(`⏳ 正在重试第 ${idx + 1} 张...`);
         try {
-            const url = await generateAgnesImage(r.images[idx].prompt, '1K', imageRatio, refImages);
-            r.images[idx] = { ...r.images[idx], url, error: null };
+            const res = await generateAgnesImage(r.images[idx].prompt, '1K', imageRatio, refImages);
+            r.images[idx] = { ...r.images[idx], url: res.dataUrl || res.url, remoteUrl: res.url, error: null };   // ⭐ 优先 base64
             const pName = r.productName || '商品';
             if (state.selectedTypes.includes('images')) {
                 renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
@@ -4436,18 +4455,18 @@
         const payload = { product_names: syncState.selectedProducts.slice(), mode: syncState.mode };
         if (wantMain) {
             const firstValid = (r.images || []).find(x => x.url);
-            if (firstValid) payload.main_image = firstValid.url;
+            if (firstValid) payload.main_image = firstValid.remoteUrl || firstValid.url;   // ⭐ 优先远程 URL（同步到商品库用）
         }
         if (wantSub) {
             const allValidIdx = (r.images || []).map((_, i) => i).filter(i => r.images[i].url);
             const idxs = syncState.selectedSubIndexes.length ? syncState.selectedSubIndexes.filter(i => r.images[i] && r.images[i].url) : allValidIdx;
-            payload.sub_images = idxs.map(i => r.images[i].url).filter(Boolean);
+            payload.sub_images = idxs.map(i => r.images[i].remoteUrl || r.images[i].url).filter(Boolean);   // ⭐ 优先远程 URL
         }
         if (wantDetail && r.detailImages) {
             rebuildDetailHTML();
             payload.detail_html = r.detailHTML;
         }
-        if (wantVideo && r.videoUrl) payload.video = r.videoUrl;
+        if (wantVideo && r.videoUrl) payload.video = r.videoRemoteUrl || r.videoUrl;   // ⭐ 优先远程 URL
         if (!payload.main_image && !payload.sub_images && !payload.detail_html && !payload.video) {
             showToast('⚠️ 请至少勾选一种有效素材');
             return;
@@ -4605,14 +4624,17 @@
                 detail_prompts: state.detailPrompts.map(x => ({ ...x })),
                 video_prompts: state.videoPrompts.map(x => ({ ...x })),
                 images: (d.images || []).map(x => ({
-                    url: x.url, style: x.style, score: x.score, ctr: x.ctr,
+                    // ★ 会话保存只存远程 URL，避免 base64 体积过大
+                    url: x.remoteUrl || (x.url && x.url.startsWith('data:') ? '' : x.url),
+                    style: x.style, score: x.score, ctr: x.ctr,
                     prompt: x.prompt, tag: x.tag, error: x.error
                 })),
                 copy_versions: d.copyVersions || [],
                 detail_images: (d.detailImages || []).map(x => ({
-                    url: x.url, step: x.step, moduleName: x.moduleName, prompt: x.prompt, error: x.error
+                    url: x.remoteUrl || (x.url && x.url.startsWith('data:') ? '' : x.url),
+                    step: x.step, moduleName: x.moduleName, prompt: x.prompt, error: x.error
                 })),
-                video_url: d.videoUrl || '',
+                video_url: d.videoRemoteUrl || (d.videoUrl && d.videoUrl.startsWith('data:') ? '' : d.videoUrl) || '',
                 image_ratio: d.imageRatio || '1:1',
                 video_ratio: d.videoRatio || '9:16',
                 platforms: d.platforms || [],
@@ -4780,6 +4802,7 @@
 
         console.log('🎨 智能素材生成已就绪（主副图编辑弹窗 + 详情页左右分栏 + 视频左右分栏）');
         console.log('💡 后端:', BACKEND_URL);
+        console.log('💾 base64 兜底已启用：生成后优先存 base64，会话保存只存远程 URL');
     });
 
     // 全局暴露
@@ -4841,12 +4864,13 @@
     window.openEditImgModal = openEditImgModal;
     window.closeEditImgModal = closeEditImgModal;
     window.regenerateSingleImage = regenerateSingleImage;
+    window.repairSingleImage = repairSingleImage;
     window.selectDetailScreen = selectDetailScreen;
     window.regenerateDetailScreen = regenerateDetailScreen;
     window.selectVideoRatio = selectVideoRatio;
     window.selectVideoQuality = selectVideoQuality;
     window.regenerateVideo = regenerateVideo;
-    window.repairVideo = repairVideo;                  // ← 新增
+    window.repairVideo = repairVideo;
     // ★ 方案 C 暴露
     window.saveGenSessionToBackend = saveGenSessionToBackend;
     window.loadGenSessionFromBackend = loadGenSessionFromBackend;
