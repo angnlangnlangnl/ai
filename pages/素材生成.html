@@ -536,6 +536,118 @@
         .platform-tag.highlight::after { content: '★'; font-size: 9px; color: var(--accent); margin-left: 2px; }
         .platform-tag.highlight.active::after { color: #fff; }
 
+                /* ★ 参考图/参考视频：左右分栏 */
+        .ref-media-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: stretch;
+            min-height: 120px;
+        }
+        .ref-media-split .ref-left {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fafcfe;
+            padding: 8px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+        .ref-media-split .ref-left .ref-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-3);
+            font-size: 12px;
+            gap: 6px;
+            min-height: 100px;
+        }
+        .ref-media-split .ref-left .ref-empty i {
+            font-size: 22px;
+            color: #c8d4e0;
+        }
+        .ref-media-split .ref-left .ref-thumbs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 100%;
+        }
+        .ref-media-split .ref-left .ref-thumbs .ref-thumb {
+            position: relative;
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: white;
+        }
+        .ref-media-split .ref-left .ref-thumbs .ref-thumb img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .ref-media-split .ref-left .ref-thumbs .ref-thumb .ref-idx {
+            position: absolute;
+            bottom: 2px; right: 2px;
+            background: rgba(10,30,47,0.75);
+            color: white; font-size: 9px;
+            padding: 0 5px; border-radius: 6px;
+        }
+        .ref-media-split .ref-left .ref-video-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .ref-media-split .ref-left .ref-video-wrap .ref-video-box {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #0a0e14;
+        }
+        .ref-media-split .ref-left .ref-video-wrap .ref-video-box video {
+            width: 100%; display: block;
+            max-height: 140px;
+            object-fit: cover;
+        }
+        .ref-media-split .ref-left .ref-video-wrap .ref-video-box .ref-video-remove {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: rgba(181,26,63,0.9);
+            color: white;
+            border: 2px solid white;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0;
+            font-family: inherit;
+        }
+        .ref-media-split .ref-left .ref-video-wrap .ref-video-meta {
+            font-size: 11px;
+            color: var(--text-2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .ref-media-split .ref-left .ref-video-wrap .ref-video-meta .kf-badge {
+            background: var(--success);
+            color: white;
+            padding: 1px 7px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .ref-media-split .ref-right {
+            display: flex;
+        }
+        @media (max-width: 768px) {
+            .ref-media-split { grid-template-columns: 1fr; }
+            .ref-media-split .ref-left { min-height: 100px; }
+        }
+        
         .upload-zone {
             border: 2px dashed var(--border); border-radius: 10px; padding: 16px;
             text-align: center; color: var(--text-3); transition: 0.15s; cursor: pointer;
@@ -1503,36 +1615,61 @@
             <div class="advanced-body" id="advancedBody">
 
                 <div class="form-row ref-media-row">
-                    <div class="card" style="margin-bottom:16px;">
+                                        <div class="card" style="margin-bottom:16px;">
                         <div class="card-header">
                             <h3><i class="fas fa-cloud-upload-alt"></i> 参考图（可选）</h3>
                         </div>
-                        <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <div class="hint">点击上传 3-5 张参考图</div>
-                            <div class="sub">AI 将参考图风格生成图片/视频（≤4MB/张，最多 5 张）</div>
-                            <input type="file" id="fileUpload" multiple accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
+                        <div class="ref-media-split">
+                            <!-- 左：已上传的图 -->
+                            <div class="ref-left">
+                                <div id="uploadPreview">
+                                    <div class="ref-empty">
+                                        <i class="fas fa-image"></i>
+                                        <span>暂无参考图</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 右：上传触发区 -->
+                            <div class="ref-right">
+                                <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <div class="hint">点击上传 3-5 张参考图</div>
+                                    <div class="sub">AI 将参考图风格生成图片/视频（≤4MB/张，最多 5 张）</div>
+                                    <input type="file" id="fileUpload" multiple accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
+                                </div>
+                            </div>
                         </div>
-                        <div id="uploadPreview" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;"></div>
                         <div id="uploadHint" style="font-size:11px; color:var(--text-3); margin-top:6px; display:none;"></div>
                     </div>
 
-                    <div class="card" style="margin-bottom:16px;">
+                                        <div class="card" style="margin-bottom:16px;">
                         <div class="card-header">
                             <h3><i class="fas fa-video"></i> 参考视频（可选）</h3>
                             <span class="action" onclick="clearReferenceVideo()" id="clearVideoBtn" style="display:none;">清空</span>
                         </div>
-                        <div class="upload-zone" onclick="document.getElementById('videoUpload').click()" id="videoUploadZone">
-                            <i class="fas fa-video"></i>
-                            <div class="hint">点击上传参考视频（≤20MB）</div>
-                            <div class="sub">AI 将自动抽帧 + 反解画面与运镜 + 生成同款</div>
-                            <input type="file" id="videoUpload" accept="video/mp4,video/webm,video/quicktime" style="display:none;" onchange="handleVideoUpload(event)">
+                        <div class="ref-media-split">
+                            <!-- 左：已上传的视频 -->
+                            <div class="ref-left">
+                                <div id="refVideoChips">
+                                    <div class="ref-empty">
+                                        <i class="fas fa-video"></i>
+                                        <span>暂无参考视频</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 右：上传触发区 -->
+                            <div class="ref-right">
+                                <div class="upload-zone" onclick="document.getElementById('videoUpload').click()" id="videoUploadZone">
+                                    <i class="fas fa-video"></i>
+                                    <div class="hint">点击上传参考视频（≤20MB）</div>
+                                    <div class="sub">AI 将自动抽帧 + 反解画面与运镜 + 生成同款</div>
+                                    <input type="file" id="videoUpload" accept="video/mp4,video/webm,video/quicktime" style="display:none;" onchange="handleVideoUpload(event)">
+                                </div>
+                            </div>
                         </div>
-                        <div class="ref-video-chips" id="refVideoChips" style="display:none;"></div>
                         <div class="kf-thumbnails" id="kfThumbnails"></div>
                         <div id="videoAnalysisBox"></div>
                     </div>
-                </div>
 
                 <div class="card">
                     <div class="card-header">
@@ -2545,15 +2682,23 @@
             if (!file.type.startsWith('image/')) { showToast('⚠️ 跳过非图片：' + file.name); continue; }
             if (file.size > MAX_SIZE) { showToast('⚠️ 过大已跳过（>4MB）：' + file.name); continue; }
             total++;
-            const reader = new FileReader();
+                        const reader = new FileReader();
             reader.onload = (e) => {
                 const dataUrl = e.target.result;
                 state.referenceImages.push(dataUrl);
+
+                // ★ 首次上传时，清掉「暂无参考图」占位，切换为网格
+                if (!preview.querySelector('.ref-thumbs')) {
+                    preview.innerHTML = '<div class="ref-thumbs"></div>';
+                }
+                const grid = preview.querySelector('.ref-thumbs');
+                const idx = state.referenceImages.length;
                 const div = document.createElement('div');
-                div.style.cssText = 'width:56px;height:56px;border-radius:8px;border:1px solid var(--border);overflow:hidden;position:relative;';
-                div.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;">
-                    <span style="position:absolute;bottom:2px;right:2px;background:rgba(10,30,47,0.75);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;">参考</span>`;
-                preview.appendChild(div);
+                div.className = 'ref-thumb';
+                div.innerHTML = `<img src="${dataUrl}" alt="参考图${idx}">
+                    <span class="ref-idx">${idx}</span>`;
+                grid.appendChild(div);
+
                 loaded++;
                 if (loaded === total) {
                     hint.style.display = 'block';
@@ -2640,24 +2785,29 @@
         return frames;
     }
 
-    function renderReferenceVideoChip() {
+        function renderReferenceVideoChip() {
         const container = document.getElementById('refVideoChips');
         if (!state.referenceVideo) {
-            container.style.display = 'none';
-            container.innerHTML = '';
+            // ★ 没视频时，显示占位
+            container.innerHTML = `
+                <div class="ref-empty">
+                    <i class="fas fa-video"></i>
+                    <span>暂无参考视频</span>
+                </div>
+            `;
             return;
         }
-        container.style.display = 'flex';
         const v = state.referenceVideo;
         container.innerHTML = `
-            <div class="ref-video-chip">
-                <video src="${v.previewUrl}" muted preload="metadata"></video>
-                <i class="fas fa-play chip-play"></i>
-                <button class="chip-remove" onclick="clearReferenceVideo()" title="移除">×</button>
-                <div class="chip-info">
-                    <i class="fas fa-video"></i>
-                    <span>${escapeHtml(v.name).slice(0, 16)}...</span>
-                    <span class="kf-badge">${state.keyframes.length}帧</span>
+            <div class="ref-video-wrap">
+                <div class="ref-video-box">
+                    <video src="${v.previewUrl}" muted preload="metadata" controls></video>
+                    <button class="ref-video-remove" onclick="clearReferenceVideo()" title="移除">×</button>
+                </div>
+                <div class="ref-video-meta">
+                    <i class="fas fa-video" style="color:var(--accent);"></i>
+                    <span>${escapeHtml(v.name).slice(0, 20)}</span>
+                    <span class="kf-badge">${state.keyframes.length} 帧</span>
                 </div>
             </div>
         `;
