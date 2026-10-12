@@ -1191,14 +1191,15 @@
             .detail-split { grid-template-columns: 1fr; }
         }
 
-        .detail-preview-wrap {
+            .detail-preview-wrap {
             background: white;
             border-radius: 12px;
-            border: 1px solid var(--border);
-            max-height: 640px;
+            border: none;                 /* ★ 去掉外框，图片直接贴边 */
             overflow-y: auto;
             line-height: 0;
             position: relative;
+            /* 用外阴影代替边框，视觉上还有"卡片"感，但不会遮图 */
+            box-shadow: 0 1px 3px rgba(10,30,47,0.06);
         }
         .detail-preview-wrap::-webkit-scrollbar { width: 6px; }
         .detail-preview-wrap::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
@@ -1232,7 +1233,17 @@
         }
         .detail-screen:hover .screen-label { background: rgba(77,171,247,0.95); }
         .detail-screen.active {
-            box-shadow: inset 0 0 0 3px var(--accent);
+            position: relative;
+        }
+        .detail-screen.active::after {
+            /* ★ 选中标记：底部 3px 蓝条，不遮图 */
+            content: '';
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 3px;
+            background: var(--accent);
+            pointer-events: none;
+            z-index: 3;
         }
         .detail-screen.active .screen-label { background: var(--accent); }
         .detail-screen.failed {
@@ -1281,10 +1292,9 @@
             border-radius: 10px;
             font-weight: 500;
         }
-        .detail-edit-panel .de-thumb {
+                .detail-edit-panel .de-thumb {
             width: 100%;
-            aspect-ratio: 3/4;
-            max-height: 200px;
+            /* ★ 去掉固定 aspect-ratio 和 max-height，让容器高度随图自适应 */
             border-radius: 10px;
             overflow: hidden;
             background: #f0f4f9;
@@ -1293,9 +1303,15 @@
             justify-content: center;
             margin-bottom: 12px;
             border: 1px solid var(--border);
+            max-height: 420px;            /* ★ 允许最大 420px，比之前大 */
+            min-height: 120px;            /* ★ 占位时至少 120px */
         }
         .detail-edit-panel .de-thumb img {
-            width: 100%; height: 100%; object-fit: cover;
+            width: 100%;
+            height: auto;                  /* ★ 高度按图片比例自适应 */
+            max-height: 420px;             /* ★ 不超过容器最大高度 */
+            object-fit: contain;           /* ★ 完整显示，不裁切 */
+            display: block;
         }
         .detail-edit-panel .de-thumb .placeholder-icon { font-size: 36px; color: #c8d4e0; }
         .detail-edit-panel .de-field {
