@@ -4730,7 +4730,108 @@ function stopAiLoadingFakeProgress() {
     showToast('❌ 抠图失败：' + err.message, 'fa-exclamation-triangle');
   }
 }
+/* ★ 抠 overlay 商品图（高亮的那张） */
+async function removeBackgroundForOverlay() {
+  if (!overlayState.active || !overlayState.src) {
+    showToast('没有可抠的商品图', 'fa-exclamation-triangle');
+    return;
+  }
 
+  showAiLoading('AI 抠图中…', '正在加载抠图库…');
+
+  try {
+    // ============ 阶段 1：加载抠图库 ============
+    updateAiLoadingStage('正在加载抠图库…');
+    const removerFn = await getImglyRemover();
+    if (typeof removerFn !== 'function') {
+      hideAiLoading();
+      showToast('❌ 抠图库加载失败，请检查网络或稍后重试', 'fa-exclamation-triangle');
+      return;
+    }
+
+    // ============ 阶段 2：预处理商品图 ============
+    updateAiLoadingStage('正在预处理商品图…');
+    const shrunk = await shrinkImageToMax(overlayState.src, 1024);
+
+    // ============ 阶段 3：调 imgly（带 progress 回调） ============
+    startAiLoadingFakeProgress();
+    const blob = await removerFn(shrunk, {
+      progress: (key, current, total) => {
+        if (aiLoadingState.finished) return;
+        if (key && key.startsWith('fetch:')) {
+          stopAiLoadingFakeProgress();
+          const pct = total > 0 ? Math.round(current / total * 100) : 0;
+          const curMB = (current / 1024 / 1024).toFixed(1);
+          const totMB = (total / 1024 / 1024).toFixed(1);
+          updateAiLoadingProgress(pct, `正在下载模型 (${curMB} / ${totMB} MB)`);
+        } else if (key && key.startsWith('compute:')) {
+          stopAiLoadingFakeProgress();
+          setAiLoadingIndeterminate(true);
+          document.getElementById('aiLoadingPct').style.display = 'none';
+          updateAiLoadingStage('AI 正在识别主体…');
+        }
+      }
+    });
+    stopAiLoadingFakeProgress();
+
+    // ============ 阶段 4：应用结果到 overlay ============
+    updateAiLoadingProgress(100, '正在应用抠图结果…');
+    await new Promise(r => setTimeout(r, 150));
+
+    // blob → dataURL
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    // ★ 保留 overlay 的位置和大小，仅替换 src
+    const keepX = overlayState.x;
+    const keepY = overlayState.y;
+    const keepW = overlayState.w;
+    const keepH = overlayState.h;
+
+    // 加载新图拿自然尺寸
+    await new Promise((resolve) => {
+      const tmp = new Image();
+      tmp.onload = () => {
+        overlayState.naturalW = tmp.naturalWidth;
+        overlayState.naturalH = tmp.naturalHeight;
+        resolve();
+      };
+      tmp.onerror = resolve;
+      tmp.src = dataUrl;
+    });
+
+    // 替换 src + 恢复位置大小
+    overlayState.src = dataUrl;
+    overlayState.x = keepX;
+    overlayState.y = keepY;
+    overlayState.w = keepW;
+    overlayState.h = keepH;
+    overlayImg.src = dataUrl;
+    overlayImg.classList.remove('hidden');
+    overlayHit.classList.remove('hidden');
+    updateOverlayPosition();
+
+    // 记录修改历史
+    addEditHistoryRecord({
+      type: 'removeBg',
+      label: '商品图抠图',
+      detail: '提取商品主体，透明底（overlay）',
+      thumb: dataUrl
+    });
+
+    hideAiLoading();
+    showToast('✅ 商品图抠图完成（可继续调整位置或点「AI融合合成」）', 'fa-scissors');
+  } catch (err) {
+    console.error('商品图抠图失败:', err);
+    hideAiLoading();
+    showToast('❌ 抠图失败：' + err.message, 'fa-exclamation-triangle');
+  }
+}
+  
 /* ★ 保留透明通道的 updateCanvasImage */
 function updateCanvasImageAlpha(dataUrl, label) {
   previewImg.src = dataUrl;
@@ -5015,7 +5116,12 @@ toolOverlay.onclick = () => {
   }
 };
 toolRemoveBg.onclick = () => {
-  removeBackgroundFrontend();
+  // ★ 有高亮 overlay → 抠 overlay；没有 → 抠画布主图
+  if (overlayState.active && overlayState.src) {
+    removeBackgroundForOverlay();
+  } else {
+    removeBackgroundFrontend();
+  }
 };
 
 /* 绑定 overlay 拖动 */
@@ -5753,9 +5859,13 @@ async function applyAiEdit() {
     await runAiComposite();
     return;
   }
-  // ★ AI抠图：走 imgly 流程
+    // ★ AI抠图：有 overlay 抠 overlay，没有抠主图
   if (action === 'removeBg') {
-    await removeBackgroundFrontend();
+    if (overlayState.active && overlayState.src) {
+      await removeBackgroundForOverlay();
+    } else {
+      await removeBackgroundFrontend();
+    }
     return;
   }
 
