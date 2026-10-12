@@ -3504,8 +3504,8 @@
                 };
                 state.generatedData = resultData;
                 renderResults(resultData, name);
+                saveGenSessionToBackend();
                 addHistory(name, state.selectedTypes, style, platforms);
-
                 const validCount = images.filter(i => i.url).length;
                 const dValid = detailImages.some(x => x.url);
                 if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
@@ -3706,6 +3706,7 @@
             document.getElementById('cnt-carousel').textContent = r.images.filter(i => i.url).length;
 
             showToast(`✅ 第 ${editImgIndex + 1} 张已重新生成`);
+            saveGenSessionToBackend();
             closeEditImgModal();
         } catch (err) {
             console.error('❌ 重新生成失败:', err);
@@ -3762,6 +3763,7 @@
             document.getElementById('cnt-carousel').textContent = r.images.filter(i => i.url).length;
 
             showToast(`✅ 第 ${editImgIndex + 1} 张已修复`);
+            saveGenSessionToBackend();
             closeEditImgModal();
         } catch (err) {
             console.error('❌ 修复图片失败:', err);
@@ -3867,8 +3869,9 @@
             d.url = url;
             d.error = null;
 
-            renderDetailSplit(r.detailImages);
+                        renderDetailSplit(r.detailImages);
             rebuildDetailHTML();
+            saveGenSessionToBackend();
             document.getElementById('cnt-detail').textContent = '1';
             showToast(`✅ 第 ${d.step} 屏已重新生成`);
         } catch (err) {
@@ -3979,7 +3982,8 @@
                 videoEditState.ratio,
                 videoEditState.quality
             );
-            r.videoUrl = videoUrl;
+                        r.videoUrl = videoUrl;
+            saveGenSessionToBackend();
             document.getElementById('cnt-video').textContent = '1';
             container.innerHTML = `<video src="${videoUrl}" controls preload="metadata"></video>`;
             showToast('✅ 视频已重新生成');
@@ -4042,7 +4046,8 @@
                 videoEditState.quality
             );
 
-            r.videoUrl = videoUrl;
+                        r.videoUrl = videoUrl;
+            saveGenSessionToBackend();
             document.getElementById('cnt-video').textContent = '1';
             container.innerHTML = `<video src="${videoUrl}" controls preload="metadata"></video>`;
             showToast('✅ 视频已修复');
@@ -4081,6 +4086,7 @@
                 renderImageGrid('carouselGrid', r.images, pName, '轮播图');
             }
             showToast(`✅ 第 ${idx + 1} 张已重试成功`);
+            saveGenSessionToBackend();
         } catch (err) {
             console.error(`❌ 重试失败:`, err);
             r.images[idx].error = err.message;
@@ -4446,6 +4452,116 @@
             </div>
         `).join('');
     }
+    // ================================================================
+    // ★ 方案 C：生成会话持久化（前端）
+    // ================================================================
+    const GEN_SESSION_KEY = 'material_gen_session_id';
+
+    function getGenSessionId() {
+        try { return localStorage.getItem(GEN_SESSION_KEY) || ''; } catch (e) { return ''; }
+    }
+    function setGenSessionId(sid) {
+        try { if (sid) localStorage.setItem(GEN_SESSION_KEY, sid); } catch (e) {}
+    }
+    function clearGenSessionId() {
+        try { localStorage.removeItem(GEN_SESSION_KEY); } catch (e) {}
+    }
+
+    async function saveGenSessionToBackend() {
+        try {
+            const d = state.generatedData || {};
+            const payload = {
+                session_id: getGenSessionId() || null,
+                product_name: d.productName || state.currentProductName || '',
+                selected_types: state.selectedTypes.slice(),
+                image_count: state.imageCount,
+                current_platform: state.currentPlatform,
+                carousel_prompts: state.carouselPrompts.slice(),
+                detail_prompts: state.detailPrompts.map(x => ({ ...x })),
+                video_prompts: state.videoPrompts.map(x => ({ ...x })),
+                images: (d.images || []).map(x => ({
+                    url: x.url, style: x.style, score: x.score, ctr: x.ctr,
+                    prompt: x.prompt, tag: x.tag, error: x.error
+                })),
+                copy_versions: d.copyVersions || [],
+                detail_images: (d.detailImages || []).map(x => ({
+                    url: x.url, step: x.step, moduleName: x.moduleName, prompt: x.prompt, error: x.error
+                })),
+                video_url: d.videoUrl || '',
+                image_ratio: d.imageRatio || '1:1',
+                video_ratio: d.videoRatio || '9:16',
+                platforms: d.platforms || [],
+                video_analysis: d.videoAnalysis || null,
+            };
+            const res = await fetch(BACKEND_URL + '/api/gen-session/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success && data.session_id) {
+                setGenSessionId(data.session_id);
+                console.log('💾 [会话] 已保存:', data.session_id);
+                return true;
+            }
+            console.warn('⚠️ [会话] 保存失败:', data.message);
+            return false;
+        } catch (e) {
+            console.warn('⚠️ [会话] 保存异常:', e);
+            return false;
+        }
+    }
+
+    async function loadGenSessionFromBackend() {
+        const sid = getGenSessionId();
+        if (!sid) return false;
+        try {
+            const res = await fetch(BACKEND_URL + '/api/gen-session/load?session_id=' + encodeURIComponent(sid));
+            const data = await res.json();
+            if (!data.success) {
+                console.warn('⚠️ [会话] 加载失败:', data.message);
+                clearGenSessionId();
+                return false;
+            }
+            const d = data.data || {};
+            state.generatedData = {
+                images: d.images || [],
+                copyVersions: d.copy_versions || [],
+                detailImages: d.detail_images || [],
+                detailHTML: '',
+                videoUrl: d.video_url || '',
+                platforms: d.platforms || [],
+                imageRatio: d.image_ratio || '1:1',
+                videoRatio: d.video_ratio || '9:16',
+                videoAnalysis: d.video_analysis || null,
+                productName: d.product_name || ''
+            };
+            if (Array.isArray(d.selected_types)) state.selectedTypes = d.selected_types;
+            if (d.image_count) state.imageCount = d.image_count;
+            if (d.current_platform) state.currentPlatform = d.current_platform;
+            if (Array.isArray(d.carousel_prompts)) state.carouselPrompts = d.carousel_prompts;
+            if (Array.isArray(d.detail_prompts)) state.detailPrompts = d.detail_prompts;
+            if (Array.isArray(d.video_prompts)) state.videoPrompts = d.video_prompts;
+            console.log('💾 [会话] 已恢复:', sid);
+            return true;
+        } catch (e) {
+            console.warn('⚠️ [会话] 加载异常:', e);
+            return false;
+        }
+    }
+
+    async function clearGenSessionOnBackend() {
+        const sid = getGenSessionId();
+        if (!sid) return;
+        try {
+            await fetch(BACKEND_URL + '/api/gen-session/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: sid })
+            });
+        } catch (e) {}
+        clearGenSessionId();
+    }
     function loadHistory() {
         try {
             const data = safeStorage.get('material_history');
@@ -4453,11 +4569,12 @@
         } catch (e) {}
         renderHistoryDrawer();
     }
-    function clearHistory() {
+        function clearHistory() {
         if (state.history.length === 0) { showToast('📭 暂无记录'); return; }
-        if (!confirm('确定清空所有记录？')) return;
+        if (!confirm('确定清空所有记录？（也会清空后端已保存的生成会话）')) return;
         state.history = [];
         safeStorage.remove('material_history');
+        clearGenSessionOnBackend();
         renderHistoryDrawer();
         showToast('🗑️ 已清空');
     }
@@ -4481,7 +4598,7 @@
         state.detailPrompts = [];
         state.videoPrompts = [];
 
-        renderCarouselPrompts();
+                renderCarouselPrompts();
         renderDetailPrompts();
         updateTabCounts();
         updateCountHint();
@@ -4493,6 +4610,39 @@
         renderSyncRecords();
 
         initVideoConfig();
+
+        // ★ 方案 C：从后端恢复上次生成会话
+        (async () => {
+            const restored = await loadGenSessionFromBackend();
+            if (!restored) return;
+
+            // 重建 UI（提示词/张数/平台可能变了）
+            renderCarouselPrompts();
+            renderDetailPrompts();
+            updateTabCounts();
+            updateCountHint();
+            updatePromptTabsVisibility();
+            initVideoConfig();
+
+            // 恢复商品名
+            if (state.generatedData.productName) {
+                document.getElementById('productName').value = state.generatedData.productName;
+                state.currentProductName = state.generatedData.productName;
+            }
+
+            // 有生成结果 → 直接渲染第 2 步
+            const d = state.generatedData;
+            const hasAny = (d.images && d.images.length)
+                || (d.copyVersions && d.copyVersions.length)
+                || (d.detailImages && d.detailImages.length)
+                || d.videoUrl;
+
+            if (hasAny) {
+                renderResults(d, d.productName || '商品');
+                showToast('💾 已恢复上次生成结果');
+                setTimeout(() => goStep(2), 150);
+            }
+        })();
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -4570,6 +4720,11 @@
     window.selectVideoQuality = selectVideoQuality;
     window.regenerateVideo = regenerateVideo;
     window.repairVideo = repairVideo;                  // ← 新增
+    // ★ 方案 C 暴露
+    window.saveGenSessionToBackend = saveGenSessionToBackend;
+    window.loadGenSessionFromBackend = loadGenSessionFromBackend;
+    window.clearGenSessionOnBackend = clearGenSessionOnBackend;
+    window.getGenSessionId = getGenSessionId;
 </script>
 </body>
 </html>
