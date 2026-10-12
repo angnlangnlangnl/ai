@@ -1510,6 +1510,45 @@
       pointer-events: none;
     }
 
+        /* ★ 新增：overlay 收藏按钮 */
+    .overlay-collect-btn {
+      position: absolute;
+      top: -26px;
+      right: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(17,24,39,0.95);
+      border: 1px solid #facc15;
+      color: #facc15;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      z-index: 63;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .overlay-collect-btn.show { display: flex; }
+    .overlay-collect-btn:hover {
+      background: #facc15;
+      color: #111827;
+      transform: scale(1.1);
+    }
+    .overlay-collect-btn.collected {
+      background: #facc15;
+      color: #111827;
+    }
+    .overlay-collect-btn.collected i::before {
+      content: "\f005"; /* fa-star (实心) */
+    }
+    .overlay-collect-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    
     /* 棋盘格（抠图透明底显示） */
     .checker-overlay-bg {
       background-image:
@@ -2055,12 +2094,16 @@
           <img id="previewImg" class="preview hidden" src="" alt="">
           <!-- ★ 新增：商品图层 -->
           <img id="overlayImg" class="overlay-img hidden" src="" alt="">
-          <div id="overlayHit" class="overlay-hit hidden">
+                    <div id="overlayHit" class="overlay-hit hidden">
             <div class="overlay-badge" id="overlayBadge">商品图</div>
             <div class="overlay-handle" data-oh="nw"></div>
             <div class="overlay-handle" data-oh="ne"></div>
             <div class="overlay-handle" data-oh="sw"></div>
             <div class="overlay-handle" data-oh="se"></div>
+            <!-- ★ 新增：收藏按钮（抠图后显示） -->
+            <div id="overlayCollectBtn" class="overlay-collect-btn" title="收藏到素材库">
+              <i class="fa fa-star-o"></i>
+            </div>
           </div>
           <div id="emptyTip" class="w-full h-full flex flex-col items-center justify-center text-gray-500">
             <i class="fa fa-image text-4xl mb-2"></i>
@@ -2793,7 +2836,8 @@ const overlayState = {
   naturalW: 0, naturalH: 0,
   dragging: null,
   startX: 0, startY: 0,
-  startMouseX: 0, startMouseY: 0
+  startMouseX: 0, startMouseY: 0,
+  isCutout: false   // ★ 是否已抠图（用于显示收藏按钮）
 };
 
 /* ================================================================
@@ -4291,6 +4335,7 @@ function insertOverlayFromUrl(url, name) {
     overlayState.src = url;
     overlayState.naturalW = nw;
     overlayState.naturalH = nh;
+    overlayState.isCutout = false;   // ★ 新插入的图未抠图
     overlayState.w = targetW;
     overlayState.h = targetH;
     overlayState.x = (cw - targetW) / 2;
@@ -4322,7 +4367,9 @@ function clearOverlay(showMsg = true) {
   overlayState.src = '';
   overlayState.x = 0; overlayState.y = 0;
   overlayState.w = 0; overlayState.h = 0;
+  overlayState.isCutout = false;   // ★ 重置抠图标记
   hideOverlay();
+  updateOverlayCollectBtn();        // ★ 隐藏收藏按钮
   if (showMsg) showToast('已移除商品图', 'fa-times');
 }
 function bindOverlayDrag() {
@@ -4810,10 +4857,12 @@ async function removeBackgroundForOverlay() {
     overlayState.y = keepY;
     overlayState.w = keepW;
     overlayState.h = keepH;
+    overlayState.isCutout = true;   // ★ 标记已抠图
     overlayImg.src = dataUrl;
     overlayImg.classList.remove('hidden');
     overlayHit.classList.remove('hidden');
     updateOverlayPosition();
+    updateOverlayCollectBtn();       // ★ 显示收藏按钮
 
     // 记录修改历史
     addEditHistoryRecord({
@@ -4831,6 +4880,78 @@ async function removeBackgroundForOverlay() {
     showToast('❌ 抠图失败：' + err.message, 'fa-exclamation-triangle');
   }
 }
+  
+/* ★ 更新收藏按钮显隐（抠图后显示，其它时候隐藏） */
+function updateOverlayCollectBtn() {
+  const btn = document.getElementById('overlayCollectBtn');
+  if (!btn) return;
+  // 显示条件：overlay 激活 + 有图 + 已抠图
+  const shouldShow = overlayState.active && overlayState.src && overlayState.isCutout;
+  btn.classList.toggle('show', shouldShow);
+  if (!shouldShow) {
+    btn.classList.remove('collected');
+    btn.title = '收藏到素材库';
+  }
+}
+  
+/* ★ 收藏 overlay 商品图到素材库 */
+async function collectOverlayToAssets() {
+  if (!overlayState.active || !overlayState.src) {
+    showToast('没有可收藏的商品图', 'fa-exclamation-triangle');
+    return;
+  }
+
+  const btn = document.getElementById('overlayCollectBtn');
+  if (btn) btn.disabled = true;
+
+  try {
+    // 1. dataURL → Blob
+    const resp = await fetch(overlayState.src);
+    const blob = await resp.blob();
+
+    // 2. 构造 FormData（对齐后端 /api/assets/upload 参数）
+    const fd = new FormData();
+    const ts = Date.now();
+    const filename = `抠图_${ts}.png`;
+    fd.append('file', blob, filename);
+    fd.append('tags', '抠图收藏,透明底');
+    fd.append('category', '抠图素材');
+    fd.append('product_name', '');
+
+    // 3. POST
+    const res = await fetch(BACKEND_URL + '/api/assets/upload', {
+      method: 'POST',
+      body: fd
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || '收藏失败');
+
+    // 4. 视觉反馈
+    if (btn) {
+      btn.classList.add('collected');
+      btn.title = '已收藏';
+    }
+    showToast('⭐ 已收藏到素材库（下次可从这里取用）', 'fa-star');
+  } catch (err) {
+    console.error('收藏失败:', err);
+    showToast('❌ 收藏失败：' + err.message, 'fa-exclamation-triangle');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+/* ★ 绑定收藏按钮点击 */
+(function bindOverlayCollectBtn() {
+  const btn = document.getElementById('overlayCollectBtn');
+  if (btn) {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      collectOverlayToAssets();
+    };
+  }
+})();
   
 /* ★ 保留透明通道的 updateCanvasImage */
 function updateCanvasImageAlpha(dataUrl, label) {
