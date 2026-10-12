@@ -1790,7 +1790,10 @@
                                 <label><i class="fas fa-comment-dots"></i> 提示词</label>
                                 <textarea id="vePrompt" placeholder="输入视频提示词..."></textarea>
                             </div>
-                            <div class="ve-field" style="display:flex; gap:8px;">
+                                                        <div class="ve-field" style="display:flex; gap:8px;">
+                                <span class="btn-sm outline" style="flex:1; justify-content:center; padding:8px;" onclick="repairVideo()">
+                                    <i class="fas fa-wand-magic-sparkles"></i> 修复视频
+                                </span>
                                 <span class="btn-sm primary" style="flex:1; justify-content:center; padding:8px;" onclick="regenerateVideo()">
                                     <i class="fas fa-redo"></i> 重新生成视频
                                 </span>
@@ -1993,14 +1996,18 @@
                     <label><i class="fas fa-comment-dots"></i> 提示词</label>
                     <textarea id="editImgPrompt" placeholder="输入提示词..."></textarea>
                 </div>
-                <div style="font-size:11px;color:var(--text-3);line-height:1.6;">
+                                <div style="font-size:11px;color:var(--text-3);line-height:1.6;">
                     <i class="fas fa-info-circle"></i>
-                    修改提示词后点「重新生成」会**只重生成这张图**，其它图不变。
+                    <strong>重新生成</strong>：参考【高级设置】里上传的参考图，只重生成这张。<br>
+                    <strong>修复图片</strong>：以【当前这张图】为参考做局部修复，保留画面。
                 </div>
             </div>
         </div>
-        <div class="edit-img-footer">
+                <div class="edit-img-footer">
             <span class="btn-lg outline" onclick="closeEditImgModal()">取消</span>
+            <span class="btn-lg outline" id="editImgRepairBtn" onclick="repairSingleImage()">
+                <i class="fas fa-wand-magic-sparkles"></i> 修复图片
+            </span>
             <span class="btn-lg primary" id="editImgRegenBtn" onclick="regenerateSingleImage()">
                 <i class="fas fa-redo"></i> 重新生成
             </span>
@@ -3560,6 +3567,62 @@
     }
 
     // ================================================================
+    // ★ 修复图片：以【当前这张图】为参考做局部修复
+    //   与 regenerateSingleImage（参考高级里的原始参考图）区分开
+    // ================================================================
+    async function repairSingleImage() {
+        if (editImgIndex < 0) return;
+        const r = state.generatedData;
+        if (!r || !r.images[editImgIndex]) { showToast('⚠️ 图片数据丢失'); return; }
+
+        const img = r.images[editImgIndex];
+        if (!img.url) { showToast('⚠️ 当前图无有效 URL，无法修复'); return; }
+
+        const newPrompt = document.getElementById('editImgPrompt').value.trim();
+        if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
+
+        const btn = document.getElementById('editImgRepairBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 修复中...';
+
+        const platforms = getSelectedPlatforms();
+        const imageRatio = getImageRatioByPlatforms(platforms);
+        const style = document.getElementById('designStyle').value;
+
+        try {
+            // ★ 关键：参考源 = 当前这张图的 URL（不是 state.referenceImages）
+            const url = await generateAgnesImage(newPrompt, '1K', imageRatio, [img.url]);
+
+            r.images[editImgIndex] = {
+                ...r.images[editImgIndex],
+                url,
+                prompt: newPrompt,
+                error: null,
+                style
+            };
+
+            const pName = r.productName || '商品';
+            if (state.selectedTypes.includes('images')) {
+                renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
+            }
+            if (state.selectedTypes.includes('carousel')) {
+                renderImageGrid('carouselGrid', r.images, pName, '轮播图');
+            }
+            document.getElementById('cnt-images').textContent = r.images.filter(i => i.url).length > 0 ? '1' : '0';
+            document.getElementById('cnt-carousel').textContent = r.images.filter(i => i.url).length;
+
+            showToast(`✅ 第 ${editImgIndex + 1} 张已修复`);
+            closeEditImgModal();
+        } catch (err) {
+            console.error('❌ 修复图片失败:', err);
+            showToast('❌ 修复失败：' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> 修复图片';
+        }
+    }
+    
+    // ================================================================
     // ★ 详情页：左右分栏 + 单屏编辑
     // ================================================================
     let deCurrentIdx = 0;
@@ -3782,6 +3845,69 @@
         }
     }
 
+
+    // ================================================================
+    // ★ 修复视频：抽【当前视频】的帧，以帧为参考重新生成
+    //   与 regenerateVideo（参考高级里的参考视频关键帧）区分开
+    // ================================================================
+    async function repairVideo() {
+        const r = state.generatedData;
+        if (!r) { showToast('⚠️ 请先生成素材'); return; }
+        if (!r.videoUrl) { showToast('⚠️ 暂无视频可修复'); return; }
+
+        const newPrompt = document.getElementById('vePrompt').value.trim();
+        if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
+
+        const container = document.getElementById('videoPreviewContainer');
+        container.innerHTML = `
+            <i class="fas fa-spinner fa-spin placeholder-icon"></i>
+            <div class="placeholder-text">正在抽帧并修复视频...</div>
+            <div class="placeholder-sub">${videoEditState.ratio} · ${videoEditState.quality}</div>
+        `;
+        showToast('⏳ 正在抽取当前视频关键帧...');
+
+        try {
+            // ① 下载当前视频 → 抽 3 帧（复用现有函数）
+            const resp = await fetch(r.videoUrl);
+            if (!resp.ok) throw new Error(`下载当前视频失败：HTTP ${resp.status}`);
+            const blob = await resp.blob();
+            const file = new File([blob], 'current_video.mp4', { type: blob.type || 'video/mp4' });
+            const frames = await extractVideoKeyframes(file, KEYFRAME_COUNT);
+            if (!frames || frames.length === 0) throw new Error('抽帧失败，未获取到有效帧');
+
+            // ② 上传关键帧到临时图床（复用现有函数）
+            const frameUrls = await uploadKeyframesToTemp(frames);
+            if (!frameUrls || frameUrls.length === 0) throw new Error('关键帧上传失败');
+
+            // ③ 用当前视频的帧当参考图，重新生成视频
+            const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+            const seconds = String(cfg?.duration || 5);
+
+            showToast('⏳ 正在基于当前视频修复（排队中，最长 10 分钟）...');
+            const videoUrl = await generateAgnesVideo(
+                newPrompt,
+                seconds,
+                frameUrls,                 // ← 参考源 = 当前视频的帧
+                videoEditState.ratio,
+                videoEditState.quality
+            );
+
+            r.videoUrl = videoUrl;
+            document.getElementById('cnt-video').textContent = '1';
+            container.innerHTML = `<video src="${videoUrl}" controls preload="metadata"></video>`;
+            showToast('✅ 视频已修复');
+        } catch (err) {
+            console.error('❌ 视频修复失败:', err);
+            container.innerHTML = `
+                <i class="fas fa-exclamation-triangle placeholder-icon" style="color:#f59e0b;"></i>
+                <div class="placeholder-text">视频修复失败</div>
+                <div class="placeholder-sub">可修改提示词后重试</div>
+                <div class="placeholder-warn">${escapeHtml(err.message)}</div>
+            `;
+            showToast('❌ 视频修复失败：' + err.message);
+        }
+    }
+    
     // ================================================================
     // 单张图片重试（快速）
     // ================================================================
@@ -4293,6 +4419,7 @@
     window.selectVideoRatio = selectVideoRatio;
     window.selectVideoQuality = selectVideoQuality;
     window.regenerateVideo = regenerateVideo;
+    window.repairVideo = repairVideo;                  // ← 新增
 </script>
 </body>
 </html>
