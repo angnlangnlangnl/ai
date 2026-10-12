@@ -2708,7 +2708,7 @@
     // ================================================================
     // 参考图上传
     // ================================================================
-    function handleFileUpload(event) {
+        function handleFileUpload(event) {
         const files = event.target.files;
         const preview = document.getElementById('uploadPreview');
         const hint = document.getElementById('uploadHint');
@@ -2722,25 +2722,14 @@
             if (!file.type.startsWith('image/')) { showToast('⚠️ 跳过非图片：' + file.name); continue; }
             if (file.size > MAX_SIZE) { showToast('⚠️ 过大已跳过（>4MB）：' + file.name); continue; }
             total++;
-                        const reader = new FileReader();
+            const reader = new FileReader();
             reader.onload = (e) => {
                 const dataUrl = e.target.result;
                 state.referenceImages.push(dataUrl);
 
-                // ★ 首次上传时，清掉「暂无参考图」占位，切换为网格
-                if (!preview.querySelector('.ref-thumbs')) {
-                    preview.innerHTML = '<div class="ref-thumbs"></div>';
-                }
-                const grid = preview.querySelector('.ref-thumbs');
-                const idx = state.referenceImages.length;
-                const div = document.createElement('div');
-                div.className = 'ref-thumb';
-                div.innerHTML = `<img src="${dataUrl}" alt="参考图${idx}">
-                    <span class="ref-idx">${idx}</span>`;
-                grid.appendChild(div);
-
                 loaded++;
                 if (loaded === total) {
+                    renderReferenceImages();       // ★ 统一重绘（带删除按钮 + 编号连续）
                     hint.style.display = 'block';
                     hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> 已上传 <strong>${state.referenceImages.length}</strong> 张参考图（最多 5 张参与生成）`;
                     showToast(`📤 已上传 ${state.referenceImages.length} 张参考图`);
@@ -2749,6 +2738,55 @@
             reader.readAsDataURL(file);
         }
         event.target.value = '';
+    }
+
+    // ================================================================
+    // ★ 删除单张参考图（按索引）
+    // ================================================================
+    function removeReferenceImage(idx) {
+        idx = parseInt(idx);
+        if (isNaN(idx) || idx < 0 || idx >= state.referenceImages.length) return;
+
+        state.referenceImages.splice(idx, 1);
+        renderReferenceImages();
+
+        const hint = document.getElementById('uploadHint');
+        if (state.referenceImages.length === 0) {
+            hint.style.display = 'none';
+            hint.innerHTML = '';
+        } else {
+            hint.style.display = 'block';
+            hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> 已上传 <strong>${state.referenceImages.length}</strong> 张参考图（最多 5 张参与生成）`;
+        }
+
+        showToast(`🗑️ 已删除第 ${idx + 1} 张参考图，剩余 ${state.referenceImages.length} 张`);
+    }
+
+    // ================================================================
+    // ★ 重新渲染参考图（编号连续 + 删除按钮索引正确）
+    // ================================================================
+    function renderReferenceImages() {
+        const preview = document.getElementById('uploadPreview');
+        if (!state.referenceImages || state.referenceImages.length === 0) {
+            preview.innerHTML = `
+                <div class="ref-empty">
+                    <i class="fas fa-image"></i>
+                    <span>暂无参考图</span>
+                </div>
+            `;
+            return;
+        }
+        preview.innerHTML = `
+            <div class="ref-thumbs">
+                ${state.referenceImages.map((dataUrl, i) => `
+                    <div class="ref-thumb">
+                        <img src="${dataUrl}" alt="参考图${i + 1}">
+                        <span class="ref-idx">${i + 1}</span>
+                        <button class="ref-remove" title="删除这张" onclick="removeReferenceImage(${i})">×</button>
+                    </div>
+                `).join('')}
+            </div>
+        `;
     }
 
     // ================================================================
@@ -4757,6 +4795,8 @@
     window.handleFileUpload = handleFileUpload;
     window.handleVideoUpload = handleVideoUpload;
     window.clearReferenceVideo = clearReferenceVideo;
+    window.removeReferenceImage = removeReferenceImage;
+    window.renderReferenceImages = renderReferenceImages;
     window.resetAllPrompts = resetAllPrompts;
     window.startGenerate = startGenerate;
     window.downloadImage = downloadImage;
