@@ -1748,6 +1748,154 @@
     }
     .loading-inline i { animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+      /* ============================================================
+       ★★★ 新增：AI 抠图加载遮罩 ★★★
+       ============================================================ */
+    .ai-loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(4px);
+      z-index: 9500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInViewer 0.2s ease;
+    }
+    .ai-loading-overlay.show { display: flex; }
+
+    .ai-loading-card {
+      width: 420px;
+      max-width: 92vw;
+      background: #1F2937;
+      border: 1px solid #4F46E5;
+      border-radius: 16px;
+      padding: 28px 24px 22px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+      text-align: center;
+      animation: aiLoadingIn 0.25s ease-out;
+    }
+    @keyframes aiLoadingIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .ai-loading-icon {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ai-loading-icon i {
+      position: absolute;
+      font-size: 22px;
+      color: #4F46E5;
+      z-index: 2;
+      animation: aiScissorsBlink 1.5s ease-in-out infinite;
+    }
+    @keyframes aiScissorsBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.92); }
+    }
+    .ai-loading-spinner {
+      position: absolute;
+      inset: 0;
+      border: 3px solid rgba(79,70,229,0.15);
+      border-top-color: #4F46E5;
+      border-right-color: #22d3ee;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    .ai-loading-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 18px;
+    }
+
+    /* 进度条（确定模式） */
+    .ai-loading-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: #111827;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .ai-loading-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4F46E5, #22d3ee);
+      border-radius: 8px;
+      transition: width 0.25s ease;
+      box-shadow: 0 0 12px rgba(34,211,238,0.5);
+    }
+
+    /* 进度条（不确定模式：条纹流动） */
+    .ai-loading-bar-indeterminate {
+      display: none;
+    }
+    .ai-loading-bar-indeterminate .ai-loading-bar-stripe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, #4F46E5, #22d3ee, transparent);
+      border-radius: 8px;
+      animation: aiStripeFlow 1.4s ease-in-out infinite;
+    }
+    @keyframes aiStripeFlow {
+      0%   { left: -40%; }
+      100% { left: 100%; }
+    }
+
+    .ai-loading-pct {
+      font-size: 22px;
+      font-weight: 700;
+      color: #22d3ee;
+      font-family: ui-monospace, monospace;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .ai-loading-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #d1d5db;
+      margin-bottom: 14px;
+      min-height: 20px;
+    }
+    .ai-loading-stage i {
+      color: #4F46E5;
+      font-size: 12px;
+    }
+
+    .ai-loading-hint {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 10px 12px;
+      background: rgba(34,211,238,0.06);
+      border: 1px solid rgba(34,211,238,0.2);
+      border-radius: 8px;
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .ai-loading-hint i {
+      color: #22d3ee;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
   </style>
 </head>
 <body class="bg-darkBg text-gray-100 h-screen overflow-hidden flex flex-col">
@@ -2309,6 +2457,35 @@
   </div>
 
   <div id="toastTip" class="toast-tip"><i class="fa fa-check-circle"></i><span id="toastText"></span></div>
+    <!-- ★★★ 新增：AI 抠图加载遮罩（全屏） ★★★ -->
+  <div id="aiLoadingOverlay" class="ai-loading-overlay">
+    <div class="ai-loading-card">
+      <div class="ai-loading-icon">
+        <div class="ai-loading-spinner"></div>
+        <i class="fa fa-scissors"></i>
+      </div>
+      <div class="ai-loading-title" id="aiLoadingTitle">AI 抠图中…</div>
+
+      <!-- 进度条：确定模式 -->
+      <div class="ai-loading-bar-wrap" id="aiLoadingBarWrap">
+        <div class="ai-loading-bar-fill" id="aiLoadingBarFill" style="width:0%;"></div>
+      </div>
+      <!-- 进度条：不确定模式（条纹流动） -->
+      <div class="ai-loading-bar-wrap ai-loading-bar-indeterminate" id="aiLoadingBarIndeterminate">
+        <div class="ai-loading-bar-stripe"></div>
+      </div>
+
+      <div class="ai-loading-pct" id="aiLoadingPct" style="display:none;">0%</div>
+      <div class="ai-loading-stage" id="aiLoadingStage">
+        <i class="fa fa-spinner fa-spin"></i>
+        <span id="aiLoadingStageText">正在加载抠图库…</span>
+      </div>
+      <div class="ai-loading-hint">
+        <i class="fa fa-info-circle"></i>
+        <span>首次使用需下载模型（约 20-40 秒），之后浏览器会缓存，下次秒开</span>
+      </div>
+    </div>
+  </div>
 
   <!-- 全屏预览层 -->
   <div id="fullscreenViewer" class="fullscreen-viewer">
@@ -4357,7 +4534,7 @@ async function runAiComposite() {
 /* ================================================================
    ★★★ 新增：前端 AI 抠图（imgly） ★★★
    ================================================================ */
-  /* ★ 动态加载 imgly 抠图库（+esm 是 jsdelivr 的 ESM 转译版，兼容性最好） */
+/* ★ 动态加载 imgly 抠图库（+esm 是 jsdelivr 的 ESM 转译版，兼容性最好） */
 async function getImglyRemover() {
   if (window.__imglyRemover) return window.__imglyRemover;
   try {
@@ -4377,29 +4554,156 @@ async function getImglyRemover() {
   }
   return null;
 }
+
+/* ================================================================
+   ★★★ 新增：AI 抠图加载遮罩控制 ★★★
+   ================================================================ */
+const aiLoadingState = {
+  timer: null,
+  fakeProgressTimer: null,
+  fakeProgress: 0,
+  finished: false
+};
+
+function showAiLoading(title, stageText) {
+  const overlay = document.getElementById('aiLoadingOverlay');
+  if (!overlay) return;
+
+  aiLoadingState.finished = false;
+  aiLoadingState.fakeProgress = 0;
+
+  document.getElementById('aiLoadingTitle').textContent = title || 'AI 抠图中…';
+  document.getElementById('aiLoadingStageText').textContent = stageText || '正在加载抠图库…';
+
+  // 默认不确定模式
+  setAiLoadingIndeterminate(true);
+  document.getElementById('aiLoadingPct').style.display = 'none';
+
+  overlay.classList.add('show');
+}
+
+function hideAiLoading() {
+  const overlay = document.getElementById('aiLoadingOverlay');
+  if (!overlay) return;
+  aiLoadingState.finished = true;
+  clearTimeout(aiLoadingState.timer);
+  clearInterval(aiLoadingState.fakeProgressTimer);
+  overlay.classList.remove('show');
+}
+
+/* 切换：确定模式 / 不确定模式 */
+function setAiLoadingIndeterminate(isIndeterminate) {
+  const barWrap = document.getElementById('aiLoadingBarWrap');
+  const barIndet = document.getElementById('aiLoadingBarIndeterminate');
+  if (!barWrap || !barIndet) return;
+  if (isIndeterminate) {
+    barWrap.style.display = 'none';
+    barIndet.style.display = 'block';
+  } else {
+    barWrap.style.display = 'block';
+    barIndet.style.display = 'none';
+  }
+}
+
+/* 更新进度（确定模式） */
+function updateAiLoadingProgress(pct, stageText) {
+  if (aiLoadingState.finished) return;
+  setAiLoadingIndeterminate(false);
+  const fill = document.getElementById('aiLoadingBarFill');
+  const pctEl = document.getElementById('aiLoadingPct');
+  if (fill) fill.style.width = pct + '%';
+  if (pctEl) {
+    pctEl.textContent = Math.round(pct) + '%';
+    pctEl.style.display = 'block';
+  }
+  if (stageText) {
+    document.getElementById('aiLoadingStageText').textContent = stageText;
+  }
+}
+
+/* 只更新阶段文字 */
+function updateAiLoadingStage(stageText) {
+  if (aiLoadingState.finished) return;
+  const el = document.getElementById('aiLoadingStageText');
+  if (el) el.textContent = stageText;
+}
+
+/* 假进度（拿不到真实进度时，慢慢爬） */
+function startAiLoadingFakeProgress() {
+  aiLoadingState.fakeProgress = 0;
+  clearInterval(aiLoadingState.fakeProgressTimer);
+  aiLoadingState.fakeProgressTimer = setInterval(() => {
+    if (aiLoadingState.finished) {
+      clearInterval(aiLoadingState.fakeProgressTimer);
+      return;
+    }
+    // 每次 +0.5~1.5，最多到 90
+    aiLoadingState.fakeProgress = Math.min(90, aiLoadingState.fakeProgress + (Math.random() * 1 + 0.5));
+    updateAiLoadingProgress(aiLoadingState.fakeProgress);
+  }, 400);
+}
+
+function stopAiLoadingFakeProgress() {
+  clearInterval(aiLoadingState.fakeProgressTimer);
+}
   async function removeBackgroundFrontend() {
   if (!canvasState.hasImage || !previewImg.src) {
     showToast('请先上传图片', 'fa-exclamation-triangle');
     return;
   }
 
-  showToast('AI抠图中（首次需下载模型，约 20-40 秒）...', 'fa-spinner fa-spin');
+  // ★ 显示全屏加载遮罩
+  showAiLoading('AI 抠图中…', '正在加载抠图库…');
 
   try {
-    // 1. 动态加载抠图库
+    // ============ 阶段 1：加载抠图库 ============
+    updateAiLoadingStage('正在加载抠图库…');
     const removerFn = await getImglyRemover();
     if (typeof removerFn !== 'function') {
+      hideAiLoading();
       showToast('❌ 抠图库加载失败，请检查网络或稍后重试', 'fa-exclamation-triangle');
       return;
     }
 
-    // 2. 先把当前图缩到 ≤1024
+    // ============ 阶段 2：预处理图片 ============
+    updateAiLoadingStage('正在预处理图片…');
     const shrunk = await shrinkImageToMax(previewImg.src, 1024);
 
-    // 3. 调 imgly
-    const blob = await removerFn(shrunk);
+    // ============ 阶段 3：调 imgly（带 progress 回调） ============
+    // 启动假进度兜底（如果 imgly 不给 progress，这个会慢慢爬）
+    startAiLoadingFakeProgress();
 
-    // 4. blob → dataURL
+    let realProgressReceived = false;
+    const blob = await removerFn(shrunk, {
+      progress: (key, current, total) => {
+        if (aiLoadingState.finished) return;
+        // key 通常形如 'fetch:/models/xxx.onnx' 或 'compute:inference'
+        if (key && key.startsWith('fetch:')) {
+          // 下载模型：有真实进度
+          realProgressReceived = true;
+          stopAiLoadingFakeProgress();
+          const pct = total > 0 ? Math.round(current / total * 100) : 0;
+          const curMB = (current / 1024 / 1024).toFixed(1);
+          const totMB = (total / 1024 / 1024).toFixed(1);
+          updateAiLoadingProgress(pct, `正在下载模型 (${curMB} / ${totMB} MB)`);
+        } else if (key && key.startsWith('compute:')) {
+          // 推理中：没有百分比
+          stopAiLoadingFakeProgress();
+          setAiLoadingIndeterminate(true);
+          document.getElementById('aiLoadingPct').style.display = 'none';
+          updateAiLoadingStage('AI 正在识别主体…');
+        }
+      }
+    });
+
+    // 停止假进度
+    stopAiLoadingFakeProgress();
+
+    // ============ 阶段 4：应用结果 ============
+    updateAiLoadingProgress(100, '正在应用抠图结果…');
+    await new Promise(r => setTimeout(r, 200));
+
+    // blob → dataURL
     const dataUrl = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
@@ -4407,7 +4711,7 @@ async function getImglyRemover() {
       reader.readAsDataURL(blob);
     });
 
-    // 5. 替换画布 + 透明底标记
+    // 替换画布 + 透明底标记
     canvasHasAlpha = true;
     canvasStage.classList.add('checker-overlay-bg');
     updateCanvasImageAlpha(dataUrl, 'AI抠图');
@@ -4417,9 +4721,12 @@ async function getImglyRemover() {
       detail: '提取主体，透明底',
       thumb: dataUrl
     });
+
+    hideAiLoading();
     showToast('✅ 抠图完成（透明底）', 'fa-scissors');
   } catch (err) {
     console.error('抠图失败:', err);
+    hideAiLoading();
     showToast('❌ 抠图失败：' + err.message, 'fa-exclamation-triangle');
   }
 }
