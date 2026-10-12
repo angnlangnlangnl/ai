@@ -2194,6 +2194,51 @@
 <div id="toast" class="toast"></div>
 <script>
     // ================================================================
+    // ★ 修复 SPA 注入导致的 DOM 嵌套错误
+    //    SPA 用 innerHTML 注入本页时，浏览器会自动修正 HTML 结构，
+    //    把 #step2 / #step3 错误地塞进 #step1 里，导致结果页空白。
+    //    这里在页面加载时把它们移到 .content 下，恢复平级结构。
+    // ================================================================
+    (function fixStepPanelNesting() {
+        function fix() {
+            const content = document.querySelector('.content');
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const step3 = document.getElementById('step3');
+            if (!content) return;
+            // 只有 step1 真的把 step2 嵌套进去了才修
+            if (step1 && step2 && step1.contains(step2)) {
+                content.appendChild(step2);
+                console.log('🔧 已修复：把 #step2 从 #step1 里移出');
+            }
+            if (step1 && step3 && step1.contains(step3)) {
+                content.appendChild(step3);
+                console.log('🔧 已修复：把 #step3 从 #step1 里移出');
+            }
+        }
+        // 立即执行一次
+        fix();
+        // DOM 完全加载后再执行一次（防止 SPA 延迟注入）
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fix);
+        }
+        // 用 MutationObserver 监听 .content 的变化，SPA 后续注入时再修
+        const content = document.querySelector('.content');
+        if (content && window.MutationObserver) {
+            const mo = new MutationObserver(() => {
+                const step1 = document.getElementById('step1');
+                const step2 = document.getElementById('step2');
+                if (step1 && step2 && step1.contains(step2)) {
+                    fix();
+                }
+            });
+            mo.observe(content, { childList: true, subtree: true });
+            // 10 秒后停止监听，避免长期开销
+            setTimeout(() => mo.disconnect(), 10000);
+        }
+    })();
+
+    // ================================================================
     // 常量
     // ================================================================
     const BACKEND_URL = 'https://ai-ecommerce-backend-production-0776.up.railway.app';
