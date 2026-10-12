@@ -2585,8 +2585,9 @@
             `;
         }).join('');
     }
-    function pickProduct(name) {
+        function pickProduct(name) {
         document.getElementById('productName').value = name;
+        state.currentProductName = name;          // ★ 提前记录，供第 3 步自动选中
         const product = pickerState.allProducts.find(p => p.name === name);
         if (product && product.category) {
             const catSelect = document.getElementById('productCategory');
@@ -4153,7 +4154,7 @@
     // ================================================================
     // 同步相关
     // ================================================================
-    async function loadSyncProducts() {
+        async function loadSyncProducts() {
         const box = document.getElementById('syncProductList');
         box.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-3);"><i class="fas fa-spinner fa-spin"></i> 加载中...</div>';
         try {
@@ -4161,9 +4162,56 @@
             const data = await res.json();
             syncState.allProducts = data.products || [];
             syncState.filteredProducts = syncState.allProducts.slice();
+
+            // ★ 自动关联第 1 步已选商品
+            autoSelectCurrentProduct();
+
             renderSyncProductList();
         } catch (e) {
             box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger);">加载失败：${escapeHtml(e.message)}</div>`;
+        }
+    }
+
+    // ================================================================
+    // ★ 自动选中第 1 步已确定的商品
+    //   优先级：generatedData.productName > state.currentProductName > 输入框
+    // ================================================================
+    function autoSelectCurrentProduct() {
+        // 没商品列表，跳过
+        if (!syncState.allProducts || syncState.allProducts.length === 0) return;
+
+        // 取出「目标商品名」
+        let target = '';
+        if (state.generatedData && state.generatedData.productName) {
+            target = state.generatedData.productName.trim();
+        }
+        if (!target && state.currentProductName) {
+            target = state.currentProductName.trim();
+        }
+        if (!target) {
+            const input = document.getElementById('productName');
+            if (input && input.value.trim()) target = input.value.trim();
+        }
+        if (!target) return;
+
+        // 精确匹配
+        let matched = syncState.allProducts.find(p => p.name === target);
+        // 包含匹配（双向）
+        if (!matched) {
+            matched = syncState.allProducts.find(p =>
+                p.name.includes(target) || target.includes(p.name)
+            );
+        }
+        if (!matched) {
+            console.log('🔍 [自动选中] 未找到匹配商品:', target);
+            return;
+        }
+
+        // 加入已选列表（去重）
+        if (!syncState.selectedProducts.includes(matched.name)) {
+            syncState.selectedProducts.push(matched.name);
+            console.log('✅ [自动选中] 已关联商品:', matched.name);
+            showToast(`✅ 已自动关联「${matched.name}」`);
         }
     }
     function renderSyncProductList() {
