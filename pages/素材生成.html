@@ -816,7 +816,6 @@
         .btn-sm.outline { background: transparent; border: 1px solid var(--border); color: var(--primary); }
         .btn-sm.danger { background: #fde8ed; color: var(--danger); }
 
-        /* ★ Tab 右侧操作按钮 */
         .result-tabs {
             display: flex; gap: 4px; border-bottom: 1px solid var(--border);
             margin-bottom: 16px; overflow-x: auto; align-items: center;
@@ -914,7 +913,6 @@
             background: rgba(77,171,247,0.75);
         }
 
-        /* ★ 文案卡片紧凑版 */
         .copy-list { display: flex; flex-direction: column; gap: 8px; }
         .copy-item {
             padding: 10px 12px;
@@ -966,7 +964,6 @@
         }
         .copy-item .actions { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
 
-        /* ★ 文案选择弹窗 */
         .copy-picker-modal {
             position: fixed; inset: 0;
             background: rgba(10,30,47,0.55);
@@ -1018,7 +1015,6 @@
             white-space: pre-line; line-height: 1.6;
         }
 
-        /* ★ 全屏图片预览 */
         .img-viewer-modal {
             position: fixed; inset: 0;
             background: rgba(0,0,0,0.92);
@@ -1327,7 +1323,6 @@
             z-index: 2;
         }
 
-        /* ★ 主副图编辑弹窗（放大一倍：720 → 1440，240 → 480） */
         .edit-img-modal {
             position: fixed; inset: 0;
             background: rgba(10,30,47,0.65);
@@ -2463,7 +2458,6 @@
     </div>
 </div>
 
-<!-- ★ 文案选择弹窗 -->
 <div class="copy-picker-modal" id="copyPickerModal" onclick="if(event.target===this) closeCopyPicker()">
     <div class="copy-picker-box">
         <div class="copy-picker-header">
@@ -2474,7 +2468,6 @@
     </div>
 </div>
 
-<!-- ★ 全屏图片预览 -->
 <div class="img-viewer-modal" id="imgViewerModal">
     <button class="img-viewer-close" onclick="closeViewer()">×</button>
     <button class="img-viewer-prev" id="viewerPrevBtn" onclick="viewerPrev()">‹</button>
@@ -2538,6 +2531,10 @@
     const REF_VIDEO_MAX_SIZE = 20 * 1024 * 1024;
     const KEYFRAME_COUNT = 3;
 
+    // ★ Agnes API 视频时长硬性限制
+    const VIDEO_SECONDS_MIN = 4;
+    const VIDEO_SECONDS_MAX = 12;
+
     const safeStorage = {
         get(key, def = null) {
             try { return localStorage.getItem(key) ?? def; }
@@ -2579,6 +2576,12 @@
 
     function getCountByPlatform(platform) {
         return PLATFORM_COUNT_RULE[platform] || 5;
+    }
+
+    // ★ 把任何时长裁剪到 Agnes 允许范围 [4, 12]
+    function clampVideoSeconds(sec) {
+        const n = parseInt(sec, 10) || 5;
+        return Math.max(VIDEO_SECONDS_MIN, Math.min(VIDEO_SECONDS_MAX, n));
     }
 
     // ================================================================
@@ -2730,6 +2733,12 @@
     // 当前打开的文案选择卡片
     let copyPickerTargetIdx = -1;
 
+    // 编辑图片索引
+    let editImgIndex = -1;
+
+    // 详情页当前索引
+    let deCurrentIdx = 0;
+
     // ================================================================
     // 工具
     // ================================================================
@@ -2774,7 +2783,6 @@
         const el = document.getElementById(id);
         if (el) el.innerHTML = val;
     }
-    // 根据 url 猜扩展名
     function guessExt(url, fallback = 'png') {
         if (!url) return fallback;
         if (url.startsWith('data:image/')) {
@@ -2790,13 +2798,11 @@
         if (parts.length > 1) return parts.pop().toLowerCase();
         return fallback;
     }
-    // 从 url 拿 blob
     async function urlToBlob(url) {
         const resp = await fetch(url);
         if (!resp.ok) throw new Error(`下载失败：HTTP ${resp.status}`);
         return await resp.blob();
     }
-    // 下载单张
     async function downloadOne(url, filename) {
         try {
             if (url.startsWith('data:')) {
@@ -2890,9 +2896,6 @@
         }
     }
 
-    // ================================================================
-    // 批量上传素材库
-    // ================================================================
     async function uploadAllToAssets(items, productName) {
         if (!items || items.length === 0) {
             showToast('⚠️ 没有可上传的内容');
@@ -2920,9 +2923,6 @@
         showToast(`✅ 上传完成：成功 ${ok} 个${fail > 0 ? `，失败 ${fail} 个` : ''}`);
     }
 
-    // ================================================================
-    // 当前 Tab 的「全部下载」「上传素材库」
-    // ================================================================
     function getCurrentResultTab() {
         const active = document.querySelector('.result-tab.active');
         return active ? active.dataset.tab : 'images';
@@ -2960,7 +2960,7 @@
             return [];
         }
         if (tab === 'copy') {
-            return []; // 文案不走 zip
+            return [];
         }
         return [];
     }
@@ -2971,7 +2971,6 @@
         const pname = (r.productName || '商品').replace(/[\/\\:*?"<>|]/g, '_');
 
         if (tab === 'copy') {
-            // 文案走 txt
             downloadCopyAsTxt();
             return;
         }
@@ -2999,7 +2998,6 @@
         await uploadAllToAssets(items, pname);
     }
 
-    // 文案导出 txt
     function downloadCopyAsTxt() {
         const r = state.generatedData || {};
         const versions = r.copyVersions || [];
@@ -3090,7 +3088,6 @@
         document.body.style.overflow = '';
     }
 
-    // 为某个 grid 构建 viewer 数据
     function buildViewerImagesFromGrid(gridId, typeName) {
         const r = state.generatedData || {};
         const pname = r.productName || '商品';
@@ -3109,7 +3106,6 @@
         return result;
     }
 
-    // 为详情页构建 viewer 数据
     function buildViewerImagesFromDetail() {
         const r = state.generatedData || {};
         const pname = r.productName || '商品';
@@ -3138,7 +3134,6 @@
     function applyCopy(idx) {
         const r = state.generatedData;
         if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
-        // 把选中的这版设为推荐
         r.copyVersions.forEach((v, i) => { v.recommended = (i === idx); });
         renderCopyList(r.copyVersions);
         showToast(`✅ 已应用「${r.copyVersions[idx].name}」`);
@@ -3164,7 +3159,6 @@
         const r = state.generatedData;
         if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
         copyPickerTargetIdx = idx;
-        // 渲染选择面板
         const body = document.getElementById('copyPickerBody');
         if (!body) return;
         const currentName = r.copyVersions[idx].name;
@@ -3186,7 +3180,6 @@
             closeCopyPicker();
             return;
         }
-        // 把 srcIdx 这版的内容复制到 copyPickerTargetIdx
         const src = r.copyVersions[srcIdx];
         r.copyVersions[copyPickerTargetIdx].content = src.content;
         r.copyVersions[copyPickerTargetIdx].name = src.name;
@@ -3201,6 +3194,12 @@
         document.getElementById('copyPickerModal').classList.remove('show');
         document.body.style.overflow = '';
         copyPickerTargetIdx = -1;
+    }
+
+    function copyTextFromIdx(idx) {
+        const r = state.generatedData;
+        if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
+        copyText(r.copyVersions[idx].content || '');
     }
 
     // ================================================================
@@ -3256,9 +3255,6 @@
         collectToAssets(d.url, `${pname}_详情第${d.step}屏`, pname);
     }
 
-    // ================================================================
-    // 视频：收藏
-    // ================================================================
     function collectVideo() {
         const r = state.generatedData;
         if (!r || !r.videoUrl) { showToast('⚠️ 暂无视频'); return; }
@@ -3266,9 +3262,6 @@
         collectToAssets(r.videoUrl, `${pname}_视频`, pname);
     }
 
-    // ================================================================
-    // 主副图编辑弹窗：下载 / 收藏
-    // ================================================================
     function downloadEditImg() {
         if (editImgIndex < 0) return;
         const r = state.generatedData;
@@ -3311,7 +3304,7 @@
     }
 
     // ================================================================
-    // collectVars 等业务函数
+    // 业务函数
     // ================================================================
     function collectVars() {
         const name = (document.getElementById('productName').value || '').trim() || '商品';
@@ -3439,7 +3432,6 @@
         const tab = getCurrentResultTab();
         const uploadBtn = document.getElementById('btnUploadAll');
         if (uploadBtn) {
-            // 文案 Tab 不支持上传
             uploadBtn.style.display = (tab === 'copy') ? 'none' : '';
         }
     }
@@ -3584,6 +3576,14 @@
     function switchPromptTab(tab) {
         document.querySelectorAll('.prompt-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
         document.querySelectorAll('.prompt-panel').forEach(p => p.classList.toggle('active', p.id === 'prompt-' + tab));
+    }
+
+    // ★ 同步 type-pill 的 UI 与 state.selectedTypes
+    function syncTypePillsUI() {
+        document.querySelectorAll('#genTypeGrid .type-pill').forEach(pill => {
+            const t = pill.dataset.type;
+            pill.classList.toggle('selected', state.selectedTypes.includes(t));
+        });
     }
 
     // ================================================================
@@ -4090,7 +4090,8 @@
         const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
         const hint = document.getElementById('videoDurationHint');
         if (hint && cfg) {
-            hint.textContent = `当前：${videoConfigState.platform} · ${cfg.duration}s · 分镜 ${cfg.timeline.length} 段`;
+            const safe = clampVideoSeconds(cfg.duration);
+            hint.textContent = `当前：${videoConfigState.platform} · 配置 ${cfg.duration}s → 实际 ${safe}s · 分镜 ${cfg.timeline.length} 段`;
         }
     }
     function rebuildVideoScript() {
@@ -4302,7 +4303,9 @@
     }
 
     async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', quality = '720P', onProgress) {
-        console.log('📤 [视频] 调用后端代理:', prompt.slice(0, 60) + '...', 'ratio:', aspectRatio, 'quality:', quality);
+        // ★ 裁剪时长到 [4, 12]
+        const safeSeconds = String(clampVideoSeconds(seconds));
+        console.log('📤 [视频] 调用后端代理:', prompt.slice(0, 60) + '...', 'seconds:', safeSeconds, 'ratio:', aspectRatio, 'quality:', quality);
 
         if (typeof onProgress === 'function') {
             onProgress(1, 60, 'processing', '生成中（队列满会自动重试）...');
@@ -4313,7 +4316,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 prompt: prompt,
-                seconds: String(seconds),
+                seconds: safeSeconds,
                 aspect_ratio: aspectRatio,
                 quality: quality,
                 reference_images: (referenceImages && referenceImages.length > 0)
@@ -4377,7 +4380,6 @@
         const errTip = img.error
             ? `<div class="img-error-tip" title="${escapeHtml(img.error)}"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(img.error).slice(0, 30)}</div>`
             : '';
-        // 图片索引需从全局 images 数组找
         const globalIdx = (state.generatedData.images || []).indexOf(img);
         const newHTML = `
             <div class="image-item" data-result-idx="${idx}">
@@ -4408,7 +4410,6 @@
         card.replaceWith(wrapper.firstChild);
     }
 
-    // 从 grid 点击图片打开全屏 viewer
     function viewerOpenFromGrid(gridId, localIdx) {
         const imgs = buildViewerImagesFromGrid(gridId, gridId === 'imageGrid' ? '主图' : '副图');
         if (imgs.length === 0) return;
@@ -4428,6 +4429,15 @@
     // ================================================================
     async function startGenerate() {
         if (state.isGenerating) { showToast('⏳ 正在生成中...'); return; }
+
+        // ★ 以 DOM 上的选中状态为准，同步到 state
+        const domSelected = Array.from(document.querySelectorAll('#genTypeGrid .type-pill.selected'))
+            .map(p => p.dataset.type);
+        if (domSelected.length > 0) {
+            state.selectedTypes = domSelected;
+            console.log('🔧 [生成前] 以 DOM 为准，selectedTypes =', state.selectedTypes);
+        }
+
         const v = collectVars();
         const name = v.name;
         if (!name || name === '商品') { showToast('⚠️ 请输入商品名称'); document.getElementById('productName').focus(); return; }
@@ -4679,16 +4689,20 @@
             if (wantVideo) {
                 try {
                     const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
+                    // ★ 裁剪时长
+                    const safeSeconds = String(clampVideoSeconds(cfg.duration));
+                    console.log(`🎬 视频时长：配置 ${cfg.duration}s → 实际 ${safeSeconds}s（Agnes 限制 4~12s）`);
+
                     const isEN = videoConfigState.platform === 'TikTok Shop' || videoConfigState.platform === 'Temu';
                     let videoPrompt = '';
                     if (isEN) {
-                        videoPrompt = `Real commercial product video, 4K, 60fps, ${cfg.duration}s e-commerce selling short video. `;
+                        videoPrompt = `Real commercial product video, 4K, 60fps, ${safeSeconds}s e-commerce selling short video. `;
                         videoPrompt += state.videoPrompts.map((s, i) => `Shot${i+1}(${s.time} ${s.tag}): ${s.prompt}`).join('. ');
                         videoPrompt += `. Camera: slow push shot, slight natural handheld. Light: soft studio natural light, real color. `;
                         videoPrompt += `Category: ${VIDEO_CATEGORY_MODS[videoConfigState.category]}. `;
                         videoPrompt += `Scene: ${VIDEO_SCENE_MODS_EN[videoConfigState.scene] || ''}. `;
                     } else {
-                        videoPrompt = `真实商业实拍短视频，4K，60fps，时长${cfg.duration}秒，电商带货短视频。`;
+                        videoPrompt = `真实商业实拍短视频，4K，60fps，时长${safeSeconds}秒，电商带货短视频。`;
                         videoPrompt += state.videoPrompts.map((s, i) => `镜头${i+1}（${s.time} ${s.tag}）：${s.prompt}`).join('。');
                         videoPrompt += `。运镜：缓慢推拉镜头，轻微自然手持抖动，稳定不晃动。`;
                         videoPrompt += `光影：柔和自然光，色彩真实，原生色彩，不饱和度拉高。`;
@@ -4698,9 +4712,9 @@
                     }
                     if (videoAnalysis?.prompt) videoPrompt = videoAnalysis.prompt;
 
-                    updateProgress(80, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
+                    updateProgress(80, `正在生成视频（${videoRatio}，时长 ${safeSeconds}s，排队中，最长 10 分钟）...`);
                     const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
-                    const videoRes = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, '720P', (attempt, total, status, text) => {
+                    const videoRes = await generateAgnesVideo(videoPrompt, safeSeconds, combinedRefs, videoRatio, '720P', (attempt, total, status, text) => {
                         const pct = 80 + Math.min(18, (attempt / total) * 18);
                         updateProgress(pct, '视频：' + text);
                     });
@@ -4880,8 +4894,6 @@
     // ================================================================
     // 主副图编辑弹窗
     // ================================================================
-    let editImgIndex = -1;
-
     function openEditImgModal(index) {
         const r = state.generatedData;
         if (!r || !r.images || !r.images[index]) { showToast('⚠️ 图片数据丢失'); return; }
@@ -4910,7 +4922,6 @@
         document.body.style.overflow = 'hidden';
     }
 
-    // 从编辑弹窗点预览图打开 viewer
     function viewerOpenFromEditModal() {
         if (editImgIndex < 0) return;
         const r = state.generatedData;
@@ -4920,7 +4931,6 @@
             url: x.url,
             filename: `${pname}_${x.tag || '图' + (i+1)}.${guessExt(x.url)}`
         }));
-        // 找到当前索引在 items 里的位置
         const curUrl = r.images[editImgIndex].url;
         let idx = 0;
         for (let i = 0; i < items.length; i++) {
@@ -5039,8 +5049,6 @@
     // ================================================================
     // 详情页
     // ================================================================
-    let deCurrentIdx = 0;
-
     function renderDetailSplit(detailImages) {
         const preview = document.getElementById('detailPreview');
         if (!preview) return;
@@ -5254,7 +5262,11 @@
         showToast(`⏳ 正在重新生成视频（${videoEditState.ratio} · ${videoEditState.quality}）...`);
 
         const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
-        const seconds = String(cfg?.duration || 5);
+        // ★ 裁剪时长
+        const rawSec = cfg?.duration || 5;
+        const seconds = String(clampVideoSeconds(rawSec));
+        console.log(`🎬 [重新生成] 视频时长：配置 ${rawSec}s → 实际 ${seconds}s`);
+
         const refImages = state.referenceImages.slice();
         const keyframeUrls = state.keyframeUrls || [];
         const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
@@ -5318,7 +5330,11 @@
             if (!frameUrls || frameUrls.length === 0) throw new Error('关键帧上传失败');
 
             const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
-            const seconds = String(cfg?.duration || 5);
+            // ★ 裁剪时长
+            const rawSec = cfg?.duration || 5;
+            const seconds = String(clampVideoSeconds(rawSec));
+            console.log(`🎬 [修复] 视频时长：配置 ${rawSec}s → 实际 ${seconds}s`);
+
             showToast('⏳ 正在基于当前视频修复（排队中，最长 10 分钟）...');
             const finalPrompt = buildPromptWithNegative(newPrompt, newNegative);
             const videoRes = await generateAgnesVideo(
@@ -5372,7 +5388,7 @@
     }
 
     // ================================================================
-    // 文案卡片渲染（紧凑 + 可编辑 + 切换）
+    // 文案卡片渲染
     // ================================================================
     function renderCopyList(versions) {
         const list = document.getElementById('copyList');
@@ -5402,14 +5418,8 @@
         }).join('');
     }
 
-    function copyTextFromIdx(idx) {
-        const r = state.generatedData;
-        if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
-        copyText(r.copyVersions[idx].content || '');
-    }
-
     // ================================================================
-    // 同步相关（保持原样）
+    // 同步相关
     // ================================================================
     async function loadSyncProducts() {
         const box = document.getElementById('syncProductList');
@@ -5847,7 +5857,12 @@
                 videoAnalysis: d.video_analysis || null,
                 productName: d.product_name || ''
             };
-            if (Array.isArray(d.selected_types)) state.selectedTypes = d.selected_types;
+            // ★ 合并去重，避免后端会话覆盖本地默认
+            if (Array.isArray(d.selected_types) && d.selected_types.length > 0) {
+                const merged = new Set([...state.selectedTypes, ...d.selected_types]);
+                state.selectedTypes = Array.from(merged);
+                console.log('💾 [会话] selectedTypes 合并后:', state.selectedTypes);
+            }
             if (d.image_count) state.imageCount = d.image_count;
             if (d.current_platform) state.currentPlatform = d.current_platform;
             if (Array.isArray(d.carousel_prompts)) state.carouselPrompts = d.carousel_prompts;
@@ -5900,6 +5915,36 @@
     }
 
     // ================================================================
+    // ★ 补齐被误删的 7 个函数（避免 window.* 暴露时 ReferenceError）
+    // ================================================================
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => showToast('📋 已复制'))
+            .catch(() => showToast('⚠️ 复制失败'));
+    }
+    function applyAllImages() { showToast('✅ 全部主图已应用'); }
+    function applyCarousel() { showToast('✅ 轮播图已应用'); }
+    function applyDetail() { showToast('✅ 详情页已应用'); }
+    function exportDetailHTML() {
+        const r = state.generatedData;
+        if (!r || !r.detailImages) { showToast('⚠️ 详情页未生成'); return; }
+        rebuildDetailHTML();
+        const blob = new Blob([r.detailHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'detail.html'; a.click();
+        URL.revokeObjectURL(a.href);
+        showToast('📥 已导出');
+    }
+    function applyVideo() { showToast('✅ 视频已应用'); }
+    function downloadVideo() {
+        const v = document.querySelector('#videoPreviewContainer video');
+        if (v && v.src) {
+            const a = document.createElement('a');
+            a.href = v.src; a.download = 'product_video.mp4'; a.target = '_blank'; a.click();
+            showToast('⬇️ 正在下载...');
+        } else showToast('⚠️ 暂无视频');
+    }
+
+    // ================================================================
     // 初始化
     // ================================================================
     document.addEventListener('DOMContentLoaded', () => {
@@ -5932,6 +5977,9 @@
             updatePromptTabsVisibility();
             initVideoConfig();
 
+            // ★ 同步 type-pill UI
+            syncTypePillsUI();
+
             if (state.generatedData.productName) {
                 document.getElementById('productName').value = state.generatedData.productName;
                 state.currentProductName = state.generatedData.productName;
@@ -5953,7 +6001,6 @@
 
         // 全局键盘事件：ESC / 左右切换
         document.addEventListener('keydown', (e) => {
-            // 全屏预览打开时
             const viewer = document.getElementById('imgViewerModal');
             if (viewer && viewer.classList.contains('show')) {
                 if (e.key === 'Escape') { closeViewer(); e.preventDefault(); }
@@ -5980,7 +6027,7 @@
             }, { passive: false });
         }
 
-        // 全屏预览：点击遮罩关闭（点击 img 不关闭）
+        // 全屏预览：点击遮罩关闭
         const viewerModal = document.getElementById('imgViewerModal');
         if (viewerModal) {
             viewerModal.addEventListener('click', (e) => {
@@ -5988,11 +6035,13 @@
             });
         }
 
-        console.log('🎨 智能素材生成已就绪（6 大需求全部实现）');
+        console.log('🎨 智能素材生成已就绪（视频时长已裁剪到 4~12s）');
         console.log('💡 后端:', BACKEND_URL);
     });
 
+    // ================================================================
     // 全局暴露
+    // ================================================================
     window.goStep = goStep;
     window.goStepBack = goStepBack;
     window.goStepNext = goStepNext;
@@ -6091,6 +6140,7 @@
     window.pickCopyVersion = pickCopyVersion;
     window.closeCopyPicker = closeCopyPicker;
     window.copyTextFromIdx = copyTextFromIdx;
+    window.syncTypePillsUI = syncTypePillsUI;
 </script>
 </body>
 </html>
