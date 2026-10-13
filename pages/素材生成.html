@@ -6,6 +6,7 @@
     <title>智能素材生成</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../css/common.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
@@ -815,9 +816,10 @@
         .btn-sm.outline { background: transparent; border: 1px solid var(--border); color: var(--primary); }
         .btn-sm.danger { background: #fde8ed; color: var(--danger); }
 
+        /* ★ Tab 右侧操作按钮 */
         .result-tabs {
             display: flex; gap: 4px; border-bottom: 1px solid var(--border);
-            margin-bottom: 16px; overflow-x: auto;
+            margin-bottom: 16px; overflow-x: auto; align-items: center;
         }
         .result-tabs::-webkit-scrollbar { height: 2px; }
         .result-tabs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -831,6 +833,32 @@
         .result-tab:hover { color: var(--text); }
         .result-tab.active { color: var(--primary); border-bottom-color: var(--accent); font-weight: 600; }
         .result-tab .count { background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; }
+
+        .result-tab-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 6px;
+            padding-right: 4px;
+            flex-shrink: 0;
+        }
+        .tab-action-btn {
+            padding: 5px 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-2);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.12s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .tab-action-btn:hover { border-color: var(--accent); color: #2a7faa; background: #f5f9fe; }
+        .tab-action-btn.primary { background: var(--accent-soft); border-color: var(--accent); color: #2a7faa; }
 
         .result-panel { display: none; }
         .result-panel.active { display: block; animation: fadeIn 0.2s ease; }
@@ -846,7 +874,7 @@
             display: flex; align-items: center; justify-content: center;
             position: relative; overflow: hidden;
         }
-        .image-item .preview img { width: 100%; height: 100%; object-fit: cover; }
+        .image-item .preview img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
         .image-item .preview .placeholder-icon { font-size: 36px; color: var(--accent); }
         .image-item .badge-pos {
             position: absolute; top: 6px; left: 6px;
@@ -886,13 +914,206 @@
             background: rgba(77,171,247,0.75);
         }
 
-        .copy-list { display: flex; flex-direction: column; gap: 10px; }
-        .copy-item { padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; background: white; }
+        /* ★ 文案卡片紧凑版 */
+        .copy-list { display: flex; flex-direction: column; gap: 8px; }
+        .copy-item {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: white;
+            transition: 0.15s;
+        }
+        .copy-item:hover { border-color: var(--accent); }
         .copy-item.recommended { border-color: var(--accent); background: #f0f8ff; }
-        .copy-item .header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .copy-item .name { font-weight: 600; font-size: 14px; }
-        .copy-item .content { font-size: 13px; margin-top: 8px; line-height: 1.7; white-space: pre-line; }
-        .copy-item .actions { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .copy-item .header {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
+        }
+        .copy-item .header .name { font-weight: 600; font-size: 13px; }
+        .copy-item .header .badges { display: flex; gap: 4px; align-items: center; }
+        .copy-item .header .badges .tag {
+            font-size: 10px; padding: 1px 8px; border-radius: 8px;
+            background: var(--accent-soft); color: var(--accent);
+            font-weight: 600;
+        }
+        .copy-item .header .badges .rec-tag {
+            font-size: 10px; padding: 1px 8px; border-radius: 8px;
+            background: var(--success); color: white;
+            font-weight: 600;
+        }
+        .copy-item textarea.copy-content-edit {
+            width: 100%;
+            min-height: 56px;
+            max-height: 200px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12.5px;
+            line-height: 1.6;
+            font-family: inherit;
+            background: #fafcfe;
+            resize: vertical;
+            box-sizing: border-box;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        .copy-item textarea.copy-content-edit:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            background: white;
+        }
+        .copy-item .actions { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
+
+        /* ★ 文案选择弹窗 */
+        .copy-picker-modal {
+            position: fixed; inset: 0;
+            background: rgba(10,30,47,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .copy-picker-modal.show { display: flex; animation: fadeIn 0.2s ease; }
+        .copy-picker-box {
+            background: white; border-radius: 16px;
+            width: 100%; max-width: 600px; max-height: 80vh;
+            display: flex; flex-direction: column;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+            animation: slideUp 0.25s ease;
+        }
+        .copy-picker-header {
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+        .copy-picker-header h3 {
+            font-size: 15px; font-weight: 600;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .copy-picker-header h3 i { color: var(--accent); }
+        .copy-picker-header .close-btn {
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: #f0f4f9; color: var(--text-2); cursor: pointer;
+            font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .copy-picker-header .close-btn:hover { background: #fde8ed; color: var(--danger); }
+        .copy-picker-body {
+            flex: 1; overflow-y: auto; padding: 10px 14px;
+        }
+        .copy-picker-body::-webkit-scrollbar { width: 4px; }
+        .copy-picker-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
+        .copy-picker-item {
+            padding: 10px 12px; border: 1px solid var(--border);
+            border-radius: 10px; margin-bottom: 8px; cursor: pointer;
+            transition: 0.12s;
+        }
+        .copy-picker-item:hover { border-color: var(--accent); background: #f5f9fe; }
+        .copy-picker-item.selected { border-color: var(--accent); background: #f0f8ff; }
+        .copy-picker-item .title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .copy-picker-item .content {
+            font-size: 12px; color: var(--text-2);
+            white-space: pre-line; line-height: 1.6;
+        }
+
+        /* ★ 全屏图片预览 */
+        .img-viewer-modal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .img-viewer-modal.show { display: flex; animation: fadeIn 0.15s ease; }
+        .img-viewer-stage {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: grab;
+        }
+        .img-viewer-stage:active { cursor: grabbing; }
+        .img-viewer-stage img {
+            max-width: 95vw;
+            max-height: 90vh;
+            object-fit: contain;
+            transition: transform 0.1s;
+            user-select: none;
+            pointer-events: none;
+        }
+        .img-viewer-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white; font-size: 22px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 3;
+            transition: 0.15s;
+        }
+        .img-viewer-close:hover { background: rgba(255,255,255,0.3); }
+        .img-viewer-prev,
+        .img-viewer-next {
+            position: absolute; top: 50%;
+            transform: translateY(-50%);
+            width: 48px; height: 48px; border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white; font-size: 26px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 3;
+            transition: 0.15s;
+        }
+        .img-viewer-prev { left: 16px; }
+        .img-viewer-next { right: 16px; }
+        .img-viewer-prev:hover,
+        .img-viewer-next:hover { background: rgba(255,255,255,0.3); }
+        .img-viewer-prev.disabled,
+        .img-viewer-next.disabled { opacity: 0.25; cursor: not-allowed; }
+        .img-viewer-toolbar {
+            position: absolute; bottom: 24px; left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(20,20,20,0.85);
+            border-radius: 40px;
+            z-index: 3;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 90vw;
+        }
+        .img-viewer-toolbar button {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .img-viewer-toolbar button:hover { background: rgba(255,255,255,0.25); }
+        .img-viewer-toolbar .viewer-scale {
+            color: rgba(255,255,255,0.85);
+            font-size: 12px;
+            min-width: 48px;
+            text-align: center;
+            font-family: ui-monospace, monospace;
+        }
 
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-3); }
         .empty-state i { font-size: 40px; margin-bottom: 10px; display: block; opacity: 0.4; }
@@ -1106,6 +1327,7 @@
             z-index: 2;
         }
 
+        /* ★ 主副图编辑弹窗（放大一倍：720 → 1440，240 → 480） */
         .edit-img-modal {
             position: fixed; inset: 0;
             background: rgba(10,30,47,0.65);
@@ -1121,8 +1343,8 @@
             background: white;
             border-radius: 16px;
             width: 100%;
-            max-width: 720px;
-            max-height: 90vh;
+            max-width: 1440px;
+            max-height: 92vh;
             display: flex;
             flex-direction: column;
             box-shadow: 0 40px 80px rgba(0,0,0,0.35);
@@ -1163,13 +1385,13 @@
             overflow-y: auto;
             padding: 18px 24px;
             display: grid;
-            grid-template-columns: 240px 1fr;
+            grid-template-columns: 480px 1fr;
             gap: 20px;
         }
         .edit-img-body::-webkit-scrollbar { width: 4px; }
         .edit-img-body::-webkit-scrollbar-thumb { background: #c8d8e8; border-radius: 10px; }
         .edit-img-preview {
-            width: 240px;
+            width: 480px;
             aspect-ratio: 3/4;
             border-radius: 12px;
             border: 1px solid var(--border);
@@ -1179,8 +1401,8 @@
             overflow: hidden;
             position: relative;
         }
-        .edit-img-preview img { width: 100%; height: 100%; object-fit: cover; }
-        .edit-img-preview .placeholder-icon { font-size: 42px; color: var(--accent); }
+        .edit-img-preview img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+        .edit-img-preview .placeholder-icon { font-size: 60px; color: var(--accent); }
         .edit-img-preview .badge-pos {
             position: absolute; top: 8px; left: 8px;
             font-size: 11px; padding: 3px 10px; border-radius: 10px;
@@ -1223,6 +1445,7 @@
             gap: 10px;
             flex-shrink: 0;
             background: #fafcfe;
+            flex-wrap: wrap;
         }
 
         .detail-split {
@@ -1353,6 +1576,7 @@
             max-height: 420px;
             object-fit: contain;
             display: block;
+            cursor: zoom-in;
         }
         .detail-edit-panel .de-thumb .placeholder-icon { font-size: 36px; color: #c8d4e0; }
         .detail-edit-panel .de-field {
@@ -1385,6 +1609,11 @@
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-soft);
             background: white;
+        }
+        .de-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
         }
         .detail-screen-nav {
             display: grid;
@@ -1535,6 +1764,11 @@
             border-color: var(--primary);
             color: white;
         }
+        .ve-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
 
         @media (max-width: 1200px) {
             .image-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1565,7 +1799,7 @@
             .video-config-row { flex-direction: column; align-items: flex-start; gap: 6px; }
             .video-config-label { min-width: 0; }
             .edit-img-body { grid-template-columns: 1fr; }
-            .edit-img-preview { width: 100%; max-width: 240px; margin: 0 auto; }
+            .edit-img-preview { width: 100%; max-width: 480px; margin: 0 auto; }
         }
         @media (max-width: 480px) {
             .type-pills { grid-template-columns: repeat(2, 1fr); }
@@ -1815,7 +2049,7 @@
                                 <div class="pill-group" id="videoSceneGroup">
                                     <button class="pill-btn active" data-video-scene="手部" onclick="selectVideoScene(this)">🙌 仅手部演示</button>
                                     <button class="pill-btn" data-video-scene="无人物" onclick="selectVideoScene(this)">🚫 无人物</button>
-                                    <button class="pill-btn" data-video-scene="局部" onclick="selectVideoScene(this)">👤 局部特写</button>
+                                    <button class="pill-btn" data-video-scene="局部" onclick="selectVideoScene(this)">📸 局部特写</button>
                                     <button class="pill-btn" data-video-scene="东方人物全景" onclick="selectVideoScene(this)">🇨🇳 东方人物全景</button>
                                     <button class="pill-btn" data-video-scene="海外人物全景" onclick="selectVideoScene(this)">🌍 海外人物全景</button>
                                 </div>
@@ -1862,6 +2096,15 @@
                 <button class="result-tab" data-tab="video" onclick="switchResultTab('video')" id="tabResultVideo">
                     <i class="fas fa-video"></i> 视频 <span class="count" id="cnt-video">0</span>
                 </button>
+
+                <div class="result-tab-actions" id="resultTabActions">
+                    <button class="tab-action-btn" id="btnDownloadAll" onclick="downloadCurrentTabZip()">
+                        <i class="fas fa-file-archive"></i> 全部下载
+                    </button>
+                    <button class="tab-action-btn primary" id="btnUploadAll" onclick="uploadCurrentTabToAssets()">
+                        <i class="fas fa-cloud-upload-alt"></i> 上传素材库
+                    </button>
+                </div>
             </div>
 
             <div class="result-panel active" id="result-images">
@@ -1917,9 +2160,18 @@
                                 <label><i class="fas fa-ban"></i> 反提示词（不想要的元素，可选）</label>
                                 <textarea id="deNegative" placeholder="例如：模糊、水印、杂乱背景、低分辨率..."></textarea>
                             </div>
-                            <div class="de-field" style="display:flex; gap:8px;">
-                                <span class="btn-sm primary" style="flex:1; justify-content:center; padding:8px;" onclick="regenerateDetailScreen()">
-                                    <i class="fas fa-redo"></i> 重新生成此屏
+                            <div class="de-field de-actions">
+                                <span class="btn-sm primary" onclick="regenerateDetailScreen()">
+                                    <i class="fas fa-redo"></i> 重新生成
+                                </span>
+                                <span class="btn-sm outline" onclick="repairDetailScreen()">
+                                    <i class="fas fa-wand-magic-sparkles"></i> 修复图片
+                                </span>
+                                <span class="btn-sm blue" onclick="downloadDetailScreen()">
+                                    <i class="fas fa-download"></i> 下载
+                                </span>
+                                <span class="btn-sm success" onclick="collectDetailScreen()">
+                                    <i class="fas fa-star"></i> 收藏
                                 </span>
                             </div>
                             <div class="detail-screen-nav" id="detailScreenNav"></div>
@@ -1935,6 +2187,7 @@
                         <div style="display:flex; gap:8px;">
                             <span class="btn-sm primary" onclick="applyVideo()"><i class="fas fa-check"></i> 应用</span>
                             <span class="btn-sm outline" onclick="downloadVideo()"><i class="fas fa-download"></i> 下载</span>
+                            <span class="btn-sm success" onclick="collectVideo()"><i class="fas fa-star"></i> 收藏</span>
                         </div>
                     </div>
                     <div class="video-split">
@@ -1975,11 +2228,11 @@
                                 <label><i class="fas fa-ban"></i> 反提示词（不想要的元素，可选）</label>
                                 <textarea id="veNegative" placeholder="例如：畸形、多余肢体、模糊、卡通..."></textarea>
                             </div>
-                            <div class="ve-field" style="display:flex; gap:8px;">
-                                <span class="btn-sm outline" style="flex:1; justify-content:center; padding:8px;" onclick="repairVideo()">
+                            <div class="ve-field ve-actions">
+                                <span class="btn-sm outline" onclick="repairVideo()">
                                     <i class="fas fa-wand-magic-sparkles"></i> 修复视频
                                 </span>
-                                <span class="btn-sm primary" style="flex:1; justify-content:center; padding:8px;" onclick="regenerateVideo()">
+                                <span class="btn-sm primary" onclick="regenerateVideo()">
                                     <i class="fas fa-redo"></i> 重新生成视频
                                 </span>
                             </div>
@@ -2194,6 +2447,12 @@
         </div>
         <div class="edit-img-footer">
             <span class="btn-lg outline" onclick="closeEditImgModal()">取消</span>
+            <span class="btn-lg outline" onclick="downloadEditImg()">
+                <i class="fas fa-download"></i> 下载
+            </span>
+            <span class="btn-lg outline" onclick="collectEditImg()">
+                <i class="fas fa-star"></i> 收藏
+            </span>
             <span class="btn-lg outline" id="editImgRepairBtn" onclick="repairSingleImage()">
                 <i class="fas fa-wand-magic-sparkles"></i> 修复图片
             </span>
@@ -2201,6 +2460,35 @@
                 <i class="fas fa-redo"></i> 重新生成
             </span>
         </div>
+    </div>
+</div>
+
+<!-- ★ 文案选择弹窗 -->
+<div class="copy-picker-modal" id="copyPickerModal" onclick="if(event.target===this) closeCopyPicker()">
+    <div class="copy-picker-box">
+        <div class="copy-picker-header">
+            <h3><i class="fas fa-list"></i> 选择文案版本</h3>
+            <button class="close-btn" onclick="closeCopyPicker()">×</button>
+        </div>
+        <div class="copy-picker-body" id="copyPickerBody"></div>
+    </div>
+</div>
+
+<!-- ★ 全屏图片预览 -->
+<div class="img-viewer-modal" id="imgViewerModal">
+    <button class="img-viewer-close" onclick="closeViewer()">×</button>
+    <button class="img-viewer-prev" id="viewerPrevBtn" onclick="viewerPrev()">‹</button>
+    <button class="img-viewer-next" id="viewerNextBtn" onclick="viewerNext()">›</button>
+    <div class="img-viewer-stage" id="viewerStage">
+        <img id="viewerImg" src="" alt="">
+    </div>
+    <div class="img-viewer-toolbar">
+        <button onclick="viewerZoom(-0.2)"><i class="fas fa-search-minus"></i></button>
+        <span class="viewer-scale" id="viewerScale">100%</span>
+        <button onclick="viewerZoom(0.2)"><i class="fas fa-search-plus"></i></button>
+        <button onclick="viewerReset()"><i class="fas fa-compress"></i> 重置</button>
+        <button onclick="viewerDownload()"><i class="fas fa-download"></i> 下载</button>
+        <button onclick="viewerCollect()"><i class="fas fa-star"></i> 收藏</button>
     </div>
 </div>
 
@@ -2234,9 +2522,7 @@
             const mo = new MutationObserver(() => {
                 const step1 = document.getElementById('step1');
                 const step2 = document.getElementById('step2');
-                if (step1 && step2 && step1.contains(step2)) {
-                    fix();
-                }
+                if (step1 && step2 && step1.contains(step2)) fix();
             });
             mo.observe(content, { childList: true, subtree: true });
             setTimeout(() => mo.disconnect(), 10000);
@@ -2434,6 +2720,16 @@
         loading: false
     };
 
+    // 全屏预览状态
+    const viewerState = {
+        images: [],
+        index: 0,
+        scale: 1,
+    };
+
+    // 当前打开的文案选择卡片
+    let copyPickerTargetIdx = -1;
+
     // ================================================================
     // 工具
     // ================================================================
@@ -2470,18 +2766,553 @@
         if (!n) return p;
         return p + '\n\n避免：' + n;
     }
-    // ★ 安全 textContent / innerHTML 工具
     function setText(id, val) {
         const el = document.getElementById(id);
         if (el) el.textContent = val;
-        else console.warn('⚠️ 找不到 #' + id);
     }
     function setHTML(id, val) {
         const el = document.getElementById(id);
         if (el) el.innerHTML = val;
-        else console.warn('⚠️ 找不到 #' + id);
+    }
+    // 根据 url 猜扩展名
+    function guessExt(url, fallback = 'png') {
+        if (!url) return fallback;
+        if (url.startsWith('data:image/')) {
+            const m = url.match(/^data:image\/(\w+)/);
+            return m ? m[1] : fallback;
+        }
+        if (url.startsWith('data:video/')) {
+            const m = url.match(/^data:video\/(\w+)/);
+            return m ? m[1] : 'mp4';
+        }
+        const clean = url.split('?')[0].split('#')[0];
+        const parts = clean.split('.');
+        if (parts.length > 1) return parts.pop().toLowerCase();
+        return fallback;
+    }
+    // 从 url 拿 blob
+    async function urlToBlob(url) {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`下载失败：HTTP ${resp.status}`);
+        return await resp.blob();
+    }
+    // 下载单张
+    async function downloadOne(url, filename) {
+        try {
+            if (url.startsWith('data:')) {
+                const a = document.createElement('a');
+                a.href = url; a.download = filename; a.click();
+                return true;
+            }
+            const blob = await urlToBlob(url);
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            return true;
+        } catch (e) {
+            console.error('下载失败:', e);
+            showToast('⚠️ 下载失败：' + e.message);
+            return false;
+        }
     }
 
+    // ================================================================
+    // 收藏 / 素材库
+    // ================================================================
+    async function collectToAssets(url, name, productName) {
+        try {
+            const blob = await urlToBlob(url);
+            const ext = guessExt(url, 'png');
+            const safeName = (name || 'asset').replace(/[\/\\:*?"<>|]/g, '_').slice(0, 50);
+            const file = new File([blob], `${safeName}.${ext}`, { type: blob.type || 'application/octet-stream' });
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('tags', '收藏');
+            fd.append('product_name', productName || '');
+            fd.append('category', '收藏');
+            const r = await fetch(BACKEND_URL + '/api/assets/upload', { method: 'POST', body: fd });
+            const data = await r.json();
+            if (data.success) {
+                showToast('⭐ 已收藏到素材库');
+                return true;
+            }
+            showToast('⚠️ 收藏失败：' + (data.message || '未知错误'));
+            return false;
+        } catch (e) {
+            console.error('收藏失败:', e);
+            showToast('⚠️ 收藏失败：' + e.message);
+            return false;
+        }
+    }
+
+    // ================================================================
+    // 打包下载（zip）
+    // ================================================================
+    async function downloadAsZip(items, zipName) {
+        if (typeof JSZip === 'undefined') {
+            showToast('⚠️ JSZip 未加载，请刷新页面');
+            return;
+        }
+        if (!items || items.length === 0) {
+            showToast('⚠️ 没有可下载的内容');
+            return;
+        }
+        showToast(`⏳ 正在打包 ${items.length} 个文件...`);
+        try {
+            const zip = new JSZip();
+            let ok = 0;
+            for (let i = 0; i < items.length; i++) {
+                const it = items[i];
+                try {
+                    const blob = await urlToBlob(it.url);
+                    zip.file(it.filename, blob);
+                    ok++;
+                } catch (e) {
+                    console.warn(`打包第 ${i+1} 个失败:`, e);
+                }
+            }
+            if (ok === 0) {
+                showToast('❌ 全部下载失败');
+                return;
+            }
+            const content = await zip.generateAsync({ type: 'blob' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(content);
+            a.download = `${zipName}.zip`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+            showToast(`✅ 已打包下载（${ok} 个文件）`);
+        } catch (e) {
+            console.error('打包失败:', e);
+            showToast('❌ 打包失败：' + e.message);
+        }
+    }
+
+    // ================================================================
+    // 批量上传素材库
+    // ================================================================
+    async function uploadAllToAssets(items, productName) {
+        if (!items || items.length === 0) {
+            showToast('⚠️ 没有可上传的内容');
+            return;
+        }
+        showToast(`⏳ 正在上传 ${items.length} 个文件到素材库...`);
+        let ok = 0, fail = 0;
+        for (let i = 0; i < items.length; i++) {
+            const it = items[i];
+            try {
+                const blob = await urlToBlob(it.url);
+                const file = new File([blob], it.filename, { type: blob.type || 'application/octet-stream' });
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('tags', '批量上传');
+                fd.append('product_name', productName || '');
+                fd.append('category', '生成素材');
+                const r = await fetch(BACKEND_URL + '/api/assets/upload', { method: 'POST', body: fd });
+                const data = await r.json();
+                if (data.success) ok++; else fail++;
+            } catch (e) {
+                fail++;
+            }
+        }
+        showToast(`✅ 上传完成：成功 ${ok} 个${fail > 0 ? `，失败 ${fail} 个` : ''}`);
+    }
+
+    // ================================================================
+    // 当前 Tab 的「全部下载」「上传素材库」
+    // ================================================================
+    function getCurrentResultTab() {
+        const active = document.querySelector('.result-tab.active');
+        return active ? active.dataset.tab : 'images';
+    }
+
+    function getCurrentTabItems() {
+        const tab = getCurrentResultTab();
+        const r = state.generatedData || {};
+        const pname = r.productName || '商品';
+
+        if (tab === 'images') {
+            const items = [];
+            const all = r.images || [];
+            all.forEach((img, i) => {
+                if (img.url) {
+                    const tag = img.tag || `图${i+1}`;
+                    items.push({ url: img.url, filename: `${pname}_${tag}.${guessExt(img.url)}` });
+                }
+            });
+            return items;
+        }
+        if (tab === 'detail') {
+            const items = [];
+            (r.detailImages || []).forEach((d, i) => {
+                if (d.url) {
+                    items.push({ url: d.url, filename: `${pname}_详情第${d.step || i+1}屏.${guessExt(d.url)}` });
+                }
+            });
+            return items;
+        }
+        if (tab === 'video') {
+            if (r.videoUrl) {
+                return [{ url: r.videoUrl, filename: `${pname}_视频.mp4` }];
+            }
+            return [];
+        }
+        if (tab === 'copy') {
+            return []; // 文案不走 zip
+        }
+        return [];
+    }
+
+    async function downloadCurrentTabZip() {
+        const tab = getCurrentResultTab();
+        const r = state.generatedData || {};
+        const pname = (r.productName || '商品').replace(/[\/\\:*?"<>|]/g, '_');
+
+        if (tab === 'copy') {
+            // 文案走 txt
+            downloadCopyAsTxt();
+            return;
+        }
+        const items = getCurrentTabItems();
+        if (items.length === 0) {
+            showToast('⚠️ 当前 Tab 没有可下载的内容');
+            return;
+        }
+        const zipName = `${pname}_${tab}_${Date.now()}`;
+        await downloadAsZip(items, zipName);
+    }
+
+    async function uploadCurrentTabToAssets() {
+        const tab = getCurrentResultTab();
+        if (tab === 'copy') {
+            showToast('ℹ️ 文案暂不支持上传素材库，请使用「全部下载」导出 txt');
+            return;
+        }
+        const items = getCurrentTabItems();
+        if (items.length === 0) {
+            showToast('⚠️ 当前 Tab 没有可上传的内容');
+            return;
+        }
+        const pname = (state.generatedData || {}).productName || '商品';
+        await uploadAllToAssets(items, pname);
+    }
+
+    // 文案导出 txt
+    function downloadCopyAsTxt() {
+        const r = state.generatedData || {};
+        const versions = r.copyVersions || [];
+        if (versions.length === 0) {
+            showToast('⚠️ 没有文案可下载');
+            return;
+        }
+        const pname = r.productName || '商品';
+        const lines = [`# ${pname} · 宣传文案` , '', `生成时间：${new Date().toLocaleString('zh-CN', { hour12: false })}`, ''];
+        versions.forEach((v, i) => {
+            lines.push(`${'═'.repeat(48)}`);
+            lines.push(`【版本 ${i + 1}】${v.name || ''}`);
+            lines.push(`转化率：${v.conversion || '-'}`);
+            lines.push('');
+            lines.push(v.content || '');
+            lines.push('');
+        });
+        const text = lines.join('\n');
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${pname}_宣传文案.txt`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        showToast('✅ 文案已导出 txt');
+    }
+
+    // ================================================================
+    // 全屏图片预览
+    // ================================================================
+    function openViewer(images, startIdx) {
+        if (!images || images.length === 0) return;
+        viewerState.images = images;
+        viewerState.index = Math.max(0, Math.min(startIdx || 0, images.length - 1));
+        viewerState.scale = 1;
+        const modal = document.getElementById('imgViewerModal');
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        viewerRender();
+    }
+
+    function viewerRender() {
+        const cur = viewerState.images[viewerState.index];
+        if (!cur) return;
+        const img = document.getElementById('viewerImg');
+        img.src = cur.url;
+        img.style.transform = `scale(${viewerState.scale})`;
+        document.getElementById('viewerScale').textContent = Math.round(viewerState.scale * 100) + '%';
+        const prevBtn = document.getElementById('viewerPrevBtn');
+        const nextBtn = document.getElementById('viewerNextBtn');
+        prevBtn.classList.toggle('disabled', viewerState.index <= 0);
+        nextBtn.classList.toggle('disabled', viewerState.index >= viewerState.images.length - 1);
+    }
+
+    function viewerPrev() {
+        if (viewerState.index <= 0) return;
+        viewerState.index--;
+        viewerState.scale = 1;
+        viewerRender();
+    }
+    function viewerNext() {
+        if (viewerState.index >= viewerState.images.length - 1) return;
+        viewerState.index++;
+        viewerState.scale = 1;
+        viewerRender();
+    }
+    function viewerZoom(delta) {
+        viewerState.scale = Math.max(0.2, Math.min(5, viewerState.scale + delta));
+        viewerRender();
+    }
+    function viewerReset() {
+        viewerState.scale = 1;
+        viewerRender();
+    }
+    function viewerDownload() {
+        const cur = viewerState.images[viewerState.index];
+        if (!cur) return;
+        downloadOne(cur.url, cur.filename || 'image.png');
+    }
+    function viewerCollect() {
+        const cur = viewerState.images[viewerState.index];
+        if (!cur) return;
+        const pname = (state.generatedData || {}).productName || '商品';
+        collectToAssets(cur.url, cur.filename || 'image', pname);
+    }
+    function closeViewer() {
+        document.getElementById('imgViewerModal').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // 为某个 grid 构建 viewer 数据
+    function buildViewerImagesFromGrid(gridId, typeName) {
+        const r = state.generatedData || {};
+        const pname = r.productName || '商品';
+        const grid = document.getElementById(gridId);
+        if (!grid) return [];
+        const imgEls = grid.querySelectorAll('img');
+        const result = [];
+        imgEls.forEach((el, i) => {
+            if (el.src) {
+                result.push({
+                    url: el.src,
+                    filename: `${pname}_${typeName}${i+1}.${guessExt(el.src)}`
+                });
+            }
+        });
+        return result;
+    }
+
+    // 为详情页构建 viewer 数据
+    function buildViewerImagesFromDetail() {
+        const r = state.generatedData || {};
+        const pname = r.productName || '商品';
+        const result = [];
+        (r.detailImages || []).forEach((d) => {
+            if (d.url) {
+                result.push({
+                    url: d.url,
+                    filename: `${pname}_详情第${d.step}屏.${guessExt(d.url)}`
+                });
+            }
+        });
+        return result;
+    }
+
+    // ================================================================
+    // 文案内容编辑 + 选择版本
+    // ================================================================
+    function onCopyEdit(idx, el) {
+        const r = state.generatedData;
+        if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
+        r.copyVersions[idx].content = el.value;
+        saveGenSessionToBackend();
+    }
+
+    function applyCopy(idx) {
+        const r = state.generatedData;
+        if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
+        // 把选中的这版设为推荐
+        r.copyVersions.forEach((v, i) => { v.recommended = (i === idx); });
+        renderCopyList(r.copyVersions);
+        showToast(`✅ 已应用「${r.copyVersions[idx].name}」`);
+        saveGenSessionToBackend();
+    }
+
+    function downloadOneCopy(idx) {
+        const r = state.generatedData;
+        if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
+        const v = r.copyVersions[idx];
+        const pname = r.productName || '商品';
+        const text = `【${v.name}】\n转化率：${v.conversion || '-'}\n\n${v.content || ''}`;
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${pname}_${v.name || '文案'}.txt`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        showToast('✅ 已下载此版文案');
+    }
+
+    function switchCopyVersion(idx) {
+        const r = state.generatedData;
+        if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
+        copyPickerTargetIdx = idx;
+        // 渲染选择面板
+        const body = document.getElementById('copyPickerBody');
+        if (!body) return;
+        const currentName = r.copyVersions[idx].name;
+        body.innerHTML = r.copyVersions.map((v, i) => `
+            <div class="copy-picker-item ${v.name === currentName ? 'selected' : ''}"
+                 onclick="pickCopyVersion(${i})">
+                <div class="title">${escapeHtml(v.name)} ${i === idx ? '（当前）' : ''}</div>
+                <div class="content">${escapeHtml((v.content || '').slice(0, 120))}${(v.content || '').length > 120 ? '...' : ''}</div>
+            </div>
+        `).join('');
+        document.getElementById('copyPickerModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function pickCopyVersion(srcIdx) {
+        const r = state.generatedData;
+        if (!r || !r.copyVersions || !r.copyVersions[srcIdx]) return;
+        if (copyPickerTargetIdx < 0 || copyPickerTargetIdx >= r.copyVersions.length) {
+            closeCopyPicker();
+            return;
+        }
+        // 把 srcIdx 这版的内容复制到 copyPickerTargetIdx
+        const src = r.copyVersions[srcIdx];
+        r.copyVersions[copyPickerTargetIdx].content = src.content;
+        r.copyVersions[copyPickerTargetIdx].name = src.name;
+        r.copyVersions[copyPickerTargetIdx].conversion = src.conversion;
+        renderCopyList(r.copyVersions);
+        saveGenSessionToBackend();
+        showToast(`✅ 已切换为「${src.name}」`);
+        closeCopyPicker();
+    }
+
+    function closeCopyPicker() {
+        document.getElementById('copyPickerModal').classList.remove('show');
+        document.body.style.overflow = '';
+        copyPickerTargetIdx = -1;
+    }
+
+    // ================================================================
+    // 详情页：修复 / 下载 / 收藏
+    // ================================================================
+    async function repairDetailScreen() {
+        const r = state.generatedData;
+        if (!r || !r.detailImages || !r.detailImages[deCurrentIdx]) return;
+        const d = r.detailImages[deCurrentIdx];
+        if (!d.url) { showToast('⚠️ 当前屏无图，无法修复'); return; }
+
+        const newPrompt = document.getElementById('dePrompt').value.trim();
+        const newNegative = document.getElementById('deNegative').value.trim();
+        if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
+
+        showToast(`⏳ 正在修复第 ${d.step} 屏...`);
+        const refImages = [d.remoteUrl || d.url];
+        const finalPrompt = buildPromptWithNegative(newPrompt, newNegative);
+
+        try {
+            const res = await generateAgnesImage(finalPrompt, '1K', '3:4', refImages);
+            d.url = res.dataUrl || res.url;
+            d.remoteUrl = res.url;
+            d.prompt = newPrompt;
+            d.negative = newNegative;
+            d.error = null;
+            renderDetailSplit(r.detailImages);
+            rebuildDetailHTML();
+            saveGenSessionToBackend();
+            setText('cnt-detail', '1');
+            showToast(`✅ 第 ${d.step} 屏已修复`);
+        } catch (err) {
+            console.error('❌ 详情页修复失败:', err);
+            showToast(`❌ 第 ${d.step} 屏修复失败：${err.message}`);
+        }
+    }
+
+    function downloadDetailScreen() {
+        const r = state.generatedData;
+        if (!r || !r.detailImages || !r.detailImages[deCurrentIdx]) return;
+        const d = r.detailImages[deCurrentIdx];
+        if (!d.url) { showToast('⚠️ 当前屏无图'); return; }
+        const pname = r.productName || '商品';
+        downloadOne(d.url, `${pname}_详情第${d.step}屏.${guessExt(d.url)}`);
+    }
+
+    function collectDetailScreen() {
+        const r = state.generatedData;
+        if (!r || !r.detailImages || !r.detailImages[deCurrentIdx]) return;
+        const d = r.detailImages[deCurrentIdx];
+        if (!d.url) { showToast('⚠️ 当前屏无图'); return; }
+        const pname = r.productName || '商品';
+        collectToAssets(d.url, `${pname}_详情第${d.step}屏`, pname);
+    }
+
+    // ================================================================
+    // 视频：收藏
+    // ================================================================
+    function collectVideo() {
+        const r = state.generatedData;
+        if (!r || !r.videoUrl) { showToast('⚠️ 暂无视频'); return; }
+        const pname = r.productName || '商品';
+        collectToAssets(r.videoUrl, `${pname}_视频`, pname);
+    }
+
+    // ================================================================
+    // 主副图编辑弹窗：下载 / 收藏
+    // ================================================================
+    function downloadEditImg() {
+        if (editImgIndex < 0) return;
+        const r = state.generatedData;
+        if (!r || !r.images || !r.images[editImgIndex]) return;
+        const img = r.images[editImgIndex];
+        if (!img.url) { showToast('⚠️ 当前图无 URL'); return; }
+        const pname = r.productName || '商品';
+        const tag = img.tag || `图${editImgIndex+1}`;
+        downloadOne(img.url, `${pname}_${tag}.${guessExt(img.url)}`);
+    }
+    function collectEditImg() {
+        if (editImgIndex < 0) return;
+        const r = state.generatedData;
+        if (!r || !r.images || !r.images[editImgIndex]) return;
+        const img = r.images[editImgIndex];
+        if (!img.url) { showToast('⚠️ 当前图无 URL'); return; }
+        const pname = r.productName || '商品';
+        const tag = img.tag || `图${editImgIndex+1}`;
+        collectToAssets(img.url, `${pname}_${tag}`, pname);
+    }
+
+    function collectFromCard(imgIdx) {
+        const r = state.generatedData;
+        if (!r || !r.images || !r.images[imgIdx]) return;
+        const img = r.images[imgIdx];
+        if (!img.url) { showToast('⚠️ 该图无 URL'); return; }
+        const pname = r.productName || '商品';
+        const tag = img.tag || `图${imgIdx+1}`;
+        collectToAssets(img.url, `${pname}_${tag}`, pname);
+    }
+
+    function downloadFromCard(imgIdx) {
+        const r = state.generatedData;
+        if (!r || !r.images || !r.images[imgIdx]) return;
+        const img = r.images[imgIdx];
+        if (!img.url) { showToast('⚠️ 该图无 URL'); return; }
+        const pname = r.productName || '商品';
+        const tag = img.tag || `图${imgIdx+1}`;
+        downloadOne(img.url, `${pname}_${tag}.${guessExt(img.url)}`);
+    }
+
+    // ================================================================
+    // collectVars 等业务函数
+    // ================================================================
     function collectVars() {
         const name = (document.getElementById('productName').value || '').trim() || '商品';
         const featStr = (document.getElementById('productFeatures').value || '').trim();
@@ -2581,6 +3412,7 @@
             if (btnNext) btnNext.style.display = 'inline-flex';
             if (actionInfo) actionInfo.innerHTML = '<i class="fas fa-info-circle"></i> 检查生成结果，满意后点击「下一步」进行同步';
             autoSelectFirstResultTab();
+            updateResultTabActions();
         } else if (n === 3) {
             if (btnSync) btnSync.style.display = 'inline-flex';
             if (actionInfo) actionInfo.innerHTML = '<i class="fas fa-info-circle"></i> 选择要同步的商品和素材，确认后点击「同步到商品」';
@@ -2601,6 +3433,15 @@
             video: !!state.generatedData.videoUrl,
         };
         for (const t of tabs) { if (map[t]) { switchResultTab(t); return; } }
+    }
+
+    function updateResultTabActions() {
+        const tab = getCurrentResultTab();
+        const uploadBtn = document.getElementById('btnUploadAll');
+        if (uploadBtn) {
+            // 文案 Tab 不支持上传
+            uploadBtn.style.display = (tab === 'copy') ? 'none' : '';
+        }
     }
 
     function toggleAdvanced() {
@@ -3135,6 +3976,7 @@
         document.querySelectorAll('.result-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
         document.querySelectorAll('.result-panel').forEach(p => p.classList.toggle('active', p.id === 'result-' + tab));
         if (tab === 'video') fillVideoEditPanel();
+        updateResultTabActions();
     }
 
     // ================================================================
@@ -3426,7 +4268,7 @@
     }
 
     // ================================================================
-    // Agnes 图片 / 视频生成（走后端代理）
+    // Agnes 图片 / 视频生成
     // ================================================================
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const body = {
@@ -3495,9 +4337,8 @@
     }
 
     // ================================================================
-    // ★ 骨架渲染 + 逐张填充
+    // 骨架渲染
     // ================================================================
-
     function buildSkeletonCard(typeName, idx, total, tag) {
         const progress = `生成中 ${idx + 1}/${total}...`;
         return `
@@ -3536,12 +4377,15 @@
         const errTip = img.error
             ? `<div class="img-error-tip" title="${escapeHtml(img.error)}"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(img.error).slice(0, 30)}</div>`
             : '';
+        // 图片索引需从全局 images 数组找
+        const globalIdx = (state.generatedData.images || []).indexOf(img);
         const newHTML = `
             <div class="image-item" data-result-idx="${idx}">
                 <div class="preview">
                     ${img.url
                         ? `<img src="${img.url}" alt="${typeName}${idx+1}"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.innerHTML='<i class=\\'fas fa-exclamation-triangle\\' style=\\'color:#b51a3f;font-size:24px;\\'></i><div style=\\'font-size:11px;color:#b51a3f;margin-top:4px;\\'>图片已失效</div>';">
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.innerHTML='<i class=\\'fas fa-exclamation-triangle\\' style=\\'color:#b51a3f;font-size:24px;\\'></i><div style=\\'font-size:11px;color:#b51a3f;margin-top:4px;\\'>图片已失效</div>';"
+                             onclick="viewerOpenFromGrid('${gridId}', ${idx})">
                            <div class="placeholder-icon" style="display:none;"><i class="fas fa-image"></i></div>`
                         : `<div class="placeholder-icon" style="color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i></div>`
                     }
@@ -3551,20 +4395,25 @@
                 <div class="info">
                     <div class="title">${escapeHtml(productName)}</div>
                     <div class="actions">
-                        ${img.url ? `<span class="btn-sm blue" onclick="downloadImage('${img.url}', '${typeName}${idx+1}.png')" title="下载"><i class="fas fa-download"></i></span>` : ''}
-                        <span class="btn-sm outline" onclick="openEditImgModal(${idx})" title="编辑提示词并重新生成"><i class="fas fa-edit"></i> 编辑</span>
-                        ${img.url
-                            ? `<span class="btn-sm success" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i></span>`
-                            : `<span class="btn-sm danger" onclick="retrySingleImage(${idx})" title="快速重试"><i class="fas fa-redo"></i></span>`
-                        }
+                        ${img.url ? `<span class="btn-sm blue" onclick="downloadFromCard(${globalIdx})" title="下载"><i class="fas fa-download"></i></span>` : ''}
+                        ${img.url ? `<span class="btn-sm success" onclick="collectFromCard(${globalIdx})" title="收藏到素材库"><i class="fas fa-star"></i></span>` : ''}
+                        <span class="btn-sm outline" onclick="openEditImgModal(${globalIdx})" title="编辑"><i class="fas fa-edit"></i></span>
+                        ${!img.url ? `<span class="btn-sm danger" onclick="retrySingleImage(${globalIdx})" title="重试"><i class="fas fa-redo"></i></span>` : ''}
                     </div>
                 </div>
             </div>
         `;
         const wrapper = document.createElement('div');
         wrapper.innerHTML = newHTML.trim();
-        const newCard = wrapper.firstChild;
-        card.replaceWith(newCard);
+        card.replaceWith(wrapper.firstChild);
+    }
+
+    // 从 grid 点击图片打开全屏 viewer
+    function viewerOpenFromGrid(gridId, localIdx) {
+        const imgs = buildViewerImagesFromGrid(gridId, gridId === 'imageGrid' ? '主图' : '副图');
+        if (imgs.length === 0) return;
+        const idx = Math.max(0, Math.min(localIdx, imgs.length - 1));
+        openViewer(imgs, idx);
     }
 
     function updateSkeletonProgress(gridId, idx, current, total) {
@@ -3584,7 +4433,6 @@
         if (!name || name === '商品') { showToast('⚠️ 请输入商品名称'); document.getElementById('productName').focus(); return; }
         if (state.selectedTypes.length === 0) { showToast('⚠️ 请至少选择一种生成类型'); return; }
 
-        // ★ 补：如果详情页 prompt 空，重新生成
         if (state.selectedTypes.includes('detail') &&
             (state.detailPrompts.length === 0 || state.detailPrompts.every(d => !d.prompt))) {
             const vv = collectVars();
@@ -3640,7 +4488,6 @@
 
         goStep(2);
 
-        // 渲染骨架
         if (wantMain) {
             renderSkeletons('imageGrid', '主图', 1, [getMainTag(0, state.imageCount)]);
         } else {
@@ -3676,7 +4523,6 @@
 
         showGeneratingOverlay(state.selectedTypes);
 
-        // ★ 每步独立 try/catch，避免一处抛错中断整个流程
         try {
             let videoAnalysis = null;
             let keyframeUrls = [];
@@ -3903,6 +4749,7 @@
             { name: '💝 情感共鸣版', conversion: '4.2%', content: `💝 ${name}\n"把心意装进礼盒，送给最重要的人"` },
             { name: '🏆 专业推荐版', conversion: '3.5%', content: `🏆 专家推荐 · ${name}\n"${features.join(' · ')}"` }
         ];
+        copyVersions[0].recommended = true;
         return { copyVersions };
     }
 
@@ -3992,6 +4839,7 @@
         }
         fillVideoEditPanel();
         updateResultTabsVisibility();
+        updateResultTabActions();
     }
 
     function renderImageGrid(gridId, images, productName, typeName) {
@@ -4001,12 +4849,14 @@
             const errTip = img.error
                 ? `<div class="img-error-tip" title="${escapeHtml(img.error)}"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(img.error).slice(0, 30)}</div>`
                 : '';
+            const globalIdx = (state.generatedData.images || []).indexOf(img);
             return `
                 <div class="image-item">
                     <div class="preview">
                         ${img.url
                             ? `<img src="${img.url}" alt="${typeName}${i+1}"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.innerHTML='<i class=\\'fas fa-exclamation-triangle\\' style=\\'color:#b51a3f;font-size:24px;\\'></i><div style=\\'font-size:11px;color:#b51a3f;margin-top:4px;\\'>图片已失效</div>';">
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.innerHTML='<i class=\\'fas fa-exclamation-triangle\\' style=\\'color:#b51a3f;font-size:24px;\\'></i><div style=\\'font-size:11px;color:#b51a3f;margin-top:4px;\\'>图片已失效</div>';"
+                                 onclick="viewerOpenFromGrid('${gridId}', ${i})">
                                <div class="placeholder-icon" style="display:none;"><i class="fas fa-image"></i></div>`
                             : `<div class="placeholder-icon" style="color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i></div>`
                         }
@@ -4016,12 +4866,10 @@
                     <div class="info">
                         <div class="title">${escapeHtml(productName)}</div>
                         <div class="actions">
-                            ${img.url ? `<span class="btn-sm blue" onclick="downloadImage('${img.url}', '${typeName}${i+1}.png')" title="下载"><i class="fas fa-download"></i></span>` : ''}
-                            <span class="btn-sm outline" onclick="openEditImgModal(${i})" title="编辑提示词并重新生成"><i class="fas fa-edit"></i> 编辑</span>
-                            ${img.url
-                                ? `<span class="btn-sm success" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i></span>`
-                                : `<span class="btn-sm danger" onclick="retrySingleImage(${i})" title="快速重试"><i class="fas fa-redo"></i></span>`
-                            }
+                            ${img.url ? `<span class="btn-sm blue" onclick="downloadFromCard(${globalIdx})" title="下载"><i class="fas fa-download"></i></span>` : ''}
+                            ${img.url ? `<span class="btn-sm success" onclick="collectFromCard(${globalIdx})" title="收藏到素材库"><i class="fas fa-star"></i></span>` : ''}
+                            <span class="btn-sm outline" onclick="openEditImgModal(${globalIdx})" title="编辑"><i class="fas fa-edit"></i></span>
+                            ${!img.url ? `<span class="btn-sm danger" onclick="retrySingleImage(${globalIdx})" title="重试"><i class="fas fa-redo"></i></span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -4046,7 +4894,7 @@
         const preview = document.getElementById('editImgPreview');
         if (preview) {
             if (img.url) {
-                preview.innerHTML = `<img src="${img.url}" alt="图${index+1}">
+                preview.innerHTML = `<img src="${img.url}" alt="图${index+1}" onclick="viewerOpenFromEditModal()">
                     <span class="badge-pos">图 ${index+1}${img.tag ? ' · ' + img.tag : ''}</span>`;
             } else {
                 preview.innerHTML = `<div class="placeholder-icon" style="color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i></div>
@@ -4060,6 +4908,25 @@
         if (n) n.value = img.negative || '';
         document.getElementById('editImgModal').classList.add('show');
         document.body.style.overflow = 'hidden';
+    }
+
+    // 从编辑弹窗点预览图打开 viewer
+    function viewerOpenFromEditModal() {
+        if (editImgIndex < 0) return;
+        const r = state.generatedData;
+        if (!r || !r.images || !r.images[editImgIndex]) return;
+        const pname = r.productName || '商品';
+        const items = (r.images || []).filter(x => x.url).map((x, i) => ({
+            url: x.url,
+            filename: `${pname}_${x.tag || '图' + (i+1)}.${guessExt(x.url)}`
+        }));
+        // 找到当前索引在 items 里的位置
+        const curUrl = r.images[editImgIndex].url;
+        let idx = 0;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].url === curUrl) { idx = i; break; }
+        }
+        openViewer(items, idx);
     }
 
     function closeEditImgModal() {
@@ -4242,7 +5109,7 @@
         const thumb = document.getElementById('deThumb');
         if (thumb) {
             if (d.url) {
-                thumb.innerHTML = `<img src="${d.url}" alt="第${d.step}屏" />`;
+                thumb.innerHTML = `<img src="${d.url}" alt="第${d.step}屏" onclick="viewerOpenFromDetail()" />`;
             } else {
                 thumb.innerHTML = `<div class="placeholder-icon"><i class="fas fa-image"></i></div>`;
             }
@@ -4252,6 +5119,14 @@
         if (dp) dp.value = d.prompt || '';
         const dn = document.getElementById('deNegative');
         if (dn) dn.value = d.negative || '';
+    }
+
+    function viewerOpenFromDetail() {
+        const r = state.generatedData;
+        if (!r || !r.detailImages) return;
+        const items = buildViewerImagesFromDetail();
+        if (items.length === 0) return;
+        openViewer(items, deCurrentIdx);
     }
 
     async function regenerateDetailScreen() {
@@ -4496,58 +5371,45 @@
         }
     }
 
+    // ================================================================
+    // 文案卡片渲染（紧凑 + 可编辑 + 切换）
+    // ================================================================
     function renderCopyList(versions) {
         const list = document.getElementById('copyList');
         if (!list) return;
-        list.innerHTML = versions.map((v, idx) => `
-            <div class="copy-item ${idx === 0 ? 'recommended' : ''}">
-                <div class="header">
-                    <span class="name">${escapeHtml(v.name)}</span>
-                    <span class="btn-sm blue">转化率 ${v.conversion}</span>
+        list.innerHTML = versions.map((v, idx) => {
+            const isRec = v.recommended || idx === 0;
+            return `
+                <div class="copy-item ${isRec ? 'recommended' : ''}">
+                    <div class="header">
+                        <span class="name">${escapeHtml(v.name)}</span>
+                        <div class="badges">
+                            ${isRec ? '<span class="rec-tag">推荐</span>' : ''}
+                            <span class="tag">转化率 ${v.conversion || '-'}</span>
+                        </div>
+                    </div>
+                    <textarea class="copy-content-edit"
+                        oninput="onCopyEdit(${idx}, this)"
+                        placeholder="编辑文案内容...">${escapeHtml(v.content)}</textarea>
+                    <div class="actions">
+                        <span class="btn-sm success" onclick="copyTextFromIdx(${idx})"><i class="fas fa-copy"></i> 复制</span>
+                        <span class="btn-sm outline" onclick="applyCopy(${idx})"><i class="fas fa-check"></i> 应用</span>
+                        <span class="btn-sm blue" onclick="downloadOneCopy(${idx})"><i class="fas fa-download"></i> 下载</span>
+                        <span class="btn-sm primary" onclick="switchCopyVersion(${idx})"><i class="fas fa-exchange-alt"></i> 重新选择</span>
+                    </div>
                 </div>
-                <div class="content">${escapeHtml(v.content)}</div>
-                <div class="actions">
-                    <span class="btn-sm success" onclick="copyText('${v.content.replace(/'/g, "\\'").replace(/\n/g, '\\n')}')"><i class="fas fa-copy"></i> 复制</span>
-                    <span class="btn-sm outline" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i> 应用</span>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    function downloadImage(url, filename) {
-        const a = document.createElement('a');
-        a.href = url; a.download = filename; a.target = '_blank'; a.click();
-        showToast('⬇️ 正在下载...');
-    }
-    function applyAllImages() { showToast('✅ 全部主图已应用'); }
-    function applyCarousel() { showToast('✅ 轮播图已应用'); }
-    function copyText(text) {
-        navigator.clipboard.writeText(text).then(() => showToast('📋 已复制'))
-            .catch(() => showToast('⚠️ 复制失败'));
-    }
-    function applyDetail() { showToast('✅ 详情页已应用'); }
-    function exportDetailHTML() {
+    function copyTextFromIdx(idx) {
         const r = state.generatedData;
-        if (!r || !r.detailImages) { showToast('⚠️ 详情页未生成'); return; }
-        rebuildDetailHTML();
-        const blob = new Blob([r.detailHTML], { type: 'text/html' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = 'detail.html'; a.click();
-        URL.revokeObjectURL(a.href);
-        showToast('📥 已导出');
-    }
-    function applyVideo() { showToast('✅ 视频已应用'); }
-    function downloadVideo() {
-        const v = document.querySelector('#videoPreviewContainer video');
-        if (v && v.src) {
-            const a = document.createElement('a');
-            a.href = v.src; a.download = 'product_video.mp4'; a.target = '_blank'; a.click();
-            showToast('⬇️ 正在下载...');
-        } else showToast('⚠️ 暂无视频');
+        if (!r || !r.copyVersions || !r.copyVersions[idx]) return;
+        copyText(r.copyVersions[idx].content || '');
     }
 
     // ================================================================
-    // 同步相关
+    // 同步相关（保持原样）
     // ================================================================
     async function loadSyncProducts() {
         const box = document.getElementById('syncProductList');
@@ -4898,7 +5760,7 @@
     }
 
     // ================================================================
-    // 方案 C：生成会话持久化
+    // 方案 C：生成会话持久化（前端）
     // ================================================================
     const GEN_SESSION_KEY = 'material_gen_session_id';
 
@@ -5089,16 +5951,44 @@
             }
         })();
 
+        // 全局键盘事件：ESC / 左右切换
         document.addEventListener('keydown', (e) => {
+            // 全屏预览打开时
+            const viewer = document.getElementById('imgViewerModal');
+            if (viewer && viewer.classList.contains('show')) {
+                if (e.key === 'Escape') { closeViewer(); e.preventDefault(); }
+                else if (e.key === 'ArrowLeft') { viewerPrev(); e.preventDefault(); }
+                else if (e.key === 'ArrowRight') { viewerNext(); e.preventDefault(); }
+                return;
+            }
             if (e.key === 'Escape') {
                 const picker = document.getElementById('productPickerModal');
                 if (picker.classList.contains('show')) closeProductPicker();
                 const editImg = document.getElementById('editImgModal');
                 if (editImg.classList.contains('show')) closeEditImgModal();
+                const copyPicker = document.getElementById('copyPickerModal');
+                if (copyPicker.classList.contains('show')) closeCopyPicker();
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（空值保护版）');
+        // 全屏预览：滚轮缩放
+        const viewerStage = document.getElementById('viewerStage');
+        if (viewerStage) {
+            viewerStage.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                viewerZoom(e.deltaY > 0 ? -0.15 : 0.15);
+            }, { passive: false });
+        }
+
+        // 全屏预览：点击遮罩关闭（点击 img 不关闭）
+        const viewerModal = document.getElementById('imgViewerModal');
+        if (viewerModal) {
+            viewerModal.addEventListener('click', (e) => {
+                if (e.target === viewerModal) closeViewer();
+            });
+        }
+
+        console.log('🎨 智能素材生成已就绪（6 大需求全部实现）');
         console.log('💡 后端:', BACKEND_URL);
     });
 
@@ -5119,7 +6009,7 @@
     window.renderReferenceImages = renderReferenceImages;
     window.resetAllPrompts = resetAllPrompts;
     window.startGenerate = startGenerate;
-    window.downloadImage = downloadImage;
+    window.downloadImage = downloadOne;
     window.applyAllImages = applyAllImages;
     window.applyCarousel = applyCarousel;
     window.copyText = copyText;
@@ -5171,6 +6061,36 @@
     window.loadGenSessionFromBackend = loadGenSessionFromBackend;
     window.clearGenSessionOnBackend = clearGenSessionOnBackend;
     window.getGenSessionId = getGenSessionId;
+    // ★ 本轮新增暴露
+    window.downloadCurrentTabZip = downloadCurrentTabZip;
+    window.uploadCurrentTabToAssets = uploadCurrentTabToAssets;
+    window.downloadCopyAsTxt = downloadCopyAsTxt;
+    window.downloadFromCard = downloadFromCard;
+    window.collectFromCard = collectFromCard;
+    window.downloadEditImg = downloadEditImg;
+    window.collectEditImg = collectEditImg;
+    window.repairDetailScreen = repairDetailScreen;
+    window.downloadDetailScreen = downloadDetailScreen;
+    window.collectDetailScreen = collectDetailScreen;
+    window.collectVideo = collectVideo;
+    window.openViewer = openViewer;
+    window.closeViewer = closeViewer;
+    window.viewerPrev = viewerPrev;
+    window.viewerNext = viewerNext;
+    window.viewerZoom = viewerZoom;
+    window.viewerReset = viewerReset;
+    window.viewerDownload = viewerDownload;
+    window.viewerCollect = viewerCollect;
+    window.viewerOpenFromGrid = viewerOpenFromGrid;
+    window.viewerOpenFromEditModal = viewerOpenFromEditModal;
+    window.viewerOpenFromDetail = viewerOpenFromDetail;
+    window.onCopyEdit = onCopyEdit;
+    window.applyCopy = applyCopy;
+    window.downloadOneCopy = downloadOneCopy;
+    window.switchCopyVersion = switchCopyVersion;
+    window.pickCopyVersion = pickCopyVersion;
+    window.closeCopyPicker = closeCopyPicker;
+    window.copyTextFromIdx = copyTextFromIdx;
 </script>
 </body>
 </html>
