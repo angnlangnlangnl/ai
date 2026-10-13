@@ -536,7 +536,6 @@
         .platform-tag.highlight::after { content: '★'; font-size: 9px; color: var(--accent); margin-left: 2px; }
         .platform-tag.highlight.active::after { color: #fff; }
 
-                /* ★ 参考图/参考视频：左右分栏 */
         .ref-media-split {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -592,7 +591,6 @@
             color: white; font-size: 9px;
             padding: 0 5px; border-radius: 6px;
         }
-        /* ★ 参考图删除按钮 */
         .ref-media-split .ref-left .ref-thumbs .ref-thumb .ref-remove {
             position: absolute;
             top: 2px; right: 2px;
@@ -859,6 +857,36 @@
         .image-item .info .title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .image-item .info .actions { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
 
+        /* ★ 骨架态（生成中占位） */
+        .image-item.skeleton .preview {
+            background: linear-gradient(110deg, #f0f4f9 8%, #e8edf4 18%, #f0f4f9 33%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .image-item.skeleton .skeleton-body {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100%; gap: 10px;
+        }
+        .image-item.skeleton .skeleton-spinner {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 3px solid rgba(77,171,247,0.25);
+            border-top-color: var(--accent);
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .image-item.skeleton .skeleton-text {
+            font-size: 11px; color: var(--text-2);
+            font-weight: 500;
+        }
+        .image-item.skeleton .badge-pos {
+            background: rgba(77,171,247,0.75);
+        }
+
         .copy-list { display: flex; flex-direction: column; gap: 10px; }
         .copy-item { padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; background: white; }
         .copy-item.recommended { border-color: var(--accent); background: #f0f8ff; }
@@ -1079,9 +1107,6 @@
             z-index: 2;
         }
 
-        /* ============================================================
-           ★ 主副图编辑弹窗
-           ============================================================ */
         .edit-img-modal {
             position: fixed; inset: 0;
             background: rgba(10,30,47,0.65);
@@ -1173,8 +1198,8 @@
         .edit-img-form label i { color: var(--accent); margin-right: 4px; }
         .edit-img-form textarea {
             width: 100%;
-            min-height: 160px;
-            max-height: 300px;
+            min-height: 100px;
+            max-height: 240px;
             padding: 12px 14px;
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -1201,9 +1226,6 @@
             background: #fafcfe;
         }
 
-        /* ============================================================
-           ★ 详情页：左右分栏
-           ============================================================ */
         .detail-split {
             display: grid;
             grid-template-columns: 1fr 380px;
@@ -1214,14 +1236,13 @@
             .detail-split { grid-template-columns: 1fr; }
         }
 
-            .detail-preview-wrap {
+        .detail-preview-wrap {
             background: white;
             border-radius: 12px;
-            border: none;                 /* ★ 去掉外框，图片直接贴边 */
+            border: none;
             overflow-y: auto;
             line-height: 0;
             position: relative;
-            /* 用外阴影代替边框，视觉上还有"卡片"感，但不会遮图 */
             box-shadow: 0 1px 3px rgba(10,30,47,0.06);
         }
         .detail-preview-wrap::-webkit-scrollbar { width: 6px; }
@@ -1259,7 +1280,6 @@
             position: relative;
         }
         .detail-screen.active::after {
-            /* ★ 选中标记：底部 3px 蓝条，不遮图 */
             content: '';
             position: absolute;
             left: 0; right: 0; bottom: 0;
@@ -1315,9 +1335,8 @@
             border-radius: 10px;
             font-weight: 500;
         }
-                .detail-edit-panel .de-thumb {
+        .detail-edit-panel .de-thumb {
             width: 100%;
-            /* ★ 去掉固定 aspect-ratio 和 max-height，让容器高度随图自适应 */
             border-radius: 10px;
             overflow: hidden;
             background: #f0f4f9;
@@ -1326,14 +1345,14 @@
             justify-content: center;
             margin-bottom: 12px;
             border: 1px solid var(--border);
-            max-height: 420px;            /* ★ 允许最大 420px，比之前大 */
-            min-height: 120px;            /* ★ 占位时至少 120px */
+            max-height: 420px;
+            min-height: 120px;
         }
         .detail-edit-panel .de-thumb img {
             width: 100%;
-            height: auto;                  /* ★ 高度按图片比例自适应 */
-            max-height: 420px;             /* ★ 不超过容器最大高度 */
-            object-fit: contain;           /* ★ 完整显示，不裁切 */
+            height: auto;
+            max-height: 420px;
+            object-fit: contain;
             display: block;
         }
         .detail-edit-panel .de-thumb .placeholder-icon { font-size: 36px; color: #c8d4e0; }
@@ -1350,7 +1369,7 @@
         .detail-edit-panel .de-field label i { color: var(--accent); margin-right: 4px; }
         .detail-edit-panel .de-field textarea {
             width: 100%;
-            min-height: 100px;
+            min-height: 80px;
             max-height: 200px;
             padding: 10px 12px;
             border: 1px solid var(--border);
@@ -1408,9 +1427,6 @@
         }
         .detail-screen-nav button.failed .nav-dot { background: var(--danger); }
 
-        /* ============================================================
-           ★ 视频卡片：左右分栏
-           ============================================================ */
         .video-split {
             display: grid;
             grid-template-columns: 1fr 380px;
@@ -1471,7 +1487,7 @@
         .video-edit-panel .ve-field label i { color: var(--accent); margin-right: 4px; }
         .video-edit-panel .ve-field textarea {
             width: 100%;
-            min-height: 120px;
+            min-height: 90px;
             max-height: 220px;
             padding: 10px 12px;
             border: 1px solid var(--border);
@@ -1659,7 +1675,6 @@
                             <h3><i class="fas fa-cloud-upload-alt"></i> 参考图（可选）</h3>
                         </div>
                         <div class="ref-media-split">
-                            <!-- 左：已上传的图 -->
                             <div class="ref-left">
                                 <div id="uploadPreview">
                                     <div class="ref-empty">
@@ -1668,7 +1683,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- 右：上传触发区 -->
                             <div class="ref-right">
                                 <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
                                     <i class="fas fa-cloud-upload-alt"></i>
@@ -1687,7 +1701,6 @@
                             <span class="action" onclick="clearReferenceVideo()" id="clearVideoBtn" style="display:none;">清空</span>
                         </div>
                         <div class="ref-media-split">
-                            <!-- 左：已上传的视频 -->
                             <div class="ref-left">
                                 <div id="refVideoChips">
                                     <div class="ref-empty">
@@ -1696,7 +1709,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- 右：上传触发区 -->
                             <div class="ref-right">
                                 <div class="upload-zone" onclick="document.getElementById('videoUpload').click()" id="videoUploadZone">
                                     <i class="fas fa-video"></i>
@@ -1839,23 +1851,22 @@
 
         <div class="step-panel" id="step2">
             <div class="result-tabs" id="resultTabs">
-                <button class="result-tab active" data-tab="images" onclick="switchResultTab('images')">
-                    <i class="fas fa-image"></i> 主图 <span class="count" id="cnt-images">0</span>
+                <!-- ★ Tab 动态生成，JS 里根据 selectedTypes 决定显示哪些 -->
+                <button class="result-tab active" data-tab="images" onclick="switchResultTab('images')" id="tabResultImages">
+                    <i class="fas fa-image"></i> 主副图 <span class="count" id="cnt-images">0</span>
                 </button>
-                <button class="result-tab" data-tab="carousel" onclick="switchResultTab('carousel')">
-                    <i class="fas fa-images"></i> 轮播图 <span class="count" id="cnt-carousel">0</span>
-                </button>
-                <button class="result-tab" data-tab="copy" onclick="switchResultTab('copy')">
+                <button class="result-tab" data-tab="copy" onclick="switchResultTab('copy')" id="tabResultCopy">
                     <i class="fas fa-pen-fancy"></i> 文案 <span class="count" id="cnt-copy">0</span>
                 </button>
-                <button class="result-tab" data-tab="detail" onclick="switchResultTab('detail')">
+                <button class="result-tab" data-tab="detail" onclick="switchResultTab('detail')" id="tabResultDetail">
                     <i class="fas fa-file-alt"></i> 详情页 <span class="count" id="cnt-detail">0</span>
                 </button>
-                <button class="result-tab" data-tab="video" onclick="switchResultTab('video')">
+                <button class="result-tab" data-tab="video" onclick="switchResultTab('video')" id="tabResultVideo">
                     <i class="fas fa-video"></i> 视频 <span class="count" id="cnt-video">0</span>
                 </button>
             </div>
 
+            <!-- ★ 主副图合并面板：主图单独一行 + 副图单独一行 -->
             <div class="result-panel active" id="result-images">
                 <div class="card">
                     <div class="card-header">
@@ -1864,12 +1875,9 @@
                     </div>
                     <div class="image-grid" id="imageGrid"></div>
                 </div>
-            </div>
-
-            <div class="result-panel" id="result-carousel">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-images"></i> 轮播图</h3>
+                        <h3><i class="fas fa-images"></i> 副图 / 轮播图</h3>
                         <span class="btn-sm blue" onclick="applyCarousel()"><i class="fas fa-check"></i> 全部应用</span>
                     </div>
                     <div class="image-grid" id="carouselGrid"></div>
@@ -1895,9 +1903,7 @@
                         </div>
                     </div>
                     <div class="detail-split">
-                        <!-- ★ 左：8 屏预览 -->
                         <div class="detail-preview-wrap" id="detailPreview"></div>
-                        <!-- ★ 右：编辑面板 -->
                         <div class="detail-edit-panel" id="detailEditPanel">
                             <div class="de-title">
                                 <i class="fas fa-edit"></i> 编辑第 <span id="deCurrentStep">1</span> 屏
@@ -1909,6 +1915,10 @@
                             <div class="de-field">
                                 <label><i class="fas fa-comment-dots"></i> 提示词</label>
                                 <textarea id="dePrompt" placeholder="输入提示词..."></textarea>
+                            </div>
+                            <div class="de-field">
+                                <label><i class="fas fa-ban"></i> 反提示词（不想要的元素，可选）</label>
+                                <textarea id="deNegative" placeholder="例如：模糊、水印、杂乱背景、低分辨率..."></textarea>
                             </div>
                             <div class="de-field" style="display:flex; gap:8px;">
                                 <span class="btn-sm primary" style="flex:1; justify-content:center; padding:8px;" onclick="regenerateDetailScreen()">
@@ -1931,13 +1941,11 @@
                         </div>
                     </div>
                     <div class="video-split">
-                        <!-- ★ 左：视频预览 -->
                         <div class="video-preview-half" id="videoPreviewContainer">
                             <i class="fas fa-play-circle placeholder-icon"></i>
                             <div class="placeholder-text">暂无视频</div>
                             <div class="placeholder-sub">生成后将在此展示</div>
                         </div>
-                        <!-- ★ 右：编辑面板 -->
                         <div class="video-edit-panel">
                             <div class="ve-title"><i class="fas fa-edit"></i> 视频编辑</div>
                             <div class="ve-row">
@@ -1966,7 +1974,11 @@
                                 <label><i class="fas fa-comment-dots"></i> 提示词</label>
                                 <textarea id="vePrompt" placeholder="输入视频提示词..."></textarea>
                             </div>
-                                                        <div class="ve-field" style="display:flex; gap:8px;">
+                            <div class="ve-field">
+                                <label><i class="fas fa-ban"></i> 反提示词（不想要的元素，可选）</label>
+                                <textarea id="veNegative" placeholder="例如：畸形、多余肢体、模糊、卡通..."></textarea>
+                            </div>
+                            <div class="ve-field" style="display:flex; gap:8px;">
                                 <span class="btn-sm outline" style="flex:1; justify-content:center; padding:8px;" onclick="repairVideo()">
                                     <i class="fas fa-wand-magic-sparkles"></i> 修复视频
                                 </span>
@@ -2155,7 +2167,6 @@
     </div>
 </div>
 
-<!-- ★ 主副图编辑弹窗 -->
 <div class="edit-img-modal" id="editImgModal" onclick="if(event.target===this) closeEditImgModal()">
     <div class="edit-img-box">
         <div class="edit-img-header">
@@ -2172,14 +2183,19 @@
                     <label><i class="fas fa-comment-dots"></i> 提示词</label>
                     <textarea id="editImgPrompt" placeholder="输入提示词..."></textarea>
                 </div>
-                                <div style="font-size:11px;color:var(--text-3);line-height:1.6;">
+                <div>
+                    <label><i class="fas fa-ban"></i> 反提示词（不想要的元素，可选）</label>
+                    <textarea id="editImgNegative" placeholder="例如：模糊、水印、卡通、塑料感、多余文字..."></textarea>
+                </div>
+                <div style="font-size:11px;color:var(--text-3);line-height:1.6;">
                     <i class="fas fa-info-circle"></i>
                     <strong>重新生成</strong>：参考【高级设置】里上传的参考图，只重生成这张。<br>
-                    <strong>修复图片</strong>：以【当前这张图】为参考做局部修复，保留画面。
+                    <strong>修复图片</strong>：以【当前这张图】为参考做局部修复，保留画面。<br>
+                    <strong>反提示词</strong>：只在前端拼接进 prompt，写成「避免：xxx」形式。
                 </div>
             </div>
         </div>
-                <div class="edit-img-footer">
+        <div class="edit-img-footer">
             <span class="btn-lg outline" onclick="closeEditImgModal()">取消</span>
             <span class="btn-lg outline" id="editImgRepairBtn" onclick="repairSingleImage()">
                 <i class="fas fa-wand-magic-sparkles"></i> 修复图片
@@ -2195,9 +2211,6 @@
 <script>
     // ================================================================
     // ★ 修复 SPA 注入导致的 DOM 嵌套错误
-    //    SPA 用 innerHTML 注入本页时，浏览器会自动修正 HTML 结构，
-    //    把 #step2 / #step3 错误地塞进 #step1 里，导致结果页空白。
-    //    这里在页面加载时把它们移到 .content 下，恢复平级结构。
     // ================================================================
     (function fixStepPanelNesting() {
         function fix() {
@@ -2206,7 +2219,6 @@
             const step2 = document.getElementById('step2');
             const step3 = document.getElementById('step3');
             if (!content) return;
-            // 只有 step1 真的把 step2 嵌套进去了才修
             if (step1 && step2 && step1.contains(step2)) {
                 content.appendChild(step2);
                 console.log('🔧 已修复：把 #step2 从 #step1 里移出');
@@ -2216,13 +2228,10 @@
                 console.log('🔧 已修复：把 #step3 从 #step1 里移出');
             }
         }
-        // 立即执行一次
         fix();
-        // DOM 完全加载后再执行一次（防止 SPA 延迟注入）
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', fix);
         }
-        // 用 MutationObserver 监听 .content 的变化，SPA 后续注入时再修
         const content = document.querySelector('.content');
         if (content && window.MutationObserver) {
             const mo = new MutationObserver(() => {
@@ -2233,7 +2242,6 @@
                 }
             });
             mo.observe(content, { childList: true, subtree: true });
-            // 10 秒后停止监听，避免长期开销
             setTimeout(() => mo.disconnect(), 10000);
         }
     })();
@@ -2458,6 +2466,12 @@
         const maxH = 220;
         el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
     }
+    function buildPromptWithNegative(prompt, negative) {
+        const p = (prompt || '').trim();
+        const n = (negative || '').trim();
+        if (!n) return p;
+        return p + '\n\n避免：' + n;
+    }
 
     function collectVars() {
         const name = (document.getElementById('productName').value || '').trim() || '商品';
@@ -2569,10 +2583,9 @@
     function goStepNext() { if (state.currentStep < 3) goStep(state.currentStep + 1); }
 
     function autoSelectFirstResultTab() {
-        const tabs = ['images', 'carousel', 'copy', 'detail', 'video'];
+        const tabs = ['images', 'copy', 'detail', 'video'];
         const map = {
             images: state.generatedData.images && state.generatedData.images.length > 0,
-            carousel: state.generatedData.images && state.generatedData.images.length > 0,
             copy: state.generatedData.copyVersions && state.generatedData.copyVersions.length > 0,
             detail: !!state.generatedData.detailImages,
             video: !!state.generatedData.videoUrl,
@@ -2668,9 +2681,9 @@
             `;
         }).join('');
     }
-        function pickProduct(name) {
+    function pickProduct(name) {
         document.getElementById('productName').value = name;
-        state.currentProductName = name;          // ★ 提前记录，供第 3 步自动选中
+        state.currentProductName = name;
         const product = pickerState.allProducts.find(p => p.name === name);
         if (product && product.category) {
             const catSelect = document.getElementById('productCategory');
@@ -2691,6 +2704,7 @@
         if (idx >= 0) state.selectedTypes.splice(idx, 1);
         else state.selectedTypes.push(type);
         updatePromptTabsVisibility();
+        updateResultTabsVisibility();
     }
     function updatePromptTabsVisibility() {
         const videoTab = document.querySelector('.prompt-tab[data-tab="video"]');
@@ -2698,6 +2712,23 @@
         videoTab.style.opacity = hasVideo ? '1' : '0.4';
         videoTab.style.pointerEvents = hasVideo ? 'auto' : 'none';
         if (!hasVideo && videoTab.classList.contains('active')) switchPromptTab('carousel');
+    }
+    function updateResultTabsVisibility() {
+        // ★ 没勾的类型，Tab 隐藏
+        const tImg = document.getElementById('tabResultImages');
+        const tCopy = document.getElementById('tabResultCopy');
+        const tDetail = document.getElementById('tabResultDetail');
+        const tVideo = document.getElementById('tabResultVideo');
+        if (tImg) tImg.style.display = (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) ? '' : 'none';
+        if (tCopy) tCopy.style.display = state.selectedTypes.includes('copy') ? '' : 'none';
+        if (tDetail) tDetail.style.display = state.selectedTypes.includes('detail') ? '' : 'none';
+        if (tVideo) tVideo.style.display = state.selectedTypes.includes('video') ? '' : 'none';
+        // 如果当前 active 的 Tab 被隐藏了，切到第一个可见的
+        const activeTab = document.querySelector('.result-tab.active');
+        if (activeTab && activeTab.style.display === 'none') {
+            const visible = Array.from(document.querySelectorAll('.result-tab')).find(t => t.style.display !== 'none');
+            if (visible) switchResultTab(visible.dataset.tab);
+        }
     }
     function switchPromptTab(tab) {
         document.querySelectorAll('.prompt-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
@@ -2752,7 +2783,7 @@
     // ================================================================
     // 参考图上传
     // ================================================================
-        function handleFileUpload(event) {
+    function handleFileUpload(event) {
         const files = event.target.files;
         const hint = document.getElementById('uploadHint');
         if (!files || files.length === 0) return;
@@ -2769,10 +2800,9 @@
             reader.onload = (e) => {
                 const dataUrl = e.target.result;
                 state.referenceImages.push(dataUrl);
-
                 loaded++;
                 if (loaded === total) {
-                    renderReferenceImages();       // ★ 统一重绘（带删除按钮 + 编号连续）
+                    renderReferenceImages();
                     hint.style.display = 'block';
                     hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> 已上传 <strong>${state.referenceImages.length}</strong> 张参考图（最多 5 张参与生成）`;
                     showToast(`📤 已上传 ${state.referenceImages.length} 张参考图`);
@@ -2783,16 +2813,11 @@
         event.target.value = '';
     }
 
-    // ================================================================
-    // ★ 删除单张参考图（按索引）
-    // ================================================================
     function removeReferenceImage(idx) {
         idx = parseInt(idx);
         if (isNaN(idx) || idx < 0 || idx >= state.referenceImages.length) return;
-
         state.referenceImages.splice(idx, 1);
         renderReferenceImages();
-
         const hint = document.getElementById('uploadHint');
         if (state.referenceImages.length === 0) {
             hint.style.display = 'none';
@@ -2801,13 +2826,9 @@
             hint.style.display = 'block';
             hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> 已上传 <strong>${state.referenceImages.length}</strong> 张参考图（最多 5 张参与生成）`;
         }
-
         showToast(`🗑️ 已删除第 ${idx + 1} 张参考图，剩余 ${state.referenceImages.length} 张`);
     }
 
-    // ================================================================
-    // ★ 重新渲染参考图（编号连续 + 删除按钮索引正确）
-    // ================================================================
     function renderReferenceImages() {
         const preview = document.getElementById('uploadPreview');
         if (!state.referenceImages || state.referenceImages.length === 0) {
@@ -2906,10 +2927,9 @@
         return frames;
     }
 
-        function renderReferenceVideoChip() {
+    function renderReferenceVideoChip() {
         const container = document.getElementById('refVideoChips');
         if (!state.referenceVideo) {
-            // ★ 没视频时，显示占位
             container.innerHTML = `
                 <div class="ref-empty">
                     <i class="fas fa-video"></i>
@@ -3384,7 +3404,6 @@
 
     // ================================================================
     // Agnes 图片 / 视频生成（走后端代理）
-    // ⭐ 改动 1：generateAgnesImage 返回 {url, dataUrl} 对象
     // ================================================================
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const body = {
@@ -3411,13 +3430,12 @@
         const data = await res.json();
         if (data.success && data.url) {
             console.log('✅ [图] 生成成功:', data.url, data.data_url ? '(含 base64 兜底)' : '');
-            return { url: data.url, dataUrl: data.data_url || '' };   // ⭐ 改动
+            return { url: data.url, dataUrl: data.data_url || '' };
         }
         console.error('❌ [图] 后端返回错误:', data);
         throw new Error(data.message || '图片生成失败');
     }
 
-    // ⭐ 改动 2：generateAgnesVideo 返回 {url, dataUrl} 对象
     async function generateAgnesVideo(prompt, seconds = '5', referenceImages = [], aspectRatio = '9:16', quality = '720P', onProgress) {
         console.log('📤 [视频] 调用后端代理:', prompt.slice(0, 60) + '...', 'ratio:', aspectRatio, 'quality:', quality);
 
@@ -3447,15 +3465,98 @@
         const data = await res.json();
         if (data.success && data.url) {
             console.log('✅ [视频] 生成成功:', data.url, data.data_url ? '(含 base64 兜底)' : '');
-            return { url: data.url, dataUrl: data.data_url || '' };   // ⭐ 改动
+            return { url: data.url, dataUrl: data.data_url || '' };
         }
         console.error('❌ [视频] 后端返回错误:', data);
         throw new Error(data.message || '视频生成失败');
     }
 
     // ================================================================
-    // 开始生成
-    // ⭐ 改动 3：三处用 res.dataUrl || res.url
+    // ★ 骨架渲染 + 逐张填充
+    // ================================================================
+
+    // 生成骨架 HTML
+    function buildSkeletonCard(typeName, idx, total, tag) {
+        const progress = `生成中 ${idx + 1}/${total}...`;
+        return `
+            <div class="image-item skeleton" data-skeleton-idx="${idx}" data-skeleton-grid="${typeName}">
+                <div class="preview">
+                    <div class="skeleton-body">
+                        <div class="skeleton-spinner"></div>
+                        <div class="skeleton-text">${progress}</div>
+                    </div>
+                    <span class="badge-pos">${typeName}${idx + 1}${tag ? ' · ' + tag : ''}</span>
+                </div>
+                <div class="info">
+                    <div class="title">等待生成...</div>
+                    <div class="actions"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 渲染骨架到指定 grid
+    function renderSkeletons(gridId, typeName, count, tags) {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+        const html = [];
+        for (let i = 0; i < count; i++) {
+            html.push(buildSkeletonCard(typeName, i, count, tags ? tags[i] : ''));
+        }
+        grid.innerHTML = html.join('');
+    }
+
+    // 填充单张到指定 grid（替换骨架）
+    function fillOneResult(gridId, typeName, idx, imageData, productName) {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+        const card = grid.querySelector(`[data-skeleton-idx="${idx}"]`);
+        if (!card) return;
+        const img = imageData;
+        const errTip = img.error
+            ? `<div class="img-error-tip" title="${escapeHtml(img.error)}"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(img.error).slice(0, 30)}</div>`
+            : '';
+        const newHTML = `
+            <div class="image-item" data-result-idx="${idx}">
+                <div class="preview">
+                    ${img.url
+                        ? `<img src="${img.url}" alt="${typeName}${idx+1}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.innerHTML='<i class=\\'fas fa-exclamation-triangle\\' style=\\'color:#b51a3f;font-size:24px;\\'></i><div style=\\'font-size:11px;color:#b51a3f;margin-top:4px;\\'>图片已失效</div>';">
+                           <div class="placeholder-icon" style="display:none;"><i class="fas fa-image"></i></div>`
+                        : `<div class="placeholder-icon" style="color:#b51a3f;"><i class="fas fa-exclamation-triangle"></i></div>`
+                    }
+                    <span class="badge-pos">${typeName}${idx + 1}${img.tag ? ' · ' + img.tag : ''}</span>
+                    ${errTip}
+                </div>
+                <div class="info">
+                    <div class="title">${escapeHtml(productName)}</div>
+                    <div class="actions">
+                        ${img.url ? `<span class="btn-sm blue" onclick="downloadImage('${img.url}', '${typeName}${idx+1}.png')" title="下载"><i class="fas fa-download"></i></span>` : ''}
+                        <span class="btn-sm outline" onclick="openEditImgModal(${idx})" title="编辑提示词并重新生成"><i class="fas fa-edit"></i> 编辑</span>
+                        ${img.url
+                            ? `<span class="btn-sm success" onclick="showToast('✅ 已应用到商品')"><i class="fas fa-check"></i></span>`
+                            : `<span class="btn-sm danger" onclick="retrySingleImage(${idx})" title="快速重试"><i class="fas fa-redo"></i></span>`
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = newHTML.trim();
+        const newCard = wrapper.firstChild;
+        card.replaceWith(newCard);
+    }
+
+    // 更新骨架进度文字
+    function updateSkeletonProgress(gridId, idx, current, total) {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+        const card = grid.querySelector(`[data-skeleton-idx="${idx}"] .skeleton-text`);
+        if (card) card.textContent = `生成中 ${current}/${total}...`;
+    }
+
+    // ================================================================
+    // 开始生成（核心改动：先渲染骨架 → 逐张生成 → 逐张填充）
     // ================================================================
     async function startGenerate() {
         if (state.isGenerating) { showToast('⏳ 正在生成中...'); return; }
@@ -3480,10 +3581,78 @@
         const hasVideoRef = !!state.referenceVideo;
         const keyframes = state.keyframes.slice();
 
+        // ★ 判断勾选了哪些类型
+        const wantMain = state.selectedTypes.includes('images');
+        const wantCarousel = state.selectedTypes.includes('carousel');
+        const wantCopy = state.selectedTypes.includes('copy');
+        const wantDetail = state.selectedTypes.includes('detail');
+        const wantVideo = state.selectedTypes.includes('video');
+
+        if (!wantMain && !wantCarousel && !wantCopy && !wantDetail && !wantVideo) {
+            showToast('⚠️ 请至少选择一种生成类型'); return;
+        }
+
+        // ★ 初始化 generatedData（先塞空数组，后续填充）
+        const resultData = {
+            images: [],
+            mainImage: null,
+            carouselImages: [],
+            copyVersions: [],
+            detailImages: [],
+            detailHTML: '',
+            videoUrl: '',
+            videoRemoteUrl: '',
+            platforms, imageRatio, videoRatio,
+            videoAnalysis: null,
+            productName: name
+        };
+        state.generatedData = resultData;
         state.isGenerating = true;
+
+        // ★ 立即跳到第 2 步
+        goStep(2);
+
+        // ★ 只渲染勾选的 Tab 的骨架
+        if (wantMain) {
+            renderSkeletons('imageGrid', '主图', 1, [getMainTag(0, state.imageCount)]);
+        } else {
+            document.getElementById('imageGrid').innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-image"></i><p>未勾选主图</p></div>';
+        }
+        if (wantCarousel) {
+            const carouselCount = state.imageCount;  // 轮播图按平台规则
+            const carouselTags = [];
+            for (let i = 0; i < carouselCount; i++) carouselTags.push(getMainTag(i, state.imageCount));
+            renderSkeletons('carouselGrid', '副图', carouselCount, carouselTags);
+        } else {
+            document.getElementById('carouselGrid').innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-images"></i><p>未勾选轮播图</p></div>';
+        }
+        if (wantCopy) {
+            document.getElementById('copyList').innerHTML = `
+                <div class="empty-state" style="padding:40px;">
+                    <div class="skeleton-spinner" style="margin:0 auto 12px;"></div>
+                    <p>文案生成中...</p>
+                </div>`;
+        }
+        if (wantDetail) {
+            document.getElementById('detailPreview').innerHTML = `
+                <div class="empty-state" style="padding:40px;">
+                    <div class="skeleton-spinner" style="margin:0 auto 12px;"></div>
+                    <p>详情页生成中... 0/8</p>
+                </div>`;
+        }
+        if (wantVideo) {
+            document.getElementById('videoPreviewContainer').innerHTML = `
+                <div class="skeleton-body" style="text-align:center;">
+                    <div class="skeleton-spinner" style="margin:0 auto 12px;"></div>
+                    <div class="placeholder-text">视频生成中...</div>
+                    <div class="placeholder-sub">排队中，最长 10 分钟</div>
+                </div>`;
+        }
+
         showGeneratingOverlay(state.selectedTypes);
 
         try {
+            // ============ 参考视频反解 ============
             let videoAnalysis = null;
             let keyframeUrls = [];
             if (hasVideoRef && keyframes.length > 0) {
@@ -3492,100 +3661,156 @@
                     keyframeUrls = await uploadKeyframesToTemp(keyframes);
                     state.keyframeUrls = keyframeUrls;
                     updateProgress(8, `正在用多模态模型反解画面与运镜（${keyframeUrls.length} 帧）...`);
-                    videoAnalysis = await decomposeVideoReference(keyframeUrls, name);
+                    videoAnalysis = await decodeVideoReference(keyframeUrls, name);
                     state.videoAnalysis = videoAnalysis;
+                    resultData.videoAnalysis = videoAnalysis;
                     renderVideoAnalysis(videoAnalysis);
                     showToast(`✅ 参考视频反解完成`);
                 } catch (err) {
                     console.warn('视频反解失败，降级为纯文本:', err);
-                    showToast('⚠️ 参考视频反解失败，改用纯文本生成');
                     videoAnalysis = null;
                     keyframeUrls = [];
                 }
             }
 
-            // ============ ① 主副图 ============
-            let images = [];
-            if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
-                const prompts = state.carouselPrompts.slice(0, state.imageCount);
-                updateProgress(12, `正在生成主副图（${state.imageCount} 张 · ${imageRatio}）...`);
-                let successCount = 0, failCount = 0;
+            // ============ ① 主图（固定 1 张） ============
+            if (wantMain) {
+                updateProgress(10, `正在生成主图（1 张 · ${imageRatio}）...`);
+                const prompt = state.carouselPrompts[0] || '';
+                try {
+                    const res = await generateAgnesImage(prompt, '1K', imageRatio, refImages);
+                    const finalUrl = res.dataUrl || res.url;
+                    const mainImage = {
+                        url: finalUrl,
+                        remoteUrl: res.url,
+                        style,
+                        score: 90 + Math.floor(Math.random() * 10),
+                        ctr: (3 + Math.random() * 3).toFixed(1),
+                        prompt,
+                        negative: '',
+                        tag: getMainTag(0, state.imageCount)
+                    };
+                    resultData.mainImage = mainImage;
+                    resultData.images.push(mainImage);
+                    fillOneResult('imageGrid', '主图', 0, mainImage, name);
+                    document.getElementById('cnt-images').textContent = '1';
+                } catch (err) {
+                    console.error('❌ 主图生成失败:', err);
+                    const failImage = {
+                        url: '', style, score: 0, ctr: '0',
+                        prompt, negative: '', tag: getMainTag(0, state.imageCount),
+                        error: err.message || '生成失败'
+                    };
+                    resultData.mainImage = failImage;
+                    resultData.images.push(failImage);
+                    fillOneResult('imageGrid', '主图', 0, failImage, name);
+                }
+            }
 
-                for (let i = 0; i < prompts.length; i++) {
+            // ============ ② 副图 / 轮播图（N 张） ============
+            if (wantCarousel) {
+                const carouselCount = state.imageCount;
+                updateProgress(20, `正在生成副图（${carouselCount} 张 · ${imageRatio}）...`);
+                let successCount = 0, failCount = 0;
+                for (let i = 0; i < carouselCount; i++) {
+                    const prompt = state.carouselPrompts[i] || state.carouselPrompts[0] || '';
                     try {
-                        const res = await generateAgnesImage(prompts[i], '1K', imageRatio, refImages);   // ⭐ 改动
-                        const finalUrl = res.dataUrl || res.url;                                        // ⭐ 优先 base64
-                        images.push({
+                        const res = await generateAgnesImage(prompt, '1K', imageRatio, refImages);
+                        const finalUrl = res.dataUrl || res.url;
+                        const imgData = {
                             url: finalUrl,
-                            remoteUrl: res.url,                                                         // ⭐ 保留远程 URL 备用
+                            remoteUrl: res.url,
                             style,
                             score: 90 + Math.floor(Math.random() * 10),
                             ctr: (3 + Math.random() * 3).toFixed(1),
-                            prompt: prompts[i],
+                            prompt,
+                            negative: '',
                             tag: getMainTag(i, state.imageCount)
-                        });
+                        };
+                        resultData.carouselImages.push(imgData);
+                        resultData.images.push(imgData);
+                        fillOneResult('carouselGrid', '副图', i, imgData, name);
                         successCount++;
-                        console.log(`📦 第 ${i+1} 张已存 ${res.dataUrl ? 'base64' : '远程 URL'}`);
-                    } catch (imgErr) {
-                        console.error(`❌ 第 ${i+1} 张主副图失败:`, imgErr);
-                        images.push({
+                    } catch (err) {
+                        console.error(`❌ 副图第 ${i+1} 张失败:`, err);
+                        const failImage = {
                             url: '', style, score: 0, ctr: '0',
-                            prompt: prompts[i],
-                            tag: getMainTag(i, state.imageCount),
-                            error: imgErr.message || '生成失败'
-                        });
+                            prompt, negative: '', tag: getMainTag(i, state.imageCount),
+                            error: err.message || '生成失败'
+                        };
+                        resultData.carouselImages.push(failImage);
+                        resultData.images.push(failImage);
+                        fillOneResult('carouselGrid', '副图', i, failImage, name);
                         failCount++;
                     }
-                    updateProgress(12 + (i + 1) / prompts.length * 30,
-                        `主副图 ${i + 1}/${prompts.length}（成功 ${successCount}，失败 ${failCount}）`);
+                    updateSkeletonProgress('carouselGrid', i + 1, i + 1, carouselCount);
+                    updateProgress(20 + (i + 1) / carouselCount * 30,
+                        `副图 ${i + 1}/${carouselCount}（成功 ${successCount}，失败 ${failCount}）`);
                 }
-
-                if (successCount === 0) {
-                    console.error('❌ 所有主副图生成失败');
-                    showToast(`❌ 所有主副图生成失败`);
-                } else if (failCount > 0) {
-                    showToast(`⚠️ ${failCount} 张主副图生成失败`);
-                }
+                document.getElementById('cnt-carousel').textContent = resultData.carouselImages.filter(i => i.url).length;
+                document.getElementById('cnt-images').textContent = resultData.images.filter(i => i.url).length;
             }
 
-            // ============ ② 宣传文案 ============
-            const fallbackData = generateFallbackData(name, category, features, style, platforms);
-            const copyVersions = fallbackData.copyVersions;
+            // ============ ③ 宣传文案 ============
+            if (wantCopy) {
+                updateProgress(55, `正在生成宣传文案...`);
+                const copyVersions = generateFallbackData(name, category, features, style, platforms).copyVersions;
+                resultData.copyVersions = copyVersions;
+                renderCopyList(copyVersions);
+                document.getElementById('cnt-copy').textContent = copyVersions.length;
+            }
 
-            // ============ ③ 详情页 ============
-            let detailImages = [];
-            if (state.selectedTypes.includes('detail')) {
+            // ============ ④ 详情页 ============
+            if (wantDetail) {
                 const detailRatio = '3:4';
-                updateProgress(45, `正在生成详情页（8 屏 · ${detailRatio}）...`);
-                let dSuccess = 0, dFail = 0;
+                const totalDetail = state.detailPrompts.length;
+                updateProgress(60, `正在生成详情页（${totalDetail} 屏 · ${detailRatio}）...`);
+                // 先渲染骨架
+                document.getElementById('detailPreview').innerHTML = state.detailPrompts.map((d, i) => `
+                    <div class="detail-screen failed" data-skeleton-idx="${i}">
+                        <div class="skeleton-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;">
+                            <div class="skeleton-spinner"></div>
+                            <div class="skeleton-text">第 ${d.step} 屏生成中...</div>
+                        </div>
+                        <span class="screen-label">第${d.step}屏</span>
+                    </div>
+                `).join('');
 
-                for (let i = 0; i < state.detailPrompts.length; i++) {
+                let dSuccess = 0, dFail = 0;
+                for (let i = 0; i < totalDetail; i++) {
                     const d = state.detailPrompts[i];
                     try {
-                        const res = await generateAgnesImage(d.prompt, '1K', detailRatio, refImages);   // ⭐ 改动
-                        detailImages.push({
-                            url: res.dataUrl || res.url,                                                // ⭐ 优先 base64
+                        const res = await generateAgnesImage(d.prompt, '1K', detailRatio, refImages);
+                        const item = {
+                            url: res.dataUrl || res.url,
                             remoteUrl: res.url,
                             step: d.step,
                             moduleName: d.moduleName,
-                            prompt: d.prompt
-                        });
+                            prompt: d.prompt,
+                            negative: ''
+                        };
+                        resultData.detailImages.push(item);
                         dSuccess++;
                     } catch (err) {
                         console.error(`❌ 详情页第 ${i+1} 屏失败:`, err);
-                        detailImages.push({ url: '', step: d.step, moduleName: d.moduleName, prompt: d.prompt, error: err.message });
+                        resultData.detailImages.push({
+                            url: '', step: d.step, moduleName: d.moduleName,
+                            prompt: d.prompt, negative: '', error: err.message
+                        });
                         dFail++;
                     }
-                    updateProgress(45 + (i + 1) / state.detailPrompts.length * 30,
-                        `详情页 ${i + 1}/${state.detailPrompts.length}（成功 ${dSuccess}，失败 ${dFail}）`);
+                    // 逐屏填充：用 renderDetailSplit 重绘已完成的
+                    renderDetailSplitProgress(resultData.detailImages, i + 1, totalDetail);
+                    updateProgress(60 + (i + 1) / totalDetail * 20,
+                        `详情页 ${i + 1}/${totalDetail}（成功 ${dSuccess}，失败 ${dFail}）`);
                 }
-
-                if (dSuccess === 0) console.warn('⚠️ 详情页所有图片生成失败，已保留 8 屏占位');
+                // 最终渲染完整详情页
+                renderDetailSplit(resultData.detailImages);
+                document.getElementById('cnt-detail').textContent = resultData.detailImages.filter(x => x.url).length > 0 ? '1' : '0';
             }
 
-            // ============ ④ 短视频 ============
-            let videoUrl = '';
-            if (state.selectedTypes.includes('video')) {
+            // ============ ⑤ 短视频 ============
+            if (wantVideo) {
                 const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
                 const isEN = videoConfigState.platform === 'TikTok Shop' || videoConfigState.platform === 'Temu';
                 let videoPrompt = '';
@@ -3595,7 +3820,6 @@
                     videoPrompt += `. Camera: slow push shot, slight natural handheld. Light: soft studio natural light, real color. `;
                     videoPrompt += `Category: ${VIDEO_CATEGORY_MODS[videoConfigState.category]}. `;
                     videoPrompt += `Scene: ${VIDEO_SCENE_MODS_EN[videoConfigState.scene] || ''}. `;
-                    videoPrompt += `Negative prompt: ${VIDEO_NEGATIVE_EN}`;
                 } else {
                     videoPrompt = `真实商业实拍短视频，4K，60fps，时长${cfg.duration}秒，电商带货短视频。`;
                     videoPrompt += state.videoPrompts.map((s, i) => `镜头${i+1}（${s.time} ${s.tag}）：${s.prompt}`).join('。');
@@ -3604,69 +3828,51 @@
                     videoPrompt += `画质：商业产品实拍，细节清晰，无过度磨皮，无塑料质感。`;
                     videoPrompt += `类目：${VIDEO_CATEGORY_MODS[videoConfigState.category]}。`;
                     videoPrompt += `出镜：${VIDEO_SCENE_MODS[videoConfigState.scene] || ''}。`;
-                    videoPrompt += `禁止：${VIDEO_NEGATIVE_CN}`;
                 }
                 if (videoAnalysis?.prompt) videoPrompt = videoAnalysis.prompt;
 
-                updateProgress(78, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
+                updateProgress(80, `正在生成视频（${videoRatio}，排队中，最长 10 分钟）...`);
                 try {
                     const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
-                    const videoRes = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, '720P', (attempt, total, status, text) => {   // ⭐ 改动
-                        const pct = 78 + Math.min(20, (attempt / total) * 20);
+                    const videoRes = await generateAgnesVideo(videoPrompt, String(cfg.duration), combinedRefs, videoRatio, '720P', (attempt, total, status, text) => {
+                        const pct = 80 + Math.min(18, (attempt / total) * 18);
                         updateProgress(pct, '视频：' + text);
                     });
-                    videoUrl = videoRes.dataUrl || videoRes.url;   // ⭐ 优先 base64
-                    state.videoRemoteUrl = videoRes.url;            // ⭐ 保留远程 URL 备用
-                    updateProgress(98, '视频生成完成');
+                    resultData.videoUrl = videoRes.dataUrl || videoRes.url;
+                    resultData.videoRemoteUrl = videoRes.url;
+                    document.getElementById('videoPreviewContainer').innerHTML = `<video src="${resultData.videoUrl}" controls preload="metadata"></video>`;
+                    document.getElementById('cnt-video').textContent = '1';
                 } catch (vidErr) {
                     console.error('❌ 视频生成失败:', vidErr);
-                    videoUrl = '';
-                    showToast('⚠️ 视频生成失败：' + vidErr.message);
+                    resultData.videoUrl = '';
+                    document.getElementById('videoPreviewContainer').innerHTML = `
+                        <i class="fas fa-exclamation-triangle placeholder-icon" style="color:#f59e0b;"></i>
+                        <div class="placeholder-text">视频生成失败</div>
+                        <div class="placeholder-sub">在右侧修改提示词后重新生成</div>
+                        <div class="placeholder-warn">${escapeHtml(vidErr.message)}</div>
+                    `;
                 }
             }
 
             updateProgress(100, '生成完成！');
+            hideGeneratingOverlay();
+            state.isGenerating = false;
+            saveGenSessionToBackend();
+            addHistory(name, state.selectedTypes, style, platforms);
 
-            setTimeout(() => {
-                hideGeneratingOverlay();
-                state.isGenerating = false;
-                const resultData = {
-                    images, copyVersions,
-                    detailImages,
-                    detailHTML: '',
-                    videoUrl,
-                    platforms, imageRatio, videoRatio, videoAnalysis,
-                    productName: name
-                };
-                state.generatedData = resultData;
-                renderResults(resultData, name);
-                saveGenSessionToBackend();
-                addHistory(name, state.selectedTypes, style, platforms);
-                const validCount = images.filter(i => i.url).length;
-                const dValid = detailImages.some(x => x.url);
-                if (state.selectedTypes.includes('images') || state.selectedTypes.includes('carousel')) {
-                    if (validCount === 0) showToast('❌ 图片生成失败，请检查后端服务');
-                    else if (validCount < images.length) showToast(`⚠️ 部分图片失败（${validCount}/${images.length}）`);
-                    else if (state.selectedTypes.includes('detail') && !dValid) showToast('⚠️ 详情页生成失败');
-                    else showToast('✅ 素材生成完成');
-                } else if (state.selectedTypes.includes('detail') && !dValid) {
-                    showToast('❌ 详情页生成失败');
-                } else if (!videoUrl && state.selectedTypes.includes('video')) {
-                    showToast('⚠️ 视频生成失败，可重试');
-                } else {
-                    showToast('✅ 素材生成完成');
-                }
-                goStep(2);
-            }, 500);
+            const validCount = resultData.images.filter(i => i.url).length;
+            const dValid = resultData.detailImages.some(x => x.url);
+            if ((wantMain || wantCarousel) && validCount === 0) showToast('❌ 图片生成失败，请检查后端服务');
+            else if (wantDetail && !dValid) showToast('⚠️ 详情页生成失败');
+            else if (wantVideo && !resultData.videoUrl) showToast('⚠️ 视频生成失败，可重试');
+            else showToast('✅ 素材生成完成');
 
         } catch (err) {
             console.error('❌ 生成失败:', err);
             updateProgress(100, '生成出错');
-            setTimeout(() => {
-                hideGeneratingOverlay();
-                state.isGenerating = false;
-                showToast('❌ 生成失败：' + err.message);
-            }, 500);
+            hideGeneratingOverlay();
+            state.isGenerating = false;
+            showToast('❌ 生成失败：' + err.message);
         }
     }
 
@@ -3681,40 +3887,78 @@
         return { copyVersions };
     }
 
+    // 详情页分步渲染
+    function renderDetailSplitProgress(detailImages, doneCount, total) {
+        const preview = document.getElementById('detailPreview');
+        if (!preview) return;
+        const html = [];
+        for (let i = 0; i < total; i++) {
+            if (i < doneCount && detailImages[i]) {
+                const x = detailImages[i];
+                if (x.url) {
+                    html.push(`<div class="detail-screen" data-idx="${i}">
+                        <img src="${x.url}" alt="第${x.step}屏" />
+                        <span class="screen-label">第${x.step}屏 · ${escapeHtml(x.moduleName || '')}</span>
+                    </div>`);
+                } else {
+                    html.push(`<div class="detail-screen failed" data-idx="${i}">
+                        <i class="fas fa-image"></i>
+                        <div class="f-title">第 ${x.step} 屏 · ${escapeHtml(x.moduleName || '')}</div>
+                        <div class="f-sub">生成失败</div>
+                        <span class="screen-label">第${x.step}屏</span>
+                    </div>`);
+                }
+            } else {
+                const tpl = state.detailPrompts[i] || { step: i + 1, moduleName: '' };
+                html.push(`<div class="detail-screen failed" data-skeleton-idx="${i}">
+                    <div class="skeleton-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;">
+                        <div class="skeleton-spinner"></div>
+                        <div class="skeleton-text">第 ${tpl.step} 屏生成中...</div>
+                    </div>
+                    <span class="screen-label">第${tpl.step}屏</span>
+                </div>`);
+            }
+        }
+        preview.innerHTML = html.join('');
+    }
+
     function renderResults(data, productName) {
-        document.getElementById('cnt-images').textContent = (data.images || []).filter(i => i.url).length > 0 ? '1' : '0';
-        document.getElementById('cnt-carousel').textContent = (data.images || []).filter(i => i.url).length;
+        // 数量统计
+        const mainImg = (data.images || [])[0];
+        const carouselImgs = (data.images || []).slice(1);
+        document.getElementById('cnt-images').textContent = (data.images || []).filter(i => i.url).length > 0 ? (data.images.filter(i => i.url).length) : '0';
+        document.getElementById('cnt-carousel').textContent = (data.images || []).length;
         document.getElementById('cnt-copy').textContent = (data.copyVersions || []).length;
         document.getElementById('cnt-detail').textContent = (data.detailImages || []).some(x => x.url) ? '1' : '0';
         document.getElementById('cnt-video').textContent = data.videoUrl ? '1' : '0';
 
-        if (state.selectedTypes.includes('images') && data.images && data.images.length > 0) {
-            renderImageGrid('imageGrid', data.images.slice(0, 1), productName, '主图');
-        } else {
+        // 主图
+        if (state.selectedTypes.includes('images') && mainImg) {
+            renderImageGrid('imageGrid', [mainImg], productName, '主图');
+        } else if (state.selectedTypes.includes('images')) {
             document.getElementById('imageGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-image"></i><p>未生成主图</p></div>`;
         }
-        if (state.selectedTypes.includes('carousel') && data.images && data.images.length > 0) {
-            renderImageGrid('carouselGrid', data.images, productName, '轮播图');
-        } else {
-            document.getElementById('carouselGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-images"></i><p>未生成轮播图</p></div>`;
+        // 副图
+        if (state.selectedTypes.includes('carousel') && (data.images || []).length > 0) {
+            renderImageGrid('carouselGrid', data.images, productName, '副图');
+        } else if (state.selectedTypes.includes('carousel')) {
+            document.getElementById('carouselGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-images"></i><p>未生成副图</p></div>`;
         }
+        // 文案
         if (state.selectedTypes.includes('copy') && data.copyVersions) {
             renderCopyList(data.copyVersions);
-        } else {
+        } else if (state.selectedTypes.includes('copy')) {
             document.getElementById('copyList').innerHTML = `<div class="empty-state"><i class="fas fa-pen-fancy"></i><p>未生成文案</p></div>`;
         }
-        // ★ 详情页：左右分栏 + 单屏编辑
+        // 详情页
         if (state.selectedTypes.includes('detail') && data.detailImages) {
             deCurrentIdx = 0;
             renderDetailSplit(data.detailImages);
         } else if (state.selectedTypes.includes('detail')) {
             document.getElementById('detailPreview').innerHTML = `<div class="empty-state" style="padding:40px;"><i class="fas fa-file-alt"></i><p>详情页未生成</p></div>`;
             document.getElementById('detailScreenNav').innerHTML = '';
-        } else {
-            document.getElementById('detailPreview').innerHTML = `<div class="empty-state" style="padding:40px;"><i class="fas fa-file-alt"></i><p>未选择生成详情页</p></div>`;
-            document.getElementById('detailScreenNav').innerHTML = '';
         }
-        // ★ 视频：左右分栏
+        // 视频
         const videoContainer = document.getElementById('videoPreviewContainer');
         if (state.selectedTypes.includes('video')) {
             if (data.videoUrl) {
@@ -3734,8 +3978,8 @@
                 <div class="placeholder-sub">请在第一步勾选"短视频"</div>
             `;
         }
-        // ★ 填充视频编辑面板
         fillVideoEditPanel();
+        updateResultTabsVisibility();
     }
 
     function renderImageGrid(gridId, images, productName, typeName) {
@@ -3773,7 +4017,7 @@
     }
 
     // ================================================================
-    // ★ 主副图编辑弹窗
+    // ★ 主副图编辑弹窗（含反提示词）
     // ================================================================
     let editImgIndex = -1;
 
@@ -3796,6 +4040,7 @@
         }
 
         document.getElementById('editImgPrompt').value = img.prompt || '';
+        document.getElementById('editImgNegative').value = img.negative || '';
         document.getElementById('editImgModal').classList.add('show');
         document.body.style.overflow = 'hidden';
     }
@@ -3812,6 +4057,7 @@
         if (!r || !r.images[editImgIndex]) return;
 
         const newPrompt = document.getElementById('editImgPrompt').value.trim();
+        const newNegative = document.getElementById('editImgNegative').value.trim();
         if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
 
         const btn = document.getElementById('editImgRegenBtn');
@@ -3822,27 +4068,20 @@
         const imageRatio = getImageRatioByPlatforms(platforms);
         const refImages = state.referenceImages.slice();
         const style = document.getElementById('designStyle').value;
+        const finalPrompt = buildPromptWithNegative(newPrompt, newNegative);
 
         try {
-            const res = await generateAgnesImage(newPrompt, '1K', imageRatio, refImages);
+            const res = await generateAgnesImage(finalPrompt, '1K', imageRatio, refImages);
             r.images[editImgIndex] = {
                 ...r.images[editImgIndex],
-                url: res.dataUrl || res.url,   // ⭐ 优先 base64
+                url: res.dataUrl || res.url,
                 remoteUrl: res.url,
                 prompt: newPrompt,
+                negative: newNegative,
                 error: null,
                 style
             };
-            const pName = r.productName || '商品';
-            if (state.selectedTypes.includes('images')) {
-                renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
-            }
-            if (state.selectedTypes.includes('carousel')) {
-                renderImageGrid('carouselGrid', r.images, pName, '轮播图');
-            }
-            document.getElementById('cnt-images').textContent = r.images.filter(i => i.url).length > 0 ? '1' : '0';
-            document.getElementById('cnt-carousel').textContent = r.images.filter(i => i.url).length;
-
+            refreshImageGrids();
             showToast(`✅ 第 ${editImgIndex + 1} 张已重新生成`);
             saveGenSessionToBackend();
             closeEditImgModal();
@@ -3855,10 +4094,6 @@
         }
     }
 
-    // ================================================================
-    // ★ 修复图片：以【当前这张图】为参考做局部修复
-    //   与 regenerateSingleImage（参考高级里的原始参考图）区分开
-    // ================================================================
     async function repairSingleImage() {
         if (editImgIndex < 0) return;
         const r = state.generatedData;
@@ -3868,6 +4103,7 @@
         if (!img.url) { showToast('⚠️ 当前图无有效 URL，无法修复'); return; }
 
         const newPrompt = document.getElementById('editImgPrompt').value.trim();
+        const newNegative = document.getElementById('editImgNegative').value.trim();
         if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
 
         const btn = document.getElementById('editImgRepairBtn');
@@ -3877,30 +4113,20 @@
         const platforms = getSelectedPlatforms();
         const imageRatio = getImageRatioByPlatforms(platforms);
         const style = document.getElementById('designStyle').value;
+        const finalPrompt = buildPromptWithNegative(newPrompt, newNegative);
 
         try {
-            // ★ 关键：参考源 = 当前这张图的 URL（不是 state.referenceImages）
-            const res = await generateAgnesImage(newPrompt, '1K', imageRatio, [img.remoteUrl || img.url]);
-
+            const res = await generateAgnesImage(finalPrompt, '1K', imageRatio, [img.remoteUrl || img.url]);
             r.images[editImgIndex] = {
                 ...r.images[editImgIndex],
-                url: res.dataUrl || res.url,   // ⭐ 优先 base64
+                url: res.dataUrl || res.url,
                 remoteUrl: res.url,
                 prompt: newPrompt,
+                negative: newNegative,
                 error: null,
                 style
             };
-
-            const pName = r.productName || '商品';
-            if (state.selectedTypes.includes('images')) {
-                renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
-            }
-            if (state.selectedTypes.includes('carousel')) {
-                renderImageGrid('carouselGrid', r.images, pName, '轮播图');
-            }
-            document.getElementById('cnt-images').textContent = r.images.filter(i => i.url).length > 0 ? '1' : '0';
-            document.getElementById('cnt-carousel').textContent = r.images.filter(i => i.url).length;
-
+            refreshImageGrids();
             showToast(`✅ 第 ${editImgIndex + 1} 张已修复`);
             saveGenSessionToBackend();
             closeEditImgModal();
@@ -3912,9 +4138,24 @@
             btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> 修复图片';
         }
     }
-    
+
+    function refreshImageGrids() {
+        const r = state.generatedData;
+        if (!r) return;
+        const pName = r.productName || '商品';
+        // 主图 = images[0]，副图 = images[1:]
+        if (state.selectedTypes.includes('images') && r.images[0]) {
+            renderImageGrid('imageGrid', [r.images[0]], pName, '主图');
+        }
+        if (state.selectedTypes.includes('carousel') && r.images.length > 0) {
+            renderImageGrid('carouselGrid', r.images, pName, '副图');
+        }
+        document.getElementById('cnt-images').textContent = r.images.filter(i => i.url).length;
+        document.getElementById('cnt-carousel').textContent = r.images.filter(i => i.url).length;
+    }
+
     // ================================================================
-    // ★ 详情页：左右分栏 + 单屏编辑
+    // 详情页：左右分栏 + 单屏编辑
     // ================================================================
     let deCurrentIdx = 0;
 
@@ -3988,6 +4229,7 @@
         }
 
         document.getElementById('dePrompt').value = d.prompt || '';
+        document.getElementById('deNegative').value = d.negative || '';
     }
 
     async function regenerateDetailScreen() {
@@ -3996,20 +4238,23 @@
         const d = r.detailImages[deCurrentIdx];
 
         const newPrompt = document.getElementById('dePrompt').value.trim();
+        const newNegative = document.getElementById('deNegative').value.trim();
         if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
 
         showToast(`⏳ 正在重新生成第 ${d.step} 屏...`);
         d.prompt = newPrompt;
+        d.negative = newNegative;
 
         const refImages = state.referenceImages.slice();
+        const finalPrompt = buildPromptWithNegative(newPrompt, newNegative);
 
         try {
-            const res = await generateAgnesImage(newPrompt, '1K', '3:4', refImages);
-            d.url = res.dataUrl || res.url;   // ⭐ 优先 base64
+            const res = await generateAgnesImage(finalPrompt, '1K', '3:4', refImages);
+            d.url = res.dataUrl || res.url;
             d.remoteUrl = res.url;
             d.error = null;
 
-                        renderDetailSplit(r.detailImages);
+            renderDetailSplit(r.detailImages);
             rebuildDetailHTML();
             saveGenSessionToBackend();
             document.getElementById('cnt-detail').textContent = '1';
@@ -4048,7 +4293,7 @@
     }
 
     // ================================================================
-    // ★ 视频：左右分栏 + 比例/画质/提示词编辑
+    // 视频：左右分栏 + 比例/画质/提示词编辑
     // ================================================================
     const videoEditState = {
         ratio: '9:16',
@@ -4098,6 +4343,7 @@
         if (!r) { showToast('⚠️ 请先生成素材'); return; }
 
         const newPrompt = document.getElementById('vePrompt').value.trim();
+        const newNegative = document.getElementById('veNegative').value.trim();
         if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
 
         const container = document.getElementById('videoPreviewContainer');
@@ -4113,17 +4359,20 @@
         const refImages = state.referenceImages.slice();
         const keyframeUrls = state.keyframeUrls || [];
         const combinedRefs = keyframeUrls.length > 0 ? keyframeUrls : refImages;
+        const finalPrompt = buildPromptWithNegative(newPrompt, newNegative);
 
         try {
             const videoRes = await generateAgnesVideo(
-                newPrompt,
+                finalPrompt,
                 seconds,
                 combinedRefs,
                 videoEditState.ratio,
                 videoEditState.quality
             );
-                        r.videoUrl = videoRes.dataUrl || videoRes.url;   // ⭐ 优先 base64
+            r.videoUrl = videoRes.dataUrl || videoRes.url;
             r.videoRemoteUrl = videoRes.url;
+            r.videoPrompt = newPrompt;
+            r.videoNegative = newNegative;
             saveGenSessionToBackend();
             document.getElementById('cnt-video').textContent = '1';
             container.innerHTML = `<video src="${r.videoUrl}" controls preload="metadata"></video>`;
@@ -4140,17 +4389,13 @@
         }
     }
 
-
-    // ================================================================
-    // ★ 修复视频：抽【当前视频】的帧，以帧为参考重新生成
-    //   与 regenerateVideo（参考高级里的参考视频关键帧）区分开
-    // ================================================================
     async function repairVideo() {
         const r = state.generatedData;
         if (!r) { showToast('⚠️ 请先生成素材'); return; }
         if (!r.videoUrl) { showToast('⚠️ 暂无视频可修复'); return; }
 
         const newPrompt = document.getElementById('vePrompt').value.trim();
+        const newNegative = document.getElementById('veNegative').value.trim();
         if (!newPrompt) { showToast('⚠️ 提示词不能为空'); return; }
 
         const container = document.getElementById('videoPreviewContainer');
@@ -4162,32 +4407,27 @@
         showToast('⏳ 正在抽取当前视频关键帧...');
 
         try {
-            // ① 下载当前视频 → 抽 3 帧（复用现有函数）
             const resp = await fetch(r.videoRemoteUrl || r.videoUrl);
             if (!resp.ok) throw new Error(`下载当前视频失败：HTTP ${resp.status}`);
             const blob = await resp.blob();
             const file = new File([blob], 'current_video.mp4', { type: blob.type || 'video/mp4' });
             const frames = await extractVideoKeyframes(file, KEYFRAME_COUNT);
             if (!frames || frames.length === 0) throw new Error('抽帧失败，未获取到有效帧');
-
-            // ② 上传关键帧到临时图床（复用现有函数）
             const frameUrls = await uploadKeyframesToTemp(frames);
             if (!frameUrls || frameUrls.length === 0) throw new Error('关键帧上传失败');
 
-            // ③ 用当前视频的帧当参考图，重新生成视频
             const cfg = VIDEO_PLATFORM_CONFIG[videoConfigState.platform];
             const seconds = String(cfg?.duration || 5);
-
             showToast('⏳ 正在基于当前视频修复（排队中，最长 10 分钟）...');
+            const finalPrompt = buildPromptWithNegative(newPrompt, newNegative);
             const videoRes = await generateAgnesVideo(
-                newPrompt,
+                finalPrompt,
                 seconds,
-                frameUrls,                 // ← 参考源 = 当前视频的帧
+                frameUrls,
                 videoEditState.ratio,
                 videoEditState.quality
             );
-
-                        r.videoUrl = videoRes.dataUrl || videoRes.url;   // ⭐ 优先 base64
+            r.videoUrl = videoRes.dataUrl || videoRes.url;
             r.videoRemoteUrl = videoRes.url;
             saveGenSessionToBackend();
             document.getElementById('cnt-video').textContent = '1';
@@ -4204,10 +4444,7 @@
             showToast('❌ 视频修复失败：' + err.message);
         }
     }
-    
-    // ================================================================
-    // 单张图片重试（快速）
-    // ================================================================
+
     async function retrySingleImage(idx) {
         const r = state.generatedData;
         if (!r || !r.images[idx]) { showToast('⚠️ 数据已丢失'); return; }
@@ -4219,26 +4456,14 @@
         showToast(`⏳ 正在重试第 ${idx + 1} 张...`);
         try {
             const res = await generateAgnesImage(r.images[idx].prompt, '1K', imageRatio, refImages);
-            r.images[idx] = { ...r.images[idx], url: res.dataUrl || res.url, remoteUrl: res.url, error: null };   // ⭐ 优先 base64
-            const pName = r.productName || '商品';
-            if (state.selectedTypes.includes('images')) {
-                renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
-            }
-            if (state.selectedTypes.includes('carousel')) {
-                renderImageGrid('carouselGrid', r.images, pName, '轮播图');
-            }
+            r.images[idx] = { ...r.images[idx], url: res.dataUrl || res.url, remoteUrl: res.url, error: null };
+            refreshImageGrids();
             showToast(`✅ 第 ${idx + 1} 张已重试成功`);
             saveGenSessionToBackend();
         } catch (err) {
             console.error(`❌ 重试失败:`, err);
             r.images[idx].error = err.message;
-            const pName = r.productName || '商品';
-            if (state.selectedTypes.includes('images')) {
-                renderImageGrid('imageGrid', r.images.slice(0, 1), pName, '主图');
-            }
-            if (state.selectedTypes.includes('carousel')) {
-                renderImageGrid('carouselGrid', r.images, pName, '轮播图');
-            }
+            refreshImageGrids();
             showToast(`❌ 重试失败：${err.message}`);
         }
     }
@@ -4295,7 +4520,7 @@
     // ================================================================
     // 同步相关
     // ================================================================
-        async function loadSyncProducts() {
+    async function loadSyncProducts() {
         const box = document.getElementById('syncProductList');
         box.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-3);"><i class="fas fa-spinner fa-spin"></i> 加载中...</div>';
         try {
@@ -4303,25 +4528,15 @@
             const data = await res.json();
             syncState.allProducts = data.products || [];
             syncState.filteredProducts = syncState.allProducts.slice();
-
-            // ★ 自动关联第 1 步已选商品
             autoSelectCurrentProduct();
-
             renderSyncProductList();
         } catch (e) {
             box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger);">加载失败：${escapeHtml(e.message)}</div>`;
         }
     }
 
-    // ================================================================
-    // ★ 自动选中第 1 步已确定的商品
-    //   优先级：generatedData.productName > state.currentProductName > 输入框
-    // ================================================================
     function autoSelectCurrentProduct() {
-        // 没商品列表，跳过
         if (!syncState.allProducts || syncState.allProducts.length === 0) return;
-
-        // 取出「目标商品名」
         let target = '';
         if (state.generatedData && state.generatedData.productName) {
             target = state.generatedData.productName.trim();
@@ -4334,24 +4549,15 @@
             if (input && input.value.trim()) target = input.value.trim();
         }
         if (!target) return;
-
-        // 精确匹配
         let matched = syncState.allProducts.find(p => p.name === target);
-        // 包含匹配（双向）
         if (!matched) {
             matched = syncState.allProducts.find(p =>
                 p.name.includes(target) || target.includes(p.name)
             );
         }
-        if (!matched) {
-            console.log('🔍 [自动选中] 未找到匹配商品:', target);
-            return;
-        }
-
-        // 加入已选列表（去重）
+        if (!matched) return;
         if (!syncState.selectedProducts.includes(matched.name)) {
             syncState.selectedProducts.push(matched.name);
-            console.log('✅ [自动选中] 已关联商品:', matched.name);
             showToast(`✅ 已自动关联「${matched.name}」`);
         }
     }
@@ -4500,18 +4706,18 @@
         const payload = { product_names: syncState.selectedProducts.slice(), mode: syncState.mode };
         if (wantMain) {
             const firstValid = (r.images || []).find(x => x.url);
-            if (firstValid) payload.main_image = firstValid.remoteUrl || firstValid.url;   // ⭐ 优先远程 URL（同步到商品库用）
+            if (firstValid) payload.main_image = firstValid.remoteUrl || firstValid.url;
         }
         if (wantSub) {
             const allValidIdx = (r.images || []).map((_, i) => i).filter(i => r.images[i].url);
             const idxs = syncState.selectedSubIndexes.length ? syncState.selectedSubIndexes.filter(i => r.images[i] && r.images[i].url) : allValidIdx;
-            payload.sub_images = idxs.map(i => r.images[i].remoteUrl || r.images[i].url).filter(Boolean);   // ⭐ 优先远程 URL
+            payload.sub_images = idxs.map(i => r.images[i].remoteUrl || r.images[i].url).filter(Boolean);
         }
         if (wantDetail && r.detailImages) {
             rebuildDetailHTML();
             payload.detail_html = r.detailHTML;
         }
-        if (wantVideo && r.videoUrl) payload.video = r.videoRemoteUrl || r.videoUrl;   // ⭐ 优先远程 URL
+        if (wantVideo && r.videoUrl) payload.video = r.videoRemoteUrl || r.videoUrl;
         if (!payload.main_image && !payload.sub_images && !payload.detail_html && !payload.video) {
             showToast('⚠️ 请至少勾选一种有效素材');
             return;
@@ -4574,7 +4780,7 @@
     function showGeneratingOverlay(types) {
         const overlay = document.getElementById('generatingOverlay');
         const steps = document.getElementById('generateSteps');
-        const typeNames = { images: '主图', carousel: '轮播图', copy: '宣传文案', detail: '详情页', video: '短视频' };
+        const typeNames = { images: '主图', carousel: '副图', copy: '宣传文案', detail: '详情页', video: '短视频' };
         steps.innerHTML = types.map(t => `
             <div class="step-item" data-step="${t}">
                 <span class="icon"><i class="far fa-circle"></i></span>
@@ -4585,10 +4791,13 @@
         updateProgress(5, '正在启动AI引擎...');
     }
     function updateProgress(pct, text) {
-        document.getElementById('generateProgress').style.width = pct + '%';
-        if (text) document.getElementById('generateStatus').textContent = text;
+        const p = document.getElementById('generateProgress');
+        if (p) p.style.width = pct + '%';
+        const s = document.getElementById('generateStatus');
+        if (text && s) s.textContent = text;
         const remaining = Math.max(0, Math.ceil((100 - pct) / 100 * 90));
-        document.getElementById('generateTime').textContent = remaining > 0 ? `预计剩余 ${remaining} 秒` : '即将完成...';
+        const t = document.getElementById('generateTime');
+        if (t) t.textContent = remaining > 0 ? `预计剩余 ${remaining} 秒` : '即将完成...';
         const types = state.selectedTypes;
         const stepIdx = Math.floor(pct / 100 * types.length);
         types.forEach((t, i) => {
@@ -4609,7 +4818,7 @@
     // 历史
     // ================================================================
     function addHistory(productName, types, style, platforms) {
-        const typeNames = { images: '主图', carousel: '轮播图', copy: '文案', detail: '详情', video: '视频' };
+        const typeNames = { images: '主图', carousel: '副图', copy: '文案', detail: '详情', video: '视频' };
         const entry = {
             id: 'h_' + Date.now(),
             product: productName,
@@ -4641,8 +4850,9 @@
             </div>
         `).join('');
     }
+
     // ================================================================
-    // ★ 方案 C：生成会话持久化（前端）
+    // 方案 C：生成会话持久化（前端）
     // ================================================================
     const GEN_SESSION_KEY = 'material_gen_session_id';
 
@@ -4669,15 +4879,14 @@
                 detail_prompts: state.detailPrompts.map(x => ({ ...x })),
                 video_prompts: state.videoPrompts.map(x => ({ ...x })),
                 images: (d.images || []).map(x => ({
-                    // ★ 会话保存只存远程 URL，避免 base64 体积过大
                     url: x.remoteUrl || (x.url && x.url.startsWith('data:') ? '' : x.url),
                     style: x.style, score: x.score, ctr: x.ctr,
-                    prompt: x.prompt, tag: x.tag, error: x.error
+                    prompt: x.prompt, negative: x.negative, tag: x.tag, error: x.error
                 })),
                 copy_versions: d.copyVersions || [],
                 detail_images: (d.detailImages || []).map(x => ({
                     url: x.remoteUrl || (x.url && x.url.startsWith('data:') ? '' : x.url),
-                    step: x.step, moduleName: x.moduleName, prompt: x.prompt, error: x.error
+                    step: x.step, moduleName: x.moduleName, prompt: x.prompt, negative: x.negative, error: x.error
                 })),
                 video_url: d.videoRemoteUrl || (d.videoUrl && d.videoUrl.startsWith('data:') ? '' : d.videoUrl) || '',
                 image_ratio: d.imageRatio || '1:1',
@@ -4718,6 +4927,8 @@
             const d = data.data || {};
             state.generatedData = {
                 images: d.images || [],
+                mainImage: (d.images || [])[0] || null,
+                carouselImages: (d.images || []).slice(1),
                 copyVersions: d.copy_versions || [],
                 detailImages: d.detail_images || [],
                 detailHTML: '',
@@ -4761,7 +4972,7 @@
         } catch (e) {}
         renderHistoryDrawer();
     }
-        function clearHistory() {
+    function clearHistory() {
         if (state.history.length === 0) { showToast('📭 暂无记录'); return; }
         if (!confirm('确定清空所有记录？（也会清空后端已保存的生成会话）')) return;
         state.history = [];
@@ -4790,25 +5001,23 @@
         state.detailPrompts = [];
         state.videoPrompts = [];
 
-                renderCarouselPrompts();
+        renderCarouselPrompts();
         renderDetailPrompts();
         updateTabCounts();
         updateCountHint();
-
         updatePromptTabsVisibility();
+        updateResultTabsVisibility();
         toggleSubPicker();
         loadHistory();
         updatePlatformToggleBtn();
         renderSyncRecords();
-
         initVideoConfig();
 
-        // ★ 方案 C：从后端恢复上次生成会话
+        // 从后端恢复上次生成会话
         (async () => {
             const restored = await loadGenSessionFromBackend();
             if (!restored) return;
 
-            // 重建 UI（提示词/张数/平台可能变了）
             renderCarouselPrompts();
             renderDetailPrompts();
             updateTabCounts();
@@ -4816,13 +5025,11 @@
             updatePromptTabsVisibility();
             initVideoConfig();
 
-            // 恢复商品名
             if (state.generatedData.productName) {
                 document.getElementById('productName').value = state.generatedData.productName;
                 state.currentProductName = state.generatedData.productName;
             }
 
-            // 有生成结果 → 直接渲染第 2 步
             const d = state.generatedData;
             const hasAny = (d.images && d.images.length)
                 || (d.copyVersions && d.copyVersions.length)
@@ -4831,6 +5038,7 @@
 
             if (hasAny) {
                 renderResults(d, d.productName || '商品');
+                updateResultTabsVisibility();
                 showToast('💾 已恢复上次生成结果');
                 setTimeout(() => goStep(2), 150);
             }
@@ -4845,9 +5053,8 @@
             }
         });
 
-        console.log('🎨 智能素材生成已就绪（主副图编辑弹窗 + 详情页左右分栏 + 视频左右分栏）');
+        console.log('🎨 智能素材生成已就绪（勾选制 + 骨架占位 + 逐张填充 + 反提示词）');
         console.log('💡 后端:', BACKEND_URL);
-        console.log('💾 base64 兜底已启用：生成后优先存 base64，会话保存只存远程 URL');
     });
 
     // 全局暴露
@@ -4905,7 +5112,6 @@
     window.copyFullPrompt = copyFullPrompt;
     window.renderVideoScript = renderVideoScript;
     window.retrySingleImage = retrySingleImage;
-    // ★ 新增暴露
     window.openEditImgModal = openEditImgModal;
     window.closeEditImgModal = closeEditImgModal;
     window.regenerateSingleImage = regenerateSingleImage;
@@ -4916,7 +5122,6 @@
     window.selectVideoQuality = selectVideoQuality;
     window.regenerateVideo = regenerateVideo;
     window.repairVideo = repairVideo;
-    // ★ 方案 C 暴露
     window.saveGenSessionToBackend = saveGenSessionToBackend;
     window.loadGenSessionFromBackend = loadGenSessionFromBackend;
     window.clearGenSessionOnBackend = clearGenSessionOnBackend;
