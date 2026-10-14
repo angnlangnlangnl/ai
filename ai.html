@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AI 助手</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../css/common.css">
-    <script src="../js/auth.js"></script>
-    <script>requireLogin();</script>
-
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; }
@@ -20,12 +16,269 @@
             flex-direction: column;
             overflow: hidden;
             overscroll-behavior: none;
+            height: 100dvh;
         }
 
+        /* ============================================================
+           登录遮罩层
+           ============================================================ */
+        .login-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #050912;
+            padding: 20px;
+            padding-top: calc(20px + env(safe-area-inset-top, 0px));
+            padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+            overflow: hidden;
+        }
+        .login-gate.hide {
+            display: none;
+        }
+        .login-gate::before {
+            content: '';
+            position: absolute;
+            width: 620px; height: 620px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(30,144,255,0.55) 0%, transparent 70%);
+            filter: blur(120px);
+            top: -220px; left: -180px;
+            animation: drift1 18s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .login-gate::after {
+            content: '';
+            position: absolute;
+            width: 540px; height: 540px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(106,92,255,0.5) 0%, transparent 70%);
+            filter: blur(120px);
+            bottom: -200px; right: -160px;
+            animation: drift2 22s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes drift1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50%      { transform: translate(80px, 60px) scale(1.15); }
+        }
+        @keyframes drift2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50%      { transform: translate(-70px, -50px) scale(1.2); }
+        }
+
+        .login-box {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 380px;
+            background: rgba(15, 25, 45, 0.72);
+            border-radius: 22px;
+            padding: 34px 30px 26px;
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(77, 171, 247, 0.2);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 80px rgba(77, 171, 247, 0.1);
+            color: #e6f1ff;
+            animation: loginIn 0.45s ease;
+        }
+        @keyframes loginIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .login-box .lg-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px; height: 56px;
+            margin: 0 auto 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(77,171,247,0.22), rgba(106,92,255,0.18));
+            border: 1px solid rgba(77,171,247,0.32);
+            box-shadow: 0 0 40px rgba(77,171,247,0.28);
+        }
+        .login-box .lg-logo i {
+            font-size: 24px;
+            color: #4dabf7;
+            filter: drop-shadow(0 0 8px rgba(77,171,247,0.8));
+        }
+        .login-box .lg-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        .login-box .lg-desc {
+            text-align: center;
+            font-size: 13px;
+            color: #7a9cc7;
+            margin-top: 4px;
+            margin-bottom: 24px;
+        }
+        .login-box .lg-group { margin-bottom: 16px; }
+        .login-box .lg-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #7a9cc7;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .login-box .lg-input {
+            position: relative;
+            border-radius: 12px;
+            background: rgba(5, 12, 25, 0.55);
+            border: 1px solid rgba(77, 171, 247, 0.16);
+            transition: 0.2s;
+        }
+        .login-box .lg-input:focus-within {
+            border-color: #4dabf7;
+            background: rgba(5, 12, 25, 0.85);
+            box-shadow: 0 0 0 4px rgba(77, 171, 247, 0.12), 0 0 30px rgba(77, 171, 247, 0.15);
+        }
+        .login-box .lg-input i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a6a8c;
+            font-size: 14px;
+            pointer-events: none;
+            transition: 0.2s;
+        }
+        .login-box .lg-input:focus-within i { color: #4dabf7; }
+        .login-box .lg-input input {
+            width: 100%;
+            padding: 14px 46px 14px 46px;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            color: #fff;
+            font-family: inherit;
+            letter-spacing: 0.02em;
+        }
+        .login-box .lg-input input::placeholder { color: #4a6a8c; }
+        .login-box .lg-input input:-webkit-autofill,
+        .login-box .lg-input input:-webkit-autofill:hover,
+        .login-box .lg-input input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #fff;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+        .login-box .lg-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a6a8c;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .login-box .lg-toggle:hover { color: #4dabf7; }
+
+        .login-box .lg-error {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(181, 26, 63, 0.14);
+            border: 1px solid rgba(181, 26, 63, 0.42);
+            color: #ff6b8a;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            animation: lgShake 0.35s;
+        }
+        .login-box .lg-error.show { display: flex; }
+        @keyframes lgShake {
+            0%, 100% { transform: translateX(0); }
+            25%      { transform: translateX(-6px); }
+            75%      { transform: translateX(6px); }
+        }
+
+        .login-box .lg-btn {
+            position: relative;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1e6fd9 0%, #4dabf7 50%, #00d4ff 100%);
+            background-size: 200% 200%;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(77, 171, 247, 0.3), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            font-family: inherit;
+        }
+        .login-box .lg-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.6s;
+        }
+        .login-box .lg-btn:hover::before { left: 100%; }
+        .login-box .lg-btn:hover {
+            background-position: 100% 0;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(77, 171, 247, 0.5), 0 0 0 1px rgba(255,255,255,0.15) inset;
+        }
+        .login-box .lg-btn:active { transform: translateY(0); }
+        .login-box .lg-btn:disabled {
+            background: #2a3a52;
+            cursor: not-allowed;
+            box-shadow: none;
+            color: #5a7fa8;
+        }
+        .login-box .lg-btn:disabled:hover { transform: none; }
+
+        .login-box .lg-foot {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(77, 171, 247, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #5a7fa8;
+        }
+        .login-box .lg-foot i { color: #0d7c4f; font-size: 11px; }
+
+        .login-box .spinner {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ============================================================
+           主界面（原有 UI 不变）
+           ============================================================ */
         .toolbar {
             background: #fff;
             border-bottom: 1px solid #e8edf4;
             padding: 10px 20px;
+            padding-top: calc(10px + env(safe-area-inset-top, 0px));
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -33,19 +286,13 @@
             flex-wrap: wrap;
             flex-shrink: 0;
         }
-        .toolbar .tb-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .toolbar .tb-left .status-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #0d7c4f;
-            animation: pulse 2s infinite;
-            flex-shrink: 0;
+        .toolbar .tb-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .toolbar .tb-left .app-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0a1e2f;
+            white-space: nowrap;
         }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-        .toolbar .tb-left .tb-text {
-            font-size: 13px; color: #5f7d95;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .toolbar .tb-left .tb-text strong { color: #0a1e2f; }
         .toolbar .tb-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .toolbar .tb-btn {
             padding: 6px 14px; border-radius: 20px;
@@ -54,12 +301,13 @@
             cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
             transition: 0.12s; text-decoration: none; white-space: nowrap;
             font-family: inherit;
+            min-height: 34px;
         }
         .toolbar .tb-btn:hover { border-color: #4dabf7; color: #2a7faa; background: #f5f9fe; }
         .toolbar .tb-btn i { color: #5f7d95; }
         .toolbar .tb-btn:hover i { color: #4dabf7; }
         .toolbar .menu-btn {
-            width: 34px; height: 34px; border-radius: 50%;
+            width: 36px; height: 36px; border-radius: 50%;
             border: 1px solid #dce5ef; background: #fff;
             color: #1e3a5f; font-size: 15px; cursor: pointer;
             display: none; align-items: center; justify-content: center;
@@ -163,17 +411,6 @@
         }
         .chat-main-header .info h4 { font-size: 15px; font-weight: 600; color: #0a1e2f; }
         .chat-main-header .info p { font-size: 12px; color: #5f7d95; margin-top: 2px; }
-        .chat-main-header .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .chat-main-header .actions .btn-sm {
-            padding: 5px 14px; border-radius: 20px;
-            border: 1px solid #dce5ef; background: #fff;
-            font-size: 12px; color: #1e3a5f; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 4px;
-            transition: 0.12s; font-family: inherit; white-space: nowrap;
-        }
-        .chat-main-header .actions .btn-sm:hover {
-            border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
-        }
 
         .messages {
             flex: 1; overflow-y: auto;
@@ -215,9 +452,7 @@
             border-radius: 4px; font-size: 13px;
             font-family: ui-monospace, monospace;
         }
-        .message .bubble ul, .message .bubble ol {
-            margin: 4px 0 6px 20px; padding: 0;
-        }
+        .message .bubble ul, .message .bubble ol { margin: 4px 0 6px 20px; padding: 0; }
         .message .bubble li { margin-bottom: 2px; }
         .message .bubble pre {
             background: #0a1e2f; color: #e2e8f0;
@@ -273,7 +508,7 @@
         .bubble .action-card .btn-group .btn-sm {
             padding: 8px 16px; border-radius: 20px; border: none;
             font-size: 12px; font-weight: 500; cursor: pointer;
-            transition: 0.1s; min-height: 32px;
+            transition: 0.1s; min-height: 34px;
             display: inline-flex; align-items: center; gap: 4px;
             font-family: inherit;
         }
@@ -360,6 +595,7 @@
             font-size: 12px; font-weight: 500; cursor: pointer;
             display: inline-flex; align-items: center; gap: 4px;
             transition: 0.1s; font-family: inherit;
+            min-height: 36px;
         }
         .bubble .no-match-card .nm-actions .btn-create { background: #0d7c4f; color: white; }
         .bubble .no-match-card .nm-actions .btn-cancel {
@@ -545,7 +781,7 @@
         }
         .ref-chip .chip-remove {
             position: absolute; top: -6px; right: -6px;
-            width: 20px; height: 20px; border-radius: 50%;
+            width: 22px; height: 22px; border-radius: 50%;
             background: #b51a3f; color: white; border: 2px solid white;
             font-size: 11px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
@@ -581,7 +817,7 @@
             display: flex; gap: 10px; align-items: flex-end;
         }
         .input-area .attach-btn {
-            width: 40px; height: 40px; border-radius: 50%;
+            width: 42px; height: 42px; border-radius: 50%;
             border: 1px solid #e8edf4; background: #fff;
             color: #5f7d95; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
@@ -607,6 +843,7 @@
             padding: 8px 0; font-size: 14px;
             font-family: inherit; resize: none; outline: none;
             max-height: 120px; color: #0a1e2f;
+            line-height: 1.5;
         }
         .input-area .input-wrap textarea::placeholder { color: #94a3b8; }
         .input-area .input-wrap .char-count {
@@ -614,11 +851,11 @@
             padding-left: 8px; flex-shrink: 0;
         }
         .input-area .send-btn {
-            width: 44px; height: 44px; border-radius: 50%;
+            width: 46px; height: 46px; border-radius: 50%;
             border: none; background: #0a1e2f; color: white;
             font-size: 18px; cursor: pointer; transition: 0.15s;
             flex-shrink: 0; display: flex; align-items: center;
-            justify-content: center; min-width: 44px;
+            justify-content: center; min-width: 46px;
         }
         .input-area .send-btn:hover:not(:disabled) {
             background: #1a3a5a; transform: scale(1.02);
@@ -626,17 +863,14 @@
         .input-area .send-btn:disabled {
             opacity: 0.4; cursor: not-allowed; transform: none;
         }
-        .input-hint {
-            text-align: center; font-size: 11px;
-            color: #94a3b8; margin-top: 6px; padding: 0 20px;
-        }
 
         .attach-menu {
-            position: absolute; bottom: 90px; left: 20px;
+            position: absolute; bottom: 96px; left: 20px;
             background: white; border: 1px solid #e8edf4;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(10,30,47,0.12);
             padding: 6px; display: none; z-index: 100; min-width: 260px;
+            max-width: calc(100vw - 40px);
         }
         .attach-menu.show { display: block; animation: fadeUpSmall 0.2s ease; }
         @keyframes fadeUpSmall {
@@ -650,6 +884,7 @@
             cursor: pointer; transition: 0.12s;
             font-family: inherit; background: none; border: none;
             width: 100%; text-align: left;
+            min-height: 42px;
         }
         .attach-menu .menu-item:hover { background: #f0f7fe; color: #2a7faa; }
         .attach-menu .menu-item i {
@@ -690,6 +925,7 @@
             border: 1px solid #dce5ef; font-size: 12px;
             color: #5f7d95; cursor: pointer; background: white;
             transition: 0.15s; font-family: inherit;
+            min-height: 36px;
         }
         .empty-state .examples .ex:hover {
             border-color: #4dabf7; color: #2a7faa; background: #f5f9fe;
@@ -724,7 +960,7 @@
         }
         .lightbox-close {
             position: absolute; top: -16px; right: -16px;
-            width: 36px; height: 36px; border-radius: 50%;
+            width: 38px; height: 38px; border-radius: 50%;
             background: white; color: #0a1e2f; border: none;
             font-size: 18px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
@@ -768,7 +1004,7 @@
         .create-product-modal .modal-box {
             background: white; border-radius: 16px;
             padding: 22px; max-width: 460px; width: 100%;
-            max-height: 90vh; overflow-y: auto;
+            max-height: 90dvh; overflow-y: auto;
             box-shadow: 0 24px 64px rgba(0,0,0,0.3);
             animation: slideUpModal 0.25s ease;
         }
@@ -787,7 +1023,7 @@
         }
         .create-product-modal .modal-header h3 i { color: #0d7c4f; }
         .create-product-modal .modal-header .close-btn {
-            width: 30px; height: 30px; border-radius: 50%;
+            width: 32px; height: 32px; border-radius: 50%;
             border: none; background: #f0f4f9; color: #5f7d95;
             cursor: pointer; font-size: 15px;
             display: flex; align-items: center; justify-content: center;
@@ -812,6 +1048,7 @@
             border: 1px solid #dce5ef; border-radius: 10px;
             font-size: 14px; background: #fafcfe;
             font-family: inherit; transition: 0.15s;
+            min-height: 44px;
         }
         .create-product-modal .form-group input:focus,
         .create-product-modal .form-group select:focus {
@@ -834,6 +1071,7 @@
             font-family: inherit;
             display: flex; align-items: center; justify-content: center;
             gap: 6px;
+            min-height: 48px;
         }
         .create-product-modal .modal-actions .btn-primary {
             background: #0d7c4f; color: white;
@@ -855,7 +1093,7 @@
             padding: 12px 28px; border-radius: 40px;
             font-size: 14px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 9999; white-space: nowrap; display: none;
+            z-index: 99999; white-space: nowrap; display: none;
             max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
         }
         .global-toast.show { display: block; animation: fadeUp 0.3s ease; }
@@ -895,7 +1133,7 @@
             color: #5f7d95;
         }
         .quote-bar .quote-close {
-            width: 20px; height: 20px;
+            width: 22px; height: 22px;
             border-radius: 50%; border: none;
             background: rgba(77,171,247,0.15);
             color: #2a7faa; cursor: pointer;
@@ -911,8 +1149,14 @@
             .sidebar-chat { width: 240px; }
         }
         @media (max-width: 768px) {
-            .toolbar { padding: 10px 14px; }
+            .toolbar {
+                padding: 8px 12px;
+                padding-top: calc(8px + env(safe-area-inset-top, 0px));
+                flex-wrap: nowrap;
+            }
             .toolbar .menu-btn { display: flex; }
+            .toolbar .tb-left { gap: 8px; }
+            .toolbar .tb-left .app-title { font-size: 14px; }
             .toolbar .tb-right .tb-btn span { display: none; }
             .toolbar .tb-right .tb-btn { padding: 6px 10px; }
 
@@ -927,13 +1171,10 @@
                 display: flex; align-items: center; justify-content: center;
             }
 
-            .chat-main-header { padding: 12px 14px; }
-            .chat-main-header .info h4 { font-size: 14px; }
-            .chat-main-header .info p { font-size: 11px; }
-            .chat-main-header .actions .btn-sm {
-                padding: 6px 10px; font-size: 11px;
+            .chat-main-header {
+                padding: 10px 12px;
+                display: none;
             }
-            .chat-main-header .actions .btn-sm span { display: none; }
 
             .messages { padding: 12px 12px 8px; gap: 10px; }
             .message { max-width: 92%; gap: 8px; }
@@ -942,8 +1183,7 @@
 
             .input-area { padding: 8px 12px 0; }
             .ref-chips { padding: 8px 12px 0; }
-            .input-hint { padding: 0 12px; }
-            .attach-menu { left: 12px; bottom: 80px; }
+            .attach-menu { left: 12px; bottom: 84px; }
             .quote-bar { padding: 8px 12px 0; }
 
             .empty-state { padding: 24px 16px; }
@@ -952,33 +1192,85 @@
             .empty-state p { font-size: 12px; }
 
             .create-product-modal .form-row { grid-template-columns: 1fr; }
+            .login-box { padding: 28px 22px 22px; }
         }
         @media (max-width: 480px) {
-            .toolbar .tb-left .tb-text { font-size: 12px; }
+            .toolbar .tb-left .app-title { font-size: 13px; }
             .message { max-width: 95%; }
             .message .bubble { font-size: 13px; padding: 9px 12px; }
             .input-area .input-wrap textarea { font-size: 16px; }
+            .input-area .attach-btn { width: 40px; height: 40px; }
+            .input-area .send-btn { width: 44px; height: 44px; min-width: 44px; }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            .toolbar { padding: 6px 12px; }
+            .messages { padding: 8px 12px 4px; gap: 6px; }
+            .message .bubble { font-size: 13px; padding: 8px 12px; }
+            .input-area { padding: 6px 12px 0; }
+            .input-area .send-btn { width: 40px; height: 40px; min-width: 40px; }
+            .login-box { padding: 20px 24px; }
+            .login-box .lg-logo { width: 44px; height: 44px; margin-bottom: 10px; }
+            .login-box .lg-logo i { font-size: 20px; }
+            .login-box .lg-title { font-size: 17px; }
+            .login-box .lg-desc { margin-bottom: 14px; }
         }
     </style>
 </head>
 <body>
 
+<!-- ============================================================
+     登录遮罩层
+     ============================================================ -->
+<div class="login-gate" id="loginGate">
+    <div class="login-box">
+        <div class="lg-logo"><i class="fas fa-bolt"></i></div>
+        <div class="lg-title">AI 经营助手</div>
+        <div class="lg-desc">请输入访问密码进入控制台</div>
+
+        <div class="lg-error" id="lgError">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="lgErrorText">密码错误</span>
+        </div>
+
+        <form id="lgForm" onsubmit="return handleGateLogin(event)">
+            <div class="lg-group">
+                <label>密码</label>
+                <div class="lg-input">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="lgPassword" placeholder="请输入密码"
+                           autocomplete="current-password" required>
+                    <span class="lg-toggle" onclick="toggleGatePwd(this)">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+            </div>
+
+            <button type="submit" class="lg-btn" id="lgBtn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>进 入 控 制 台</span>
+            </button>
+        </form>
+
+        <div class="lg-foot">
+            <i class="fas fa-shield-alt"></i>
+            数据加密 · 仅限授权访问
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     AI 助手主界面
+     ============================================================ -->
 <div class="toolbar">
     <div class="tb-left">
         <button class="menu-btn" onclick="toggleSidebar()" title="对话历史">
             <i class="fas fa-bars"></i>
         </button>
-        <span class="status-dot"></span>
-        <span class="tb-text">
-            在线 · 已接入 <strong>DeepSeek</strong> · AI 电商策略分析
-        </span>
+        <span class="app-title">AI 经营助手</span>
     </div>
     <div class="tb-right">
         <button class="tb-btn" onclick="clearMessages()" title="清空对话">
             <i class="fas fa-eraser"></i><span>清空</span>
-        </button>
-        <button class="tb-btn" onclick="exportChat()" title="导出对话">
-            <i class="fas fa-file-export"></i><span>导出</span>
         </button>
     </div>
 </div>
@@ -1009,14 +1301,6 @@
             <div class="info">
                 <h4 id="chatTitle">AI 经营助手</h4>
                 <p id="chatSubtitle">智能商品匹配 · AI 电商策略分析 · 图片/视频/海报生成</p>
-            </div>
-            <div class="actions">
-                <span class="btn-sm" onclick="clearMessages()">
-                    <i class="fas fa-eraser"></i> <span>清空</span>
-                </span>
-                <span class="btn-sm" onclick="exportChat()">
-                    <i class="fas fa-file-export"></i> <span>导出</span>
-                </span>
             </div>
         </div>
 
@@ -1051,7 +1335,7 @@
                 <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu(event)" title="添加参考素材">+</button>
                 <div class="input-wrap">
                     <textarea id="chatInput" rows="1"
-                        placeholder="试试：生成3张茶叶主图 / 生成母亲节海报 / 将图片替换到茶叶商品主图 / 分析图片并替换 / 替换到商品视频 / 再来一张 / 这是什么"
+                        placeholder="输入指令，或上传图片/视频"
                         onkeydown="handleKeyDown(event)"
                         oninput="autoResize(this)"></textarea>
                     <span class="char-count" id="charCount">0/500</span>
@@ -1059,9 +1343,6 @@
                 <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
                     <i class="fas fa-paper-plane"></i>
                 </button>
-            </div>
-            <div class="input-hint">
-                回车发送 · Shift+回车换行 · 上传图后发"这是什么"触发看图 · 上传视频后发"替换到商品视频"自动反解匹配 · 点消息"引用"可追问
             </div>
 
             <div class="attach-menu" id="attachMenu">
@@ -1170,19 +1451,126 @@
 
 <div class="global-toast" id="toast"></div>
 
-<script src="../js/common.js"></script>
 <script>
+    /* ================================================================
+       登录门禁：密码 654321
+       ================================================================ */
+    const GATE_PASSWORD = '654321';
+    const GATE_KEY = 'aicontrol_logged_in';
+
+    function isGatePassed() {
+        try { return sessionStorage.getItem(GATE_KEY) === '1'; } catch (e) { return false; }
+    }
+    function setGatePassed() {
+        try { sessionStorage.setItem(GATE_KEY, '1'); } catch (e) {}
+    }
+    function showGate() {
+        document.getElementById('loginGate').classList.remove('hide');
+        setTimeout(() => document.getElementById('lgPassword').focus(), 200);
+    }
+    function hideGate() {
+        document.getElementById('loginGate').classList.add('hide');
+    }
+    function toggleGatePwd(el) {
+        const input = document.getElementById('lgPassword');
+        const icon = el.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+    function handleGateLogin(e) {
+        e.preventDefault();
+        const pwd = document.getElementById('lgPassword').value;
+        const errBox = document.getElementById('lgError');
+        const errText = document.getElementById('lgErrorText');
+        const btn = document.getElementById('lgBtn');
+
+        if (!pwd) {
+            errText.textContent = '请输入密码';
+            errBox.classList.add('show');
+            return false;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> <span>验证中...</span>';
+
+        setTimeout(() => {
+            if (pwd === GATE_PASSWORD) {
+                errBox.classList.remove('show');
+                btn.innerHTML = '<i class="fas fa-check"></i> <span>登录成功</span>';
+                setGatePassed();
+                setTimeout(() => {
+                    hideGate();
+                    initMainUI();
+                }, 400);
+            } else {
+                errText.textContent = '密码错误';
+                errBox.classList.add('show');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>进 入 控 制 台</span>';
+                document.getElementById('lgPassword').select();
+            }
+        }, 500);
+        return false;
+    }
+
+    // 页面加载时决定显示登录层还是主界面
+    document.addEventListener('DOMContentLoaded', function () {
+        if (isGatePassed()) {
+            hideGate();
+            initMainUI();
+        } else {
+            showGate();
+        }
+    });
+
+    /* ================================================================
+       主界面初始化（只执行一次）
+       ================================================================ */
+    let _mainUIInited = false;
+    function initMainUI() {
+        if (_mainUIInited) return;
+        _mainUIInited = true;
+
+        loadHistoryFromStorage();
+        renderHistory();
+        updateSendBtn();
+        if (window.innerWidth > 768) {
+            document.getElementById('chatInput').focus();
+        }
+        document.getElementById('messageContainer').addEventListener('click', () => {
+            if (window.innerWidth > 768) {
+                document.getElementById('chatInput').focus();
+            }
+        });
+
+        loadReferenceFromSession();
+
+        const lastGen = loadLastGeneration();
+        if (lastGen) {
+            state.lastGeneratedMedia = lastGen;
+            console.log('🔄 已恢复上次生成结果:', lastGen);
+        }
+
+        renderQuoteBar();
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) closeSidebar();
+        });
+    }
+
     // ================================================================
     // 配置
     // ================================================================
     const BACKEND_URL = 'https://ai-ecommerce-backend-production-0776.up.railway.app';
     const STORAGE_KEY = 'ai_chat_history';
     const MAX_HISTORY = 50;
-
-    const AGNES_API_BASE = 'https://apihub.agnes-ai.com/v1';
-    const AGNES_IMAGE_MODEL = 'agnes-image-2.5-flash';
-    const AGNES_VIDEO_MODEL = 'agnes-video-2.5-flash';
-    const AGNES_API_KEY_DEFAULT = 'sk-XmLjN9e3Mhh8wf';
 
     const REF_IMAGE_MAX = 5;
     const REF_IMAGE_MAX_SIZE = 4 * 1024 * 1024;
@@ -1191,7 +1579,6 @@
     const KEYFRAME_COUNT = 3;
 
     const MATCH_EXACT_THRESHOLD = 0.95;
-    const MATCH_SEMANTIC_THRESHOLD = 0.5;
 
     const FESTIVAL_STYLE_WORDS = [
         '母亲节', '父亲节', '情人节', '女神节', '七夕', '中秋', '春节',
@@ -1275,9 +1662,6 @@
         remove(key) { try { localStorage.removeItem(key); return true; } catch (e) { return false; } }
     };
 
-    /* ============================================================
-       会话 ID & 会话级持久化
-       ============================================================ */
     function getOrCreateSessionId() {
         let sid = safeStorage.get('ai_session_id');
         if (!sid) {
@@ -1301,7 +1685,7 @@
                 .filter(x => x.dataUrl && x.dataUrl.length < 1.5 * 1024 * 1024)
                 .slice(0, 2);
             sessionStorage.setItem(REF_KEY, JSON.stringify(payload));
-        } catch (e) { /* ignore quota */ }
+        } catch (e) { }
     }
     function loadReferenceFromSession() {
         try {
@@ -1321,7 +1705,7 @@
                 renderReferenceChips();
                 showToast('🔄 已恢复上次的参考素材');
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) { }
     }
     function clearReferenceSession() {
         try { sessionStorage.removeItem(REF_KEY); } catch (e) {}
@@ -1355,10 +1739,6 @@
             if (Date.now() - (info.time || 0) > 24 * 3600 * 1000) return null;
             return info;
         } catch (e) { return null; }
-    }
-
-    function getAgnesApiKey() {
-        return AGNES_API_KEY_DEFAULT;
     }
 
     // ================================================================
@@ -2059,7 +2439,6 @@
         if (added > 0) showToast(`📤 已添加 ${added} 张参考图`);
         if (skipped > 0 && added === 0) showToast(`⚠️ 有 ${skipped} 个文件被跳过`);
         renderReferenceChips();
-        // ★ 不自动识别，等用户发消息触发
     }
 
     async function handleReferenceVideoUpload(files) {
@@ -2073,7 +2452,7 @@
             const videoEntry = {
                 id: 'ref_vid_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
                 file, name: file.name, previewUrl,
-                remoteUrl: ''   // ★ 新增：上传到服务器后的公网 URL
+                remoteUrl: ''
             };
             state.referenceMedia.videos.push(videoEntry);
             showToast('🎬 正在从视频抽帧...');
@@ -2089,7 +2468,6 @@
                 showToast(`⚠️ 抽帧失败：${err.message}`);
             }
 
-            // ★ 同步把视频上传到临时图床，拿公网 URL（用于后续替换商品视频）
             try {
                 showToast('📤 正在上传视频到服务器...');
                 const formData = new FormData();
@@ -2111,7 +2489,6 @@
             }
         }
         renderReferenceChips();
-        // ★ 不自动分析，等用户发消息触发
     }
 
     function renderReferenceChips() {
@@ -2217,10 +2594,16 @@
         });
 
         renderReferenceChips();
+
+        chatInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                chatInput.scrollIntoView({ block: 'end', behavior: 'smooth' });
+            }, 300);
+        });
     });
 
     // ================================================================
-    // ★ 自动识别图片内容（发消息触发）
+    // 以下为所有原有业务函数（保持完全不变）
     // ================================================================
     let _autoAnalyzeLock = false;
 
@@ -2292,9 +2675,6 @@
         }
     }
 
-    // ================================================================
-    // ★ 自动反解参考视频（发消息触发）
-    // ================================================================
     async function autoAnalyzeVideo(silent = false) {
         const keyframes = state.referenceMedia.keyframes || [];
         if (keyframes.length === 0) return null;
@@ -2346,9 +2726,6 @@
         }
     }
 
-    // ================================================================
-    // ★ 视频反解 + 自动匹配商品（一步到位，调后端新端点）
-    // ================================================================
     async function decomposeAndMatchVideo() {
         const keyframes = state.referenceMedia.keyframes || [];
         if (keyframes.length === 0) return null;
@@ -2378,9 +2755,6 @@
         }
     }
 
-    // ================================================================
-    // ★ 上传参考图到临时图床
-    // ================================================================
     async function uploadRefImagesToTemp() {
         if (state.referenceMedia.images.length === 0) return [];
         const formData = new FormData();
@@ -2401,9 +2775,6 @@
         return (data.results || []).filter(r => r.success).map(r => sanitizeImageUrl(r.url));
     }
 
-    // ================================================================
-    // ★ 手动触发：AI 识别图片内容
-    // ================================================================
     async function analyzeImageContent() {
         document.getElementById('attachMenu').classList.remove('show');
         if (state.referenceMedia.images.length === 0) {
@@ -2418,9 +2789,6 @@
         updateSendBtn();
     }
 
-    // ================================================================
-    // ★ 一键识别 + 自动匹配商品 + 替换（全链路）
-    // ================================================================
     async function autoReplaceFromImages() {
         document.getElementById('attachMenu').classList.remove('show');
         if (state.referenceMedia.images.length === 0) {
@@ -2514,9 +2882,6 @@
         }
     }
 
-    // ================================================================
-    // 临时图床
-    // ================================================================
     async function uploadKeyframesToTemp(keyframes) {
         if (!keyframes || keyframes.length === 0) return [];
         const formData = new FormData();
@@ -2543,9 +2908,6 @@
         return data.analysis;
     }
 
-    // ================================================================
-    // AI 意图解析
-    // ================================================================
     async function callAiParseGeneration(text, refSnapshot) {
         const products = await fetchProducts();
         const availableNames = (products || []).map(p => p.name);
@@ -2573,9 +2935,6 @@
         }
     }
 
-    // ================================================================
-    // 意图类型判定
-    // ================================================================
     function detectIntentType(text) {
         const t = text.trim();
         const boundMatch = t.match(/[给为帮]([^\s，,。]{2,20}?)(?:生成|做|画|出|来|弄|制作|设计)/);
@@ -2629,9 +2988,6 @@
         return Array.from(candidates);
     }
 
-    // ================================================================
-    // ★ 素材同步/替换意图识别
-    // ================================================================
     function parseMediaSyncIntent(text) {
         const t = (text || '').trim();
         if (!t) return null;
@@ -2693,9 +3049,6 @@
         };
     }
 
-    // ================================================================
-    // ★ 识别"看图/分析图"意图
-    // ================================================================
     function parseImageAnalysisIntent(text) {
         const t = (text || '').trim();
         if (!t) return null;
@@ -2724,9 +3077,6 @@
         };
     }
 
-    // ================================================================
-    // ★ 处理"看图/分析图"意图
-    // ================================================================
     async function handleImageAnalysisIntent(intent) {
         if (intent.hasKeyframes && !intent.hasImages) {
             state._lastAnalyzedVideoSig = null;
@@ -2750,15 +3100,10 @@
         });
     }
 
-    // ================================================================
-    // ★ 处理"素材同步"意图
-    // ★ 无商品名时：优先图片识别 → 其次调 /api/video/decompose-and-match 反解视频
-    // ================================================================
     async function handleMediaSyncIntent(intent) {
         const { targetType, targetLabel, productHint } = intent;
 
         let imageUrls = state.referenceMedia.images.map(x => x.dataUrl).filter(Boolean);
-        // ★ 视频优先用 remoteUrl（公网 URL），没有再退到本地 previewUrl
         let videoUrl = '';
         let videoIsRemote = false;
         if (state.referenceMedia.videos.length > 0) {
@@ -2808,7 +3153,6 @@
         if (imageUrls.length > 0) materialSummary.push(`${imageUrls.length} 张图`);
         if (videoUrl) materialSummary.push(`1 个视频`);
 
-        // ★ 无商品名分支：优先图片识别，其次视频反解匹配
         if (!productHint) {
             appendMessage({
                 role: 'ai',
@@ -2818,7 +3162,6 @@
 
             let recognizedKeyword = '';
 
-            // ① 优先用图片识别
             if (imageUrls.length > 0) {
                 let recognized = null;
                 try {
@@ -2831,7 +3174,6 @@
                 }
             }
 
-            // ② 图片识别不出来 → 用视频反解并匹配（调后端一步到位端点）
             if (!recognizedKeyword && state.referenceMedia.keyframes.length > 0) {
                 let dmResult = null;
                 try {
@@ -2840,7 +3182,6 @@
                     console.warn('视频反解匹配失败:', e);
                 }
                 if (dmResult && dmResult.success) {
-                    // 后端直接返回了匹配好的商品
                     if (dmResult.has_match && dmResult.matched && dmResult.matched.length > 0) {
                         showSyncMatchCard(
                             dmResult.keyword || '视频内容',
@@ -2855,7 +3196,6 @@
                         recognizedKeyword = dmResult.keyword || '';
                     }
                 } else if (dmResult && dmResult.analysis) {
-                    // 反解成功但没匹配上
                     const content = (dmResult.analysis.content || dmResult.analysis.prompt || '');
                     recognizedKeyword = extractKeywordFromRecognition(content);
                 }
@@ -2904,7 +3244,6 @@
             return;
         }
 
-        // 有明确商品名，走原逻辑
         appendMessage({
             role: 'ai',
             text: `📦 检测到素材：${materialSummary.join(' + ')}\n🎯 目标槽位：${targetLabel}\n🔍 正在查找商品「${productHint}」...`,
@@ -2938,9 +3277,6 @@
         }
     }
 
-    // ================================================================
-    // ★ 从 AI 识别文本中提取商品关键词
-    // ================================================================
     function extractKeywordFromRecognition(text) {
         if (!text) return '';
         let s = String(text).trim();
@@ -2957,9 +3293,6 @@
         return firstPart.slice(0, 20);
     }
 
-    // ================================================================
-    // ★ 同步确认卡片
-    // ================================================================
     function showSyncConfirmCard(product, intent, imageUrls, videoUrl, posterUrl, matchDesc) {
         const { targetType, targetLabel } = intent;
         const actionId = 'sync_card_' + Date.now();
@@ -2996,9 +3329,6 @@
         });
     }
 
-    // ================================================================
-    // ★ 候选商品选择卡片
-    // ================================================================
     function showSyncMatchCard(keyword, matched, intent, imageUrls, videoUrl, posterUrl) {
         state.pendingApplyContext = {
             theme: keyword,
@@ -3022,11 +3352,7 @@
         });
     }
 
-    // ================================================================
-    // ★ 执行素材同步
-    // ================================================================
     async function executeMediaSync(productName, targetType, imageUrls, videoUrl, posterUrl) {
-        // ★ 视频优先使用 remoteUrl
         if (targetType === 'video') {
             const videoEntry = state.referenceMedia.videos[0];
             if (videoEntry && videoEntry.remoteUrl) {
@@ -3111,9 +3437,6 @@
         }
     }
 
-    // ================================================================
-    // 商品校验 / 匹配
-    // ================================================================
     async function fetchProducts(force = false) {
         const now = Date.now();
         if (!force && state.productsCache && (now - state.productsCacheTime) < 30000) {
@@ -3231,9 +3554,6 @@
         return parts.join('。');
     }
 
-    // ================================================================
-    // 卡片构造
-    // ================================================================
     function buildCard(data) {
         const t = data.type;
         const a = data.args;
@@ -3287,9 +3607,6 @@
         return map[t] ? map[t]() : { title: '操作预览', desc: JSON.stringify(a) };
     }
 
-    // ================================================================
-    // 意图识别（正则降级）
-    // ================================================================
     function parseGenerationIntent(text) {
         const t = text.trim();
 
@@ -3404,9 +3721,6 @@
         return null;
     }
 
-    // ================================================================
-    // Agnes 图片/视频生成（走后端代理）
-    // ================================================================
     async function generateAgnesImage(prompt, sizeTier = '1K', ratio = '1:1', referenceImages = []) {
         const body = {
             prompt, size: sizeTier, ratio,
@@ -3459,9 +3773,6 @@
         throw new Error(data.message || '视频生成失败');
     }
 
-    // ================================================================
-    // 智能生成处理
-    // ================================================================
     async function handleSmartGenerationIntent(intent, originalText, refSnapshot, candidateNames) {
         const matches = await matchProductsFromBackend(candidateNames, intent.kind || 'images');
         const topMatch = matches[0];
@@ -3603,9 +3914,6 @@
         rememberLastGeneration({ kind: 'video', theme, product_name: theme, videoUrl });
     }
 
-    // ================================================================
-    // 自由生成（含 AI 电商策略分析）
-    // ================================================================
     async function generateWithoutProduct(intent, originalText, refSnapshot) {
         const aiResult = await callAiParseGeneration(originalText, refSnapshot);
         const kind = aiResult.kind || intent.kind || 'images';
@@ -3806,9 +4114,6 @@
         rememberLastGeneration({ kind: 'poster', theme, product_name: '', posterType, posterUrl });
     }
 
-    // ================================================================
-    // 绑定商品的生成
-    // ================================================================
     async function handleGenerationIntent(intent, originalText, refSnapshot) {
         let { kind, count, productName, seconds, extraDesc, category } = intent;
         const intentType = detectIntentType(originalText);
@@ -3992,9 +4297,6 @@
         });
     }
 
-    // ================================================================
-    // 智能应用到商品
-    // ================================================================
     async function startSmartApply(context) {
         const theme = context.theme || '';
         const keyword = theme.trim();
@@ -4091,9 +4393,6 @@
         appendMessage({ role: 'ai', text: '好的，已取消应用。素材已保存，稍后可再次使用。', time: nowTime() });
     };
 
-    // ================================================================
-    // 创建新商品弹窗
-    // ================================================================
     function openCreateProductModal() {
         const context = state.pendingApplyContext;
         if (!context) { showToast('⚠️ 素材上下文已丢失，请重新操作'); return; }
@@ -4188,9 +4487,6 @@
         }
     }
 
-    // ================================================================
-    // 发送消息
-    // ================================================================
     async function sendMessage() {
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
@@ -4236,7 +4532,6 @@
         state.isProcessing = true;
         document.getElementById('sendBtn').disabled = true;
 
-        // ★★★ 优先判断"素材同步/替换"意图
         const syncIntent = parseMediaSyncIntent(text);
         if (syncIntent) {
             document.getElementById('typingIndicator').classList.remove('show');
@@ -4250,7 +4545,6 @@
             return;
         }
 
-        // ★★★ 优先判断"看图/分析图"意图
         const analysisIntent = parseImageAnalysisIntent(text);
         if (analysisIntent) {
             document.getElementById('typingIndicator').classList.remove('show');
@@ -4401,9 +4695,6 @@
         updateSendBtn();
     }
 
-    // ================================================================
-    // 确认动作
-    // ================================================================
     async function confirmAction(actionId) {
         const action = state.pendingActions[actionId];
         if (!action) { showToast('⚠️ 该操作已失效或已执行'); return; }
@@ -4777,34 +5068,6 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        loadHistoryFromStorage();
-        renderHistory();
-        updateSendBtn();
-        if (window.innerWidth > 768) {
-            document.getElementById('chatInput').focus();
-        }
-        document.getElementById('messageContainer').addEventListener('click', () => {
-            if (window.innerWidth > 768) {
-                document.getElementById('chatInput').focus();
-            }
-        });
-
-        loadReferenceFromSession();
-
-        const lastGen = loadLastGeneration();
-        if (lastGen) {
-            state.lastGeneratedMedia = lastGen;
-            console.log('🔄 已恢复上次生成结果:', lastGen);
-        }
-
-        renderQuoteBar();
-    });
-
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) closeSidebar();
-    });
-
     window.toggleSidebar = toggleSidebar;
     window.closeSidebar = closeSidebar;
     window.newChat = newChat;
@@ -4835,10 +5098,9 @@
     window.cancelQuote = cancelQuote;
     window.analyzeImageContent = analyzeImageContent;
     window.autoReplaceFromImages = autoReplaceFromImages;
+    window.toggleGatePwd = toggleGatePwd;
 
-    console.log('🤖 AI 助手已加载（发消息触发看图/视频反解 + 视频先上传服务器再替换）');
-    console.log('💡 后端:', BACKEND_URL);
-    console.log('🆔 Session:', SESSION_ID);
+    console.log('🤖 AI 助手已加载（内嵌登录门禁，密码 654321）');
 </script>
 </body>
 </html>
