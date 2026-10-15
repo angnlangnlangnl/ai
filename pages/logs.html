@@ -1,1 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智控电商 · 操作日志</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #0a1a2b;
+            min-height: 100vh;
+        }
+        .header {
+            background: white;
+            padding: 16px 32px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .header .logo i {
+            color: #4dabf7;
+            font-size: 26px;
+            background: rgba(77,171,247,0.12);
+            padding: 6px;
+            border-radius: 10px;
+        }
+        .header .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+        .header .nav-links a {
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            background: white;
+            font-size: 13px;
+            color: #1e3a5f;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.15s;
+        }
+        .header .nav-links a:hover {
+            border-color: #4dabf7;
+            color: #2a7faa;
+        }
+        .header .nav-links a.active {
+            background: #0a1e2f;
+            border-color: #0a1e2f;
+            color: white;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .page-title h1 {
+            font-size: 22px;
+            color: #0a1e2f;
+        }
+        .page-title .stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #5f7d95;
+        }
+        .page-title .stats .stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .page-title .stats .stat .num {
+            font-weight: 700;
+            color: #0a1e2f;
+            font-size: 16px;
+        }
+        .page-title .refresh-btn {
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid #dce5ef;
+            background: white;
+            font-size: 13px;
+            color: #1e3a5f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.15s;
+        }
+        .page-title .refresh-btn:hover { border-color: #4dabf7; color: #2a7faa; }
 
+        /* 筛选栏 */
+        .filter-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .filter-bar .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .filter-bar .filter-item label {
+            font-size: 13px;
+            color: #5f7d95;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .filter-bar .filter-item select,
+        .filter-bar .filter-item input {
+            padding: 6px 12px;
+            border: 1px solid #dce5ef;
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            color: #0a1e2f;
+            outline: none;
+            transition: 0.15s;
+        }
+        .filter-bar .filter-item select:focus,
+        .filter-bar .filter-item input:focus {
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77,171,247,0.08);
+        }
+        .filter-bar .filter-item input { width: 200px; }
+
+        /* 日志列表 */
+        .logs-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f4f9;
+            transition: 0.15s;
+        }
+        .log-item:last-child { border-bottom: none; }
+        .log-item:hover { background: #fafcfe; }
+        .log-item .log-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .log-item .log-icon.success { background: linear-gradient(135deg, #0d7c4f, #0e9a5a); }
+        .log-item .log-icon.fail { background: linear-gradient(135deg, #b51a3f, #d43a5c); }
+        .log-item .log-content { flex: 1; min-width: 0; }
+        .log-item .log-content .log-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+        .log-item .log-content .log-header .log-type {
+            font-weight: 600;
+            font-size: 14px;
+            color: #0a1e2f;
+        }
+        .log-item .log-content .log-header .log-status {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .log-item .log-content .log-header .log-status.success {
+            background: #e6f7ec;
+            color: #0d7c4f;
+        }
+        .log-item .log-content .log-header .log-status.fail {
+            background: #fde8ed;
+            color: #b51a3f;
+        }
+        .log-item .log-content .log-header .log-time {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-left: auto;
+        }
+        .log-item .log-content .log-result {
+            font-size: 13px;
+            color: #5f7d95;
+            line-height: 1.6;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+        .log-item .log-content .log-args {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #f8fafc;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            color: #dce5ef;
+        }
+
+        .auto-refresh-tip {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10,30,47,0.85);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(8px);
+            z-index: 200;
+        }
+        .auto-refresh-tip i { color: #4dabf7; font-size: 12px; }
+
+        @media (max-width: 768px) {
+            .header { padding: 12px 16px; }
+            .container { padding: 16px; }
+            .filter-bar { padding: 10px 14px; }
+            .log-item { padding: 12px 16px; }
+            .log-item .log-content .log-header .log-time { margin-left: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="logo">
+        <i class="fas fa-bolt"></i>
+        智控电商 · 操作日志
+    </div>
+    <div class="nav-links">
+        <a href="products.html"><i class="fas fa-box"></i> 商品展示</a>
+        <a href="ai_assistant.html"><i class="fas fa-robot"></i> AI 助手</a>
+        <a href="logs.html" class="active"><i class="fas fa-history"></i> 操作日志</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="page-title">
+        <h1>操作日志</h1>
+        <div class="stats" id="stats">
+            <div class="stat"><i class="fas fa-list"></i> 共 <span class="num" id="totalCount">0</span> 条</div>
+            <div class="stat"><i class="fas fa-check-circle" style="color:#0d7c4f;"></i> 成功 <span class="num" id="successCount">0</span></div>
+            <div class="stat"><i class="fas fa-times-circle" style="color:#b51a3f;"></i> 失败 <span class="num" id="failCount">0</span></div>
+        </div>
+        <button class="refresh-btn" onclick="loadLogs()">
+            <i class="fas fa-sync-alt"></i> 刷新
+        </button>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-item">
+            <label><i class="fas fa-filter"></i> 状态</label>
+            <select id="filterStatus" onchange="applyFilter()">
+                <option value="all">全部</option>
+                <option value="success">仅成功</option>
+                <option value="fail">仅失败</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <label><i class="fas fa-tag"></i> 类型</label>
+            <select id="filterType" onchange="applyFilter()">
+                <option value="all">全部类型</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <label><i class="fas fa-search"></i> 关键词</label>
+            <input type="text" id="filterKeyword" placeholder="搜索操作内容..." oninput="applyFilter()">
+        </div>
+    </div>
+
+    <div class="logs-container" id="logsContainer">
+        <div class="empty-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>加载中...</p>
+        </div>
+    </div>
+</div>
+
+<div class="auto-refresh-tip">
+    <i class="fas fa-circle-notch fa-spin"></i>
+    <span>每 10 秒自动刷新</span>
+</div>
+
+<script>
+    const BACKEND_URL = 'https://ai-ecommerce-backend-production-0776.up.railway.app';
+
+    let allLogs = [];
+
+    // 操作类型图标映射
+    const typeIcons = {
+        "update_price": "fa-dollar-sign",
+        "update_stock": "fa-cubes",
+        "query_low_stock": "fa-search",
+        "publish_to_platforms": "fa-rocket",
+        "update_title": "fa-edit",
+        "take_off_shelf": "fa-arrow-down",
+        "put_on_shelf": "fa-arrow-up",
+        "query_sales": "fa-chart-line",
+        "create_coupon": "fa-ticket-alt",
+        "batch_take_off": "fa-arrow-down",
+        "batch_update_price": "fa-chart-line",
+        "query_by_price_range": "fa-search-dollar",
+        "batch_take_off_zero_stock": "fa-broom",
+        "batch_markup_all": "fa-percentage",
+        "query_sort_by_sales": "fa-sort-amount-down",
+        "add_product": "fa-plus-circle",
+        "delete_product": "fa-trash",
+        "batch_update_stock": "fa-cubes",
+        "query_by_platform": "fa-store",
+        "query_by_status": "fa-info-circle",
+        "batch_put_on_shelf": "fa-arrow-up",
+        "duplicate_product": "fa-copy",
+        "query_by_category": "fa-tags",
+        "export_products": "fa-download",
+        "search_product": "fa-search",
+        "batch_delete_by_category": "fa-trash-alt",
+        "query_restock_alert": "fa-exclamation-triangle",
+        "export_to_excel": "fa-file-csv",
+    };
+
+    async function loadLogs() {
+        const container = document.getElementById('logsContainer');
+        try {
+            const res = await fetch(BACKEND_URL + '/api/logs');
+            const data = await res.json();
+            allLogs = data.logs || [];
+
+            // 更新统计
+            document.getElementById('totalCount').textContent = allLogs.length;
+            document.getElementById('successCount').textContent = allLogs.filter(l => l.success).length;
+            document.getElementById('failCount').textContent = allLogs.filter(l => !l.success).length;
+
+            // 更新类型下拉
+            const typeSelect = document.getElementById('filterType');
+            const currentVal = typeSelect.value;
+            const types = [...new Set(allLogs.map(l => l.type))];
+            typeSelect.innerHTML = '<option value="all">全部类型</option>' +
+                types.map(t => `<option value="${t}">${allLogs.find(l => l.type === t).type_name || t}</option>`).join('');
+            typeSelect.value = currentVal;
+
+            applyFilter();
+        } catch (err) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>加载失败：${err.message}</p></div>`;
+        }
+    }
+
+    function applyFilter() {
+        const status = document.getElementById('filterStatus').value;
+        const type = document.getElementById('filterType').value;
+        const keyword = document.getElementById('filterKeyword').value.toLowerCase().trim();
+
+        let filtered = allLogs;
+        if (status === 'success') filtered = filtered.filter(l => l.success);
+        if (status === 'fail') filtered = filtered.filter(l => !l.success);
+        if (type !== 'all') filtered = filtered.filter(l => l.type === type);
+        if (keyword) {
+            filtered = filtered.filter(l =>
+                l.result.toLowerCase().includes(keyword) ||
+                l.type_name.toLowerCase().includes(keyword) ||
+                JSON.stringify(l.args).toLowerCase().includes(keyword)
+            );
+        }
+
+        renderLogs(filtered);
+    }
+
+    function renderLogs(logs) {
+        const container = document.getElementById('logsContainer');
+        if (logs.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>暂无匹配的日志记录</p></div>';
+            return;
+        }
+        container.innerHTML = logs.map(log => {
+            const icon = typeIcons[log.type] || 'fa-circle';
+            const statusClass = log.success ? 'success' : 'fail';
+            const statusText = log.success ? '成功' : '失败';
+            const argsStr = JSON.stringify(log.args);
+            return `
+                <div class="log-item">
+                    <div class="log-icon ${statusClass}">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="log-content">
+                        <div class="log-header">
+                            <span class="log-type">${log.type_name}</span>
+                            <span class="log-status ${statusClass}">${statusText}</span>
+                            <span class="log-time"><i class="far fa-clock"></i> ${log.time}</span>
+                        </div>
+                        <div class="log-result">${log.result}</div>
+                        <div class="log-args" title="${argsStr}">${argsStr}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 首次加载
+    loadLogs();
+
+    // 每 10 秒自动刷新
+    setInterval(loadLogs, 10000);
+
+    console.log('📋 操作日志页已加载，每 10 秒自动刷新');
+</script>
+</body>
+</html>
